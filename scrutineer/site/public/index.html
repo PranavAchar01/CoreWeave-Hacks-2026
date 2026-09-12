@@ -6561,6 +6561,9 @@ const ROAD_W = Wd.ROAD_W = 6;
 // How full the grandstands are drawn, 0..1. build() sets it from opts.detail, so a circuit
 // early in the season is a half-empty Thursday and a late one is a full house.
 Wd.crowdFill = 0.8;
+// How much of the circuit either side of a point counts as "the corner you are standing on"
+// when working out how much room there is beside the track. Lower is stricter.
+Wd.ROOM_NEAR = 4;
 Wd.makeCircuit = function (seed) {
   const rng = E.mulberry32(seed);
   // Layout character, drawn from the seed: how many corners it is built from, how stretched the
@@ -6603,6 +6606,43 @@ Wd.makeCircuit = function (seed) {
   c.outside = i => { const p = c.at(i); const dl = Math.hypot(p.x + p.nx - cx, p.z + p.nz - cz), dr = Math.hypot(p.x - p.nx - cx, p.z - p.nz - cz); return dl > dr ? 1 : -1; };
   c.geomInside = i => c.at(i).curv > 0 ? 1 : -1;
   c.clearOfTrack = (x, z, margin) => { const m2 = margin * margin; for (const p of R) { const dx = p.x - x, dz = p.z - z; if (dx * dx + dz * dz < m2) return false; } return true; };
+  // ---------------------------------------------------------------------------------------
+  // How far you can step off the centreline at i, on one side, before you are standing on
+  // another part of the same circuit. A hairpin brings the track back alongside itself within
+  // thirty metres, and a barrier built at the usual twelve metres out then sits in the middle
+  // of the road further round — which is what the car was driving through.
+  // Walk the normal at i and stop short of any other stretch of track it runs into.
+  // ---------------------------------------------------------------------------------------
+  const CLEAR = ROAD_W + 2.5, ROOM_MAX = 46, NEAR = Wd.ROOM_NEAR, STEP_W = 1.5, CELL = 8;
+  // Index the centreline once so the walk below is a handful of cell lookups rather than a
+  // scan of the whole circuit at every step.
+  const grid = new Map(), gkey = (x, z) => Math.floor(x / CELL) + ',' + Math.floor(z / CELL);
+  for (let j = 0; j < n; j++) { const p = R[j], k = gkey(p.x, p.z); const a = grid.get(k); if (a) a.push(j); else grid.set(k, [j]); }
+  // Is this spot standing on a different stretch of the circuit?
+  const onTrack = (x, z, i) => {
+    const cx = Math.floor(x / CELL), cz = Math.floor(z / CELL), r = Math.ceil(CLEAR / CELL);
+    for (let a = cx - r; a <= cx + r; a++) for (let b = cz - r; b <= cz + r; b++) {
+      const arr = grid.get(a + ',' + b); if (!arr) continue;
+      for (const j of arr) { const dj = Math.abs(j - i), gap = Math.min(dj, n - dj);
+        if (gap < NEAR) continue;                       // the corner you are standing on
+        const q = R[j], dx = q.x - x, dz = q.z - z;
+        if (dx * dx + dz * dz < CLEAR * CLEAR) return true; } }
+    return false;
+  };
+  // Walk out along the normal until the road comes back at you, and stop there.
+  const roomOf = (i, side) => {
+    const p = R[i], ax = p.nx * side, az = p.nz * side;
+    let w = 0;
+    for (; w <= ROOM_MAX; w += STEP_W) if (onTrack(p.x + ax * w, p.z + az * w, i)) break;
+    return Math.max(0, w - STEP_W);
+  };
+  const roomP = new Array(n), roomN = new Array(n);
+  for (let i = 0; i < n; i++) { roomP[i] = roomOf(i, 1); roomN[i] = roomOf(i, -1); }
+  // Neighbouring segments have to agree, or a barrier ends abruptly mid-air where the room runs
+  // out. Take the tightest value over a short window so the wall tapers instead of stopping.
+  const tighten = arr => arr.map((_, i) => { let m = 1e9; for (let k = -2; k <= 2; k++) m = Math.min(m, arr[((i + k) % n + n) % n]); return m; });
+  const rp = tighten(roomP), rn = tighten(roomN);
+  c.room = (i, side) => { const k = ((i % n) + n) % n; return side > 0 ? rp[k] : rn[k]; };
   c.name = Wd.circuitName(seed);
   return c;
 };
@@ -6626,7 +6666,10 @@ Wd.build = function (c, opts = {}) {
   const STAND_CAP = 1 + Math.round(detail * 3);           // 1..4 grandstands
   const LIGHTS = 5 + Math.round(detail * 9);              // 5..14 floodlight towers
   Wd.crowdFill = 0.32 + detail * 0.52;
-  const maxInside = i => 0.85 / Math.max(Math.abs(at(i).curv), 1e-4), safeOff = (i, side, w) => (side === geomInside(i)) ? Math.min(w, maxInside(i)) : w;
+  const maxInside = i => 0.85 / Math.max(Math.abs(at(i).curv), 1e-4);
+  const safeOff = (i, side, w) => Math.min(
+    (side === geomInside(i)) ? Math.min(w, maxInside(i)) : w,
+    c.room ? c.room(i, side) : w);
   const LIGHTPOOLS = [], TVCAMS = [], signs = E.signs, tris = () => E.current();
   E.begin(); E.setGroup(0); E.setAux(0);
   let minx = 1e9, maxx = -1e9, minz = 1e9, maxz = -1e9;
@@ -6659,7 +6702,9 @@ Wd.build = function (c, opts = {}) {
   const straights = []; let i = 0;
   while (i < cn) { if (Math.abs(at(i).curv) < 0.004) { let j = i; while (j < cn && Math.abs(at(j).curv) < 0.004) j++; straights.push([i, j - i]); i = j; } else i++; }
   straights.sort((a, b) => b[1] - a[1]);
-  const clearRun = (i0, len, side, wmax) => { for (let q = i0; q <= i0 + len; q += 2) { const p = pos(q, side * wmax); if (!clearOfTrack(p[0], p[2], ROAD_W + 3)) return false; } return true; };
+  const clearRun = (i0, len, side, wmax) => { for (let q = i0; q <= i0 + len; q += 2) {
+    if (c.room && c.room(q, side) < wmax) return false;
+    const p = pos(q, side * wmax); if (!clearOfTrack(p[0], p[2], ROAD_W + 3)) return false; } return true; };
   const segQuad = (k, side, w0, w1, y0, y1, m) => { const A = pos(k, side * w0, y0), B = pos(k + 1, side * w0, y0), Cq = pos(k + 1, side * w1, y1), Dq = pos(k, side * w1, y1); if (side > 0) Q(A, Dq, Cq, B, m); else Q(A, B, Cq, Dq, m); };
   const segWall = (k, side, w, y0, y1, m) => { const A = pos(k, side * w, y0), B = pos(k + 1, side * w, y0), Cq = pos(k + 1, side * w, y1), Dq = pos(k, side * w, y1); if (side > 0) Q(A, B, Cq, Dq, m); else Q(A, Dq, Cq, B, m); };
   const segSign = (k, side, w, y0, y1, text, u0, cell, fg, bg) => { const t = at(k), A = pos(k, side * w, y0); E.setAux(signs.length); signs.push({ text, o: A, r: [t.tx, 0, t.tz], u: [0, 1, 0], cell, fg, bg, u0 }); segWall(k, side, w, y0, y1, M.SIGN); E.setAux(0); };
