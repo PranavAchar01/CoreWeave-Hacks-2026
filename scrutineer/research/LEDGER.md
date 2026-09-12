@@ -794,3 +794,32 @@ the draws still tie. Champion vs scaling: unresolved. Headline: `unresolved`. If
 the strongest harness change we have measured.
 
 Bar check: 1 ✓ 2 ✓ 3 ✓ 4 prediction written in advance, result pending 5 ✓ 6 pending.
+
+### Iteration 12a — the first scaling-arm run was invalid, and why every arm is re-measured
+
+**The first run produced no result, and none is reported.** After 1 h 20 m it was still running,
+the Python worker had used 20 ms of CPU in 15 minutes, and 24 `scrutineer-bcb:2` containers were
+alive, the oldest about an hour old against a 180 s limit. Cause, in `rails/sandbox.py`:
+`subprocess.run(..., timeout=...)` kills the `docker run` *client*, not the container; `--rm` only
+removes a container after it exits. Each orphan held 2 CPUs and 2 GB, later sandboxes starved and
+timed out too, and every grade taken under that starvation measured the machine rather than the
+harness. The scaling arm made it visible because its selector runs the docstring examples in the
+sandbox for every candidate, so generated code that hangs meets the limit far more often.
+
+Stopped before it wrote `bcb_scaling.json`; all 24 containers were created after the run started
+and were killed. Fixed in f9d2fca: the program runs under `timeout -s KILL` inside the container,
+and on a client-side timeout the container is killed by name. A test against a real daemon asserts
+nothing outlives a 3 s limit.
+
+**Consequence for the comparison, decided before any number exists.** The starting (32.9 %) and
+champion (26.3 %) measurements ran on the leaking sandbox. They finished in normal time, so no
+spiral is evident, but any grade that hit the limit leaked a container, and there is no record of
+how many did. Comparing a scaling arm graded on the fixed sandbox against two arms graded on the
+old one would be a confound that favours the scaling arm. So:
+
+- The comparison of record is all three arms — starting, champion, scaling — measured on the fixed
+  sandbox at f9d2fca, same seed, same environment, same 76 items, run one after another rather than
+  concurrently.
+- The pre-fix 32.9 % and 26.3 % stay in this ledger as what they were. They are not replaced if
+  the re-measurement moves, and the re-measurement is not repeated if it disappoints.
+- The prediction in Iteration 12 stands unchanged and is scored against the re-measured arms.
