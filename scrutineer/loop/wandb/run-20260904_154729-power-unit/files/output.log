@@ -1,0 +1,25 @@
+train: 0it [00:07, ?it/s]
+train: 0it [00:05, ?it/s]
+{
+  "checkpoint": "wandb-artifact:///achar-pranav-optivia/scrutineer/power-unit:step3",
+  "steps": 3,
+  "reward": [
+    0.4861111111111111,
+    0.4861111111111111,
+    0.4861111111111111
+  ],
+  "entropy": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "kl": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "zero_variance_groups": 0.25,
+  "groups": 12,
+  "rollouts": 72,
+  "reward_rate": 0.4861
+}

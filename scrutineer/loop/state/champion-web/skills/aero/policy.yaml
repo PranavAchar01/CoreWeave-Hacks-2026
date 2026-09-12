@@ -1,0 +1,7 @@
+# AERODYNAMICIST — context assembly. Prefix R (references / context).
+# Owned by AERO. The improver may edit this file and references.md; nothing else.
+retrieval: concept-match    # keyword | family-match | concept-match
+n_refs: 5                   # references admitted into the context
+budget_tokens: 1800         # BALLAST on the broadcast
+layout: refs-first          # refs-first | spec-first
+include_failures: false     # anti-contextual-drag: failed trajectories never enter the context

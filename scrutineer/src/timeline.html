@@ -1,0 +1,39 @@
+<!-- The car, across the whole season, under your thumb. Stubbed: it reads the recorded run. -->
+<div class="tl">
+  <header class="tl-top">
+    <span class="tl-mark">SCRUTINEER</span>
+    <span class="tl-sub">the car is the harness — drag to watch the loop rebuild it</span>
+    <span class="tl-views">
+      <button class="tl-view on" id="tlViewCar">CAR</button>
+      <button class="tl-view" id="tlViewGarage">GARAGE</button>
+    </span>
+    <button class="tl-play" id="tlPlay">▶ PLAY</button>
+  </header>
+
+  <main class="tl-body">
+    <section class="tl-stage">
+      <canvas id="stage" aria-label="the car at this generation"></canvas>
+      <div class="tl-hud">
+        <span class="tl-gen" id="tlGen">START</span>
+        <span class="tl-of" id="tlOf"></span>
+        <span class="tl-era" id="tlEra"></span>
+      </div>
+      <div class="tl-score">
+        <em>SCORE</em><b id="tlScore">—</b><i id="tlGain"></i>
+      </div>
+    </section>
+
+    <aside class="tl-side">
+      <h2>WHAT THIS RUN DID</h2>
+      <div class="tl-what" id="tlWhat"></div>
+      <h2>THE TEN COMPONENTS</h2>
+      <div class="tl-rig" id="tlRig"></div>
+    </aside>
+  </main>
+
+  <footer class="tl-foot">
+    <div class="tl-rail" id="tlRail"></div>
+    <p class="tl-help">drag · scroll · ← → · gold marks are the runs whose change survived the gates
+      <span class="tl-note" id="tlNote"></span></p>
+  </footer>
+</div>

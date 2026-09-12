@@ -1,0 +1,2689 @@
+{
+  "seed": 1994,
+  "generation": 3,
+  "accepted": 2,
+  "circuit_version": 0,
+  "regs_sha256": "b84b1f8a5e2e1f6dcb1e132700c5eeb9446591e268c9cfc9a1b6e665e6cc595f",
+  "halted": null,
+  "backends": {
+    "driver": "anthropic",
+    "typed_decision": "local-policy (stand-in)",
+    "sandbox": "docker \u2014 managed sandbox unavailable: sandboxes are not enabled for this organisation \u2014 W&B enables the preview per org on request to support@wandb.com",
+    "weave": "weave",
+    "rl": "serverless-rl",
+    "registry": "wandb-registry",
+    "aria": "aria"
+  },
+  "meters": {
+    "driver": {
+      "calls": 1372,
+      "cache_hits": 1409,
+      "tokens_in": 456818,
+      "tokens_out": 2951736,
+      "spend_usd": 15.2155
+    },
+    "typed_decision": {
+      "backend": "local-policy (stand-in)",
+      "answered": 0,
+      "fell_back": 1922,
+      "answered_share": 0.0,
+      "spend_usd": 0.0
+    },
+    "weave": {
+      "backend": "weave",
+      "url": "https://wandb.ai/achar-pranav-optivia/scrutineer/weave",
+      "calls_logged": 8581,
+      "feedback_rows": 74
+    },
+    "sandbox": {
+      "backend": "docker",
+      "executions": 0,
+      "cache_hits": 0
+    }
+  },
+  "circuit": {
+    "quali": [
+      "w03",
+      "w08",
+      "w13",
+      "w18",
+      "w20",
+      "w25",
+      "w29",
+      "w34",
+      "w36",
+      "w05"
+    ],
+    "sealed": [
+      "w07",
+      "w09",
+      "w16",
+      "w19",
+      "w23",
+      "w27",
+      "w30",
+      "w35",
+      "w01",
+      "w06"
+    ],
+    "opening_rates": {
+      "w03": 0.0,
+      "w08": 0.0,
+      "w13": 0.0,
+      "w18": 0.0,
+      "w20": 0.0,
+      "w25": 0.0,
+      "w29": 0.0,
+      "w34": 0.0,
+      "w36": 0.0,
+      "w05": 0.25
+    }
+  },
+  "champions": {
+    "AERO": "aero:v1",
+    "STRATEGIST": null,
+    "POWER_UNIT": null,
+    "TYRES": null,
+    "DATA": "data:v0",
+    "SIMULATOR": null,
+    "ENGINEER": null,
+    "SCRUTINEER": null,
+    "HISTORIAN": null,
+    "PIT_CREW": null
+  },
+  "reports": [
+    {
+      "generation": 0,
+      "mode": "attended",
+      "claimed_s": 81.39673966672373,
+      "official_s": 85.1265,
+      "d_quali": 6.580908752324532,
+      "d_sealed": 8.2166,
+      "d_smoke": 9.348323927561424,
+      "selection": {
+        "generation": 0,
+        "r_star": "AERO",
+        "path": "harness",
+        "rule_fired": "gain_per_usd",
+        "blame_s": 153.493,
+        "ci": [
+          121.259,
+          184.568
+        ],
+        "n": 12,
+        "p_fix": 0.5,
+        "p_fix_is_prior": true,
+        "cost_usd": 0.3,
+        "hours": 0.25,
+        "expected_gain_per_usd": 180.58,
+        "alternatives": [
+          {
+            "role": "AERO",
+            "n": 12,
+            "blame_s": 153.493,
+            "ci_lo": 121.259,
+            "gain_per_usd": 180.58,
+            "eligible": true,
+            "exhausted": false,
+            "n_attempts": 0,
+            "fix_rate": null
+          },
+          {
+            "role": "DATA",
+            "n": 8,
+            "blame_s": 88.373,
+            "ci_lo": 59.328,
+            "gain_per_usd": 103.97,
+            "eligible": true,
+            "exhausted": false,
+            "n_attempts": 0,
+            "fix_rate": null
+          },
+          {
+            "role": "POWER_UNIT",
+            "n": 1,
+            "blame_s": 15.879,
+            "ci_lo": 15.879,
+            "gain_per_usd": 3.97,
+            "eligible": false,
+            "exhausted": false,
+            "n_attempts": 0,
+            "fix_rate": null
+          },
+          {
+            "role": "STRATEGIST",
+            "n": 0,
+            "blame_s": 0,
+            "ci_lo": 0.0,
+            "gain_per_usd": 0.0,
+            "eligible": false,
+            "exhausted": false,
+            "n_attempts": 0,
+            "fix_rate": null
+          },
+          {
+            "role": "TYRES",
+            "n": 0,
+            "blame_s": 0,
+            "ci_lo": 0.0,
+            "gain_per_usd": 0.0,
+            "eligible": false,
+            "exhausted": false,
+            "n_attempts": 0,
+            "fix_rate": null
+          }
+        ],
+        "parked": null,
+        "notes": []
+      },
+      "verdict": {
+        "verdict": "LEGAL",
+        "functional_role": "Execution",
+        "obligation": "Faithfulness",
+        "confidence": 0.93,
+        "evidence": [
+          "2 file(s) in scope"
+        ],
+        "cell": "Execution x Faithfulness",
+        "seeded": false
+      },
+      "gates": [
+        {
+          "gate": "diff_size",
+          "ok": true,
+          "detail": "51 changed line(s), minimum 3",
+          "value": {
+            "lines": 51
+          },
+          "about": "change"
+        },
+        {
+          "gate": "comparable_ab",
+          "ok": true,
+          "detail": "two comparable candidates",
+          "value": null,
+          "about": "comparison"
+        },
+        {
+          "gate": "novelty",
+          "ok": true,
+          "detail": "closest previous proposal cosine 0.000 (reject at 0.95)",
+          "value": {
+            "cosine": 0.0
+          },
+          "about": "change"
+        },
+        {
+          "gate": "evidence",
+          "ok": true,
+          "detail": "cites 1 pattern page(s)",
+          "value": {
+            "pages": [
+              "pattern-0035"
+            ]
+          },
+          "about": "change"
+        },
+        {
+          "gate": "seesaw",
+          "ok": true,
+          "detail": "TEAM CLAIMED +6.581s, OFFICIAL +8.217s",
+          "value": {
+            "d_quali": 6.581,
+            "d_sealed": 8.217
+          },
+          "about": "change"
+        },
+        {
+          "gate": "correlation",
+          "ok": true,
+          "detail": "smoke +9.348s, quali +6.581s, sealed +8.217s (dead band 0.3s)",
+          "value": {
+            "d_smoke": 9.348,
+            "d_quali": 6.581,
+            "d_sealed": 8.217
+          },
+          "about": "comparison"
+        },
+        {
+          "gate": "regression",
+          "ok": true,
+          "detail": "no item that passed last generation now fails",
+          "value": {
+            "lost": []
+          },
+          "about": "change"
+        },
+        {
+          "gate": "cost_cap",
+          "ok": true,
+          "detail": "$4.699 of $6.00 race + replay budget",
+          "value": {
+            "spent": 4.6993,
+            "cap": 6.0
+          },
+          "about": "run"
+        },
+        {
+          "gate": "scrutineering",
+          "ok": true,
+          "detail": "LEGAL at 0.93",
+          "value": {
+            "verdict": "LEGAL"
+          },
+          "about": "change"
+        },
+        {
+          "gate": "rl_entropy",
+          "ok": true,
+          "detail": "no RL job this generation",
+          "value": null,
+          "about": "change"
+        }
+      ],
+      "promoted": true,
+      "rule_fired": "gain_per_usd",
+      "role": "AERO",
+      "prefix": "R",
+      "part": "R-v1",
+      "patterns": [
+        "pattern-0035"
+      ],
+      "debrief": {
+        "path": "round_000.py",
+        "marimo_check": true,
+        "script_run": true,
+        "gate_ok": true
+      },
+      "cost_usd": 4.699261999999999,
+      "tts_ghost": null,
+      "rl": null,
+      "circuit": null,
+      "manifest": {
+        "evidence": [
+          "scrutineer:///replay-aero-w07-patch-replay@a97ed6166c3b0432",
+          "scrutineer:///replay-aero-w32-patch-replay@ce568b7691e8ec8a",
+          "scrutineer:///replay-aero-w13-patch-replay@46029ecc4aa03a83"
+        ],
+        "root_cause": "references.md covers only labels/names/headings/landmarks, so keyword retrieval of 2 blocks returns nothing usable for specs whose axe families are dialogs, keyboard, contrast, tables, images, language, lists, or status \u2014 the agent is asked for requirements it was never shown.",
+        "predicted_fixes": [
+          "w05",
+          "w07",
+          "w13",
+          "w15",
+          "w32",
+          "w36"
+        ],
+        "at_risk_regressions": [
+          "w01",
+          "w10",
+          "w12"
+        ],
+        "predicted_delta_s": 68.0
+      },
+      "manifest_check": {},
+      "candidate_verdicts": [
+        {
+          "candidate": "A",
+          "summary": "claude-code proposal A",
+          "verdict": "LEGAL",
+          "functional_role": "Execution",
+          "obligation": "Faithfulness",
+          "confidence": 0.93,
+          "evidence": [
+            "2 file(s) in scope"
+          ],
+          "cell": "Execution x Faithfulness",
+          "seeded": false
+        },
+        {
+          "candidate": "B",
+          "summary": "claude-code proposal B",
+          "verdict": "LEGAL",
+          "functional_role": "Execution",
+          "obligation": "Faithfulness",
+          "confidence": 0.93,
+          "evidence": [
+            "2 file(s) in scope"
+          ],
+          "cell": "Execution x Faithfulness",
+          "seeded": false
+        }
+      ],
+      "black_flags": [],
+      "router_rows": [
+        {
+          "item": "w03",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.351,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.27,
+            "TYRES": 0.135,
+            "DATA": 0.243
+          },
+          "confidence": 0.564,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w08",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.419,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.129,
+            "TYRES": 0.161,
+            "DATA": 0.29
+          },
+          "confidence": 0.631,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w13",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.419,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.129,
+            "TYRES": 0.161,
+            "DATA": 0.29
+          },
+          "confidence": 0.631,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w18",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.419,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.129,
+            "TYRES": 0.161,
+            "DATA": 0.29
+          },
+          "confidence": 0.631,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w20",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.419,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.129,
+            "TYRES": 0.161,
+            "DATA": 0.29
+          },
+          "confidence": 0.631,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w25",
+          "blamed_role": "DATA",
+          "mast_mode": "3.3-incorrect-verification",
+          "blame_share": {
+            "AERO": 0.351,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.108,
+            "TYRES": 0.135,
+            "DATA": 0.405
+          },
+          "confidence": 0.526,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w29",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.419,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.129,
+            "TYRES": 0.161,
+            "DATA": 0.29
+          },
+          "confidence": 0.631,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w34",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.419,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.129,
+            "TYRES": 0.161,
+            "DATA": 0.29
+          },
+          "confidence": 0.631,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w36",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.419,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.129,
+            "TYRES": 0.161,
+            "DATA": 0.29
+          },
+          "confidence": 0.631,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w08",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.419,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.129,
+            "TYRES": 0.161,
+            "DATA": 0.29
+          },
+          "confidence": 0.631,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w13",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.419,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.129,
+            "TYRES": 0.161,
+            "DATA": 0.29
+          },
+          "confidence": 0.631,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w18",
+          "blamed_role": "DATA",
+          "mast_mode": "3.3-incorrect-verification",
+          "blame_share": {
+            "AERO": 0.351,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.108,
+            "TYRES": 0.135,
+            "DATA": 0.405
+          },
+          "confidence": 0.526,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w20",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.419,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.129,
+            "TYRES": 0.161,
+            "DATA": 0.29
+          },
+          "confidence": 0.631,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w25",
+          "blamed_role": "DATA",
+          "mast_mode": "3.3-incorrect-verification",
+          "blame_share": {
+            "AERO": 0.351,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.108,
+            "TYRES": 0.135,
+            "DATA": 0.405
+          },
+          "confidence": 0.526,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w34",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.419,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.129,
+            "TYRES": 0.161,
+            "DATA": 0.29
+          },
+          "confidence": 0.631,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w36",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.419,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.129,
+            "TYRES": 0.161,
+            "DATA": 0.29
+          },
+          "confidence": 0.631,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w05",
+          "blamed_role": "DATA",
+          "mast_mode": "3.3-incorrect-verification",
+          "blame_share": {
+            "AERO": 0.325,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.1,
+            "TYRES": 0.125,
+            "DATA": 0.45
+          },
+          "confidence": 0.625,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "w08",
+          "attempts": 2,
+          "solved": 0,
+          "steps": 2,
+          "cost_usd": 0.05512,
+          "missing": [
+            "contrast",
+            "dialogs",
+            "keyboard",
+            "language"
+          ],
+          "tool_errors": 0,
+          "retired": 0,
+          "family": "dialog",
+          "title": "Build a modal dialog that asks the user to confirm deleting their account, with Cancel and Delete buttons, ove"
+        },
+        {
+          "id": "w13",
+          "attempts": 2,
+          "solved": 0,
+          "steps": 2,
+          "cost_usd": 0.0659,
+          "missing": [
+            "contrast",
+            "language",
+            "lists"
+          ],
+          "tool_errors": 0,
+          "retired": 0,
+          "family": "pricing",
+          "title": "Build a pricing section with three plan cards. Each has a plan name, a price, a list of features, and a button"
+        },
+        {
+          "id": "w18",
+          "attempts": 2,
+          "solved": 0,
+          "steps": 2,
+          "cost_usd": 0.07034,
+          "missing": [
+            "contrast",
+            "language",
+            "status"
+          ],
+          "tool_errors": 1,
+          "retired": 0,
+          "family": "signup",
+          "title": "Build a sign-up form with name, email and password, where the password field explains its requirements and an "
+        },
+        {
+          "id": "w20",
+          "attempts": 2,
+          "solved": 0,
+          "steps": 2,
+          "cost_usd": 0.05218,
+          "missing": [
+            "contrast",
+            "images",
+            "language",
+            "lists"
+          ],
+          "tool_errors": 0,
+          "retired": 0,
+          "family": "gallery",
+          "title": "Build a gallery of six product images in a grid, each with a caption and a price. Use a dark colour scheme; te"
+        },
+        {
+          "id": "w25",
+          "attempts": 2,
+          "solved": 0,
+          "steps": 2,
+          "cost_usd": 0.07107,
+          "missing": [
+            "contrast",
+            "keyboard",
+            "language"
+          ],
+          "tool_errors": 2,
+          "retired": 0,
+          "family": "tabs",
+          "title": "Build a three-tab interface where each tab reveals a different panel of text."
+        },
+        {
+          "id": "w34",
+          "attempts": 2,
+          "solved": 0,
+          "steps": 2,
+          "cost_usd": 0.04879,
+          "missing": [
+            "contrast",
+            "language",
+            "status"
+          ],
+          "tool_errors": 0,
+          "retired": 0,
+          "family": "dashboard",
+          "title": "Build a dashboard with four metric cards, each with a label, a big number, and a change against last week."
+        },
+        {
+          "id": "w36",
+          "attempts": 2,
+          "solved": 0,
+          "steps": 2,
+          "cost_usd": 0.05432,
+          "missing": [
+            "contrast",
+            "language",
+            "status"
+          ],
+          "tool_errors": 0,
+          "retired": 0,
+          "family": "dashboard",
+          "title": "Build a dashboard with four metric cards, each with a label, a big number, and a change against last week. Mak"
+        },
+        {
+          "id": "w03",
+          "attempts": 2,
+          "solved": 1,
+          "steps": 16,
+          "cost_usd": 0.31676,
+          "missing": [
+            "contrast",
+            "labels",
+            "language",
+            "names"
+          ],
+          "tool_errors": 25,
+          "retired": 0,
+          "family": "checkout",
+          "title": "Build a checkout form: email, card number, expiry, CVC, a country select, and a Pay button. Show the order tot"
+        },
+        {
+          "id": "w05",
+          "attempts": 2,
+          "solved": 1,
+          "steps": 9,
+          "cost_usd": 0.20814,
+          "missing": [
+            "contrast",
+            "language",
+            "tables"
+          ],
+          "tool_errors": 16,
+          "retired": 0,
+          "family": "invoices",
+          "title": "Build a table of five invoices with columns Date, Client, Amount and Status. The column headers must be sortab"
+        },
+        {
+          "id": "w29",
+          "attempts": 2,
+          "solved": 1,
+          "steps": 11,
+          "cost_usd": 0.25766,
+          "missing": [
+            "contrast",
+            "language",
+            "lists",
+            "status"
+          ],
+          "tool_errors": 20,
+          "retired": 0,
+          "family": "search",
+          "title": "Build a search results page: a search field with the current query, a count of results, and a list of eight re"
+        }
+      ],
+      "pages": [
+        {
+          "id": "w36",
+          "family": "dashboard",
+          "title": "Metrics dashboard (3)",
+          "file": "run-00/dashboard-w36.html",
+          "passed": false,
+          "weighted": 40,
+          "critical": 8,
+          "rules": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "n": 8
+            }
+          ],
+          "missing": [
+            "h2, h3 (0/4)"
+          ],
+          "bytes": 6214
+        },
+        {
+          "id": "w34",
+          "family": "dashboard",
+          "title": "Metrics dashboard",
+          "file": "run-00/dashboard-w34.html",
+          "passed": false,
+          "weighted": 20,
+          "critical": 4,
+          "rules": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "n": 4
+            }
+          ],
+          "missing": [
+            "h2, h3 (0/4)"
+          ],
+          "bytes": 4883
+        },
+        {
+          "id": "w13",
+          "family": "pricing",
+          "title": "Pricing plans",
+          "file": "run-00/pricing-w13.html",
+          "passed": false,
+          "weighted": 15,
+          "critical": 3,
+          "rules": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "n": 3
+            }
+          ],
+          "missing": [],
+          "bytes": 7229
+        },
+        {
+          "id": "w25",
+          "family": "tabs",
+          "title": "Tabbed panel",
+          "file": "run-00/tabs-w25.html",
+          "passed": false,
+          "weighted": 15,
+          "critical": 3,
+          "rules": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "n": 3
+            }
+          ],
+          "missing": [],
+          "bytes": 8687
+        },
+        {
+          "id": "w18",
+          "family": "signup",
+          "title": "Sign-up with validation (3)",
+          "file": "run-00/signup-w18.html",
+          "passed": false,
+          "weighted": 12,
+          "critical": 2,
+          "rules": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "n": 2
+            },
+            {
+              "id": "heading-order",
+              "impact": "moderate",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 8516
+        },
+        {
+          "id": "w08",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (2)",
+          "file": "run-00/dialog-w08.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [
+            "[role=dialog], dialog (0/1)"
+          ],
+          "bytes": 7756
+        },
+        {
+          "id": "w29",
+          "family": "search",
+          "title": "Search results (2)",
+          "file": "run-00/search-w29.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [
+            "li a, article a (7/8)"
+          ],
+          "bytes": 8709
+        },
+        {
+          "id": "w03",
+          "family": "checkout",
+          "title": "Checkout form (3)",
+          "file": "run-00/checkout-w03.html",
+          "passed": false,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [
+            "select (0/1)",
+            "button (0/1)"
+          ],
+          "bytes": 8911
+        },
+        {
+          "id": "w20",
+          "family": "gallery",
+          "title": "Image gallery (2)",
+          "file": "run-00/gallery-w20.html",
+          "passed": false,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [
+            "img (0/6)"
+          ],
+          "bytes": 5022
+        },
+        {
+          "id": "w05",
+          "family": "invoices",
+          "title": "Sortable invoice table (2)",
+          "file": "run-00/invoices-w05.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 8917
+        }
+      ],
+      "diff": "--- a/skills/aero/policy.yaml\n+++ b/skills/aero/policy.yaml\n@@ -1,7 +1,7 @@\n # AERODYNAMICIST \u2014 context assembly. Prefix R (references / context).\n # Owned by AERO. The improver may edit this file and references.md; nothing else.\n-retrieval: keyword          # keyword | family-match | concept-match\n-n_refs: 2                   # references admitted into the context\n-budget_tokens: 900          # BALLAST on the broadcast\n+retrieval: concept-match    # keyword | family-match | concept-match\n+n_refs: 5                   # references admitted into the context\n+budget_tokens: 1800         # BALLAST on the broadcast\n layout: refs-first          # refs-first | spec-first\n include_failures: false     # anti-contextual-drag: failed trajectories never enter the context\n--- a/skills/aero/references.md\n+++ b/skills/aero/references.md\n@@ -13,4 +13,44 @@\n ## ref-structure\n concepts: headings, landmarks\n One `<h1>` per document, and heading levels do not skip. Every region of content sits inside a\n landmark: `<header>`, `<nav>`, `<main>`, `<footer>`.\n+\n+## ref-dialogs\n+concepts: dialogs, keyboard, names\n+A modal is `role=\"dialog\" aria-modal=\"true\"` with `aria-labelledby` pointing at its own heading.\n+Focus moves into the dialog on open, is trapped while it is open, Escape closes it, and focus\n+returns to the control that opened it. Content behind it is `inert` or `aria-hidden=\"true\"`.\n+\n+## ref-keyboard\n+concepts: keyboard, names\n+Every interactive element is reachable and operable by keyboard. Use real `<button>`/`<a href>`\n+rather than clickable `<div>`s; if a custom widget is unavoidable it needs `tabindex=\"0\"`, a\n+`role`, and Enter/Space handlers. Never remove the focus outline without replacing it.\n+\n+## ref-contrast\n+concepts: contrast\n+Body text needs 4.5:1 against its background, large text (18.66px bold or 24px) 3:1, and UI\n+component boundaries and focus indicators 3:1. Placeholder and disabled-looking greys on white\n+are the usual failure; darken to at least #595959 on #ffffff.\n+\n+## ref-tables\n+concepts: tables, headings\n+Data tables use `<table>` with a `<caption>`, `<thead>`, and `<th scope=\"col\">`/`<th scope=\"row\">`\n+on every header cell. A sortable column header carries `aria-sort=\"ascending|descending|none\"`\n+on the `<th>`, and the sort control is a `<button>` inside that `<th>`.\n+\n+## ref-images\n+concepts: images\n+Every `<img>` has an `alt`. Informative images describe the information; decorative images take\n+`alt=\"\"` (never omit the attribute). Icon-only buttons carry `aria-label` on the button, not on\n+the icon inside it.\n+\n+## ref-language\n+concepts: language\n+The root element declares `<html lang=\"en\">` and the document has a non-empty `<title>`. Any\n+passage in another language carries its own `lang` on the wrapping element.\n+\n+## ref-lists\n+concepts: lists\n+Groups of related items are `<ul>`/`<ol>` with `<li>` children only \u2014 no stray `<div>` between\n+list and item. Definition pairs use `<dl>`/`<dt>`/`<dd>`.\n+\n+## ref-status\n+concepts: status, labels\n+Validation errors and async results are announced: `role=\"alert\"` for errors, `role=\"status\"`\n+for non-urgent updates. Tie a field to its message with `aria-describedby` and `aria-invalid`.\n",
+      "diff_summary": "claude-code proposal A",
+      "samples": [
+        {
+          "id": "w03",
+          "family": "checkout",
+          "solved": false,
+          "task": "Build a checkout form: email, card number, expiry, CVC, a country select, and a Pay button. Show the order total. Make it work on a narrow phone screen without hiding content from assistive technology.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the",
+          "wrote": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Checkout</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        html, body {\n            height: 100%;\n            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\n            background-color: #f5f5f5;\n            color: #333;\n        }\n\n        body {\n            display: flex;\n            flex-direction: column;\n        }\n\n        header {\n            background-color: #fff;\n            border-bottom: 1px solid #e0e0e0;\n            padding: 1rem;\n        }\n\n        header h1 {\n            font-size: 1.75rem;\n            font-weight: 600;\n        }\n\n        main {\n            flex: 1;\n          ",
+          "context_refs": [
+            "ref-structure"
+          ],
+          "missing": [
+            "contrast",
+            "labels",
+            "language",
+            "names"
+          ],
+          "steps": 8
+        },
+        {
+          "id": "w08",
+          "family": "dialog",
+          "solved": false,
+          "task": "Build a modal dialog that asks the user to confirm deleting their account, with Cancel and Delete buttons, over a dimmed page behind it. Use a dark colour scheme; text still has to meet contrast requirements.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and agai",
+          "wrote": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Account Deletion Confirmation</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        body {\n            font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;\n            background-color: #1a1a1a;\n            color: #e0e0e0;\n            line-height: 1.5;\n        }\n\n        header {\n            background-color: #2a2a2a;\n            padding: 1.5rem;\n            border-bottom: 1px solid #404040;\n        }\n\n        h1 {\n            font-size: 1.75rem;\n            font-weight: 600;\n            color: #ffffff;\n        }\n\n        main {\n            padding: 2rem;\n        }\n\n        .page-content {\n            max-wi",
+          "context_refs": [
+            "ref-forms",
+            "ref-structure"
+          ],
+          "missing": [
+            "contrast",
+            "dialogs",
+            "keyboard",
+            "language"
+          ],
+          "steps": 1
+        },
+        {
+          "id": "w13",
+          "family": "pricing",
+          "solved": false,
+          "task": "Build a pricing section with three plan cards. Each has a plan name, a price, a list of features, and a button to choose it.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functional requirements above.",
+          "wrote": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Pricing Plans</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        body {\n            font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;\n            line-height: 1.6;\n            color: #333;\n            background-color: #f9fafb;\n        }\n\n        header {\n            background-color: #fff;\n            padding: 2rem 1rem;\n            text-align: center;\n            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);\n        }\n\n        h1 {\n            font-size: 2rem;\n            color: #111;\n            margin-bottom: 0.5rem;\n        }\n\n        .subtitle {\n            color: #666;\n            font-size: 1.1rem;",
+          "context_refs": [
+            "ref-forms",
+            "ref-structure"
+          ],
+          "missing": [
+            "contrast",
+            "language",
+            "lists"
+          ],
+          "steps": 1
+        },
+        {
+          "id": "w18",
+          "family": "signup",
+          "solved": false,
+          "task": "Build a sign-up form with name, email and password, where the password field explains its requirements and an error message is shown for an invalid email. Make it work on a narrow phone screen without hiding content from assistive technology.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against",
+          "wrote": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Sign Up</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        body {\n            font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;\n            line-height: 1.5;\n            color: #333;\n            background-color: #f5f5f5;\n        }\n\n        header {\n            background-color: #2c3e50;\n            color: white;\n            padding: 1.5rem;\n            text-align: center;\n        }\n\n        header h1 {\n            font-size: 1.75rem;\n        }\n\n        main {\n            padding: 1.5rem;\n            max-width: 400px;\n            margin: 2rem auto;\n        }\n\n        .form-group {\n            margin-bo",
+          "context_refs": [
+            "ref-structure",
+            "ref-forms"
+          ],
+          "missing": [
+            "contrast",
+            "language",
+            "status"
+          ],
+          "steps": 1
+        }
+      ],
+      "standings": {
+        "AERO": {
+          "role": "AERO",
+          "n": 12,
+          "blame_s": 153.493,
+          "ci": [
+            121.259,
+            184.568
+          ],
+          "var": 32.176,
+          "modes": {
+            "patch-replay": 17
+          }
+        },
+        "STRATEGIST": {
+          "role": "STRATEGIST",
+          "n": 0,
+          "blame_s": 0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "var": 0.0,
+          "modes": {}
+        },
+        "POWER_UNIT": {
+          "role": "POWER_UNIT",
+          "n": 1,
+          "blame_s": 15.879,
+          "ci": [
+            15.879,
+            15.879
+          ],
+          "var": 0.0,
+          "modes": {
+            "null-stub": 1
+          }
+        },
+        "TYRES": {
+          "role": "TYRES",
+          "n": 0,
+          "blame_s": 0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "var": 0.0,
+          "modes": {}
+        },
+        "DATA": {
+          "role": "DATA",
+          "n": 8,
+          "blame_s": 88.373,
+          "ci": [
+            59.328,
+            116.904
+          ],
+          "var": 47.184,
+          "modes": {
+            "patch-replay": 16
+          }
+        }
+      },
+      "wall_s": 1415.982815027237,
+      "backends": {
+        "driver": "anthropic",
+        "typed_decision": "local-policy (stand-in)",
+        "sandbox": "docker \u2014 managed sandbox unavailable: sandboxes are not enabled for this organisation \u2014 W&B enables the preview per org on request to support@wandb.com",
+        "weave": "weave",
+        "rl": "serverless-rl",
+        "registry": "wandb-registry",
+        "aria": "aria"
+      },
+      "notes": []
+    },
+    {
+      "generation": 1,
+      "mode": "attended",
+      "claimed_s": 72.6153847052864,
+      "official_s": 74.3187,
+      "d_quali": 2.2004462091127976,
+      "d_sealed": 2.5911999999999864,
+      "d_smoke": 0.0,
+      "selection": {
+        "generation": 1,
+        "r_star": null,
+        "path": null,
+        "rule_fired": "no_upgrade",
+        "blame_s": 0.0,
+        "ci": [
+          0.0,
+          0.0
+        ],
+        "n": 0,
+        "p_fix": 0.5,
+        "p_fix_is_prior": true,
+        "cost_usd": 0.0,
+        "hours": 0.0,
+        "expected_gain_per_usd": 0.0,
+        "alternatives": [
+          {
+            "role": "DATA",
+            "n": 4,
+            "blame_s": 50.913,
+            "ci_lo": 22.293,
+            "gain_per_usd": 59.9,
+            "eligible": false,
+            "exhausted": false,
+            "n_attempts": 0,
+            "fix_rate": null
+          },
+          {
+            "role": "AERO",
+            "n": 4,
+            "blame_s": 27.315,
+            "ci_lo": 22.53,
+            "gain_per_usd": 32.14,
+            "eligible": false,
+            "exhausted": false,
+            "n_attempts": 1,
+            "fix_rate": null
+          },
+          {
+            "role": "POWER_UNIT",
+            "n": 1,
+            "blame_s": 22.131,
+            "ci_lo": 22.131,
+            "gain_per_usd": 5.53,
+            "eligible": false,
+            "exhausted": false,
+            "n_attempts": 0,
+            "fix_rate": null
+          },
+          {
+            "role": "STRATEGIST",
+            "n": 0,
+            "blame_s": 0,
+            "ci_lo": 0.0,
+            "gain_per_usd": 0.0,
+            "eligible": false,
+            "exhausted": false,
+            "n_attempts": 0,
+            "fix_rate": null
+          },
+          {
+            "role": "TYRES",
+            "n": 0,
+            "blame_s": 0,
+            "ci_lo": 0.0,
+            "gain_per_usd": 0.0,
+            "eligible": false,
+            "exhausted": false,
+            "n_attempts": 0,
+            "fix_rate": null
+          }
+        ],
+        "parked": null,
+        "notes": [
+          "no role reached n >= 5 with a positive 90 % lower bound; the matched-budget test-time-scaling ghost runs instead"
+        ]
+      },
+      "verdict": {},
+      "gates": [],
+      "promoted": false,
+      "rule_fired": "no_upgrade",
+      "role": null,
+      "prefix": null,
+      "part": null,
+      "patterns": [],
+      "debrief": {},
+      "cost_usd": 2.732171,
+      "tts_ghost": {
+        "race_s": 70.7,
+        "pass_rate": 0.6,
+        "note": "extra-lap ghost: k+1 samples at the same budget, no upgrade"
+      },
+      "rl": null,
+      "circuit": null,
+      "manifest": {},
+      "manifest_check": {
+        "role": "AERO",
+        "fix_precision": 0.167,
+        "regression_precision": 0.0,
+        "predicted_delta_s": 68.0,
+        "measured_delta_s": 2.591,
+        "delta_error": 65.409
+      },
+      "candidate_verdicts": [],
+      "black_flags": [],
+      "router_rows": [
+        {
+          "item": "w13",
+          "blamed_role": "DATA",
+          "mast_mode": "3.3-incorrect-verification",
+          "blame_share": {
+            "AERO": 0.314,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.114,
+            "TYRES": 0.143,
+            "DATA": 0.429
+          },
+          "confidence": 0.61,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w29",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.379,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.138,
+            "TYRES": 0.172,
+            "DATA": 0.31
+          },
+          "confidence": 0.547,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w34",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.379,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.138,
+            "TYRES": 0.172,
+            "DATA": 0.31
+          },
+          "confidence": 0.547,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w36",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.379,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.138,
+            "TYRES": 0.172,
+            "DATA": 0.31
+          },
+          "confidence": 0.547,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w05",
+          "blamed_role": "DATA",
+          "mast_mode": "3.3-incorrect-verification",
+          "blame_share": {
+            "AERO": 0.25,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.111,
+            "TYRES": 0.139,
+            "DATA": 0.5
+          },
+          "confidence": 0.8,
+          "needs_ablation": false,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w03",
+          "blamed_role": "POWER_UNIT",
+          "mast_mode": "2.1-capability-shortfall",
+          "blame_share": {
+            "AERO": 0.273,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.303,
+            "TYRES": 0.152,
+            "DATA": 0.273
+          },
+          "confidence": 0.492,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w29",
+          "blamed_role": "DATA",
+          "mast_mode": "3.3-incorrect-verification",
+          "blame_share": {
+            "AERO": 0.289,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.105,
+            "TYRES": 0.132,
+            "DATA": 0.474
+          },
+          "confidence": 0.708,
+          "needs_ablation": false,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w34",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.379,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.138,
+            "TYRES": 0.172,
+            "DATA": 0.31
+          },
+          "confidence": 0.547,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w36",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.379,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.138,
+            "TYRES": 0.172,
+            "DATA": 0.31
+          },
+          "confidence": 0.547,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w05",
+          "blamed_role": "DATA",
+          "mast_mode": "3.3-incorrect-verification",
+          "blame_share": {
+            "AERO": 0.265,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.118,
+            "TYRES": 0.147,
+            "DATA": 0.471
+          },
+          "confidence": 0.738,
+          "needs_ablation": false,
+          "backend": "local-policy"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "w05",
+          "attempts": 2,
+          "solved": 0,
+          "steps": 5,
+          "cost_usd": 0.15013,
+          "missing": [
+            "language"
+          ],
+          "tool_errors": 10,
+          "retired": 0,
+          "family": "invoices",
+          "title": "Build a table of five invoices with columns Date, Client, Amount and Status. The column headers must be sortab"
+        },
+        {
+          "id": "w29",
+          "attempts": 2,
+          "solved": 0,
+          "steps": 9,
+          "cost_usd": 0.21147,
+          "missing": [
+            "language",
+            "lists"
+          ],
+          "tool_errors": 16,
+          "retired": 0,
+          "family": "search",
+          "title": "Build a search results page: a search field with the current query, a count of results, and a list of eight re"
+        },
+        {
+          "id": "w34",
+          "attempts": 2,
+          "solved": 0,
+          "steps": 2,
+          "cost_usd": 0.05149,
+          "missing": [
+            "language",
+            "status"
+          ],
+          "tool_errors": 0,
+          "retired": 0,
+          "family": "dashboard",
+          "title": "Build a dashboard with four metric cards, each with a label, a big number, and a change against last week."
+        },
+        {
+          "id": "w36",
+          "attempts": 2,
+          "solved": 0,
+          "steps": 2,
+          "cost_usd": 0.05126,
+          "missing": [
+            "language",
+            "status"
+          ],
+          "tool_errors": 0,
+          "retired": 0,
+          "family": "dashboard",
+          "title": "Build a dashboard with four metric cards, each with a label, a big number, and a change against last week. Mak"
+        },
+        {
+          "id": "w03",
+          "attempts": 2,
+          "solved": 1,
+          "steps": 10,
+          "cost_usd": 0.22425,
+          "missing": [
+            "language"
+          ],
+          "tool_errors": 17,
+          "retired": 0,
+          "family": "checkout",
+          "title": "Build a checkout form: email, card number, expiry, CVC, a country select, and a Pay button. Show the order tot"
+        },
+        {
+          "id": "w13",
+          "attempts": 2,
+          "solved": 1,
+          "steps": 2,
+          "cost_usd": 0.06792,
+          "missing": [
+            "language",
+            "lists"
+          ],
+          "tool_errors": 1,
+          "retired": 0,
+          "family": "pricing",
+          "title": "Build a pricing section with three plan cards. Each has a plan name, a price, a list of features, and a button"
+        },
+        {
+          "id": "w08",
+          "attempts": 2,
+          "solved": 2,
+          "steps": 2,
+          "cost_usd": 0.0669,
+          "missing": [
+            "language"
+          ],
+          "tool_errors": 0,
+          "retired": 0,
+          "family": "dialog",
+          "title": "Build a modal dialog that asks the user to confirm deleting their account, with Cancel and Delete buttons, ove"
+        },
+        {
+          "id": "w18",
+          "attempts": 2,
+          "solved": 2,
+          "steps": 3,
+          "cost_usd": 0.09868,
+          "missing": [
+            "language"
+          ],
+          "tool_errors": 6,
+          "retired": 0,
+          "family": "signup",
+          "title": "Build a sign-up form with name, email and password, where the password field explains its requirements and an "
+        },
+        {
+          "id": "w20",
+          "attempts": 2,
+          "solved": 2,
+          "steps": 2,
+          "cost_usd": 0.07367,
+          "missing": [
+            "language",
+            "lists"
+          ],
+          "tool_errors": 2,
+          "retired": 0,
+          "family": "gallery",
+          "title": "Build a gallery of six product images in a grid, each with a caption and a price. Use a dark colour scheme; te"
+        },
+        {
+          "id": "w25",
+          "attempts": 2,
+          "solved": 2,
+          "steps": 2,
+          "cost_usd": 0.0712,
+          "missing": [
+            "language"
+          ],
+          "tool_errors": 2,
+          "retired": 0,
+          "family": "tabs",
+          "title": "Build a three-tab interface where each tab reveals a different panel of text."
+        }
+      ],
+      "pages": [
+        {
+          "id": "w05",
+          "family": "invoices",
+          "title": "Sortable invoice table (2)",
+          "file": "run-01/invoices-w05.html",
+          "passed": false,
+          "weighted": 45,
+          "critical": 5,
+          "rules": [
+            {
+              "id": "aria-allowed-attr",
+              "impact": "critical",
+              "n": 4
+            },
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 8727
+        },
+        {
+          "id": "w13",
+          "family": "pricing",
+          "title": "Pricing plans",
+          "file": "run-01/pricing-w13.html",
+          "passed": false,
+          "weighted": 15,
+          "critical": 3,
+          "rules": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "n": 3
+            }
+          ],
+          "missing": [],
+          "bytes": 6082
+        },
+        {
+          "id": "w29",
+          "family": "search",
+          "title": "Search results (2)",
+          "file": "run-01/search-w29.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [
+            "li a, article a (6/8)"
+          ],
+          "bytes": 8538
+        },
+        {
+          "id": "w34",
+          "family": "dashboard",
+          "title": "Metrics dashboard",
+          "file": "run-01/dashboard-w34.html",
+          "passed": false,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [
+            "h2, h3 (0/4)"
+          ],
+          "bytes": 4846
+        },
+        {
+          "id": "w36",
+          "family": "dashboard",
+          "title": "Metrics dashboard (3)",
+          "file": "run-01/dashboard-w36.html",
+          "passed": false,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [
+            "h2, h3 (0/4)"
+          ],
+          "bytes": 4347
+        },
+        {
+          "id": "w03",
+          "family": "checkout",
+          "title": "Checkout form (3)",
+          "file": "run-01/checkout-w03.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 7408
+        },
+        {
+          "id": "w08",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (2)",
+          "file": "run-01/dialog-w08.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 8449
+        },
+        {
+          "id": "w18",
+          "family": "signup",
+          "title": "Sign-up with validation (3)",
+          "file": "run-01/signup-w18.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 8084
+        },
+        {
+          "id": "w20",
+          "family": "gallery",
+          "title": "Image gallery (2)",
+          "file": "run-01/gallery-w20.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 7249
+        },
+        {
+          "id": "w25",
+          "family": "tabs",
+          "title": "Tabbed panel",
+          "file": "run-01/tabs-w25.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 8958
+        }
+      ],
+      "diff": "",
+      "diff_summary": "",
+      "samples": [
+        {
+          "id": "w13",
+          "family": "pricing",
+          "solved": false,
+          "task": "Build a pricing section with three plan cards. Each has a plan name, a price, a list of features, and a button to choose it.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functional requirements above.",
+          "wrote": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Pricing Plans</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        body {\n            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\n            background-color: #ffffff;\n            color: #212121;\n            line-height: 1.6;\n        }\n\n        header {\n            padding: 2rem 1rem;\n            text-align: center;\n            background-color: #f5f5f5;\n        }\n\n        h1 {\n            font-size: 2.5rem;\n            font-weight: 700;\n            color: #212121;\n            margin-bottom: 0.5rem;\n        }\n\n        .header-subtitle {\n            font-size: 1.125rem;\n            color: #595959;\n",
+          "context_refs": [
+            "ref-structure",
+            "ref-contrast",
+            "ref-dialogs",
+            "ref-forms",
+            "ref-keyboard"
+          ],
+          "missing": [
+            "language",
+            "lists"
+          ],
+          "steps": 1
+        },
+        {
+          "id": "w29",
+          "family": "search",
+          "solved": false,
+          "task": "Build a search results page: a search field with the current query, a count of results, and a list of eight results each with a title link and a snippet. Use a dark colour scheme; text still has to meet contrast requirements.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by a",
+          "wrote": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Search Results</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        body {\n            font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;\n            background-color: #1a1a1a;\n            color: #e0e0e0;\n            line-height: 1.6;\n        }\n\n        header {\n            background-color: #0d0d0d;\n            padding: 1.5rem 2rem;\n            border-bottom: 1px solid #333;\n        }\n\n        h1 {\n            font-size: 1.75rem;\n            margin-bottom: 1.5rem;\n            color: #ffffff;\n        }\n\n        .search-container {\n            display: flex;\n            gap: 0.75rem;\n            ma",
+          "context_refs": [
+            "ref-forms",
+            "ref-status",
+            "ref-structure",
+            "ref-contrast",
+            "ref-dialogs"
+          ],
+          "missing": [
+            "language",
+            "lists"
+          ],
+          "steps": 7
+        },
+        {
+          "id": "w34",
+          "family": "dashboard",
+          "solved": false,
+          "task": "Build a dashboard with four metric cards, each with a label, a big number, and a change against last week.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functional requirements above.",
+          "wrote": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Dashboard</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        html {\n            font-size: 16px;\n        }\n\n        body {\n            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;\n            background-color: #f5f5f5;\n            color: #1a1a1a;\n            line-height: 1.6;\n        }\n\n        header {\n            background-color: #ffffff;\n            border-bottom: 1px solid #e0e0e0;\n            padding: 2rem;\n            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);\n        }\n\n        h1 {\n            font-size: 2rem;\n            font-weight: 600;\n            color: #1a1a1a;\n        }\n\n        ",
+          "context_refs": [
+            "ref-structure",
+            "ref-contrast",
+            "ref-dialogs",
+            "ref-forms",
+            "ref-keyboard"
+          ],
+          "missing": [
+            "language",
+            "status"
+          ],
+          "steps": 1
+        },
+        {
+          "id": "w36",
+          "family": "dashboard",
+          "solved": false,
+          "task": "Build a dashboard with four metric cards, each with a label, a big number, and a change against last week. Make it work on a narrow phone screen without hiding content from assistive technology.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functi",
+          "wrote": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Dashboard</title>\n  <style>\n    * {\n      margin: 0;\n      padding: 0;\n      box-sizing: border-box;\n    }\n\n    body {\n      font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif;\n      background-color: #ffffff;\n      color: #1a1a1a;\n      line-height: 1.5;\n    }\n\n    header {\n      background-color: #0052cc;\n      color: #ffffff;\n      padding: 1.5rem;\n      text-align: center;\n    }\n\n    header h1 {\n      font-size: 1.75rem;\n      font-weight: 700;\n    }\n\n    main {\n      padding: 1.5rem;\n      max-width: 1200px;\n      margin: 0 auto;\n    }\n\n    .metrics-grid {\n      display: grid;\n      grid-template-columns: 1fr;\n      gap: 1rem;\n      margin-bottom: 2rem;\n    }\n\n    @media (min-width: 640px) {\n      .metrics-grid",
+          "context_refs": [
+            "ref-structure",
+            "ref-contrast",
+            "ref-dialogs",
+            "ref-forms",
+            "ref-keyboard"
+          ],
+          "missing": [
+            "language",
+            "status"
+          ],
+          "steps": 1
+        }
+      ],
+      "standings": {
+        "AERO": {
+          "role": "AERO",
+          "n": 4,
+          "blame_s": 27.315,
+          "ci": [
+            22.53,
+            33.05
+          ],
+          "var": 3.407,
+          "modes": {
+            "ghost-swap": 9
+          }
+        },
+        "STRATEGIST": {
+          "role": "STRATEGIST",
+          "n": 0,
+          "blame_s": 0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "var": 0.0,
+          "modes": {}
+        },
+        "POWER_UNIT": {
+          "role": "POWER_UNIT",
+          "n": 1,
+          "blame_s": 22.131,
+          "ci": [
+            22.131,
+            22.131
+          ],
+          "var": 0.0,
+          "modes": {
+            "null-stub": 1
+          }
+        },
+        "TYRES": {
+          "role": "TYRES",
+          "n": 0,
+          "blame_s": 0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "var": 0.0,
+          "modes": {}
+        },
+        "DATA": {
+          "role": "DATA",
+          "n": 4,
+          "blame_s": 50.913,
+          "ci": [
+            22.293,
+            80.018
+          ],
+          "var": 97.423,
+          "modes": {
+            "patch-replay": 10
+          }
+        }
+      },
+      "wall_s": 374.8604371547699,
+      "backends": {
+        "driver": "anthropic",
+        "typed_decision": "local-policy (stand-in)",
+        "sandbox": "docker \u2014 managed sandbox unavailable: sandboxes are not enabled for this organisation \u2014 W&B enables the preview per org on request to support@wandb.com",
+        "weave": "weave",
+        "rl": "serverless-rl",
+        "registry": "wandb-registry",
+        "aria": "aria"
+      },
+      "notes": [
+        "no role reached n >= 5 with a positive 90 % lower bound; the matched-budget test-time-scaling ghost runs instead"
+      ]
+    },
+    {
+      "generation": 2,
+      "mode": "attended",
+      "claimed_s": 72.61532245260594,
+      "official_s": 74.3188,
+      "d_quali": 3.8608813186346254,
+      "d_sealed": 3.8447999999999922,
+      "d_smoke": 3.459261042912786,
+      "selection": {
+        "generation": 2,
+        "r_star": "DATA",
+        "path": "harness",
+        "rule_fired": "gain_per_usd",
+        "blame_s": 69.344,
+        "ci": [
+          42.049,
+          100.997
+        ],
+        "n": 6,
+        "p_fix": 0.5,
+        "p_fix_is_prior": true,
+        "cost_usd": 0.3,
+        "hours": 0.25,
+        "expected_gain_per_usd": 81.58,
+        "alternatives": [
+          {
+            "role": "DATA",
+            "n": 6,
+            "blame_s": 69.344,
+            "ci_lo": 42.049,
+            "gain_per_usd": 81.58,
+            "eligible": true,
+            "exhausted": false,
+            "n_attempts": 0,
+            "fix_rate": null
+          },
+          {
+            "role": "AERO",
+            "n": 4,
+            "blame_s": 30.553,
+            "ci_lo": 24.166,
+            "gain_per_usd": 35.94,
+            "eligible": false,
+            "exhausted": false,
+            "n_attempts": 1,
+            "fix_rate": null
+          },
+          {
+            "role": "POWER_UNIT",
+            "n": 1,
+            "blame_s": 23.665,
+            "ci_lo": 23.665,
+            "gain_per_usd": 5.92,
+            "eligible": false,
+            "exhausted": false,
+            "n_attempts": 0,
+            "fix_rate": null
+          },
+          {
+            "role": "STRATEGIST",
+            "n": 0,
+            "blame_s": 0,
+            "ci_lo": 0.0,
+            "gain_per_usd": 0.0,
+            "eligible": false,
+            "exhausted": false,
+            "n_attempts": 0,
+            "fix_rate": null
+          },
+          {
+            "role": "TYRES",
+            "n": 0,
+            "blame_s": 0,
+            "ci_lo": 0.0,
+            "gain_per_usd": 0.0,
+            "eligible": false,
+            "exhausted": false,
+            "n_attempts": 0,
+            "fix_rate": null
+          }
+        ],
+        "parked": null,
+        "notes": []
+      },
+      "verdict": {
+        "verdict": "LEGAL",
+        "functional_role": "Execution",
+        "obligation": "Faithfulness",
+        "confidence": 0.93,
+        "evidence": [
+          "1 file(s) in scope"
+        ],
+        "cell": "Execution x Faithfulness",
+        "seeded": false
+      },
+      "gates": [
+        {
+          "gate": "diff_size",
+          "ok": true,
+          "detail": "7 changed line(s), minimum 3",
+          "value": {
+            "lines": 7
+          },
+          "about": "change"
+        },
+        {
+          "gate": "comparable_ab",
+          "ok": true,
+          "detail": "two comparable candidates",
+          "value": null,
+          "about": "comparison"
+        },
+        {
+          "gate": "novelty",
+          "ok": true,
+          "detail": "closest previous proposal cosine 0.099 (reject at 0.95)",
+          "value": {
+            "cosine": 0.099
+          },
+          "about": "change"
+        },
+        {
+          "gate": "evidence",
+          "ok": true,
+          "detail": "cites 1 pattern page(s)",
+          "value": {
+            "pages": [
+              "pattern-0299"
+            ]
+          },
+          "about": "change"
+        },
+        {
+          "gate": "seesaw",
+          "ok": true,
+          "detail": "TEAM CLAIMED +3.861s, OFFICIAL +3.845s",
+          "value": {
+            "d_quali": 3.861,
+            "d_sealed": 3.845
+          },
+          "about": "change"
+        },
+        {
+          "gate": "correlation",
+          "ok": true,
+          "detail": "smoke +3.459s, quali +3.861s, sealed +3.845s (dead band 0.3s)",
+          "value": {
+            "d_smoke": 3.459,
+            "d_quali": 3.861,
+            "d_sealed": 3.845
+          },
+          "about": "comparison"
+        },
+        {
+          "gate": "regression",
+          "ok": true,
+          "detail": "no item that passed last generation now fails",
+          "value": {
+            "lost": []
+          },
+          "about": "change"
+        },
+        {
+          "gate": "cost_cap",
+          "ok": true,
+          "detail": "$4.995 of $6.00 race + replay budget",
+          "value": {
+            "spent": 4.9955,
+            "cap": 6.0
+          },
+          "about": "run"
+        },
+        {
+          "gate": "scrutineering",
+          "ok": true,
+          "detail": "LEGAL at 0.93",
+          "value": {
+            "verdict": "LEGAL"
+          },
+          "about": "change"
+        },
+        {
+          "gate": "rl_entropy",
+          "ok": true,
+          "detail": "no RL job this generation",
+          "value": null,
+          "about": "change"
+        }
+      ],
+      "promoted": true,
+      "rule_fired": "gain_per_usd",
+      "role": "DATA",
+      "prefix": "H",
+      "part": "H-v0",
+      "patterns": [
+        "pattern-0299"
+      ],
+      "debrief": {
+        "path": "round_002.py",
+        "marimo_check": true,
+        "script_run": true,
+        "gate_ok": true
+      },
+      "cost_usd": 4.995475,
+      "tts_ghost": null,
+      "rl": null,
+      "circuit": null,
+      "manifest": {
+        "evidence": [
+          "DATA",
+          "AERO",
+          "POWER_UNIT"
+        ],
+        "root_cause": "DATA is the largest confirmed source of lost time this generation (69.3s over 6 incidents, 90% CI lower bound 42.0s)",
+        "predicted_fixes": [
+          "w13",
+          "w29",
+          "w34"
+        ],
+        "at_risk_regressions": [
+          "w36",
+          "w05"
+        ],
+        "predicted_delta_s": 4.623
+      },
+      "manifest_check": {},
+      "candidate_verdicts": [
+        {
+          "candidate": "A",
+          "summary": "raise the sensor rake from syntax to render",
+          "verdict": "LEGAL",
+          "functional_role": "Execution",
+          "obligation": "Faithfulness",
+          "confidence": 0.93,
+          "evidence": [
+            "1 file(s) in scope"
+          ],
+          "cell": "Execution x Faithfulness",
+          "seeded": false
+        },
+        {
+          "candidate": "B",
+          "summary": "open the page in a browser and audit it before submitting",
+          "verdict": "LEGAL",
+          "functional_role": "Execution",
+          "obligation": "Faithfulness",
+          "confidence": 0.93,
+          "evidence": [
+            "1 file(s) in scope"
+          ],
+          "cell": "Execution x Faithfulness",
+          "seeded": false
+        }
+      ],
+      "black_flags": [],
+      "router_rows": [
+        {
+          "item": "w13",
+          "blamed_role": "DATA",
+          "mast_mode": "3.3-incorrect-verification",
+          "blame_share": {
+            "AERO": 0.314,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.114,
+            "TYRES": 0.143,
+            "DATA": 0.429
+          },
+          "confidence": 0.61,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w29",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.379,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.138,
+            "TYRES": 0.172,
+            "DATA": 0.31
+          },
+          "confidence": 0.547,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w34",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.379,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.138,
+            "TYRES": 0.172,
+            "DATA": 0.31
+          },
+          "confidence": 0.547,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w36",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.379,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.138,
+            "TYRES": 0.172,
+            "DATA": 0.31
+          },
+          "confidence": 0.547,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w05",
+          "blamed_role": "DATA",
+          "mast_mode": "3.3-incorrect-verification",
+          "blame_share": {
+            "AERO": 0.25,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.111,
+            "TYRES": 0.139,
+            "DATA": 0.5
+          },
+          "confidence": 0.8,
+          "needs_ablation": false,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w03",
+          "blamed_role": "POWER_UNIT",
+          "mast_mode": "2.1-capability-shortfall",
+          "blame_share": {
+            "AERO": 0.273,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.303,
+            "TYRES": 0.152,
+            "DATA": 0.273
+          },
+          "confidence": 0.492,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w29",
+          "blamed_role": "DATA",
+          "mast_mode": "3.3-incorrect-verification",
+          "blame_share": {
+            "AERO": 0.289,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.105,
+            "TYRES": 0.132,
+            "DATA": 0.474
+          },
+          "confidence": 0.708,
+          "needs_ablation": false,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w34",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.379,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.138,
+            "TYRES": 0.172,
+            "DATA": 0.31
+          },
+          "confidence": 0.547,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w36",
+          "blamed_role": "AERO",
+          "mast_mode": "1.4-loss-of-history",
+          "blame_share": {
+            "AERO": 0.379,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.138,
+            "TYRES": 0.172,
+            "DATA": 0.31
+          },
+          "confidence": 0.547,
+          "needs_ablation": true,
+          "backend": "local-policy"
+        },
+        {
+          "item": "w05",
+          "blamed_role": "DATA",
+          "mast_mode": "3.3-incorrect-verification",
+          "blame_share": {
+            "AERO": 0.265,
+            "STRATEGIST": 0.0,
+            "POWER_UNIT": 0.118,
+            "TYRES": 0.147,
+            "DATA": 0.471
+          },
+          "confidence": 0.738,
+          "needs_ablation": false,
+          "backend": "local-policy"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "w05",
+          "attempts": 2,
+          "solved": 0,
+          "steps": 5,
+          "cost_usd": 0.15013,
+          "missing": [
+            "language"
+          ],
+          "tool_errors": 10,
+          "retired": 0,
+          "family": "invoices",
+          "title": "Build a table of five invoices with columns Date, Client, Amount and Status. The column headers must be sortab"
+        },
+        {
+          "id": "w29",
+          "attempts": 2,
+          "solved": 0,
+          "steps": 9,
+          "cost_usd": 0.21147,
+          "missing": [
+            "language",
+            "lists"
+          ],
+          "tool_errors": 16,
+          "retired": 0,
+          "family": "search",
+          "title": "Build a search results page: a search field with the current query, a count of results, and a list of eight re"
+        },
+        {
+          "id": "w34",
+          "attempts": 2,
+          "solved": 0,
+          "steps": 2,
+          "cost_usd": 0.05149,
+          "missing": [
+            "language",
+            "status"
+          ],
+          "tool_errors": 0,
+          "retired": 0,
+          "family": "dashboard",
+          "title": "Build a dashboard with four metric cards, each with a label, a big number, and a change against last week."
+        },
+        {
+          "id": "w36",
+          "attempts": 2,
+          "solved": 0,
+          "steps": 2,
+          "cost_usd": 0.05126,
+          "missing": [
+            "language",
+            "status"
+          ],
+          "tool_errors": 0,
+          "retired": 0,
+          "family": "dashboard",
+          "title": "Build a dashboard with four metric cards, each with a label, a big number, and a change against last week. Mak"
+        },
+        {
+          "id": "w03",
+          "attempts": 2,
+          "solved": 1,
+          "steps": 10,
+          "cost_usd": 0.22425,
+          "missing": [
+            "language"
+          ],
+          "tool_errors": 17,
+          "retired": 0,
+          "family": "checkout",
+          "title": "Build a checkout form: email, card number, expiry, CVC, a country select, and a Pay button. Show the order tot"
+        },
+        {
+          "id": "w13",
+          "attempts": 2,
+          "solved": 1,
+          "steps": 2,
+          "cost_usd": 0.06792,
+          "missing": [
+            "language",
+            "lists"
+          ],
+          "tool_errors": 1,
+          "retired": 0,
+          "family": "pricing",
+          "title": "Build a pricing section with three plan cards. Each has a plan name, a price, a list of features, and a button"
+        },
+        {
+          "id": "w08",
+          "attempts": 2,
+          "solved": 2,
+          "steps": 2,
+          "cost_usd": 0.0669,
+          "missing": [
+            "language"
+          ],
+          "tool_errors": 0,
+          "retired": 0,
+          "family": "dialog",
+          "title": "Build a modal dialog that asks the user to confirm deleting their account, with Cancel and Delete buttons, ove"
+        },
+        {
+          "id": "w18",
+          "attempts": 2,
+          "solved": 2,
+          "steps": 3,
+          "cost_usd": 0.09868,
+          "missing": [
+            "language"
+          ],
+          "tool_errors": 6,
+          "retired": 0,
+          "family": "signup",
+          "title": "Build a sign-up form with name, email and password, where the password field explains its requirements and an "
+        },
+        {
+          "id": "w20",
+          "attempts": 2,
+          "solved": 2,
+          "steps": 2,
+          "cost_usd": 0.07367,
+          "missing": [
+            "language",
+            "lists"
+          ],
+          "tool_errors": 2,
+          "retired": 0,
+          "family": "gallery",
+          "title": "Build a gallery of six product images in a grid, each with a caption and a price. Use a dark colour scheme; te"
+        },
+        {
+          "id": "w25",
+          "attempts": 2,
+          "solved": 2,
+          "steps": 2,
+          "cost_usd": 0.0712,
+          "missing": [
+            "language"
+          ],
+          "tool_errors": 2,
+          "retired": 0,
+          "family": "tabs",
+          "title": "Build a three-tab interface where each tab reveals a different panel of text."
+        }
+      ],
+      "pages": [
+        {
+          "id": "w05",
+          "family": "invoices",
+          "title": "Sortable invoice table (2)",
+          "file": "run-02/invoices-w05.html",
+          "passed": false,
+          "weighted": 45,
+          "critical": 5,
+          "rules": [
+            {
+              "id": "aria-allowed-attr",
+              "impact": "critical",
+              "n": 4
+            },
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 8727
+        },
+        {
+          "id": "w13",
+          "family": "pricing",
+          "title": "Pricing plans",
+          "file": "run-02/pricing-w13.html",
+          "passed": false,
+          "weighted": 15,
+          "critical": 3,
+          "rules": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "n": 3
+            }
+          ],
+          "missing": [],
+          "bytes": 6082
+        },
+        {
+          "id": "w29",
+          "family": "search",
+          "title": "Search results (2)",
+          "file": "run-02/search-w29.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [
+            "li a, article a (6/8)"
+          ],
+          "bytes": 8538
+        },
+        {
+          "id": "w34",
+          "family": "dashboard",
+          "title": "Metrics dashboard",
+          "file": "run-02/dashboard-w34.html",
+          "passed": false,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [
+            "h2, h3 (0/4)"
+          ],
+          "bytes": 4846
+        },
+        {
+          "id": "w36",
+          "family": "dashboard",
+          "title": "Metrics dashboard (3)",
+          "file": "run-02/dashboard-w36.html",
+          "passed": false,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [
+            "h2, h3 (0/4)"
+          ],
+          "bytes": 4347
+        },
+        {
+          "id": "w03",
+          "family": "checkout",
+          "title": "Checkout form (3)",
+          "file": "run-02/checkout-w03.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 7408
+        },
+        {
+          "id": "w08",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (2)",
+          "file": "run-02/dialog-w08.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 8449
+        },
+        {
+          "id": "w18",
+          "family": "signup",
+          "title": "Sign-up with validation (3)",
+          "file": "run-02/signup-w18.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 8084
+        },
+        {
+          "id": "w20",
+          "family": "gallery",
+          "title": "Image gallery (2)",
+          "file": "run-02/gallery-w20.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 7249
+        },
+        {
+          "id": "w25",
+          "family": "tabs",
+          "title": "Tabbed panel",
+          "file": "run-02/tabs-w25.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 8958
+        }
+      ],
+      "diff": "--- a/skills/data/tools.yaml\n+++ b/skills/data/tools.yaml\n@@ -1,7 +1,6 @@\n-# VERIFICATION \u2014 how strongly a candidate is checked before the agent submits it. Prefix H.\n probe:\n   enabled: true\n-  mode: syntax           # none | syntax | render | audit\n-  reaudit: false         # after a fix, check the fix instead of trusting it\n-schema_version: 1\n+  mode: audit\n+  reaudit: true\n+schema_version: 2\n strict_parse: false\n",
+      "diff_summary": "open the page in a browser and audit it before submitting",
+      "samples": [
+        {
+          "id": "w13",
+          "family": "pricing",
+          "solved": false,
+          "task": "Build a pricing section with three plan cards. Each has a plan name, a price, a list of features, and a button to choose it.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functional requirements above.",
+          "wrote": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Pricing Plans</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        body {\n            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\n            background-color: #ffffff;\n            color: #212121;\n            line-height: 1.6;\n        }\n\n        header {\n            padding: 2rem 1rem;\n            text-align: center;\n            background-color: #f5f5f5;\n        }\n\n        h1 {\n            font-size: 2.5rem;\n            font-weight: 700;\n            color: #212121;\n            margin-bottom: 0.5rem;\n        }\n\n        .header-subtitle {\n            font-size: 1.125rem;\n            color: #595959;\n",
+          "context_refs": [
+            "ref-structure",
+            "ref-contrast",
+            "ref-dialogs",
+            "ref-forms",
+            "ref-keyboard"
+          ],
+          "missing": [
+            "language",
+            "lists"
+          ],
+          "steps": 1
+        },
+        {
+          "id": "w29",
+          "family": "search",
+          "solved": false,
+          "task": "Build a search results page: a search field with the current query, a count of results, and a list of eight results each with a title link and a snippet. Use a dark colour scheme; text still has to meet contrast requirements.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by a",
+          "wrote": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Search Results</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        body {\n            font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;\n            background-color: #1a1a1a;\n            color: #e0e0e0;\n            line-height: 1.6;\n        }\n\n        header {\n            background-color: #0d0d0d;\n            padding: 1.5rem 2rem;\n            border-bottom: 1px solid #333;\n        }\n\n        h1 {\n            font-size: 1.75rem;\n            margin-bottom: 1.5rem;\n            color: #ffffff;\n        }\n\n        .search-container {\n            display: flex;\n            gap: 0.75rem;\n            ma",
+          "context_refs": [
+            "ref-forms",
+            "ref-status",
+            "ref-structure",
+            "ref-contrast",
+            "ref-dialogs"
+          ],
+          "missing": [
+            "language",
+            "lists"
+          ],
+          "steps": 7
+        },
+        {
+          "id": "w34",
+          "family": "dashboard",
+          "solved": false,
+          "task": "Build a dashboard with four metric cards, each with a label, a big number, and a change against last week.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functional requirements above.",
+          "wrote": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Dashboard</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        html {\n            font-size: 16px;\n        }\n\n        body {\n            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;\n            background-color: #f5f5f5;\n            color: #1a1a1a;\n            line-height: 1.6;\n        }\n\n        header {\n            background-color: #ffffff;\n            border-bottom: 1px solid #e0e0e0;\n            padding: 2rem;\n            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);\n        }\n\n        h1 {\n            font-size: 2rem;\n            font-weight: 600;\n            color: #1a1a1a;\n        }\n\n        ",
+          "context_refs": [
+            "ref-structure",
+            "ref-contrast",
+            "ref-dialogs",
+            "ref-forms",
+            "ref-keyboard"
+          ],
+          "missing": [
+            "language",
+            "status"
+          ],
+          "steps": 1
+        },
+        {
+          "id": "w36",
+          "family": "dashboard",
+          "solved": false,
+          "task": "Build a dashboard with four metric cards, each with a label, a big number, and a change against last week. Make it work on a narrow phone screen without hiding content from assistive technology.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functi",
+          "wrote": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Dashboard</title>\n  <style>\n    * {\n      margin: 0;\n      padding: 0;\n      box-sizing: border-box;\n    }\n\n    body {\n      font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif;\n      background-color: #ffffff;\n      color: #1a1a1a;\n      line-height: 1.5;\n    }\n\n    header {\n      background-color: #0052cc;\n      color: #ffffff;\n      padding: 1.5rem;\n      text-align: center;\n    }\n\n    header h1 {\n      font-size: 1.75rem;\n      font-weight: 700;\n    }\n\n    main {\n      padding: 1.5rem;\n      max-width: 1200px;\n      margin: 0 auto;\n    }\n\n    .metrics-grid {\n      display: grid;\n      grid-template-columns: 1fr;\n      gap: 1rem;\n      margin-bottom: 2rem;\n    }\n\n    @media (min-width: 640px) {\n      .metrics-grid",
+          "context_refs": [
+            "ref-structure",
+            "ref-contrast",
+            "ref-dialogs",
+            "ref-forms",
+            "ref-keyboard"
+          ],
+          "missing": [
+            "language",
+            "status"
+          ],
+          "steps": 1
+        }
+      ],
+      "standings": {
+        "AERO": {
+          "role": "AERO",
+          "n": 4,
+          "blame_s": 30.553,
+          "ci": [
+            24.166,
+            37.872
+          ],
+          "var": 5.75,
+          "modes": {
+            "ghost-swap": 9
+          }
+        },
+        "STRATEGIST": {
+          "role": "STRATEGIST",
+          "n": 0,
+          "blame_s": 0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "var": 0.0,
+          "modes": {}
+        },
+        "POWER_UNIT": {
+          "role": "POWER_UNIT",
+          "n": 1,
+          "blame_s": 23.665,
+          "ci": [
+            23.665,
+            23.665
+          ],
+          "var": 0.0,
+          "modes": {
+            "null-stub": 1
+          }
+        },
+        "TYRES": {
+          "role": "TYRES",
+          "n": 0,
+          "blame_s": 0,
+          "ci": [
+            0.0,
+            0.0
+          ],
+          "var": 0.0,
+          "modes": {}
+        },
+        "DATA": {
+          "role": "DATA",
+          "n": 6,
+          "blame_s": 69.344,
+          "ci": [
+            42.049,
+            100.997
+          ],
+          "var": 64.57,
+          "modes": {
+            "patch-replay": 10
+          }
+        }
+      },
+      "wall_s": 475.6792571544647,
+      "backends": {
+        "driver": "anthropic",
+        "typed_decision": "local-policy (stand-in)",
+        "sandbox": "docker \u2014 managed sandbox unavailable: sandboxes are not enabled for this organisation \u2014 W&B enables the preview per org on request to support@wandb.com",
+        "weave": "weave",
+        "rl": "serverless-rl",
+        "registry": "wandb-registry",
+        "aria": "aria"
+      },
+      "notes": []
+    }
+  ]
+}

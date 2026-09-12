@@ -1,0 +1,24 @@
+<!-- Scrutineer broadcast frame. Panels are filled by ui.js; ids are the contract. -->
+<div class="bcast" id="bcast">
+  <header class="hdr">
+    <div class="wordmark">SCRUTINEER</div>
+    <div class="hdr-mid" id="hdrMid">SEASON 1 · ROUND 01/22</div>
+    <div class="badge" id="sessionBadge">GARAGE</div>
+    <div class="clock" id="sessionClock">SESSION 00:00.0</div>
+    <div class="live">LIVE</div>
+  </header>
+  <aside class="tower" id="tower" aria-label="Timing tower"></aside>
+  <section class="stage-wrap">
+    <div class="stage-box"><canvas id="stage" aria-label="Broadcast picture"></canvas><div class="hud" id="hud"></div><div class="cards" id="cards"></div></div>
+    <div class="strip" id="strip" aria-label="Season lineage"></div>
+  </section>
+  <aside class="telemetry" id="telemetry" aria-label="FIA telemetry"></aside>
+  <section class="lower" id="lower">
+    <div class="champ" id="champ" aria-label="Constructors' championship"></div>
+    <div class="chart-box"><canvas id="chart" width="640" height="150" aria-label="Team claimed vs official"></canvas></div>
+    <div class="controls" id="controls" aria-label="Controls"></div>
+  </section>
+  <aside class="garage-panel" id="garagePanel" aria-label="Team"></aside>
+  <footer class="ticker"><span class="ticker-tag">STEWARDS</span><div class="ticker-track" id="ticker"></div></footer>
+  <div class="regs" id="regs" hidden></div>
+</div>

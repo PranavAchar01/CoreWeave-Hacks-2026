@@ -1,0 +1,264 @@
+{
+  "schema": 2,
+  "system": "You are building a web interface that real people will use, including people using a screen reader or a keyboard alone. Return one complete, self-contained HTML document and nothing else. Inline all CSS. Make no external requests.",
+  "models": [
+    "OpenPipe/Qwen3-14B-Instruct"
+  ],
+  "axe": "https://cdn.jsdelivr.net/npm/axe-core@4.10.2/axe.min.js",
+  "before_label": "the harness it starts with",
+  "after_label": "after the upgrades the loop found",
+  "tasks": [
+    {
+      "id": "w27",
+      "family": "tabs",
+      "title": "Tabbed panel (3)",
+      "prompt": "Build a three-tab interface where each tab reveals a different panel of text. Make it work on a narrow phone screen without hiding content from assistive technology.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functional requirements above.",
+      "must": [
+        [
+          "[role=tab]",
+          3
+        ],
+        [
+          "[role=tabpanel]",
+          3
+        ],
+        [
+          "h1",
+          1
+        ]
+      ],
+      "concepts": [
+        "contrast",
+        "headings",
+        "keyboard",
+        "landmarks",
+        "language",
+        "names"
+      ],
+      "before": {
+        "context": "# References\n[ref-structure] One `<h1>` per document, and heading levels do not skip. Every region of content sits inside a\nlandmark: `<header>`, `<nav>`, `<main>`, `<footer>`.\n\n[ref-forms] Every control needs a programmatic name. `<label for=\"id\">` beside `<input id=\"id\">` is the\ndefault; `aria-label` when no visible text exists. Placeholder text is not a label.\n\n# Task\nBuild a three-tab interface where each tab reveals a different panel of text. Make it work on a narrow phone screen without hiding content from assistive technology.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functional requirements above.",
+        "refs": [
+          "ref-structure",
+          "ref-forms"
+        ],
+        "missing": [
+          "contrast",
+          "keyboard",
+          "language"
+        ],
+        "retrieval": "keyword",
+        "n_refs": 2,
+        "verification": "syntax",
+        "samples": 2
+      },
+      "after": {
+        "context": "# Task\nBuild a three-tab interface where each tab reveals a different panel of text. Make it work on a narrow phone screen without hiding content from assistive technology.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functional requirements above.\n\n# References\n[ref-landmarks] Set <html lang=\"en\"> and a non-empty <title>. Every region of content belongs inside <header>,\n<nav>, <main> or <footer>. Exactly one <h1>, and heading levels do not skip.\n\n[ref-controls] Every control needs a programmatic name: <label for> beside the input, or aria-label on an\nicon-only control. Everything operable by mouse is operable by keyboard, with a visible focus\nstyle. Placeholder text is not a label.\n\n[ref-structure] One `<h1>` per document, and heading levels do not skip. Every region of content sits inside a\nlandmark: `<header>`, `<nav>`, `<main>`, `<footer>`.\n\n[ref-contrast] Body text needs 4.5:1 against its background and large text 3:1. Mid greys on white fail; check\nthe pair before you use it, and never rely on colour alone to carry meaning.\n\n[ref-forms] Every control needs a programmatic name. `<label for=\"id\">` beside `<input id=\"id\">` is the\ndefault; `aria-label` when no visible text exists. Placeholder text is not a label.",
+        "refs": [
+          "ref-landmarks",
+          "ref-controls",
+          "ref-structure",
+          "ref-contrast",
+          "ref-forms"
+        ],
+        "missing": [],
+        "retrieval": "concept-match",
+        "n_refs": 5,
+        "verification": "audit",
+        "samples": 2
+      }
+    },
+    {
+      "id": "w09",
+      "family": "dialog",
+      "title": "Destructive confirm dialog (3)",
+      "prompt": "Build a modal dialog that asks the user to confirm deleting their account, with Cancel and Delete buttons, over a dimmed page behind it. Make it work on a narrow phone screen without hiding content from assistive technology.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functional requirements above.",
+      "must": [
+        [
+          "[role=dialog], dialog",
+          1
+        ],
+        [
+          "button",
+          2
+        ],
+        [
+          "h1",
+          1
+        ]
+      ],
+      "concepts": [
+        "contrast",
+        "dialogs",
+        "headings",
+        "keyboard",
+        "landmarks",
+        "language",
+        "names"
+      ],
+      "before": {
+        "context": "# References\n[ref-structure] One `<h1>` per document, and heading levels do not skip. Every region of content sits inside a\nlandmark: `<header>`, `<nav>`, `<main>`, `<footer>`.\n\n# Task\nBuild a modal dialog that asks the user to confirm deleting their account, with Cancel and Delete buttons, over a dimmed page behind it. Make it work on a narrow phone screen without hiding content from assistive technology.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functional requirements above.",
+        "refs": [
+          "ref-structure"
+        ],
+        "missing": [
+          "contrast",
+          "dialogs",
+          "keyboard",
+          "language",
+          "names"
+        ],
+        "retrieval": "keyword",
+        "n_refs": 2,
+        "verification": "syntax",
+        "samples": 2
+      },
+      "after": {
+        "context": "# Task\nBuild a modal dialog that asks the user to confirm deleting their account, with Cancel and Delete buttons, over a dimmed page behind it. Make it work on a narrow phone screen without hiding content from assistive technology.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functional requirements above.\n\n# References\n[ref-landmarks] Set <html lang=\"en\"> and a non-empty <title>. Every region of content belongs inside <header>,\n<nav>, <main> or <footer>. Exactly one <h1>, and heading levels do not skip.\n\n[ref-controls] Every control needs a programmatic name: <label for> beside the input, or aria-label on an\nicon-only control. Everything operable by mouse is operable by keyboard, with a visible focus\nstyle. Placeholder text is not a label.\n\n[ref-structure] One `<h1>` per document, and heading levels do not skip. Every region of content sits inside a\nlandmark: `<header>`, `<nav>`, `<main>`, `<footer>`.\n\n[ref-contrast] Body text needs 4.5:1 against its background and large text 3:1. Mid greys on white fail; check\nthe pair before you use it, and never rely on colour alone to carry meaning.\n\n[ref-forms] Every control needs a programmatic name. `<label for=\"id\">` beside `<input id=\"id\">` is the\ndefault; `aria-label` when no visible text exists. Placeholder text is not a label.",
+        "refs": [
+          "ref-landmarks",
+          "ref-controls",
+          "ref-structure",
+          "ref-contrast",
+          "ref-forms"
+        ],
+        "missing": [
+          "dialogs"
+        ],
+        "retrieval": "concept-match",
+        "n_refs": 5,
+        "verification": "audit",
+        "samples": 2
+      }
+    },
+    {
+      "id": "w18",
+      "family": "signup",
+      "title": "Sign-up with validation (3)",
+      "prompt": "Build a sign-up form with name, email and password, where the password field explains its requirements and an error message is shown for an invalid email. Make it work on a narrow phone screen without hiding content from assistive technology.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functional requirements above.",
+      "must": [
+        [
+          "form",
+          1
+        ],
+        [
+          "input",
+          3
+        ],
+        [
+          "button",
+          1
+        ],
+        [
+          "h1",
+          1
+        ]
+      ],
+      "concepts": [
+        "contrast",
+        "headings",
+        "labels",
+        "landmarks",
+        "language",
+        "names",
+        "status"
+      ],
+      "before": {
+        "context": "# References\n[ref-structure] One `<h1>` per document, and heading levels do not skip. Every region of content sits inside a\nlandmark: `<header>`, `<nav>`, `<main>`, `<footer>`.\n\n[ref-forms] Every control needs a programmatic name. `<label for=\"id\">` beside `<input id=\"id\">` is the\ndefault; `aria-label` when no visible text exists. Placeholder text is not a label.\n\n# Task\nBuild a sign-up form with name, email and password, where the password field explains its requirements and an error message is shown for an invalid email. Make it work on a narrow phone screen without hiding content from assistive technology.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functional requirements above.",
+        "refs": [
+          "ref-structure",
+          "ref-forms"
+        ],
+        "missing": [
+          "contrast",
+          "language",
+          "status"
+        ],
+        "retrieval": "keyword",
+        "n_refs": 2,
+        "verification": "syntax",
+        "samples": 2
+      },
+      "after": {
+        "context": "# Task\nBuild a sign-up form with name, email and password, where the password field explains its requirements and an error message is shown for an invalid email. Make it work on a narrow phone screen without hiding content from assistive technology.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functional requirements above.\n\n# References\n[ref-landmarks] Set <html lang=\"en\"> and a non-empty <title>. Every region of content belongs inside <header>,\n<nav>, <main> or <footer>. Exactly one <h1>, and heading levels do not skip.\n\n[ref-controls] Every control needs a programmatic name: <label for> beside the input, or aria-label on an\nicon-only control. Everything operable by mouse is operable by keyboard, with a visible focus\nstyle. Placeholder text is not a label.\n\n[ref-forms] Every control needs a programmatic name. `<label for=\"id\">` beside `<input id=\"id\">` is the\ndefault; `aria-label` when no visible text exists. Placeholder text is not a label.\n\n[ref-structure] One `<h1>` per document, and heading levels do not skip. Every region of content sits inside a\nlandmark: `<header>`, `<nav>`, `<main>`, `<footer>`.\n\n[ref-contrast] Body text needs 4.5:1 against its background and large text 3:1. Mid greys on white fail; check\nthe pair before you use it, and never rely on colour alone to carry meaning.",
+        "refs": [
+          "ref-landmarks",
+          "ref-controls",
+          "ref-forms",
+          "ref-structure",
+          "ref-contrast"
+        ],
+        "missing": [
+          "status"
+        ],
+        "retrieval": "concept-match",
+        "n_refs": 5,
+        "verification": "audit",
+        "samples": 2
+      }
+    },
+    {
+      "id": "w33",
+      "family": "stepper",
+      "title": "Multi-step form (3)",
+      "prompt": "Build step two of a three-step booking form, showing progress, with two fields and Back and Continue buttons. Make it work on a narrow phone screen without hiding content from assistive technology.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functional requirements above.",
+      "must": [
+        [
+          "input",
+          2
+        ],
+        [
+          "button",
+          2
+        ],
+        [
+          "h1",
+          1
+        ]
+      ],
+      "concepts": [
+        "contrast",
+        "headings",
+        "labels",
+        "landmarks",
+        "language",
+        "names",
+        "status"
+      ],
+      "before": {
+        "context": "# References\n[ref-structure] One `<h1>` per document, and heading levels do not skip. Every region of content sits inside a\nlandmark: `<header>`, `<nav>`, `<main>`, `<footer>`.\n\n# Task\nBuild step two of a three-step booking form, showing progress, with two fields and Back and Continue buttons. Make it work on a narrow phone screen without hiding content from assistive technology.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functional requirements above.",
+        "refs": [
+          "ref-structure"
+        ],
+        "missing": [
+          "contrast",
+          "labels",
+          "language",
+          "names",
+          "status"
+        ],
+        "retrieval": "keyword",
+        "n_refs": 2,
+        "verification": "syntax",
+        "samples": 2
+      },
+      "after": {
+        "context": "# Task\nBuild step two of a three-step booking form, showing progress, with two fields and Back and Continue buttons. Make it work on a narrow phone screen without hiding content from assistive technology.\n\nReturn one complete, self-contained HTML document. Inline any CSS in a <style> tag. No external requests. It will be opened in a browser and checked against WCAG 2.2 AA by axe-core, and against the functional requirements above.\n\n# References\n[ref-landmarks] Set <html lang=\"en\"> and a non-empty <title>. Every region of content belongs inside <header>,\n<nav>, <main> or <footer>. Exactly one <h1>, and heading levels do not skip.\n\n[ref-controls] Every control needs a programmatic name: <label for> beside the input, or aria-label on an\nicon-only control. Everything operable by mouse is operable by keyboard, with a visible focus\nstyle. Placeholder text is not a label.\n\n[ref-forms] Every control needs a programmatic name. `<label for=\"id\">` beside `<input id=\"id\">` is the\ndefault; `aria-label` when no visible text exists. Placeholder text is not a label.\n\n[ref-structure] One `<h1>` per document, and heading levels do not skip. Every region of content sits inside a\nlandmark: `<header>`, `<nav>`, `<main>`, `<footer>`.\n\n[ref-contrast] Body text needs 4.5:1 against its background and large text 3:1. Mid greys on white fail; check\nthe pair before you use it, and never rely on colour alone to carry meaning.",
+        "refs": [
+          "ref-landmarks",
+          "ref-controls",
+          "ref-forms",
+          "ref-structure",
+          "ref-contrast"
+        ],
+        "missing": [
+          "status"
+        ],
+        "retrieval": "concept-match",
+        "n_refs": 5,
+        "verification": "audit",
+        "samples": 2
+      }
+    }
+  ],
+  "identical": false
+}

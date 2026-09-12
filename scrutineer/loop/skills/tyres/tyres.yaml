@@ -1,0 +1,8 @@
+# TYRE / PERFORMANCE ENGINEER — decoding and retry config. Prefix S.
+# engine_mode -> what the driver is allowed to spend on one step.
+modes:
+  1: {temperature: 0.10, samples: 1, max_tokens: 700,  compound: HARD}
+  2: {temperature: 0.20, samples: 1, max_tokens: 800,  compound: HARD}
+  3: {temperature: 0.25, samples: 2, max_tokens: 900,  compound: MEDIUM}
+  4: {temperature: 0.35, samples: 2, max_tokens: 1000, compound: MEDIUM}
+  5: {temperature: 0.55, samples: 3, max_tokens: 1200, compound: SOFT}

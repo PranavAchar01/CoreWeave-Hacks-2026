@@ -1,0 +1,7 @@
+# VERIFICATION — how strongly a candidate is checked before the agent submits it. Prefix H.
+probe:
+  enabled: true
+  mode: syntax           # none | syntax | render | audit
+  reaudit: false         # after a fix, check the fix instead of trusting it
+schema_version: 1
+strict_parse: false

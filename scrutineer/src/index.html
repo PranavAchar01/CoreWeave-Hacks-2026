@@ -1,0 +1,42 @@
+<!-- Scrutineer. One view, one button, and the agent's own work underneath it. -->
+<div class="app" id="app">
+  <header class="top">
+    <div class="mark">SCRUTINEER</div>
+    <div class="tag">an agent that builds web interfaces, and rebuilds its own harness</div>
+    <div class="views" role="tablist">
+      <button class="view-tab on" id="tabTrack" role="tab">TRACK</button>
+      <button class="view-tab dash-tab" id="tabDash" role="tab">TELEMETRY</button>
+    </div>
+    <div class="top-right">
+      <span class="runcount" id="runCount"></span>
+      <button class="hold" id="holdBtn" title="the loop runs on its own; this only pauses it">
+        <span class="dot"></span>RUNNING</button>
+    </div>
+  </header>
+
+  <main class="body">
+    <section class="view">
+      <div class="stage-box" id="viewTrack">
+        <canvas id="stage" aria-label="The agent's harness"></canvas>
+        <div class="hud" id="hud"></div>
+        <div class="cards" id="cards"></div>
+        <div class="overlay" id="overlay" hidden></div>
+      </div>
+      <p class="say" id="say">Six components decide how this agent works. Press <b>RUN THE AGENT</b>.</p>
+      <div class="meters" id="meters"></div>
+    </section>
+
+    <aside class="rig" aria-label="The harness">
+      <div class="rig-head"><span>THE HARNESS</span><span class="rig-sub" id="rigSub">six components</span></div>
+      <div class="rig-list" id="rig"></div>
+      <button class="ghost-btn" id="regsBtn">how this works</button>
+      <button class="ghost-btn" id="tryBtn">run it yourself &middot; your own key</button>
+    </aside>
+  </main>
+
+  <section class="work" id="work" aria-label="The agent's work"></section>
+  <div class="regs" id="regs" hidden></div>
+</div>
+<!-- Live telemetry. Its own surface: takes the whole viewport, and shows the agent running
+     rather than describing it. -->
+<div class="dash" id="dash" hidden></div>

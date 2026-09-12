@@ -1,0 +1,6 @@
+probe:
+  enabled: true
+  mode: audit
+  reaudit: true
+schema_version: 2
+strict_parse: false

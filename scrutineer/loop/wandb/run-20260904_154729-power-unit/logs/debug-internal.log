@@ -1,0 +1,22 @@
+{"time":"2026-09-04T15:47:29.780715-07:00","level":"INFO","msg":"wandb-core"}
+{"time":"2026-09-04T15:47:29.78536-07:00","level":"INFO","msg":"stream: starting","core version":"0.29.0"}
+{"time":"2026-09-04T15:47:29.905728-07:00","level":"INFO","msg":"stream: created new stream","id":"power-unit"}
+{"time":"2026-09-04T15:47:29.906078-07:00","level":"INFO","msg":"stream: started"}
+{"time":"2026-09-04T15:47:29.906272-07:00","level":"INFO","msg":"sender: started"}
+{"time":"2026-09-04T15:47:29.906285-07:00","level":"INFO","msg":"writer: started","stream_id":"power-unit"}
+{"time":"2026-09-04T15:47:29.906387-07:00","level":"INFO","msg":"handler: started"}
+{"time":"2026-09-04T15:47:30.758427-07:00","level":"INFO","msg":"filestream: sending request","total_files":1}
+{"time":"2026-09-04T15:47:31.021012-07:00","level":"INFO","msg":"filestream: request sent","status":"200 OK"}
+{"time":"2026-09-04T15:47:45.756758-07:00","level":"INFO","msg":"filestream: sending request","total_files":1,"console_offset":6,"console_lines":1,"uploaded_len":2}
+{"time":"2026-09-04T15:47:45.758071-07:00","level":"ERROR","msg":"request failed","error":"Get \"http://localhost:8000/metrics\": dial tcp [::1]:8000: connect: connection refused","method":"GET","url":"http://localhost:8000/metrics"}
+{"time":"2026-09-04T15:47:45.9235-07:00","level":"INFO","msg":"filestream: request sent","status":"200 OK"}
+{"time":"2026-09-04T15:47:46.837664-07:00","level":"ERROR","msg":"request failed","error":"Get \"http://localhost:8000/metrics\": dial tcp [::1]:8000: connect: connection refused","method":"GET","url":"http://localhost:8000/metrics"}
+{"time":"2026-09-04T15:47:48.883349-07:00","level":"ERROR","msg":"request failed","error":"Get \"http://localhost:8000/metrics\": dial tcp [::1]:8000: connect: connection refused","method":"GET","url":"http://localhost:8000/metrics"}
+{"time":"2026-09-04T15:47:52.917471-07:00","level":"ERROR","msg":"request failed","error":"Get \"http://localhost:8000/metrics\": dial tcp [::1]:8000: connect: connection refused","method":"GET","url":"http://localhost:8000/metrics"}
+{"time":"2026-09-04T15:47:55.108374-07:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2026-09-04T15:47:55.108521-07:00","level":"INFO","msg":"filestream: sending request","total_files":3,"events_offset":0,"events_lines":2,"console_offset":7,"console_lines":24,"uploaded_len":3,"complete":true,"exit_code":0}
+{"time":"2026-09-04T15:47:55.400495-07:00","level":"INFO","msg":"filestream: request sent","status":"200 OK"}
+{"time":"2026-09-04T15:47:55.400647-07:00","level":"INFO","msg":"stream: finishing up"}
+{"time":"2026-09-04T15:47:55.400674-07:00","level":"INFO","msg":"handler: closed"}
+{"time":"2026-09-04T15:47:55.400942-07:00","level":"INFO","msg":"sender: closed"}
+{"time":"2026-09-04T15:47:55.400957-07:00","level":"INFO","msg":"stream: all finished"}

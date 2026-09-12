@@ -1,0 +1,45 @@
+_wandb:
+    value:
+        cli_version: 0.29.0
+        e:
+            9jmrfic1ai92vkac266qdl9hdfcielhj:
+                args:
+                    - runs
+                    - --bundle
+                    - /tmp/season_v1_bundle.json
+                    - --group
+                    - season-v1
+                    - --report
+                executable: /Users/pranavachar/coreweaves/scrutineer/loop/.venv/bin/python
+                host: mac.lan
+                os: macOS-26.5.2-arm64-arm-64bit
+                program: -m scrutineer.cli
+                python: CPython 3.12.13
+                root: /Users/pranavachar/coreweaves/scrutineer/loop
+                startedAt: "2026-09-04T22:34:29.522605Z"
+                writerId: 9jmrfic1ai92vkac266qdl9hdfcielhj
+        m: []
+        python_version: 3.12.13
+        t:
+            "3":
+                - 2
+                - 13
+                - 16
+            "4": 3.12.13
+            "5": 0.29.0
+            "10":
+                - 20
+            "12": 0.29.0
+            "13": darwin-arm64
+generation:
+    value: 11
+mode:
+    value: unattended
+part:
+    value: R-v2
+picked:
+    value: true
+role:
+    value: AERO
+rule_fired:
+    value: gain_per_usd

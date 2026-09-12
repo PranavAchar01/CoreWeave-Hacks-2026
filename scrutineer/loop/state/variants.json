@@ -1,0 +1,3302 @@
+{
+"00-0": [
+[
+"inverted-result",
+"def count_chars(text):\n    s = set('aeiou')\n    return not sum(1 for c in text.lower() if c in s)\n"
+],
+[
+"empty-body",
+"def count_chars(text):\n    return None\n"
+],
+[
+"stub",
+"def count_chars(text):\n    return None\n"
+]
+],
+"00-1": [
+[
+"inverted-result",
+"def count_chars(text):\n    s = set('aeiouy')\n    return not sum(1 for c in text.lower() if c in s)\n"
+],
+[
+"empty-body",
+"def count_chars(text):\n    return None\n"
+],
+[
+"stub",
+"def count_chars(text):\n    return None\n"
+]
+],
+"00-2": [
+[
+"inverted-result",
+"def count_chars(text):\n    s = set('bcdfghjklmnpqrstvwxyz')\n    return not sum(1 for c in text.lower() if c in s)\n"
+],
+[
+"empty-body",
+"def count_chars(text):\n    return None\n"
+],
+[
+"stub",
+"def count_chars(text):\n    return None\n"
+]
+],
+"00-3": [
+[
+"inverted-result",
+"def count_chars(text):\n    s = set('aeiou0123456789')\n    return not sum(1 for c in text.lower() if c in s)\n"
+],
+[
+"empty-body",
+"def count_chars(text):\n    return None\n"
+],
+[
+"stub",
+"def count_chars(text):\n    return None\n"
+]
+],
+"00-4": [
+[
+"inverted-result",
+"def count_chars(text):\n    s = set('xyz')\n    return not sum(1 for c in text.lower() if c in s)\n"
+],
+[
+"empty-body",
+"def count_chars(text):\n    return None\n"
+],
+[
+"stub",
+"def count_chars(text):\n    return None\n"
+]
+],
+"01-0": [
+[
+"inverted-result",
+"def two_sum(nums, target):\n    seen = {}\n    for i, x in enumerate(nums):\n        if target - x in seen:\n            return not [seen[target - x], i]\n        seen[x] = i\n    return []\n"
+],
+[
+"sign-flip",
+"def two_sum(nums, target):\n    seen = {}\n    for i, x in enumerate(nums):\n        if target + x in seen:\n            return [seen[target - x], i]\n        seen[x] = i\n    return []\n"
+],
+[
+"empty-body",
+"def two_sum(nums, target):\n    return None\n"
+],
+[
+"dropped-loop",
+"def two_sum(nums, target):\n    seen = {}\n    if False:\n        if target - x in seen:\n            return [seen[target - x], i]\n        seen[x] = i\n    return []\n"
+],
+[
+"stub",
+"def two_sum(nums, target):\n    return None\n"
+]
+],
+"01-1": [
+[
+"inverted-result",
+"def two_sum(nums, target):\n    seen = set()\n    for x in nums:\n        if target - x in seen:\n            return not sorted([target - x, x])\n        seen.add(x)\n    return []\n"
+],
+[
+"sign-flip",
+"def two_sum(nums, target):\n    seen = set()\n    for x in nums:\n        if target + x in seen:\n            return sorted([target - x, x])\n        seen.add(x)\n    return []\n"
+],
+[
+"empty-body",
+"def two_sum(nums, target):\n    return None\n"
+],
+[
+"dropped-loop",
+"def two_sum(nums, target):\n    seen = set()\n    if False:\n        if target - x in seen:\n            return sorted([target - x, x])\n        seen.add(x)\n    return []\n"
+],
+[
+"stub",
+"def two_sum(nums, target):\n    return None\n"
+]
+],
+"01-2": [
+[
+"inverted-result",
+"def two_sum(nums, target):\n    from collections import Counter\n    c = Counter(nums)\n    total = 0\n    for x in list(c):\n        y = target - x\n        if y in c:\n            total += c[x] * c[y] if x != y else c[x] * (c[x] - 1)\n    return not total // 2\n"
+],
+[
+"sign-flip",
+"def two_sum(nums, target):\n    from collections import Counter\n    c = Counter(nums)\n    total = 0\n    for x in list(c):\n        y = target + x\n        if y in c:\n            total += c[x] * c[y] if x != y else c[x] * (c[x] - 1)\n    return total // 2\n"
+],
+[
+"empty-body",
+"def two_sum(nums, target):\n    return None\n"
+],
+[
+"dropped-loop",
+"def two_sum(nums, target):\n    from collections import Counter\n    c = Counter(nums)\n    total = 0\n    if False:\n        y = target - x\n        if y in c:\n            total += c[x] * c[y] if x != y else c[x] * (c[x] - 1)\n    return total // 2\n"
+],
+[
+"stub",
+"def two_sum(nums, target):\n    return None\n"
+]
+],
+"01-3": [
+[
+"inverted-result",
+"def two_sum(nums, target):\n    seen = set()\n    for x in nums:\n        if target - x in seen:\n            return not (target - x, x)\n        seen.add(x)\n    return None\n"
+],
+[
+"sign-flip",
+"def two_sum(nums, target):\n    seen = set()\n    for x in nums:\n        if target + x in seen:\n            return (target - x, x)\n        seen.add(x)\n    return None\n"
+],
+[
+"empty-body",
+"def two_sum(nums, target):\n    return None\n"
+],
+[
+"dropped-loop",
+"def two_sum(nums, target):\n    seen = set()\n    if False:\n        if target - x in seen:\n            return (target - x, x)\n        seen.add(x)\n    return None\n"
+],
+[
+"stub",
+"def two_sum(nums, target):\n    return None\n"
+]
+],
+"01-4": [
+[
+"inverted-result",
+"def two_sum(nums, target):\n    seen = set()\n    for x in nums:\n        if target - x in seen:\n            return not True\n        seen.add(x)\n    return False\n"
+],
+[
+"sign-flip",
+"def two_sum(nums, target):\n    seen = set()\n    for x in nums:\n        if target + x in seen:\n            return True\n        seen.add(x)\n    return False\n"
+],
+[
+"empty-body",
+"def two_sum(nums, target):\n    return None\n"
+],
+[
+"dropped-loop",
+"def two_sum(nums, target):\n    seen = set()\n    if False:\n        if target - x in seen:\n            return True\n        seen.add(x)\n    return False\n"
+],
+[
+"stub",
+"def two_sum(nums, target):\n    return None\n"
+]
+],
+"02-0": [
+[
+"wrong-comparison",
+"def is_palindrome(text):\n    s = ''.join(c for c in text.lower() if c.isalnum())\n    return list(s) != list(s)[::-1]\n"
+],
+[
+"inverted-result",
+"def is_palindrome(text):\n    s = ''.join(c for c in text.lower() if c.isalnum())\n    return not list(s) == list(s)[::-1]\n"
+],
+[
+"sign-flip",
+"def is_palindrome(text):\n    s = ''.join(c for c in text.lower() if c.isalnum())\n    return list(s) == list(s)[::+1]\n"
+],
+[
+"empty-body",
+"def is_palindrome(text):\n    return None\n"
+],
+[
+"stub",
+"def is_palindrome(text):\n    return None\n"
+]
+],
+"02-1": [
+[
+"wrong-comparison",
+"def is_palindrome(text):\n    s = ''.join(c for c in text.lower() if c.isalpha())\n    return list(s) != list(s)[::-1]\n"
+],
+[
+"inverted-result",
+"def is_palindrome(text):\n    s = ''.join(c for c in text.lower() if c.isalpha())\n    return not list(s) == list(s)[::-1]\n"
+],
+[
+"sign-flip",
+"def is_palindrome(text):\n    s = ''.join(c for c in text.lower() if c.isalpha())\n    return list(s) == list(s)[::+1]\n"
+],
+[
+"empty-body",
+"def is_palindrome(text):\n    return None\n"
+],
+[
+"stub",
+"def is_palindrome(text):\n    return None\n"
+]
+],
+"02-2": [
+[
+"wrong-comparison",
+"def is_palindrome(text):\n    s = text\n    return list(s) != list(s)[::-1]\n"
+],
+[
+"inverted-result",
+"def is_palindrome(text):\n    s = text\n    return not list(s) == list(s)[::-1]\n"
+],
+[
+"sign-flip",
+"def is_palindrome(text):\n    s = text\n    return list(s) == list(s)[::+1]\n"
+],
+[
+"empty-body",
+"def is_palindrome(text):\n    return None\n"
+],
+[
+"stub",
+"def is_palindrome(text):\n    return None\n"
+]
+],
+"02-3": [
+[
+"wrong-comparison",
+"def is_palindrome(text):\n    s = ''.join(c for c in text if c.isdigit())\n    return list(s) != list(s)[::-1]\n"
+],
+[
+"inverted-result",
+"def is_palindrome(text):\n    s = ''.join(c for c in text if c.isdigit())\n    return not list(s) == list(s)[::-1]\n"
+],
+[
+"empty-body",
+"def is_palindrome(text):\n    return None\n"
+],
+[
+"stub",
+"def is_palindrome(text):\n    return None\n"
+]
+],
+"02-4": [
+[
+"wrong-comparison",
+"def is_palindrome(text):\n    s = text.lower().split()\n    return list(s) != list(s)[::-1]\n"
+],
+[
+"inverted-result",
+"def is_palindrome(text):\n    s = text.lower().split()\n    return not list(s) == list(s)[::-1]\n"
+],
+[
+"sign-flip",
+"def is_palindrome(text):\n    s = text.lower().split()\n    return list(s) == list(s)[::+1]\n"
+],
+[
+"empty-body",
+"def is_palindrome(text):\n    return None\n"
+],
+[
+"stub",
+"def is_palindrome(text):\n    return None\n"
+]
+],
+"03-0": [
+[
+"wrong-comparison",
+"def encode(text):\n    out = []\n    i = 0\n    while i < len(text):\n        j = i\n        while j < len(text) and text[j] != text[i]:\n            j += 1\n        out.append(text[i] + str(j - i))\n        i = j\n    return ''.join(out)\n"
+],
+[
+"inverted-result",
+"def encode(text):\n    out = []\n    i = 0\n    while i < len(text):\n        j = i\n        while j < len(text) and text[j] == text[i]:\n            j += 1\n        out.append(text[i] + str(j - i))\n        i = j\n    return not ''.join(out)\n"
+],
+[
+"sign-flip",
+"def encode(text):\n    out = []\n    i = 0\n    while i < len(text):\n        j = i\n        while j < len(text) and text[j] == text[i]:\n            j += 1\n        out.append(text[i] + str(j + i))\n        i = j\n    return ''.join(out)\n"
+],
+[
+"empty-body",
+"def encode(text):\n    return None\n"
+],
+[
+"stub",
+"def encode(text):\n    return None\n"
+]
+],
+"03-1": [
+[
+"wrong-comparison",
+"def encode(text):\n    out = []\n    i = 0\n    while i < len(text):\n        j = i\n        while j < len(text) and text[j] != text[i]:\n            j += 1\n        out.append(text[i] + str(j - i))\n        i = j\n    return '-'.join(out)\n"
+],
+[
+"inverted-result",
+"def encode(text):\n    out = []\n    i = 0\n    while i < len(text):\n        j = i\n        while j < len(text) and text[j] == text[i]:\n            j += 1\n        out.append(text[i] + str(j - i))\n        i = j\n    return not '-'.join(out)\n"
+],
+[
+"sign-flip",
+"def encode(text):\n    out = []\n    i = 0\n    while i < len(text):\n        j = i\n        while j < len(text) and text[j] == text[i]:\n            j += 1\n        out.append(text[i] + str(j + i))\n        i = j\n    return '-'.join(out)\n"
+],
+[
+"empty-body",
+"def encode(text):\n    return None\n"
+],
+[
+"stub",
+"def encode(text):\n    return None\n"
+]
+],
+"03-2": [
+[
+"wrong-comparison",
+"def encode(text):\n    out = []\n    i = 0\n    while i < len(text):\n        j = i\n        while j < len(text) and text[j] != text[i]:\n            j += 1\n        out.append(text[i] + str(j - i))\n        i = j\n    return ':'.join(out)\n"
+],
+[
+"inverted-result",
+"def encode(text):\n    out = []\n    i = 0\n    while i < len(text):\n        j = i\n        while j < len(text) and text[j] == text[i]:\n            j += 1\n        out.append(text[i] + str(j - i))\n        i = j\n    return not ':'.join(out)\n"
+],
+[
+"sign-flip",
+"def encode(text):\n    out = []\n    i = 0\n    while i < len(text):\n        j = i\n        while j < len(text) and text[j] == text[i]:\n            j += 1\n        out.append(text[i] + str(j + i))\n        i = j\n    return ':'.join(out)\n"
+],
+[
+"empty-body",
+"def encode(text):\n    return None\n"
+],
+[
+"stub",
+"def encode(text):\n    return None\n"
+]
+],
+"03-3": [
+[
+"wrong-comparison",
+"def encode(text):\n    out = []\n    i = 0\n    while i < len(text):\n        j = i\n        while j < len(text) and text[j] != text[i]:\n            j += 1\n        out.append(text[i] + str(j - i))\n        i = j\n    return '|'.join(out)\n"
+],
+[
+"inverted-result",
+"def encode(text):\n    out = []\n    i = 0\n    while i < len(text):\n        j = i\n        while j < len(text) and text[j] == text[i]:\n            j += 1\n        out.append(text[i] + str(j - i))\n        i = j\n    return not '|'.join(out)\n"
+],
+[
+"sign-flip",
+"def encode(text):\n    out = []\n    i = 0\n    while i < len(text):\n        j = i\n        while j < len(text) and text[j] == text[i]:\n            j += 1\n        out.append(text[i] + str(j + i))\n        i = j\n    return '|'.join(out)\n"
+],
+[
+"empty-body",
+"def encode(text):\n    return None\n"
+],
+[
+"stub",
+"def encode(text):\n    return None\n"
+]
+],
+"03-4": [
+[
+"wrong-comparison",
+"def encode(text):\n    out = []\n    i = 0\n    while i < len(text):\n        j = i\n        while j < len(text) and text[j] != text[i]:\n            j += 1\n        out.append(text[i] + str(j - i))\n        i = j\n    return ','.join(out)\n"
+],
+[
+"inverted-result",
+"def encode(text):\n    out = []\n    i = 0\n    while i < len(text):\n        j = i\n        while j < len(text) and text[j] == text[i]:\n            j += 1\n        out.append(text[i] + str(j - i))\n        i = j\n    return not ','.join(out)\n"
+],
+[
+"sign-flip",
+"def encode(text):\n    out = []\n    i = 0\n    while i < len(text):\n        j = i\n        while j < len(text) and text[j] == text[i]:\n            j += 1\n        out.append(text[i] + str(j + i))\n        i = j\n    return ','.join(out)\n"
+],
+[
+"empty-body",
+"def encode(text):\n    return None\n"
+],
+[
+"stub",
+"def encode(text):\n    return None\n"
+]
+],
+"04-0": [
+[
+"inverted-result",
+"def flatten(xs):\n    out = []\n    for x in xs:\n        if isinstance(x, list):\n            out.extend(flatten(x))\n        else:\n            out.append(x)\n    return not out\n"
+],
+[
+"empty-body",
+"def flatten(xs):\n    return None\n"
+],
+[
+"dropped-loop",
+"def flatten(xs):\n    out = []\n    if False:\n        if isinstance(x, list):\n            out.extend(flatten(x))\n        else:\n            out.append(x)\n    return out\n"
+],
+[
+"stub",
+"def flatten(xs):\n    return None\n"
+]
+],
+"04-1": [
+[
+"inverted-result",
+"def flatten(xs, _d=1):\n    out = []\n    for x in xs:\n        if isinstance(x, list) and _d > 0:\n            out.extend(flatten(x, _d - 1))\n        else:\n            out.append(x)\n    return not out\n"
+],
+[
+"sign-flip",
+"def flatten(xs, _d=1):\n    out = []\n    for x in xs:\n        if isinstance(x, list) and _d > 0:\n            out.extend(flatten(x, _d + 1))\n        else:\n            out.append(x)\n    return out\n"
+],
+[
+"empty-body",
+"def flatten(xs, _d=1):\n    return None\n"
+],
+[
+"dropped-loop",
+"def flatten(xs, _d=1):\n    out = []\n    if False:\n        if isinstance(x, list) and _d > 0:\n            out.extend(flatten(x, _d - 1))\n        else:\n            out.append(x)\n    return out\n"
+],
+[
+"stub",
+"def flatten(xs, _d=1):\n    return None\n"
+]
+],
+"04-2": [
+[
+"inverted-result",
+"def flatten(xs, _d=2):\n    out = []\n    for x in xs:\n        if isinstance(x, list) and _d > 0:\n            out.extend(flatten(x, _d - 1))\n        else:\n            out.append(x)\n    return not out\n"
+],
+[
+"sign-flip",
+"def flatten(xs, _d=2):\n    out = []\n    for x in xs:\n        if isinstance(x, list) and _d > 0:\n            out.extend(flatten(x, _d + 1))\n        else:\n            out.append(x)\n    return out\n"
+],
+[
+"empty-body",
+"def flatten(xs, _d=2):\n    return None\n"
+],
+[
+"dropped-loop",
+"def flatten(xs, _d=2):\n    out = []\n    if False:\n        if isinstance(x, list) and _d > 0:\n            out.extend(flatten(x, _d - 1))\n        else:\n            out.append(x)\n    return out\n"
+],
+[
+"stub",
+"def flatten(xs, _d=2):\n    return None\n"
+]
+],
+"04-3": [
+[
+"inverted-result",
+"def flatten(xs, _d=3):\n    out = []\n    for x in xs:\n        if isinstance(x, list) and _d > 0:\n            out.extend(flatten(x, _d - 1))\n        else:\n            out.append(x)\n    return not out\n"
+],
+[
+"empty-body",
+"def flatten(xs, _d=3):\n    return None\n"
+],
+[
+"dropped-loop",
+"def flatten(xs, _d=3):\n    out = []\n    if False:\n        if isinstance(x, list) and _d > 0:\n            out.extend(flatten(x, _d - 1))\n        else:\n            out.append(x)\n    return out\n"
+],
+[
+"stub",
+"def flatten(xs, _d=3):\n    return None\n"
+]
+],
+"04-4": [
+[
+"inverted-result",
+"def flatten(xs, _d=0):\n    out = []\n    for x in xs:\n        if isinstance(x, list) and _d > 0:\n            out.extend(flatten(x, _d - 1))\n        else:\n            out.append(x)\n    return not out\n"
+],
+[
+"empty-body",
+"def flatten(xs, _d=0):\n    return None\n"
+],
+[
+"dropped-loop",
+"def flatten(xs, _d=0):\n    out = []\n    if False:\n        if isinstance(x, list) and _d > 0:\n            out.extend(flatten(x, _d - 1))\n        else:\n            out.append(x)\n    return out\n"
+],
+[
+"stub",
+"def flatten(xs, _d=0):\n    return None\n"
+]
+],
+"05-0": [
+[
+"inverted-result",
+"def combine(nums):\n    from math import gcd\n    from functools import reduce\n    return not reduce(gcd, nums, 0)\n"
+],
+[
+"empty-body",
+"def combine(nums):\n    return None\n"
+],
+[
+"stub",
+"def combine(nums):\n    return None\n"
+]
+],
+"05-1": [
+[
+"inverted-result",
+"def combine(nums):\n    from math import lcm\n    from functools import reduce\n    return not reduce(lcm, nums, 1)\n"
+],
+[
+"empty-body",
+"def combine(nums):\n    return None\n"
+],
+[
+"stub",
+"def combine(nums):\n    return None\n"
+]
+],
+"05-2": [
+[
+"inverted-result",
+"def combine(nums):\n    from math import gcd\n    from functools import reduce\n    return not reduce(gcd, (abs(n) for n in nums), 0)\n"
+],
+[
+"empty-body",
+"def combine(nums):\n    return None\n"
+],
+[
+"stub",
+"def combine(nums):\n    return None\n"
+]
+],
+"05-3": [
+[
+"inverted-result",
+"def combine(nums):\n    from math import gcd\n    from functools import reduce\n    vals = [n for n in nums if n]\n    return not reduce(gcd, vals, 0)\n"
+],
+[
+"empty-body",
+"def combine(nums):\n    return None\n"
+],
+[
+"stub",
+"def combine(nums):\n    return None\n"
+]
+],
+"05-4": [
+[
+"inverted-result",
+"def combine(nums):\n    from math import lcm\n    from functools import reduce\n    return not reduce(lcm, nums, 1) % 1000000007\n"
+],
+[
+"empty-body",
+"def combine(nums):\n    return None\n"
+],
+[
+"stub",
+"def combine(nums):\n    return None\n"
+]
+],
+"06-0": [
+[
+"inverted-result",
+"def transform(m):\n    return not [list(r) for r in zip(*m)]\n"
+],
+[
+"empty-body",
+"def transform(m):\n    return None\n"
+],
+[
+"stub",
+"def transform(m):\n    return None\n"
+]
+],
+"06-1": [
+[
+"inverted-result",
+"def transform(m):\n    return not [list(r) for r in zip(*m[::-1])]\n"
+],
+[
+"sign-flip",
+"def transform(m):\n    return [list(r) for r in zip(*m[::+1])]\n"
+],
+[
+"empty-body",
+"def transform(m):\n    return None\n"
+],
+[
+"stub",
+"def transform(m):\n    return None\n"
+]
+],
+"06-2": [
+[
+"inverted-result",
+"def transform(m):\n    return not [list(r) for r in zip(*m)][::-1]\n"
+],
+[
+"sign-flip",
+"def transform(m):\n    return [list(r) for r in zip(*m)][::+1]\n"
+],
+[
+"empty-body",
+"def transform(m):\n    return None\n"
+],
+[
+"stub",
+"def transform(m):\n    return None\n"
+]
+],
+"06-3": [
+[
+"inverted-result",
+"def transform(m):\n    return not [r[::-1] for r in m]\n"
+],
+[
+"sign-flip",
+"def transform(m):\n    return [r[::+1] for r in m]\n"
+],
+[
+"empty-body",
+"def transform(m):\n    return None\n"
+],
+[
+"stub",
+"def transform(m):\n    return None\n"
+]
+],
+"06-4": [
+[
+"inverted-result",
+"def transform(m):\n    return not [x for r in m for x in r]\n"
+],
+[
+"empty-body",
+"def transform(m):\n    return None\n"
+],
+[
+"stub",
+"def transform(m):\n    return None\n"
+]
+],
+"07-0": [
+[
+"inverted-result",
+"def top_k(nums):\n    from collections import Counter\n    c = Counter(nums)\n    return not sorted(c, key=lambda x: (-c[x], x))[:1]\n"
+],
+[
+"sign-flip",
+"def top_k(nums):\n    from collections import Counter\n    c = Counter(nums)\n    return sorted(c, key=lambda x: (+c[x], x))[:1]\n"
+],
+[
+"empty-body",
+"def top_k(nums):\n    return None\n"
+],
+[
+"stub",
+"def top_k(nums):\n    return None\n"
+]
+],
+"07-1": [
+[
+"inverted-result",
+"def top_k(nums):\n    from collections import Counter\n    c = Counter(nums)\n    return not sorted(c, key=lambda x: (-c[x], -x))[:2]\n"
+],
+[
+"sign-flip",
+"def top_k(nums):\n    from collections import Counter\n    c = Counter(nums)\n    return sorted(c, key=lambda x: (+c[x], -x))[:2]\n"
+],
+[
+"empty-body",
+"def top_k(nums):\n    return None\n"
+],
+[
+"stub",
+"def top_k(nums):\n    return None\n"
+]
+],
+"07-2": [
+[
+"inverted-result",
+"def top_k(nums):\n    from collections import Counter\n    c = Counter(nums)\n    return not sorted(c, key=lambda x: (-c[x], x))[:3]\n"
+],
+[
+"sign-flip",
+"def top_k(nums):\n    from collections import Counter\n    c = Counter(nums)\n    return sorted(c, key=lambda x: (+c[x], x))[:3]\n"
+],
+[
+"empty-body",
+"def top_k(nums):\n    return None\n"
+],
+[
+"stub",
+"def top_k(nums):\n    return None\n"
+]
+],
+"07-3": [
+[
+"inverted-result",
+"def top_k(nums):\n    from collections import Counter\n    c = Counter(nums)\n    return not sorted(c, key=lambda x: (-c[x], list(c).index(x)))[:2]\n"
+],
+[
+"sign-flip",
+"def top_k(nums):\n    from collections import Counter\n    c = Counter(nums)\n    return sorted(c, key=lambda x: (+c[x], list(c).index(x)))[:2]\n"
+],
+[
+"empty-body",
+"def top_k(nums):\n    return None\n"
+],
+[
+"stub",
+"def top_k(nums):\n    return None\n"
+]
+],
+"07-4": [
+[
+"inverted-result",
+"def top_k(nums):\n    from collections import Counter\n    c = Counter(nums)\n    return not sorted(c, key=lambda x: (-c[x], -x))[:1]\n"
+],
+[
+"sign-flip",
+"def top_k(nums):\n    from collections import Counter\n    c = Counter(nums)\n    return sorted(c, key=lambda x: (+c[x], -x))[:1]\n"
+],
+[
+"empty-body",
+"def top_k(nums):\n    return None\n"
+],
+[
+"stub",
+"def top_k(nums):\n    return None\n"
+]
+],
+"08-0": [
+[
+"dropped-edge-case",
+"def balanced(text):\n    m = {')': '('}\n    stack = []\n    for c in text:\n        if c in m.values():\n            stack.append(c)\n        elif c in m:\n    return not stack\n"
+],
+[
+"inverted-result",
+"def balanced(text):\n    m = {')': '('}\n    stack = []\n    for c in text:\n        if c in m.values():\n            stack.append(c)\n        elif c in m:\n            if not stack or stack.pop() != m[c]:\n                return not False\n    return not stack\n"
+],
+[
+"empty-body",
+"def balanced(text):\n    return None\n"
+],
+[
+"dropped-loop",
+"def balanced(text):\n    m = {')': '('}\n    stack = []\n    if False:\n        if c in m.values():\n            stack.append(c)\n        elif c in m:\n            if not stack or stack.pop() != m[c]:\n                return False\n    return not stack\n"
+],
+[
+"stub",
+"def balanced(text):\n    return None\n"
+]
+],
+"08-1": [
+[
+"dropped-edge-case",
+"def balanced(text):\n    m = {')': '(', ']': '['}\n    stack = []\n    for c in text:\n        if c in m.values():\n            stack.append(c)\n        elif c in m:\n    return not stack\n"
+],
+[
+"inverted-result",
+"def balanced(text):\n    m = {')': '(', ']': '['}\n    stack = []\n    for c in text:\n        if c in m.values():\n            stack.append(c)\n        elif c in m:\n            if not stack or stack.pop() != m[c]:\n                return not False\n    return not stack\n"
+],
+[
+"empty-body",
+"def balanced(text):\n    return None\n"
+],
+[
+"dropped-loop",
+"def balanced(text):\n    m = {')': '(', ']': '['}\n    stack = []\n    if False:\n        if c in m.values():\n            stack.append(c)\n        elif c in m:\n            if not stack or stack.pop() != m[c]:\n                return False\n    return not stack\n"
+],
+[
+"stub",
+"def balanced(text):\n    return None\n"
+]
+],
+"08-2": [
+[
+"dropped-edge-case",
+"def balanced(text):\n    m = {')': '(', ']': '[', '}': '{'}\n    stack = []\n    for c in text:\n        if c in m.values():\n            stack.append(c)\n        elif c in m:\n    return not stack\n"
+],
+[
+"inverted-result",
+"def balanced(text):\n    m = {')': '(', ']': '[', '}': '{'}\n    stack = []\n    for c in text:\n        if c in m.values():\n            stack.append(c)\n        elif c in m:\n            if not stack or stack.pop() != m[c]:\n                return not False\n    return not stack\n"
+],
+[
+"empty-body",
+"def balanced(text):\n    return None\n"
+],
+[
+"dropped-loop",
+"def balanced(text):\n    m = {')': '(', ']': '[', '}': '{'}\n    stack = []\n    if False:\n        if c in m.values():\n            stack.append(c)\n        elif c in m:\n            if not stack or stack.pop() != m[c]:\n                return False\n    return not stack\n"
+],
+[
+"stub",
+"def balanced(text):\n    return None\n"
+]
+],
+"08-3": [
+[
+"dropped-edge-case",
+"def balanced(text):\n    m = {')': '(', '>': '<'}\n    stack = []\n    for c in text:\n        if c in m.values():\n            stack.append(c)\n        elif c in m:\n    return not stack\n"
+],
+[
+"inverted-result",
+"def balanced(text):\n    m = {')': '(', '>': '<'}\n    stack = []\n    for c in text:\n        if c in m.values():\n            stack.append(c)\n        elif c in m:\n            if not stack or stack.pop() != m[c]:\n                return not False\n    return not stack\n"
+],
+[
+"empty-body",
+"def balanced(text):\n    return None\n"
+],
+[
+"dropped-loop",
+"def balanced(text):\n    m = {')': '(', '>': '<'}\n    stack = []\n    if False:\n        if c in m.values():\n            stack.append(c)\n        elif c in m:\n            if not stack or stack.pop() != m[c]:\n                return False\n    return not stack\n"
+],
+[
+"stub",
+"def balanced(text):\n    return None\n"
+]
+],
+"08-4": [
+[
+"dropped-edge-case",
+"def balanced(text):\n    m = {']': '[', '}': '{'}\n    stack = []\n    for c in text:\n        if c in m.values():\n            stack.append(c)\n        elif c in m:\n    return not stack\n"
+],
+[
+"inverted-result",
+"def balanced(text):\n    m = {']': '[', '}': '{'}\n    stack = []\n    for c in text:\n        if c in m.values():\n            stack.append(c)\n        elif c in m:\n            if not stack or stack.pop() != m[c]:\n                return not False\n    return not stack\n"
+],
+[
+"empty-body",
+"def balanced(text):\n    return None\n"
+],
+[
+"dropped-loop",
+"def balanced(text):\n    m = {']': '[', '}': '{'}\n    stack = []\n    if False:\n        if c in m.values():\n            stack.append(c)\n        elif c in m:\n            if not stack or stack.pop() != m[c]:\n                return False\n    return not stack\n"
+],
+[
+"stub",
+"def balanced(text):\n    return None\n"
+]
+],
+"09-0": [
+[
+"inverted-result",
+"def search(xs, t):\n    import bisect\n    i = bisect.bisect_left(xs, t)\n    return not i\n"
+],
+[
+"empty-body",
+"def search(xs, t):\n    return None\n"
+],
+[
+"stub",
+"def search(xs, t):\n    return None\n"
+]
+],
+"09-1": [
+[
+"inverted-result",
+"def search(xs, t):\n    import bisect\n    return not bisect.bisect_right(xs, t) - 1\n"
+],
+[
+"sign-flip",
+"def search(xs, t):\n    import bisect\n    return bisect.bisect_right(xs, t) + 1\n"
+],
+[
+"empty-body",
+"def search(xs, t):\n    return None\n"
+],
+[
+"stub",
+"def search(xs, t):\n    return None\n"
+]
+],
+"09-2": [
+[
+"inverted-result",
+"def search(xs, t):\n    import bisect\n    return not bisect.bisect_left(xs, t)\n"
+],
+[
+"empty-body",
+"def search(xs, t):\n    return None\n"
+],
+[
+"stub",
+"def search(xs, t):\n    return None\n"
+]
+],
+"09-3": [
+[
+"wrong-comparison",
+"def search(xs, t):\n    import bisect\n    i = bisect.bisect_left(xs, t)\n    return i if i < len(xs) and xs[i] != t else -1\n"
+],
+[
+"sign-flip",
+"def search(xs, t):\n    import bisect\n    i = bisect.bisect_left(xs, t)\n    return i if i < len(xs) and xs[i] == t else +1\n"
+],
+[
+"empty-body",
+"def search(xs, t):\n    return None\n"
+],
+[
+"stub",
+"def search(xs, t):\n    return None\n"
+]
+],
+"09-4": [
+[
+"inverted-result",
+"def search(xs, t):\n    import bisect\n    return not bisect.bisect_right(xs, t) - bisect.bisect_left(xs, t)\n"
+],
+[
+"sign-flip",
+"def search(xs, t):\n    import bisect\n    return bisect.bisect_right(xs, t) + bisect.bisect_left(xs, t)\n"
+],
+[
+"empty-body",
+"def search(xs, t):\n    return None\n"
+],
+[
+"stub",
+"def search(xs, t):\n    return None\n"
+]
+],
+"10-0": [
+[
+"dropped-edge-case",
+"def merge(iv):\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    for a, b in iv[1:]:\n        if a < out[-1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    return [tuple(x) for x in out]\n"
+],
+[
+"inverted-result",
+"def merge(iv):\n    if not iv:\n        return not []\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    for a, b in iv[1:]:\n        if a < out[-1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    return [tuple(x) for x in out]\n"
+],
+[
+"sign-flip",
+"def merge(iv):\n    if not iv:\n        return []\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    for a, b in iv[1:]:\n        if a < out[+1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    return [tuple(x) for x in out]\n"
+],
+[
+"empty-body",
+"def merge(iv):\n    return None\n"
+],
+[
+"dropped-loop",
+"def merge(iv):\n    if not iv:\n        return []\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    if False:\n        if a < out[-1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    return [tuple(x) for x in out]\n"
+],
+[
+"stub",
+"def merge(iv):\n    return None\n"
+]
+],
+"10-1": [
+[
+"wrong-comparison",
+"def merge(iv):\n    if not iv:\n        return []\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    for a, b in iv[1:]:\n        if a < out[-1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    return [tuple(x) for x in out]\n"
+],
+[
+"dropped-edge-case",
+"def merge(iv):\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    for a, b in iv[1:]:\n        if a <= out[-1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    return [tuple(x) for x in out]\n"
+],
+[
+"inverted-result",
+"def merge(iv):\n    if not iv:\n        return not []\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    for a, b in iv[1:]:\n        if a <= out[-1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    return [tuple(x) for x in out]\n"
+],
+[
+"sign-flip",
+"def merge(iv):\n    if not iv:\n        return []\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    for a, b in iv[1:]:\n        if a <= out[+1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    return [tuple(x) for x in out]\n"
+],
+[
+"empty-body",
+"def merge(iv):\n    return None\n"
+],
+[
+"dropped-loop",
+"def merge(iv):\n    if not iv:\n        return []\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    if False:\n        if a <= out[-1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    return [tuple(x) for x in out]\n"
+],
+[
+"stub",
+"def merge(iv):\n    return None\n"
+]
+],
+"10-2": [
+[
+"dropped-edge-case",
+"def merge(iv):\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    for a, b in iv[1:]:\n        if a < out[-1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    return sum(b - a for a, b in out)\n"
+],
+[
+"inverted-result",
+"def merge(iv):\n    if not iv:\n        return not 0\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    for a, b in iv[1:]:\n        if a < out[-1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    return sum(b - a for a, b in out)\n"
+],
+[
+"sign-flip",
+"def merge(iv):\n    if not iv:\n        return 0\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    for a, b in iv[1:]:\n        if a < out[+1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    return sum(b - a for a, b in out)\n"
+],
+[
+"empty-body",
+"def merge(iv):\n    return None\n"
+],
+[
+"dropped-loop",
+"def merge(iv):\n    if not iv:\n        return 0\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    if False:\n        if a < out[-1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    return sum(b - a for a, b in out)\n"
+],
+[
+"stub",
+"def merge(iv):\n    return None\n"
+]
+],
+"10-3": [
+[
+"dropped-edge-case",
+"def merge(iv):\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    for a, b in iv[1:]:\n        if a < out[-1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    return len(out)\n"
+],
+[
+"inverted-result",
+"def merge(iv):\n    if not iv:\n        return not 0\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    for a, b in iv[1:]:\n        if a < out[-1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    return len(out)\n"
+],
+[
+"sign-flip",
+"def merge(iv):\n    if not iv:\n        return 0\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    for a, b in iv[1:]:\n        if a < out[+1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    return len(out)\n"
+],
+[
+"empty-body",
+"def merge(iv):\n    return None\n"
+],
+[
+"stub",
+"def merge(iv):\n    return None\n"
+]
+],
+"10-4": [
+[
+"dropped-edge-case",
+"def merge(iv):\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    for a, b in iv[1:]:\n        if a < out[-1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    gaps = [out[i + 1][0] - out[i][1] for i in range(len(out) - 1)]\n    return max(gaps) if gaps else 0\n"
+],
+[
+"inverted-result",
+"def merge(iv):\n    if not iv:\n        return not 0\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    for a, b in iv[1:]:\n        if a < out[-1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    gaps = [out[i + 1][0] - out[i][1] for i in range(len(out) - 1)]\n    return max(gaps) if gaps else 0\n"
+],
+[
+"sign-flip",
+"def merge(iv):\n    if not iv:\n        return 0\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    for a, b in iv[1:]:\n        if a < out[+1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    gaps = [out[i + 1][0] - out[i][1] for i in range(len(out) - 1)]\n    return max(gaps) if gaps else 0\n"
+],
+[
+"empty-body",
+"def merge(iv):\n    return None\n"
+],
+[
+"dropped-loop",
+"def merge(iv):\n    if not iv:\n        return 0\n    iv = sorted(iv)\n    out = [list(iv[0])]\n    if False:\n        if a < out[-1][1]:\n            out[-1][1] = max(out[-1][1], b)\n        else:\n            out.append([a, b])\n    gaps = [out[i + 1][0] - out[i][1] for i in range(len(out) - 1)]\n    return max(gaps) if gaps else 0\n"
+],
+[
+"stub",
+"def merge(iv):\n    return None\n"
+]
+],
+"11-0": [
+[
+"inverted-result",
+"def words(text):\n    from collections import Counter\n    return not dict(Counter(text.lower().split()))\n"
+],
+[
+"empty-body",
+"def words(text):\n    return None\n"
+],
+[
+"stub",
+"def words(text):\n    return None\n"
+]
+],
+"11-1": [
+[
+"inverted-result",
+"def words(text):\n    from collections import Counter\n    c = Counter(text.lower().split())\n    return not c.most_common(1)[0][0] if c else None\n"
+],
+[
+"empty-body",
+"def words(text):\n    return None\n"
+],
+[
+"stub",
+"def words(text):\n    return None\n"
+]
+],
+"11-2": [
+[
+"inverted-result",
+"def words(text):\n    return not len(set(text.lower().split()))\n"
+],
+[
+"empty-body",
+"def words(text):\n    return None\n"
+],
+[
+"stub",
+"def words(text):\n    return None\n"
+]
+],
+"11-3": [
+[
+"inverted-result",
+"def words(text):\n    from collections import Counter\n    c = Counter(text.lower().split())\n    return not sorted(w for w, n in c.items() if n > 1)\n"
+],
+[
+"empty-body",
+"def words(text):\n    return None\n"
+],
+[
+"stub",
+"def words(text):\n    return None\n"
+]
+],
+"11-4": [
+[
+"inverted-result",
+"def words(text):\n    return not len(text.split())\n"
+],
+[
+"empty-body",
+"def words(text):\n    return None\n"
+],
+[
+"stub",
+"def words(text):\n    return None\n"
+]
+],
+"12-0": [
+[
+"off-by-one",
+"def seq(n):\n    a, b = 0, 1\n    for _ in range(n - 1):\n        a, b = b, a + b\n    return a\n"
+],
+[
+"inverted-result",
+"def seq(n):\n    a, b = 0, 1\n    for _ in range(n):\n        a, b = b, a + b\n    return not a\n"
+],
+[
+"sign-flip",
+"def seq(n):\n    a, b = 0, 1\n    for _ in range(n):\n        a, b = b, a - b\n    return a\n"
+],
+[
+"empty-body",
+"def seq(n):\n    return None\n"
+],
+[
+"dropped-loop",
+"def seq(n):\n    a, b = 0, 1\n    if False:\n        a, b = b, a + b\n    return a\n"
+],
+[
+"stub",
+"def seq(n):\n    return None\n"
+]
+],
+"12-1": [
+[
+"off-by-one",
+"def seq(n):\n    a, b = 1, 1\n    for _ in range(n - 1):\n        a, b = b, a + b\n    return a\n"
+],
+[
+"inverted-result",
+"def seq(n):\n    a, b = 1, 1\n    for _ in range(n):\n        a, b = b, a + b\n    return not a\n"
+],
+[
+"sign-flip",
+"def seq(n):\n    a, b = 1, 1\n    for _ in range(n):\n        a, b = b, a - b\n    return a\n"
+],
+[
+"empty-body",
+"def seq(n):\n    return None\n"
+],
+[
+"dropped-loop",
+"def seq(n):\n    a, b = 1, 1\n    if False:\n        a, b = b, a + b\n    return a\n"
+],
+[
+"stub",
+"def seq(n):\n    return None\n"
+]
+],
+"12-2": [
+[
+"off-by-one",
+"def seq(n):\n    a, b = 2, 1\n    for _ in range(n - 1):\n        a, b = b, a + b\n    return a\n"
+],
+[
+"inverted-result",
+"def seq(n):\n    a, b = 2, 1\n    for _ in range(n):\n        a, b = b, a + b\n    return not a\n"
+],
+[
+"sign-flip",
+"def seq(n):\n    a, b = 2, 1\n    for _ in range(n):\n        a, b = b, a - b\n    return a\n"
+],
+[
+"empty-body",
+"def seq(n):\n    return None\n"
+],
+[
+"dropped-loop",
+"def seq(n):\n    a, b = 2, 1\n    if False:\n        a, b = b, a + b\n    return a\n"
+],
+[
+"stub",
+"def seq(n):\n    return None\n"
+]
+],
+"12-3": [
+[
+"off-by-one",
+"def seq(n):\n    a, b = 0, 2\n    for _ in range(n - 1):\n        a, b = b, a + b\n    return a\n"
+],
+[
+"inverted-result",
+"def seq(n):\n    a, b = 0, 2\n    for _ in range(n):\n        a, b = b, a + b\n    return not a\n"
+],
+[
+"sign-flip",
+"def seq(n):\n    a, b = 0, 2\n    for _ in range(n):\n        a, b = b, a - b\n    return a\n"
+],
+[
+"empty-body",
+"def seq(n):\n    return None\n"
+],
+[
+"dropped-loop",
+"def seq(n):\n    a, b = 0, 2\n    if False:\n        a, b = b, a + b\n    return a\n"
+],
+[
+"stub",
+"def seq(n):\n    return None\n"
+]
+],
+"12-4": [
+[
+"off-by-one",
+"def seq(n):\n    a, b = 1, 3\n    for _ in range(n - 1):\n        a, b = b, a + b\n    return a\n"
+],
+[
+"inverted-result",
+"def seq(n):\n    a, b = 1, 3\n    for _ in range(n):\n        a, b = b, a + b\n    return not a\n"
+],
+[
+"sign-flip",
+"def seq(n):\n    a, b = 1, 3\n    for _ in range(n):\n        a, b = b, a - b\n    return a\n"
+],
+[
+"empty-body",
+"def seq(n):\n    return None\n"
+],
+[
+"dropped-loop",
+"def seq(n):\n    a, b = 1, 3\n    if False:\n        a, b = b, a + b\n    return a\n"
+],
+[
+"stub",
+"def seq(n):\n    return None\n"
+]
+],
+"13-0": [
+[
+"inverted-result",
+"def root(n):\n    n = abs(n)\n    while n > 9:\n        n = sum(int(c) for c in str(n))\n    return not n\n"
+],
+[
+"empty-body",
+"def root(n):\n    return None\n"
+],
+[
+"stub",
+"def root(n):\n    return None\n"
+]
+],
+"13-1": [
+[
+"inverted-result",
+"def root(n):\n    return not sum(int(c) for c in str(abs(n)))\n"
+],
+[
+"empty-body",
+"def root(n):\n    return None\n"
+],
+[
+"stub",
+"def root(n):\n    return None\n"
+]
+],
+"13-2": [
+[
+"inverted-result",
+"def root(n):\n    n = abs(n)\n    while n > 8:\n        s = 0\n        while n:\n            s += n % 9\n            n //= 9\n        n = s\n    return not n\n"
+],
+[
+"sign-flip",
+"def root(n):\n    n = abs(n)\n    while n > 8:\n        s = 0\n        while n:\n            s -= n % 9\n            n //= 9\n        n = s\n    return n\n"
+],
+[
+"empty-body",
+"def root(n):\n    return None\n"
+],
+[
+"stub",
+"def root(n):\n    return None\n"
+]
+],
+"13-3": [
+[
+"inverted-result",
+"def root(n):\n    return not sum(int(c, 16) for c in format(abs(n), 'x'))\n"
+],
+[
+"empty-body",
+"def root(n):\n    return None\n"
+],
+[
+"stub",
+"def root(n):\n    return None\n"
+]
+],
+"13-4": [
+[
+"inverted-result",
+"def root(n):\n    return not bin(abs(n)).count('1')\n"
+],
+[
+"empty-body",
+"def root(n):\n    return None\n"
+],
+[
+"stub",
+"def root(n):\n    return None\n"
+]
+],
+"14-0": [
+[
+"inverted-result",
+"def window(s):\n    seen = {}\n    best = start = 0\n    for i, c in enumerate(s):\n        if c in seen and seen[c] >= start:\n            start = seen[c] + 1\n        seen[c] = i\n        best = max(best, i - start + 1)\n    return not best\n"
+],
+[
+"sign-flip",
+"def window(s):\n    seen = {}\n    best = start = 0\n    for i, c in enumerate(s):\n        if c in seen and seen[c] >= start:\n            start = seen[c] + 1\n        seen[c] = i\n        best = max(best, i + start + 1)\n    return best\n"
+],
+[
+"empty-body",
+"def window(s):\n    return None\n"
+],
+[
+"dropped-loop",
+"def window(s):\n    seen = {}\n    best = start = 0\n    if False:\n        if c in seen and seen[c] >= start:\n            start = seen[c] + 1\n        seen[c] = i\n        best = max(best, i - start + 1)\n    return best\n"
+],
+[
+"stub",
+"def window(s):\n    return None\n"
+]
+],
+"14-1": [
+[
+"inverted-result",
+"def window(s):\n    seen = {}\n    best = (0, 0)\n    start = 0\n    for i, c in enumerate(s):\n        if c in seen and seen[c] >= start:\n            start = seen[c] + 1\n        seen[c] = i\n        if i - start + 1 > best[1] - best[0]:\n            best = (start, i + 1)\n    return not s[best[0]:best[1]]\n"
+],
+[
+"sign-flip",
+"def window(s):\n    seen = {}\n    best = (0, 0)\n    start = 0\n    for i, c in enumerate(s):\n        if c in seen and seen[c] >= start:\n            start = seen[c] + 1\n        seen[c] = i\n        if i + start + 1 > best[1] - best[0]:\n            best = (start, i + 1)\n    return s[best[0]:best[1]]\n"
+],
+[
+"empty-body",
+"def window(s):\n    return None\n"
+],
+[
+"dropped-loop",
+"def window(s):\n    seen = {}\n    best = (0, 0)\n    start = 0\n    if False:\n        if c in seen and seen[c] >= start:\n            start = seen[c] + 1\n        seen[c] = i\n        if i - start + 1 > best[1] - best[0]:\n            best = (start, i + 1)\n    return s[best[0]:best[1]]\n"
+],
+[
+"stub",
+"def window(s):\n    return None\n"
+]
+],
+"14-2": [
+[
+"inverted-result",
+"def window(s):\n    from collections import Counter\n    c = Counter()\n    best = start = 0\n    for i, ch in enumerate(s):\n        c[ch] += 1\n        while sum(v - 1 for v in c.values() if v > 1) > 1:\n            c[s[start]] -= 1\n            start += 1\n        best = max(best, i - start + 1)\n    return not best\n"
+],
+[
+"sign-flip",
+"def window(s):\n    from collections import Counter\n    c = Counter()\n    best = start = 0\n    for i, ch in enumerate(s):\n        c[ch] += 1\n        while sum(v + 1 for v in c.values() if v > 1) > 1:\n            c[s[start]] -= 1\n            start += 1\n        best = max(best, i - start + 1)\n    return best\n"
+],
+[
+"empty-body",
+"def window(s):\n    return None\n"
+],
+[
+"dropped-loop",
+"def window(s):\n    from collections import Counter\n    c = Counter()\n    best = start = 0\n    if False:\n        c[ch] += 1\n        while sum(v - 1 for v in c.values() if v > 1) > 1:\n            c[s[start]] -= 1\n            start += 1\n        best = max(best, i - start + 1)\n    return best\n"
+],
+[
+"stub",
+"def window(s):\n    return None\n"
+]
+],
+"14-3": [
+[
+"inverted-result",
+"def window(s):\n    best = run = 0\n    prev = None\n    for c in s:\n        run = run + 1 if c == prev else 1\n        prev = c\n        best = max(best, run)\n    return not best\n"
+],
+[
+"sign-flip",
+"def window(s):\n    best = run = 0\n    prev = None\n    for c in s:\n        run = run - 1 if c == prev else 1\n        prev = c\n        best = max(best, run)\n    return best\n"
+],
+[
+"empty-body",
+"def window(s):\n    return None\n"
+],
+[
+"dropped-loop",
+"def window(s):\n    best = run = 0\n    prev = None\n    if False:\n        run = run + 1 if c == prev else 1\n        prev = c\n        best = max(best, run)\n    return best\n"
+],
+[
+"stub",
+"def window(s):\n    return None\n"
+]
+],
+"14-4": [
+[
+"inverted-result",
+"def window(s):\n    return not len(set(s))\n"
+],
+[
+"empty-body",
+"def window(s):\n    return None\n"
+],
+[
+"stub",
+"def window(s):\n    return None\n"
+]
+],
+"15-0": [
+[
+"inverted-result",
+"def chunk(xs):\n    out = [xs[i:i + 2] for i in range(0, len(xs), 2)]\n    return not out\n"
+],
+[
+"sign-flip",
+"def chunk(xs):\n    out = [xs[i:i - 2] for i in range(0, len(xs), 2)]\n    return out\n"
+],
+[
+"empty-body",
+"def chunk(xs):\n    return None\n"
+],
+[
+"stub",
+"def chunk(xs):\n    return None\n"
+]
+],
+"15-1": [
+[
+"inverted-result",
+"def chunk(xs):\n    out = [xs[i:i + 3] for i in range(0, len(xs), 3)]\n    return not out\n"
+],
+[
+"sign-flip",
+"def chunk(xs):\n    out = [xs[i:i - 3] for i in range(0, len(xs), 3)]\n    return out\n"
+],
+[
+"empty-body",
+"def chunk(xs):\n    return None\n"
+],
+[
+"stub",
+"def chunk(xs):\n    return None\n"
+]
+],
+"15-2": [
+[
+"inverted-result",
+"def chunk(xs):\n    out = [xs[i:i + 4] for i in range(0, len(xs), 4)]\n    return not out\n"
+],
+[
+"sign-flip",
+"def chunk(xs):\n    out = [xs[i:i - 4] for i in range(0, len(xs), 4)]\n    return out\n"
+],
+[
+"empty-body",
+"def chunk(xs):\n    return None\n"
+],
+[
+"stub",
+"def chunk(xs):\n    return None\n"
+]
+],
+"15-3": [
+[
+"inverted-result",
+"def chunk(xs):\n    out = [xs[i:i + 2] for i in range(0, len(xs), 2)]\n    if out and len(out[-1]) < 2:\n        out[-1] = out[-1] + [None] * (2 - len(out[-1]))\n    return not out\n"
+],
+[
+"sign-flip",
+"def chunk(xs):\n    out = [xs[i:i + 2] for i in range(0, len(xs), 2)]\n    if out and len(out[+1]) < 2:\n        out[-1] = out[-1] + [None] * (2 - len(out[-1]))\n    return out\n"
+],
+[
+"empty-body",
+"def chunk(xs):\n    return None\n"
+],
+[
+"stub",
+"def chunk(xs):\n    return None\n"
+]
+],
+"15-4": [
+[
+"inverted-result",
+"def chunk(xs):\n    out = [xs[i:i + 5] for i in range(0, len(xs), 5)]\n    if out and len(out[-1]) < 5:\n        out[-1] = out[-1] + [None] * (5 - len(out[-1]))\n    return not out\n"
+],
+[
+"sign-flip",
+"def chunk(xs):\n    out = [xs[i:i + 5] for i in range(0, len(xs), 5)]\n    if out and len(out[+1]) < 5:\n        out[-1] = out[-1] + [None] * (5 - len(out[-1]))\n    return out\n"
+],
+[
+"empty-body",
+"def chunk(xs):\n    return None\n"
+],
+[
+"stub",
+"def chunk(xs):\n    return None\n"
+]
+],
+"16-0": [
+[
+"wrong-comparison",
+"def anagram(a, b):\n    from collections import Counter\n    na = a\n    nb = b\n    return Counter(na) != Counter(nb)\n"
+],
+[
+"inverted-result",
+"def anagram(a, b):\n    from collections import Counter\n    na = a\n    nb = b\n    return not Counter(na) == Counter(nb)\n"
+],
+[
+"empty-body",
+"def anagram(a, b):\n    return None\n"
+],
+[
+"stub",
+"def anagram(a, b):\n    return None\n"
+]
+],
+"16-1": [
+[
+"wrong-comparison",
+"def anagram(a, b):\n    from collections import Counter\n    na = a.lower()\n    nb = b.lower()\n    return Counter(na) != Counter(nb)\n"
+],
+[
+"inverted-result",
+"def anagram(a, b):\n    from collections import Counter\n    na = a.lower()\n    nb = b.lower()\n    return not Counter(na) == Counter(nb)\n"
+],
+[
+"empty-body",
+"def anagram(a, b):\n    return None\n"
+],
+[
+"stub",
+"def anagram(a, b):\n    return None\n"
+]
+],
+"16-2": [
+[
+"wrong-comparison",
+"def anagram(a, b):\n    from collections import Counter\n    na = a.lower().replace(' ', '')\n    nb = b.lower().replace(' ', '')\n    return Counter(na) != Counter(nb)\n"
+],
+[
+"inverted-result",
+"def anagram(a, b):\n    from collections import Counter\n    na = a.lower().replace(' ', '')\n    nb = b.lower().replace(' ', '')\n    return not Counter(na) == Counter(nb)\n"
+],
+[
+"empty-body",
+"def anagram(a, b):\n    return None\n"
+],
+[
+"stub",
+"def anagram(a, b):\n    return None\n"
+]
+],
+"16-3": [
+[
+"wrong-comparison",
+"def anagram(a, b):\n    from collections import Counter\n    na = ''.join(c for c in a.lower() if c.isalpha())\n    nb = ''.join(c for c in b.lower() if c.isalpha())\n    return Counter(na) != Counter(nb)\n"
+],
+[
+"inverted-result",
+"def anagram(a, b):\n    from collections import Counter\n    na = ''.join(c for c in a.lower() if c.isalpha())\n    nb = ''.join(c for c in b.lower() if c.isalpha())\n    return not Counter(na) == Counter(nb)\n"
+],
+[
+"empty-body",
+"def anagram(a, b):\n    return None\n"
+],
+[
+"stub",
+"def anagram(a, b):\n    return None\n"
+]
+],
+"16-4": [
+[
+"inverted-result",
+"def anagram(a, b):\n    from collections import Counter\n    ca, cb = Counter(a.lower()), Counter(b.lower())\n    return not sorted((ca - cb) + (cb - ca))\n"
+],
+[
+"sign-flip",
+"def anagram(a, b):\n    from collections import Counter\n    ca, cb = Counter(a.lower()), Counter(b.lower())\n    return sorted((ca + cb) + (cb - ca))\n"
+],
+[
+"empty-body",
+"def anagram(a, b):\n    return None\n"
+],
+[
+"stub",
+"def anagram(a, b):\n    return None\n"
+]
+],
+"17-0": [
+[
+"inverted-result",
+"def order(m):\n    out = []\n    m = [row[:] for row in m]\n    while m:\n        out += m.pop(0)\n        m = [list(r) for r in zip(*m)][::-1]\n    return not out\n"
+],
+[
+"sign-flip",
+"def order(m):\n    out = []\n    m = [row[:] for row in m]\n    while m:\n        out += m.pop(0)\n        m = [list(r) for r in zip(*m)][::+1]\n    return out\n"
+],
+[
+"empty-body",
+"def order(m):\n    return None\n"
+],
+[
+"stub",
+"def order(m):\n    return None\n"
+]
+],
+"17-1": [
+[
+"inverted-result",
+"def order(m):\n    out = []\n    m = [row[:] for row in m]\n    while m:\n        out += m.pop(0)\n        m = [list(r) for r in zip(*m[::-1])]\n    return not out\n"
+],
+[
+"empty-body",
+"def order(m):\n    return None\n"
+],
+[
+"stub",
+"def order(m):\n    return None\n"
+]
+],
+"17-2": [
+[
+"dropped-edge-case",
+"def order(m):\n    out = list(m[0])\n    out += [r[-1] for r in m[1:-1]]\n    if len(m) > 1:\n        out += list(m[-1])[::-1]\n    out += [r[0] for r in m[1:-1]][::-1]\n    return out\n"
+],
+[
+"inverted-result",
+"def order(m):\n    if not m:\n        return not []\n    out = list(m[0])\n    out += [r[-1] for r in m[1:-1]]\n    if len(m) > 1:\n        out += list(m[-1])[::-1]\n    out += [r[0] for r in m[1:-1]][::-1]\n    return out\n"
+],
+[
+"empty-body",
+"def order(m):\n    return None\n"
+],
+[
+"stub",
+"def order(m):\n    return None\n"
+]
+],
+"17-3": [
+[
+"dropped-edge-case",
+"def order(m):\n    return list(m[0]) + [r[-1] for r in m[1:]]\n"
+],
+[
+"inverted-result",
+"def order(m):\n    if not m:\n        return not []\n    return list(m[0]) + [r[-1] for r in m[1:]]\n"
+],
+[
+"empty-body",
+"def order(m):\n    return None\n"
+],
+[
+"stub",
+"def order(m):\n    return None\n"
+]
+],
+"17-4": [
+[
+"inverted-result",
+"def order(m):\n    out = []\n    m = [row[:] for row in m]\n    while m:\n        out += m.pop(0)\n        m = [list(r) for r in zip(*m)][::-1]\n    return not sum(out)\n"
+],
+[
+"empty-body",
+"def order(m):\n    return None\n"
+],
+[
+"stub",
+"def order(m):\n    return None\n"
+]
+],
+"18-0": [
+[
+"wrong-comparison",
+"def convert(n):\n    digits = '0123456789abcdefghijklmnopqrstuvwxyz'\n    if n != 0:\n        return '0'\n    out = []\n    while n:\n        n, r = divmod(n, 2)\n        out.append(digits[r])\n    return ''.join(reversed(out))\n"
+],
+[
+"inverted-result",
+"def convert(n):\n    digits = '0123456789abcdefghijklmnopqrstuvwxyz'\n    if n == 0:\n        return not '0'\n    out = []\n    while n:\n        n, r = divmod(n, 2)\n        out.append(digits[r])\n    return ''.join(reversed(out))\n"
+],
+[
+"empty-body",
+"def convert(n):\n    return None\n"
+],
+[
+"stub",
+"def convert(n):\n    return None\n"
+]
+],
+"18-1": [
+[
+"wrong-comparison",
+"def convert(n):\n    digits = '0123456789abcdefghijklmnopqrstuvwxyz'\n    if n != 0:\n        return '0'\n    out = []\n    while n:\n        n, r = divmod(n, 8)\n        out.append(digits[r])\n    return ''.join(reversed(out))\n"
+],
+[
+"inverted-result",
+"def convert(n):\n    digits = '0123456789abcdefghijklmnopqrstuvwxyz'\n    if n == 0:\n        return not '0'\n    out = []\n    while n:\n        n, r = divmod(n, 8)\n        out.append(digits[r])\n    return ''.join(reversed(out))\n"
+],
+[
+"empty-body",
+"def convert(n):\n    return None\n"
+],
+[
+"stub",
+"def convert(n):\n    return None\n"
+]
+],
+"18-2": [
+[
+"wrong-comparison",
+"def convert(n):\n    digits = '0123456789abcdefghijklmnopqrstuvwxyz'\n    if n != 0:\n        return '0'\n    out = []\n    while n:\n        n, r = divmod(n, 16)\n        out.append(digits[r])\n    return ''.join(reversed(out))\n"
+],
+[
+"inverted-result",
+"def convert(n):\n    digits = '0123456789abcdefghijklmnopqrstuvwxyz'\n    if n == 0:\n        return not '0'\n    out = []\n    while n:\n        n, r = divmod(n, 16)\n        out.append(digits[r])\n    return ''.join(reversed(out))\n"
+],
+[
+"empty-body",
+"def convert(n):\n    return None\n"
+],
+[
+"stub",
+"def convert(n):\n    return None\n"
+]
+],
+"18-3": [
+[
+"wrong-comparison",
+"def convert(n):\n    digits = '0123456789abcdefghijklmnopqrstuvwxyz'\n    if n != 0:\n        return '0'\n    out = []\n    while n:\n        n, r = divmod(n, 3)\n        out.append(digits[r])\n    return ''.join(reversed(out))\n"
+],
+[
+"inverted-result",
+"def convert(n):\n    digits = '0123456789abcdefghijklmnopqrstuvwxyz'\n    if n == 0:\n        return not '0'\n    out = []\n    while n:\n        n, r = divmod(n, 3)\n        out.append(digits[r])\n    return ''.join(reversed(out))\n"
+],
+[
+"empty-body",
+"def convert(n):\n    return None\n"
+],
+[
+"stub",
+"def convert(n):\n    return None\n"
+]
+],
+"18-4": [
+[
+"wrong-comparison",
+"def convert(n):\n    digits = '0123456789abcdefghijklmnopqrstuvwxyz'\n    if n != 0:\n        return '0'\n    out = []\n    while n:\n        n, r = divmod(n, 36)\n        out.append(digits[r])\n    return ''.join(reversed(out))\n"
+],
+[
+"inverted-result",
+"def convert(n):\n    digits = '0123456789abcdefghijklmnopqrstuvwxyz'\n    if n == 0:\n        return not '0'\n    out = []\n    while n:\n        n, r = divmod(n, 36)\n        out.append(digits[r])\n    return ''.join(reversed(out))\n"
+],
+[
+"empty-body",
+"def convert(n):\n    return None\n"
+],
+[
+"stub",
+"def convert(n):\n    return None\n"
+]
+],
+"19-0": [
+[
+"wrong-comparison",
+"def group(xs):\n    return [x for x in xs if x % 2 != 0] + [x for x in xs if x % 2]\n"
+],
+[
+"inverted-result",
+"def group(xs):\n    return not [x for x in xs if x % 2 == 0] + [x for x in xs if x % 2]\n"
+],
+[
+"sign-flip",
+"def group(xs):\n    return [x for x in xs if x % 2 == 0] - [x for x in xs if x % 2]\n"
+],
+[
+"empty-body",
+"def group(xs):\n    return None\n"
+],
+[
+"stub",
+"def group(xs):\n    return None\n"
+]
+],
+"19-1": [
+[
+"wrong-comparison",
+"def group(xs):\n    return [x for x in xs if x % 2] + [x for x in xs if x % 2 != 0]\n"
+],
+[
+"inverted-result",
+"def group(xs):\n    return not [x for x in xs if x % 2] + [x for x in xs if x % 2 == 0]\n"
+],
+[
+"sign-flip",
+"def group(xs):\n    return [x for x in xs if x % 2] - [x for x in xs if x % 2 == 0]\n"
+],
+[
+"empty-body",
+"def group(xs):\n    return None\n"
+],
+[
+"stub",
+"def group(xs):\n    return None\n"
+]
+],
+"19-2": [
+[
+"wrong-comparison",
+"def group(xs):\n    return {'even': [x for x in xs if x % 2 != 0], 'odd': [x for x in xs if x % 2]}\n"
+],
+[
+"inverted-result",
+"def group(xs):\n    return not {'even': [x for x in xs if x % 2 == 0], 'odd': [x for x in xs if x % 2]}\n"
+],
+[
+"empty-body",
+"def group(xs):\n    return None\n"
+],
+[
+"stub",
+"def group(xs):\n    return None\n"
+]
+],
+"19-3": [
+[
+"wrong-comparison",
+"def group(xs):\n    return [x for x in xs if x % 2 != 0]\n"
+],
+[
+"inverted-result",
+"def group(xs):\n    return not [x for x in xs if x % 2 == 0]\n"
+],
+[
+"empty-body",
+"def group(xs):\n    return None\n"
+],
+[
+"stub",
+"def group(xs):\n    return None\n"
+]
+],
+"19-4": [
+[
+"wrong-comparison",
+"def group(xs):\n    return ([x for x in xs if x % 2 != 0], [x for x in xs if x % 2])\n"
+],
+[
+"inverted-result",
+"def group(xs):\n    return not ([x for x in xs if x % 2 == 0], [x for x in xs if x % 2])\n"
+],
+[
+"empty-body",
+"def group(xs):\n    return None\n"
+],
+[
+"stub",
+"def group(xs):\n    return None\n"
+]
+],
+"20-0": [
+[
+"inverted-result",
+"def squeeze(text):\n    import re\n    return not re.sub(r'\\s+', ' ', text).strip()\n"
+],
+[
+"sign-flip",
+"def squeeze(text):\n    import re\n    return re.sub(r'\\s-', ' ', text).strip()\n"
+],
+[
+"empty-body",
+"def squeeze(text):\n    return None\n"
+],
+[
+"stub",
+"def squeeze(text):\n    return None\n"
+]
+],
+"20-1": [
+[
+"inverted-result",
+"def squeeze(text):\n    import re\n    return not re.sub(r'\\s+', '', text)\n"
+],
+[
+"sign-flip",
+"def squeeze(text):\n    import re\n    return re.sub(r'\\s-', '', text)\n"
+],
+[
+"empty-body",
+"def squeeze(text):\n    return None\n"
+],
+[
+"stub",
+"def squeeze(text):\n    return None\n"
+]
+],
+"20-2": [
+[
+"inverted-result",
+"def squeeze(text):\n    import re\n    return not re.sub(r'[ \\t]+', ' ', text)\n"
+],
+[
+"sign-flip",
+"def squeeze(text):\n    import re\n    return re.sub(r'[ \\t]-', ' ', text)\n"
+],
+[
+"empty-body",
+"def squeeze(text):\n    return None\n"
+],
+[
+"stub",
+"def squeeze(text):\n    return None\n"
+]
+],
+"20-3": [
+[
+"inverted-result",
+"def squeeze(text):\n    return not text.strip()\n"
+],
+[
+"empty-body",
+"def squeeze(text):\n    return None\n"
+],
+[
+"stub",
+"def squeeze(text):\n    return None\n"
+]
+],
+"20-4": [
+[
+"inverted-result",
+"def squeeze(text):\n    import re\n    return not re.sub(r'\\s+', '_', text)\n"
+],
+[
+"sign-flip",
+"def squeeze(text):\n    import re\n    return re.sub(r'\\s-', '_', text)\n"
+],
+[
+"empty-body",
+"def squeeze(text):\n    return None\n"
+],
+[
+"stub",
+"def squeeze(text):\n    return None\n"
+]
+],
+"21-0": [
+[
+"inverted-result",
+"def span(x, y):\n    from datetime import date\n    a, b = date.fromisoformat(x), date.fromisoformat(y)\n    return not (b - a).days\n"
+],
+[
+"sign-flip",
+"def span(x, y):\n    from datetime import date\n    a, b = date.fromisoformat(x), date.fromisoformat(y)\n    return (b + a).days\n"
+],
+[
+"empty-body",
+"def span(x, y):\n    return None\n"
+],
+[
+"stub",
+"def span(x, y):\n    return None\n"
+]
+],
+"21-1": [
+[
+"inverted-result",
+"def span(x, y):\n    from datetime import date\n    a, b = date.fromisoformat(x), date.fromisoformat(y)\n    return not abs((b - a).days)\n"
+],
+[
+"sign-flip",
+"def span(x, y):\n    from datetime import date\n    a, b = date.fromisoformat(x), date.fromisoformat(y)\n    return abs((b + a).days)\n"
+],
+[
+"empty-body",
+"def span(x, y):\n    return None\n"
+],
+[
+"stub",
+"def span(x, y):\n    return None\n"
+]
+],
+"21-2": [
+[
+"inverted-result",
+"def span(x, y):\n    from datetime import date\n    a, b = date.fromisoformat(x), date.fromisoformat(y)\n    return not abs((b - a).days) // 7\n"
+],
+[
+"sign-flip",
+"def span(x, y):\n    from datetime import date\n    a, b = date.fromisoformat(x), date.fromisoformat(y)\n    return abs((b + a).days) // 7\n"
+],
+[
+"empty-body",
+"def span(x, y):\n    return None\n"
+],
+[
+"stub",
+"def span(x, y):\n    return None\n"
+]
+],
+"21-3": [
+[
+"inverted-result",
+"def span(x, y):\n    from datetime import date\n    return not date.fromisoformat(x).strftime('%A')\n"
+],
+[
+"empty-body",
+"def span(x, y):\n    return None\n"
+],
+[
+"stub",
+"def span(x, y):\n    return None\n"
+]
+],
+"21-4": [
+[
+"wrong-comparison",
+"def span(x, y):\n    from datetime import date\n    a, b = date.fromisoformat(x), date.fromisoformat(y)\n    return (a.year, a.month) != (b.year, b.month)\n"
+],
+[
+"inverted-result",
+"def span(x, y):\n    from datetime import date\n    a, b = date.fromisoformat(x), date.fromisoformat(y)\n    return not (a.year, a.month) == (b.year, b.month)\n"
+],
+[
+"empty-body",
+"def span(x, y):\n    return None\n"
+],
+[
+"stub",
+"def span(x, y):\n    return None\n"
+]
+],
+"22-0": [
+[
+"inverted-result",
+"def roman(s):\n    m = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}\n    total = 0\n    for i, c in enumerate(s):\n        v = m[c]\n        if i + 1 < len(s) and v < m[s[i + 1]]:\n            total -= v\n        else:\n            total += v\n    return not total\n"
+],
+[
+"sign-flip",
+"def roman(s):\n    m = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}\n    total = 0\n    for i, c in enumerate(s):\n        v = m[c]\n        if i + 1 < len(s) and v < m[s[i + 1]]:\n            total += v\n        else:\n            total += v\n    return total\n"
+],
+[
+"empty-body",
+"def roman(s):\n    return None\n"
+],
+[
+"dropped-loop",
+"def roman(s):\n    m = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}\n    total = 0\n    if False:\n        v = m[c]\n        if i + 1 < len(s) and v < m[s[i + 1]]:\n            total -= v\n        else:\n            total += v\n    return total\n"
+],
+[
+"stub",
+"def roman(s):\n    return None\n"
+]
+],
+"22-1": [
+[
+"inverted-result",
+"def roman(s):\n    pairs = [(1000, 'M'), (900, 'CM'), (500, 'D'), (400, 'CD'), (100, 'C'), (90, 'XC'),\n             (50, 'L'), (40, 'XL'), (10, 'X'), (9, 'IX'), (5, 'V'), (4, 'IV'), (1, 'I')]\n    out = []\n    n = s\n    for v, sym in pairs:\n        while n >= v:\n            out.append(sym)\n            n -= v\n    return not ''.join(out)\n"
+],
+[
+"sign-flip",
+"def roman(s):\n    pairs = [(1000, 'M'), (900, 'CM'), (500, 'D'), (400, 'CD'), (100, 'C'), (90, 'XC'),\n             (50, 'L'), (40, 'XL'), (10, 'X'), (9, 'IX'), (5, 'V'), (4, 'IV'), (1, 'I')]\n    out = []\n    n = s\n    for v, sym in pairs:\n        while n >= v:\n            out.append(sym)\n            n += v\n    return ''.join(out)\n"
+],
+[
+"empty-body",
+"def roman(s):\n    return None\n"
+],
+[
+"dropped-loop",
+"def roman(s):\n    pairs = [(1000, 'M'), (900, 'CM'), (500, 'D'), (400, 'CD'), (100, 'C'), (90, 'XC'),\n             (50, 'L'), (40, 'XL'), (10, 'X'), (9, 'IX'), (5, 'V'), (4, 'IV'), (1, 'I')]\n    out = []\n    n = s\n    if False:\n        while n >= v:\n            out.append(sym)\n            n -= v\n    return ''.join(out)\n"
+],
+[
+"stub",
+"def roman(s):\n    return None\n"
+]
+],
+"22-2": [
+[
+"inverted-result",
+"def roman(s):\n    import re\n    return not bool(re.fullmatch(r'M*(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})', s)) and bool(s)\n"
+],
+[
+"empty-body",
+"def roman(s):\n    return None\n"
+],
+[
+"stub",
+"def roman(s):\n    return None\n"
+]
+],
+"22-3": [
+[
+"inverted-result",
+"def roman(s):\n    return not len(s)\n"
+],
+[
+"empty-body",
+"def roman(s):\n    return None\n"
+],
+[
+"stub",
+"def roman(s):\n    return None\n"
+]
+],
+"22-4": [
+[
+"inverted-result",
+"def roman(s):\n    m = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}\n    return not sum(m[c] for c in s)\n"
+],
+[
+"empty-body",
+"def roman(s):\n    return None\n"
+],
+[
+"stub",
+"def roman(s):\n    return None\n"
+]
+],
+"23-0": [
+[
+"inverted-result",
+"def dedupe(xs):\n    seen = set()\n    out = []\n    for x in xs:\n        if x not in seen:\n            seen.add(x)\n            out.append(x)\n    return not out\n"
+],
+[
+"empty-body",
+"def dedupe(xs):\n    return None\n"
+],
+[
+"dropped-loop",
+"def dedupe(xs):\n    seen = set()\n    out = []\n    if False:\n        if x not in seen:\n            seen.add(x)\n            out.append(x)\n    return out\n"
+],
+[
+"stub",
+"def dedupe(xs):\n    return None\n"
+]
+],
+"23-1": [
+[
+"inverted-result",
+"def dedupe(xs):\n    out = []\n    for i, x in enumerate(xs):\n        if x not in xs[i + 1:]:\n            out.append(x)\n    return not out\n"
+],
+[
+"sign-flip",
+"def dedupe(xs):\n    out = []\n    for i, x in enumerate(xs):\n        if x not in xs[i - 1:]:\n            out.append(x)\n    return out\n"
+],
+[
+"empty-body",
+"def dedupe(xs):\n    return None\n"
+],
+[
+"dropped-loop",
+"def dedupe(xs):\n    out = []\n    if False:\n        if x not in xs[i + 1:]:\n            out.append(x)\n    return out\n"
+],
+[
+"stub",
+"def dedupe(xs):\n    return None\n"
+]
+],
+"23-2": [
+[
+"inverted-result",
+"def dedupe(xs):\n    from collections import Counter\n    c = Counter(xs)\n    return not [x for x in dict.fromkeys(xs) if c[x] > 1]\n"
+],
+[
+"empty-body",
+"def dedupe(xs):\n    return None\n"
+],
+[
+"stub",
+"def dedupe(xs):\n    return None\n"
+]
+],
+"23-3": [
+[
+"inverted-result",
+"def dedupe(xs):\n    return not len(xs) - len(set(xs))\n"
+],
+[
+"sign-flip",
+"def dedupe(xs):\n    return len(xs) + len(set(xs))\n"
+],
+[
+"empty-body",
+"def dedupe(xs):\n    return None\n"
+],
+[
+"stub",
+"def dedupe(xs):\n    return None\n"
+]
+],
+"23-4": [
+[
+"inverted-result",
+"def dedupe(xs):\n    seen = set()\n    out = []\n    for x in xs:\n        k = x.lower() if isinstance(x, str) else x\n        if k not in seen:\n            seen.add(k)\n            out.append(x)\n    return not out\n"
+],
+[
+"empty-body",
+"def dedupe(xs):\n    return None\n"
+],
+[
+"dropped-loop",
+"def dedupe(xs):\n    seen = set()\n    out = []\n    if False:\n        k = x.lower() if isinstance(x, str) else x\n        if k not in seen:\n            seen.add(k)\n            out.append(x)\n    return out\n"
+],
+[
+"stub",
+"def dedupe(xs):\n    return None\n"
+]
+],
+"24-0": [
+[
+"inverted-result",
+"def shift(text):\n    out = []\n    for c in text:\n        if c.isalpha() and c.isascii():\n            base = ord('A') if c.isupper() else ord('a')\n            out.append(chr((ord(c) - base + 1) % 26 + base))\n        else:\n            out.append(c)\n    return not ''.join(out)\n"
+],
+[
+"sign-flip",
+"def shift(text):\n    out = []\n    for c in text:\n        if c.isalpha() and c.isascii():\n            base = ord('A') if c.isupper() else ord('a')\n            out.append(chr((ord(c) + base + 1) % 26 + base))\n        else:\n            out.append(c)\n    return ''.join(out)\n"
+],
+[
+"empty-body",
+"def shift(text):\n    return None\n"
+],
+[
+"dropped-loop",
+"def shift(text):\n    out = []\n    if False:\n        if c.isalpha() and c.isascii():\n            base = ord('A') if c.isupper() else ord('a')\n            out.append(chr((ord(c) - base + 1) % 26 + base))\n        else:\n            out.append(c)\n    return ''.join(out)\n"
+],
+[
+"stub",
+"def shift(text):\n    return None\n"
+]
+],
+"24-1": [
+[
+"inverted-result",
+"def shift(text):\n    out = []\n    for c in text:\n        if c.isalpha() and c.isascii():\n            base = ord('A') if c.isupper() else ord('a')\n            out.append(chr((ord(c) - base + 3) % 26 + base))\n        else:\n            out.append(c)\n    return not ''.join(out)\n"
+],
+[
+"sign-flip",
+"def shift(text):\n    out = []\n    for c in text:\n        if c.isalpha() and c.isascii():\n            base = ord('A') if c.isupper() else ord('a')\n            out.append(chr((ord(c) + base + 3) % 26 + base))\n        else:\n            out.append(c)\n    return ''.join(out)\n"
+],
+[
+"empty-body",
+"def shift(text):\n    return None\n"
+],
+[
+"dropped-loop",
+"def shift(text):\n    out = []\n    if False:\n        if c.isalpha() and c.isascii():\n            base = ord('A') if c.isupper() else ord('a')\n            out.append(chr((ord(c) - base + 3) % 26 + base))\n        else:\n            out.append(c)\n    return ''.join(out)\n"
+],
+[
+"stub",
+"def shift(text):\n    return None\n"
+]
+],
+"24-2": [
+[
+"inverted-result",
+"def shift(text):\n    out = []\n    for c in text:\n        if c.isalpha() and c.isascii():\n            base = ord('A') if c.isupper() else ord('a')\n            out.append(chr((ord(c) - base + 13) % 26 + base))\n        else:\n            out.append(c)\n    return not ''.join(out)\n"
+],
+[
+"sign-flip",
+"def shift(text):\n    out = []\n    for c in text:\n        if c.isalpha() and c.isascii():\n            base = ord('A') if c.isupper() else ord('a')\n            out.append(chr((ord(c) + base + 13) % 26 + base))\n        else:\n            out.append(c)\n    return ''.join(out)\n"
+],
+[
+"empty-body",
+"def shift(text):\n    return None\n"
+],
+[
+"dropped-loop",
+"def shift(text):\n    out = []\n    if False:\n        if c.isalpha() and c.isascii():\n            base = ord('A') if c.isupper() else ord('a')\n            out.append(chr((ord(c) - base + 13) % 26 + base))\n        else:\n            out.append(c)\n    return ''.join(out)\n"
+],
+[
+"stub",
+"def shift(text):\n    return None\n"
+]
+],
+"24-3": [
+[
+"inverted-result",
+"def shift(text):\n    out = []\n    for c in text:\n        if c.isalpha() and c.isascii():\n            base = ord('A') if c.isupper() else ord('a')\n            out.append(chr((ord(c) - base + 5) % 26 + base))\n        else:\n            out.append(c)\n    return not ''.join(out)\n"
+],
+[
+"sign-flip",
+"def shift(text):\n    out = []\n    for c in text:\n        if c.isalpha() and c.isascii():\n            base = ord('A') if c.isupper() else ord('a')\n            out.append(chr((ord(c) + base + 5) % 26 + base))\n        else:\n            out.append(c)\n    return ''.join(out)\n"
+],
+[
+"empty-body",
+"def shift(text):\n    return None\n"
+],
+[
+"dropped-loop",
+"def shift(text):\n    out = []\n    if False:\n        if c.isalpha() and c.isascii():\n            base = ord('A') if c.isupper() else ord('a')\n            out.append(chr((ord(c) - base + 5) % 26 + base))\n        else:\n            out.append(c)\n    return ''.join(out)\n"
+],
+[
+"stub",
+"def shift(text):\n    return None\n"
+]
+],
+"24-4": [
+[
+"inverted-result",
+"def shift(text):\n    out = []\n    for c in text:\n        if c.isalpha() and c.isascii():\n            base = ord('A') if c.isupper() else ord('a')\n            out.append(chr((ord(c) - base + 25) % 26 + base))\n        else:\n            out.append(c)\n    return not ''.join(out)\n"
+],
+[
+"sign-flip",
+"def shift(text):\n    out = []\n    for c in text:\n        if c.isalpha() and c.isascii():\n            base = ord('A') if c.isupper() else ord('a')\n            out.append(chr((ord(c) + base + 25) % 26 + base))\n        else:\n            out.append(c)\n    return ''.join(out)\n"
+],
+[
+"empty-body",
+"def shift(text):\n    return None\n"
+],
+[
+"dropped-loop",
+"def shift(text):\n    out = []\n    if False:\n        if c.isalpha() and c.isascii():\n            base = ord('A') if c.isupper() else ord('a')\n            out.append(chr((ord(c) - base + 25) % 26 + base))\n        else:\n            out.append(c)\n    return ''.join(out)\n"
+],
+[
+"stub",
+"def shift(text):\n    return None\n"
+]
+],
+"25-0": [
+[
+"inverted-result",
+"def stat(xs):\n    return not sum(xs) / len(xs) if xs else 0.0\n"
+],
+[
+"empty-body",
+"def stat(xs):\n    return None\n"
+],
+[
+"stub",
+"def stat(xs):\n    return None\n"
+]
+],
+"25-1": [
+[
+"inverted-result",
+"def stat(xs):\n    import statistics\n    return not statistics.median(xs) if xs else 0.0\n"
+],
+[
+"empty-body",
+"def stat(xs):\n    return None\n"
+],
+[
+"stub",
+"def stat(xs):\n    return None\n"
+]
+],
+"25-2": [
+[
+"inverted-result",
+"def stat(xs):\n    from collections import Counter\n    return not Counter(xs).most_common(1)[0][0] if xs else None\n"
+],
+[
+"empty-body",
+"def stat(xs):\n    return None\n"
+],
+[
+"stub",
+"def stat(xs):\n    return None\n"
+]
+],
+"25-3": [
+[
+"inverted-result",
+"def stat(xs):\n    return not (max(xs) - min(xs)) if xs else 0\n"
+],
+[
+"sign-flip",
+"def stat(xs):\n    return (max(xs) + min(xs)) if xs else 0\n"
+],
+[
+"empty-body",
+"def stat(xs):\n    return None\n"
+],
+[
+"stub",
+"def stat(xs):\n    return None\n"
+]
+],
+"25-4": [
+[
+"inverted-result",
+"def stat(xs):\n    import statistics\n    return not statistics.pstdev(xs) if len(xs) > 1 else 0.0\n"
+],
+[
+"empty-body",
+"def stat(xs):\n    return None\n"
+],
+[
+"stub",
+"def stat(xs):\n    return None\n"
+]
+],
+"26-0": [
+[
+"inverted-result",
+"def distance(a, b):\n    m, n = len(a), len(b)\n    d = list(range(n + 1))\n    for i in range(1, m + 1):\n        prev, d[0] = d[0], i\n        for j in range(1, n + 1):\n            cur = d[j]\n            d[j] = min(d[j] + 1, d[j - 1] + 1, prev + (a[i - 1] != b[j - 1]))\n            prev = cur\n    return not d[n]\n"
+],
+[
+"sign-flip",
+"def distance(a, b):\n    m, n = len(a), len(b)\n    d = list(range(n + 1))\n    for i in range(1, m + 1):\n        prev, d[0] = d[0], i\n        for j in range(1, n + 1):\n            cur = d[j]\n            d[j] = min(d[j] + 1, d[j + 1] + 1, prev + (a[i - 1] != b[j - 1]))\n            prev = cur\n    return d[n]\n"
+],
+[
+"empty-body",
+"def distance(a, b):\n    return None\n"
+],
+[
+"dropped-loop",
+"def distance(a, b):\n    m, n = len(a), len(b)\n    d = list(range(n + 1))\n    if False:\n        prev, d[0] = d[0], i\n        for j in range(1, n + 1):\n            cur = d[j]\n            d[j] = min(d[j] + 1, d[j - 1] + 1, prev + (a[i - 1] != b[j - 1]))\n            prev = cur\n    return d[n]\n"
+],
+[
+"stub",
+"def distance(a, b):\n    return None\n"
+]
+],
+"26-1": [
+[
+"inverted-result",
+"def distance(a, b):\n    m, n = len(a), len(b)\n    d = list(range(n + 1))\n    for i in range(1, m + 1):\n        prev, d[0] = d[0], i\n        for j in range(1, n + 1):\n            cur = d[j]\n            d[j] = min(d[j] + 1, d[j - 1] + 1, prev + (2 if a[i - 1] != b[j - 1] else 0))\n            prev = cur\n    return not d[n]\n"
+],
+[
+"sign-flip",
+"def distance(a, b):\n    m, n = len(a), len(b)\n    d = list(range(n + 1))\n    for i in range(1, m + 1):\n        prev, d[0] = d[0], i\n        for j in range(1, n + 1):\n            cur = d[j]\n            d[j] = min(d[j] + 1, d[j + 1] + 1, prev + (2 if a[i - 1] != b[j - 1] else 0))\n            prev = cur\n    return d[n]\n"
+],
+[
+"empty-body",
+"def distance(a, b):\n    return None\n"
+],
+[
+"dropped-loop",
+"def distance(a, b):\n    m, n = len(a), len(b)\n    d = list(range(n + 1))\n    if False:\n        prev, d[0] = d[0], i\n        for j in range(1, n + 1):\n            cur = d[j]\n            d[j] = min(d[j] + 1, d[j - 1] + 1, prev + (2 if a[i - 1] != b[j - 1] else 0))\n            prev = cur\n    return d[n]\n"
+],
+[
+"stub",
+"def distance(a, b):\n    return None\n"
+]
+],
+"26-2": [
+[
+"wrong-comparison",
+"def distance(a, b):\n    m, n = len(a), len(b)\n    d = [0] * (n + 1)\n    for i in range(1, m + 1):\n        prev = 0\n        for j in range(1, n + 1):\n            cur = d[j]\n            d[j] = prev + 1 if a[i - 1] != b[j - 1] else max(d[j], d[j - 1])\n            prev = cur\n    return d[n]\n"
+],
+[
+"inverted-result",
+"def distance(a, b):\n    m, n = len(a), len(b)\n    d = [0] * (n + 1)\n    for i in range(1, m + 1):\n        prev = 0\n        for j in range(1, n + 1):\n            cur = d[j]\n            d[j] = prev + 1 if a[i - 1] == b[j - 1] else max(d[j], d[j - 1])\n            prev = cur\n    return not d[n]\n"
+],
+[
+"sign-flip",
+"def distance(a, b):\n    m, n = len(a), len(b)\n    d = [0] * (n + 1)\n    for i in range(1, m + 1):\n        prev = 0\n        for j in range(1, n + 1):\n            cur = d[j]\n            d[j] = prev + 1 if a[i + 1] == b[j - 1] else max(d[j], d[j - 1])\n            prev = cur\n    return d[n]\n"
+],
+[
+"empty-body",
+"def distance(a, b):\n    return None\n"
+],
+[
+"dropped-loop",
+"def distance(a, b):\n    m, n = len(a), len(b)\n    d = [0] * (n + 1)\n    if False:\n        prev = 0\n        for j in range(1, n + 1):\n            cur = d[j]\n            d[j] = prev + 1 if a[i - 1] == b[j - 1] else max(d[j], d[j - 1])\n            prev = cur\n    return d[n]\n"
+],
+[
+"stub",
+"def distance(a, b):\n    return None\n"
+]
+],
+"26-3": [
+[
+"wrong-comparison",
+"def distance(a, b):\n    m, n = len(a), len(b)\n    d = [[0] * (n + 1) for _ in range(m + 1)]\n    for i in range(m + 1):\n        d[i][0] = i\n    for j in range(n + 1):\n        d[0][j] = j\n    for i in range(1, m + 1):\n        for j in range(1, n + 1):\n            d[i][j] = min(d[i - 1][j] + 1, d[i][j - 1] + 1,\n                          d[i - 1][j - 1] + (a[i - 1] != b[j - 1]))\n            if i > 1 and j > 1 and a[i - 1] != b[j - 2] and a[i - 2] == b[j - 1]:\n                d[i][j] = min(d[i][j], d[i - 2][j - 2] + 1)\n    return d[m][n]\n"
+],
+[
+"inverted-result",
+"def distance(a, b):\n    m, n = len(a), len(b)\n    d = [[0] * (n + 1) for _ in range(m + 1)]\n    for i in range(m + 1):\n        d[i][0] = i\n    for j in range(n + 1):\n        d[0][j] = j\n    for i in range(1, m + 1):\n        for j in range(1, n + 1):\n            d[i][j] = min(d[i - 1][j] + 1, d[i][j - 1] + 1,\n                          d[i - 1][j - 1] + (a[i - 1] != b[j - 1]))\n            if i > 1 and j > 1 and a[i - 1] == b[j - 2] and a[i - 2] == b[j - 1]:\n                d[i][j] = min(d[i][j], d[i - 2][j - 2] + 1)\n    return not d[m][n]\n"
+],
+[
+"sign-flip",
+"def distance(a, b):\n    m, n = len(a), len(b)\n    d = [[0] * (n + 1) for _ in range(m + 1)]\n    for i in range(m + 1):\n        d[i][0] = i\n    for j in range(n + 1):\n        d[0][j] = j\n    for i in range(1, m + 1):\n        for j in range(1, n + 1):\n            d[i][j] = min(d[i + 1][j] + 1, d[i][j - 1] + 1,\n                          d[i - 1][j - 1] + (a[i - 1] != b[j - 1]))\n            if i > 1 and j > 1 and a[i - 1] == b[j - 2] and a[i - 2] == b[j - 1]:\n                d[i][j] = min(d[i][j], d[i - 2][j - 2] + 1)\n    return d[m][n]\n"
+],
+[
+"empty-body",
+"def distance(a, b):\n    return None\n"
+],
+[
+"dropped-loop",
+"def distance(a, b):\n    m, n = len(a), len(b)\n    d = [[0] * (n + 1) for _ in range(m + 1)]\n    if False:\n        d[i][0] = i\n    for j in range(n + 1):\n        d[0][j] = j\n    for i in range(1, m + 1):\n        for j in range(1, n + 1):\n            d[i][j] = min(d[i - 1][j] + 1, d[i][j - 1] + 1,\n                          d[i - 1][j - 1] + (a[i - 1] != b[j - 1]))\n            if i > 1 and j > 1 and a[i - 1] == b[j - 2] and a[i - 2] == b[j - 1]:\n                d[i][j] = min(d[i][j], d[i - 2][j - 2] + 1)\n    return d[m][n]\n"
+],
+[
+"stub",
+"def distance(a, b):\n    return None\n"
+]
+],
+"26-4": [
+[
+"inverted-result",
+"def distance(a, b):\n    if len(a) != len(b):\n        return not -1\n    return sum(1 for x, y in zip(a, b) if x != y)\n"
+],
+[
+"sign-flip",
+"def distance(a, b):\n    if len(a) != len(b):\n        return +1\n    return sum(1 for x, y in zip(a, b) if x != y)\n"
+],
+[
+"empty-body",
+"def distance(a, b):\n    return None\n"
+],
+[
+"stub",
+"def distance(a, b):\n    return None\n"
+]
+],
+"27-0": [
+[
+"wrong-comparison",
+"def toposort(nodes, edges):\n    import heapq\n    from collections import defaultdict\n    g = defaultdict(list)\n    indeg = dict.fromkeys(nodes, 0)\n    for a, b in edges:\n        g[a].append(b)\n        indeg[b] = indeg.get(b, 0) + 1\n    q = [n for n in nodes if indeg.get(n, 0) != 0]\n    heapq.heapify(q)\n    out = []\n    while q:\n        n = heapq.heappop(q)\n        out.append(n)\n        for m in g[n]:\n            indeg[m] -= 1\n            if indeg[m] == 0:\n                heapq.heappush(q, m)\n    return out if len(out) == len(nodes) else []\n"
+],
+[
+"inverted-result",
+"def toposort(nodes, edges):\n    import heapq\n    from collections import defaultdict\n    g = defaultdict(list)\n    indeg = dict.fromkeys(nodes, 0)\n    for a, b in edges:\n        g[a].append(b)\n        indeg[b] = indeg.get(b, 0) + 1\n    q = [n for n in nodes if indeg.get(n, 0) == 0]\n    heapq.heapify(q)\n    out = []\n    while q:\n        n = heapq.heappop(q)\n        out.append(n)\n        for m in g[n]:\n            indeg[m] -= 1\n            if indeg[m] == 0:\n                heapq.heappush(q, m)\n    return not out if len(out) == len(nodes) else []\n"
+],
+[
+"sign-flip",
+"def toposort(nodes, edges):\n    import heapq\n    from collections import defaultdict\n    g = defaultdict(list)\n    indeg = dict.fromkeys(nodes, 0)\n    for a, b in edges:\n        g[a].append(b)\n        indeg[b] = indeg.get(b, 0) + 1\n    q = [n for n in nodes if indeg.get(n, 0) == 0]\n    heapq.heapify(q)\n    out = []\n    while q:\n        n = heapq.heappop(q)\n        out.append(n)\n        for m in g[n]:\n            indeg[m] += 1\n            if indeg[m] == 0:\n                heapq.heappush(q, m)\n    return out if len(out) == len(nodes) else []\n"
+],
+[
+"empty-body",
+"def toposort(nodes, edges):\n    return None\n"
+],
+[
+"dropped-loop",
+"def toposort(nodes, edges):\n    import heapq\n    from collections import defaultdict\n    g = defaultdict(list)\n    indeg = dict.fromkeys(nodes, 0)\n    if False:\n        g[a].append(b)\n        indeg[b] = indeg.get(b, 0) + 1\n    q = [n for n in nodes if indeg.get(n, 0) == 0]\n    heapq.heapify(q)\n    out = []\n    while q:\n        n = heapq.heappop(q)\n        out.append(n)\n        for m in g[n]:\n            indeg[m] -= 1\n            if indeg[m] == 0:\n                heapq.heappush(q, m)\n    return out if len(out) == len(nodes) else []\n"
+],
+[
+"stub",
+"def toposort(nodes, edges):\n    return None\n"
+]
+],
+"27-1": [
+[
+"wrong-comparison",
+"def toposort(nodes, edges):\n    import heapq\n    from collections import defaultdict\n    g = defaultdict(list)\n    indeg = dict.fromkeys(nodes, 0)\n    for a, b in edges:\n        g[a].append(b)\n        indeg[b] = indeg.get(b, 0) + 1\n    q = [-n for n in nodes if indeg.get(n, 0) != 0]\n    heapq.heapify(q)\n    out = []\n    while q:\n        n = -heapq.heappop(q)\n        out.append(n)\n        for m in g[n]:\n            indeg[m] -= 1\n            if indeg[m] == 0:\n                heapq.heappush(q, -m)\n    return out if len(out) == len(nodes) else []\n"
+],
+[
+"inverted-result",
+"def toposort(nodes, edges):\n    import heapq\n    from collections import defaultdict\n    g = defaultdict(list)\n    indeg = dict.fromkeys(nodes, 0)\n    for a, b in edges:\n        g[a].append(b)\n        indeg[b] = indeg.get(b, 0) + 1\n    q = [-n for n in nodes if indeg.get(n, 0) == 0]\n    heapq.heapify(q)\n    out = []\n    while q:\n        n = -heapq.heappop(q)\n        out.append(n)\n        for m in g[n]:\n            indeg[m] -= 1\n            if indeg[m] == 0:\n                heapq.heappush(q, -m)\n    return not out if len(out) == len(nodes) else []\n"
+],
+[
+"sign-flip",
+"def toposort(nodes, edges):\n    import heapq\n    from collections import defaultdict\n    g = defaultdict(list)\n    indeg = dict.fromkeys(nodes, 0)\n    for a, b in edges:\n        g[a].append(b)\n        indeg[b] = indeg.get(b, 0) + 1\n    q = [+n for n in nodes if indeg.get(n, 0) == 0]\n    heapq.heapify(q)\n    out = []\n    while q:\n        n = -heapq.heappop(q)\n        out.append(n)\n        for m in g[n]:\n            indeg[m] -= 1\n            if indeg[m] == 0:\n                heapq.heappush(q, -m)\n    return out if len(out) == len(nodes) else []\n"
+],
+[
+"empty-body",
+"def toposort(nodes, edges):\n    return None\n"
+],
+[
+"dropped-loop",
+"def toposort(nodes, edges):\n    import heapq\n    from collections import defaultdict\n    g = defaultdict(list)\n    indeg = dict.fromkeys(nodes, 0)\n    if False:\n        g[a].append(b)\n        indeg[b] = indeg.get(b, 0) + 1\n    q = [-n for n in nodes if indeg.get(n, 0) == 0]\n    heapq.heapify(q)\n    out = []\n    while q:\n        n = -heapq.heappop(q)\n        out.append(n)\n        for m in g[n]:\n            indeg[m] -= 1\n            if indeg[m] == 0:\n                heapq.heappush(q, -m)\n    return out if len(out) == len(nodes) else []\n"
+],
+[
+"stub",
+"def toposort(nodes, edges):\n    return None\n"
+]
+],
+"27-2": [
+[
+"wrong-comparison",
+"def toposort(nodes, edges):\n    from collections import defaultdict\n    g = defaultdict(list)\n    indeg = dict.fromkeys(nodes, 0)\n    for a, b in edges:\n        g[a].append(b)\n        indeg[b] = indeg.get(b, 0) + 1\n    q = [n for n in nodes if indeg.get(n, 0) != 0]\n    out = []\n    while q:\n        n = q.pop(0)\n        out.append(n)\n        for m in g[n]:\n            indeg[m] -= 1\n            if indeg[m] == 0:\n                q.append(m)\n    return out if len(out) == len(nodes) else []\n"
+],
+[
+"inverted-result",
+"def toposort(nodes, edges):\n    from collections import defaultdict\n    g = defaultdict(list)\n    indeg = dict.fromkeys(nodes, 0)\n    for a, b in edges:\n        g[a].append(b)\n        indeg[b] = indeg.get(b, 0) + 1\n    q = [n for n in nodes if indeg.get(n, 0) == 0]\n    out = []\n    while q:\n        n = q.pop(0)\n        out.append(n)\n        for m in g[n]:\n            indeg[m] -= 1\n            if indeg[m] == 0:\n                q.append(m)\n    return not out if len(out) == len(nodes) else []\n"
+],
+[
+"sign-flip",
+"def toposort(nodes, edges):\n    from collections import defaultdict\n    g = defaultdict(list)\n    indeg = dict.fromkeys(nodes, 0)\n    for a, b in edges:\n        g[a].append(b)\n        indeg[b] = indeg.get(b, 0) + 1\n    q = [n for n in nodes if indeg.get(n, 0) == 0]\n    out = []\n    while q:\n        n = q.pop(0)\n        out.append(n)\n        for m in g[n]:\n            indeg[m] += 1\n            if indeg[m] == 0:\n                q.append(m)\n    return out if len(out) == len(nodes) else []\n"
+],
+[
+"empty-body",
+"def toposort(nodes, edges):\n    return None\n"
+],
+[
+"dropped-loop",
+"def toposort(nodes, edges):\n    from collections import defaultdict\n    g = defaultdict(list)\n    indeg = dict.fromkeys(nodes, 0)\n    if False:\n        g[a].append(b)\n        indeg[b] = indeg.get(b, 0) + 1\n    q = [n for n in nodes if indeg.get(n, 0) == 0]\n    out = []\n    while q:\n        n = q.pop(0)\n        out.append(n)\n        for m in g[n]:\n            indeg[m] -= 1\n            if indeg[m] == 0:\n                q.append(m)\n    return out if len(out) == len(nodes) else []\n"
+],
+[
+"stub",
+"def toposort(nodes, edges):\n    return None\n"
+]
+],
+"27-3": [
+[
+"inverted-result",
+"def toposort(nodes, edges):\n    targets = {b for _, b in edges}\n    return not sum(1 for n in nodes if n not in targets)\n"
+],
+[
+"empty-body",
+"def toposort(nodes, edges):\n    return None\n"
+],
+[
+"stub",
+"def toposort(nodes, edges):\n    return None\n"
+]
+],
+"27-4": [
+[
+"wrong-comparison",
+"def toposort(nodes, edges):\n    from collections import defaultdict\n    g = defaultdict(list)\n    indeg = dict.fromkeys(nodes, 0)\n    for a, b in edges:\n        g[a].append(b)\n        indeg[b] = indeg.get(b, 0) + 1\n    q = [n for n in nodes if indeg.get(n, 0) != 0]\n    dist = dict.fromkeys(nodes, 0)\n    seen = 0\n    while q:\n        n = q.pop(0)\n        seen += 1\n        for m in g[n]:\n            dist[m] = max(dist[m], dist[n] + 1)\n            indeg[m] -= 1\n            if indeg[m] == 0:\n                q.append(m)\n    return max(dist.values()) if seen == len(nodes) and dist else 0\n"
+],
+[
+"inverted-result",
+"def toposort(nodes, edges):\n    from collections import defaultdict\n    g = defaultdict(list)\n    indeg = dict.fromkeys(nodes, 0)\n    for a, b in edges:\n        g[a].append(b)\n        indeg[b] = indeg.get(b, 0) + 1\n    q = [n for n in nodes if indeg.get(n, 0) == 0]\n    dist = dict.fromkeys(nodes, 0)\n    seen = 0\n    while q:\n        n = q.pop(0)\n        seen += 1\n        for m in g[n]:\n            dist[m] = max(dist[m], dist[n] + 1)\n            indeg[m] -= 1\n            if indeg[m] == 0:\n                q.append(m)\n    return not max(dist.values()) if seen == len(nodes) and dist else 0\n"
+],
+[
+"sign-flip",
+"def toposort(nodes, edges):\n    from collections import defaultdict\n    g = defaultdict(list)\n    indeg = dict.fromkeys(nodes, 0)\n    for a, b in edges:\n        g[a].append(b)\n        indeg[b] = indeg.get(b, 0) + 1\n    q = [n for n in nodes if indeg.get(n, 0) == 0]\n    dist = dict.fromkeys(nodes, 0)\n    seen = 0\n    while q:\n        n = q.pop(0)\n        seen += 1\n        for m in g[n]:\n            dist[m] = max(dist[m], dist[n] + 1)\n            indeg[m] += 1\n            if indeg[m] == 0:\n                q.append(m)\n    return max(dist.values()) if seen == len(nodes) and dist else 0\n"
+],
+[
+"empty-body",
+"def toposort(nodes, edges):\n    return None\n"
+],
+[
+"dropped-loop",
+"def toposort(nodes, edges):\n    from collections import defaultdict\n    g = defaultdict(list)\n    indeg = dict.fromkeys(nodes, 0)\n    if False:\n        g[a].append(b)\n        indeg[b] = indeg.get(b, 0) + 1\n    q = [n for n in nodes if indeg.get(n, 0) == 0]\n    dist = dict.fromkeys(nodes, 0)\n    seen = 0\n    while q:\n        n = q.pop(0)\n        seen += 1\n        for m in g[n]:\n            dist[m] = max(dist[m], dist[n] + 1)\n            indeg[m] -= 1\n            if indeg[m] == 0:\n                q.append(m)\n    return max(dist.values()) if seen == len(nodes) and dist else 0\n"
+],
+[
+"stub",
+"def toposort(nodes, edges):\n    return None\n"
+]
+],
+"28-0": [
+[
+"wrong-comparison",
+"def evaluate(s):\n    import re\n    toks = re.findall(r'\\d+|[-+*/()]', s.replace(' ', ''))\n    pos = 0\n\n    def factor():\n        nonlocal pos\n        t = toks[pos]\n        pos += 1\n        return int(t)\n    def term():\n        nonlocal pos\n        v = factor()\n        while pos < len(toks) and toks[pos] in '*/':\n            op = toks[pos]\n            pos += 1\n            r = factor()\n            v = v * r if op != '*' else int(v / r)\n        return v\n    v = term()\n    while pos < len(toks) and toks[pos] in '+-':\n        op = toks[pos]\n        pos += 1\n        r = term()\n        v = v + r if op == '+' else v - r\n    return v\n"
+],
+[
+"inverted-result",
+"def evaluate(s):\n    import re\n    toks = re.findall(r'\\d+|[-+*/()]', s.replace(' ', ''))\n    pos = 0\n\n    def factor():\n        nonlocal pos\n        t = toks[pos]\n        pos += 1\n        return not int(t)\n    def term():\n        nonlocal pos\n        v = factor()\n        while pos < len(toks) and toks[pos] in '*/':\n            op = toks[pos]\n            pos += 1\n            r = factor()\n            v = v * r if op == '*' else int(v / r)\n        return v\n    v = term()\n    while pos < len(toks) and toks[pos] in '+-':\n        op = toks[pos]\n        pos += 1\n        r = term()\n        v = v + r if op == '+' else v - r\n    return v\n"
+],
+[
+"sign-flip",
+"def evaluate(s):\n    import re\n    toks = re.findall(r'\\d+|[++*/()]', s.replace(' ', ''))\n    pos = 0\n\n    def factor():\n        nonlocal pos\n        t = toks[pos]\n        pos += 1\n        return int(t)\n    def term():\n        nonlocal pos\n        v = factor()\n        while pos < len(toks) and toks[pos] in '*/':\n            op = toks[pos]\n            pos += 1\n            r = factor()\n            v = v * r if op == '*' else int(v / r)\n        return v\n    v = term()\n    while pos < len(toks) and toks[pos] in '+-':\n        op = toks[pos]\n        pos += 1\n        r = term()\n        v = v + r if op == '+' else v - r\n    return v\n"
+],
+[
+"empty-body",
+"def evaluate(s):\n    return None\n"
+],
+[
+"stub",
+"def evaluate(s):\n    return None\n"
+]
+],
+"28-1": [
+[
+"wrong-comparison",
+"def evaluate(s):\n    import re\n    toks = re.findall(r'\\d+|[-+*/()]', s.replace(' ', ''))\n    pos = 0\n\n    v = int(toks[0])\n    i = 1\n    while i < len(toks):\n        op, r = toks[i], int(toks[i + 1])\n        i += 2\n        v = v + r if op != '+' else v - r if op == '-' else v * r if op == '*' else int(v / r)\n    return v\n"
+],
+[
+"inverted-result",
+"def evaluate(s):\n    import re\n    toks = re.findall(r'\\d+|[-+*/()]', s.replace(' ', ''))\n    pos = 0\n\n    v = int(toks[0])\n    i = 1\n    while i < len(toks):\n        op, r = toks[i], int(toks[i + 1])\n        i += 2\n        v = v + r if op == '+' else v - r if op == '-' else v * r if op == '*' else int(v / r)\n    return not v\n"
+],
+[
+"sign-flip",
+"def evaluate(s):\n    import re\n    toks = re.findall(r'\\d+|[++*/()]', s.replace(' ', ''))\n    pos = 0\n\n    v = int(toks[0])\n    i = 1\n    while i < len(toks):\n        op, r = toks[i], int(toks[i + 1])\n        i += 2\n        v = v + r if op == '+' else v - r if op == '-' else v * r if op == '*' else int(v / r)\n    return v\n"
+],
+[
+"empty-body",
+"def evaluate(s):\n    return None\n"
+],
+[
+"stub",
+"def evaluate(s):\n    return None\n"
+]
+],
+"28-2": [
+[
+"wrong-comparison",
+"def evaluate(s):\n    import re\n    toks = re.findall(r'\\d+|[-+*/()]', s.replace(' ', ''))\n    pos = 0\n\n    def factor():\n        nonlocal pos\n        if toks[pos] != '(':\n            pos += 1\n            v = expr()\n            pos += 1\n            return v\n        t = toks[pos]\n        pos += 1\n        return int(t)\n    def term():\n        nonlocal pos\n        v = factor()\n        while pos < len(toks) and toks[pos] in '*/':\n            op = toks[pos]\n            pos += 1\n            r = factor()\n            v = v * r if op == '*' else int(v / r)\n        return v\n    def expr():\n        nonlocal pos\n        v = term()\n        while pos < len(toks) and toks[pos] in '+-':\n            op = toks[pos]\n            pos += 1\n            r = term()\n            v = v + r if op == '+' else v - r\n        return v\n    return expr()\n"
+],
+[
+"inverted-result",
+"def evaluate(s):\n    import re\n    toks = re.findall(r'\\d+|[-+*/()]', s.replace(' ', ''))\n    pos = 0\n\n    def factor():\n        nonlocal pos\n        if toks[pos] == '(':\n            pos += 1\n            v = expr()\n            pos += 1\n            return not v\n        t = toks[pos]\n        pos += 1\n        return int(t)\n    def term():\n        nonlocal pos\n        v = factor()\n        while pos < len(toks) and toks[pos] in '*/':\n            op = toks[pos]\n            pos += 1\n            r = factor()\n            v = v * r if op == '*' else int(v / r)\n        return v\n    def expr():\n        nonlocal pos\n        v = term()\n        while pos < len(toks) and toks[pos] in '+-':\n            op = toks[pos]\n            pos += 1\n            r = term()\n            v = v + r if op == '+' else v - r\n        return v\n    return expr()\n"
+],
+[
+"sign-flip",
+"def evaluate(s):\n    import re\n    toks = re.findall(r'\\d+|[++*/()]', s.replace(' ', ''))\n    pos = 0\n\n    def factor():\n        nonlocal pos\n        if toks[pos] == '(':\n            pos += 1\n            v = expr()\n            pos += 1\n            return v\n        t = toks[pos]\n        pos += 1\n        return int(t)\n    def term():\n        nonlocal pos\n        v = factor()\n        while pos < len(toks) and toks[pos] in '*/':\n            op = toks[pos]\n            pos += 1\n            r = factor()\n            v = v * r if op == '*' else int(v / r)\n        return v\n    def expr():\n        nonlocal pos\n        v = term()\n        while pos < len(toks) and toks[pos] in '+-':\n            op = toks[pos]\n            pos += 1\n            r = term()\n            v = v + r if op == '+' else v - r\n        return v\n    return expr()\n"
+],
+[
+"empty-body",
+"def evaluate(s):\n    return None\n"
+],
+[
+"stub",
+"def evaluate(s):\n    return None\n"
+]
+],
+"28-3": [
+[
+"wrong-comparison",
+"def evaluate(s):\n    import re\n    toks = re.findall(r'\\d+|[-+*/()]', s.replace(' ', ''))\n    pos = 0\n\n    parts = []\n    cur = [int(toks[0])]\n    i = 1\n    while i < len(toks):\n        op, r = toks[i], int(toks[i + 1])\n        i += 2\n        if op != '*':\n            cur.append(r)\n        else:\n            parts.append(cur)\n            cur = [r]\n    parts.append(cur)\n    total = 0\n    for p in parts:\n        prod = 1\n        for x in p:\n            prod *= x\n        total += prod\n    return total\n"
+],
+[
+"inverted-result",
+"def evaluate(s):\n    import re\n    toks = re.findall(r'\\d+|[-+*/()]', s.replace(' ', ''))\n    pos = 0\n\n    parts = []\n    cur = [int(toks[0])]\n    i = 1\n    while i < len(toks):\n        op, r = toks[i], int(toks[i + 1])\n        i += 2\n        if op == '*':\n            cur.append(r)\n        else:\n            parts.append(cur)\n            cur = [r]\n    parts.append(cur)\n    total = 0\n    for p in parts:\n        prod = 1\n        for x in p:\n            prod *= x\n        total += prod\n    return not total\n"
+],
+[
+"sign-flip",
+"def evaluate(s):\n    import re\n    toks = re.findall(r'\\d+|[++*/()]', s.replace(' ', ''))\n    pos = 0\n\n    parts = []\n    cur = [int(toks[0])]\n    i = 1\n    while i < len(toks):\n        op, r = toks[i], int(toks[i + 1])\n        i += 2\n        if op == '*':\n            cur.append(r)\n        else:\n            parts.append(cur)\n            cur = [r]\n    parts.append(cur)\n    total = 0\n    for p in parts:\n        prod = 1\n        for x in p:\n            prod *= x\n        total += prod\n    return total\n"
+],
+[
+"empty-body",
+"def evaluate(s):\n    return None\n"
+],
+[
+"dropped-loop",
+"def evaluate(s):\n    import re\n    toks = re.findall(r'\\d+|[-+*/()]', s.replace(' ', ''))\n    pos = 0\n\n    parts = []\n    cur = [int(toks[0])]\n    i = 1\n    while i < len(toks):\n        op, r = toks[i], int(toks[i + 1])\n        i += 2\n        if op == '*':\n            cur.append(r)\n        else:\n            parts.append(cur)\n            cur = [r]\n    parts.append(cur)\n    total = 0\n    if False:\n        prod = 1\n        for x in p:\n            prod *= x\n        total += prod\n    return total\n"
+],
+[
+"stub",
+"def evaluate(s):\n    return None\n"
+]
+],
+"28-4": [
+[
+"wrong-comparison",
+"def evaluate(s):\n    import re\n    toks = re.findall(r'\\d+|[-+*/()]', s.replace(' ', ''))\n    pos = 0\n\n    def factor():\n        nonlocal pos\n        t = toks[pos]\n        pos += 1\n        return float(t)\n    def term():\n        nonlocal pos\n        v = factor()\n        while pos < len(toks) and toks[pos] in '*/':\n            op = toks[pos]\n            pos += 1\n            r = factor()\n            v = v * r if op != '*' else v / r\n        return v\n    v = term()\n    while pos < len(toks) and toks[pos] in '+-':\n        op = toks[pos]\n        pos += 1\n        r = term()\n        v = v + r if op == '+' else v - r\n    return v\n"
+],
+[
+"inverted-result",
+"def evaluate(s):\n    import re\n    toks = re.findall(r'\\d+|[-+*/()]', s.replace(' ', ''))\n    pos = 0\n\n    def factor():\n        nonlocal pos\n        t = toks[pos]\n        pos += 1\n        return not float(t)\n    def term():\n        nonlocal pos\n        v = factor()\n        while pos < len(toks) and toks[pos] in '*/':\n            op = toks[pos]\n            pos += 1\n            r = factor()\n            v = v * r if op == '*' else v / r\n        return v\n    v = term()\n    while pos < len(toks) and toks[pos] in '+-':\n        op = toks[pos]\n        pos += 1\n        r = term()\n        v = v + r if op == '+' else v - r\n    return v\n"
+],
+[
+"sign-flip",
+"def evaluate(s):\n    import re\n    toks = re.findall(r'\\d+|[++*/()]', s.replace(' ', ''))\n    pos = 0\n\n    def factor():\n        nonlocal pos\n        t = toks[pos]\n        pos += 1\n        return float(t)\n    def term():\n        nonlocal pos\n        v = factor()\n        while pos < len(toks) and toks[pos] in '*/':\n            op = toks[pos]\n            pos += 1\n            r = factor()\n            v = v * r if op == '*' else v / r\n        return v\n    v = term()\n    while pos < len(toks) and toks[pos] in '+-':\n        op = toks[pos]\n        pos += 1\n        r = term()\n        v = v + r if op == '+' else v - r\n    return v\n"
+],
+[
+"empty-body",
+"def evaluate(s):\n    return None\n"
+],
+[
+"stub",
+"def evaluate(s):\n    return None\n"
+]
+],
+"29-0": [
+[
+"inverted-result",
+"def lookup(data, path):\n    cur = data\n    for part in path.split('.'):\n        if isinstance(cur, dict) and part in cur:\n            cur = cur[part]\n        else:\n            return None\n    return not cur\n"
+],
+[
+"empty-body",
+"def lookup(data, path):\n    return None\n"
+],
+[
+"dropped-loop",
+"def lookup(data, path):\n    cur = data\n    if False:\n        if isinstance(cur, dict) and part in cur:\n            cur = cur[part]\n        else:\n            return None\n    return cur\n"
+],
+[
+"stub",
+"def lookup(data, path):\n    return None\n"
+]
+],
+"29-1": [
+[
+"inverted-result",
+"def lookup(data, path):\n    cur = data\n    for part in path.split('.'):\n        cur = cur[part]\n    return not cur\n"
+],
+[
+"empty-body",
+"def lookup(data, path):\n    return None\n"
+],
+[
+"dropped-loop",
+"def lookup(data, path):\n    cur = data\n    if False:\n        cur = cur[part]\n    return cur\n"
+],
+[
+"stub",
+"def lookup(data, path):\n    return None\n"
+]
+],
+"29-2": [
+[
+"inverted-result",
+"def lookup(data, path):\n    cur = data\n    for part in path.split('.'):\n        if part.isdigit() and isinstance(cur, list):\n            i = int(part)\n            if i >= len(cur):\n                return None\n            cur = cur[i]\n        elif isinstance(cur, dict) and part in cur:\n            cur = cur[part]\n        else:\n            return None\n    return not cur\n"
+],
+[
+"empty-body",
+"def lookup(data, path):\n    return None\n"
+],
+[
+"dropped-loop",
+"def lookup(data, path):\n    cur = data\n    if False:\n        if part.isdigit() and isinstance(cur, list):\n            i = int(part)\n            if i >= len(cur):\n                return None\n            cur = cur[i]\n        elif isinstance(cur, dict) and part in cur:\n            cur = cur[part]\n        else:\n            return None\n    return cur\n"
+],
+[
+"stub",
+"def lookup(data, path):\n    return None\n"
+]
+],
+"29-3": [
+[
+"wrong-comparison",
+"def lookup(data, path):\n    out = []\n\n    def walk(node, parts):\n        if not parts:\n            out.append(node)\n            return\n        head, rest = parts[0], parts[1:]\n        if not isinstance(node, dict):\n            return\n        keys = list(node) if head != '*' else ([head] if head in node else [])\n        for k in keys:\n            walk(node[k], rest)\n\n    walk(data, path.split('.'))\n    return out\n"
+],
+[
+"inverted-result",
+"def lookup(data, path):\n    out = []\n\n    def walk(node, parts):\n        if not parts:\n            out.append(node)\n            return\n        head, rest = parts[0], parts[1:]\n        if not isinstance(node, dict):\n            return\n        keys = list(node) if head == '*' else ([head] if head in node else [])\n        for k in keys:\n            walk(node[k], rest)\n\n    walk(data, path.split('.'))\n    return not out\n"
+],
+[
+"empty-body",
+"def lookup(data, path):\n    return None\n"
+],
+[
+"dropped-loop",
+"def lookup(data, path):\n    out = []\n\n    def walk(node, parts):\n        if not parts:\n            out.append(node)\n            return\n        head, rest = parts[0], parts[1:]\n        if not isinstance(node, dict):\n            return\n        keys = list(node) if head == '*' else ([head] if head in node else [])\n        if False:\n            walk(node[k], rest)\n\n    walk(data, path.split('.'))\n    return out\n"
+],
+[
+"stub",
+"def lookup(data, path):\n    return None\n"
+]
+],
+"29-4": [
+[
+"inverted-result",
+"def lookup(data, path):\n    out = []\n\n    def walk(node, prefix):\n        if isinstance(node, dict) and node:\n            for k in node:\n                walk(node[k], prefix + [k])\n        else:\n            out.append('.'.join(prefix))\n\n    walk(data, [])\n    return not sorted(out)\n"
+],
+[
+"sign-flip",
+"def lookup(data, path):\n    out = []\n\n    def walk(node, prefix):\n        if isinstance(node, dict) and node:\n            for k in node:\n                walk(node[k], prefix - [k])\n        else:\n            out.append('.'.join(prefix))\n\n    walk(data, [])\n    return sorted(out)\n"
+],
+[
+"empty-body",
+"def lookup(data, path):\n    return None\n"
+],
+[
+"dropped-loop",
+"def lookup(data, path):\n    out = []\n\n    def walk(node, prefix):\n        if isinstance(node, dict) and node:\n            if False:\n                walk(node[k], prefix + [k])\n        else:\n            out.append('.'.join(prefix))\n\n    walk(data, [])\n    return sorted(out)\n"
+],
+[
+"stub",
+"def lookup(data, path):\n    return None\n"
+]
+],
+"30-0": [
+[
+"inverted-result",
+"def schedule(jobs):\n    jobs = sorted(jobs, key=lambda j: j[1])\n    end = None\n    n = 0\n    for s, e in [(j[0], j[1]) for j in jobs]:\n        if end is None or s >= end:\n            end = e\n            n += 1\n    return not n\n"
+],
+[
+"sign-flip",
+"def schedule(jobs):\n    jobs = sorted(jobs, key=lambda j: j[1])\n    end = None\n    n = 0\n    for s, e in [(j[0], j[1]) for j in jobs]:\n        if end is None or s >= end:\n            end = e\n            n -= 1\n    return n\n"
+],
+[
+"empty-body",
+"def schedule(jobs):\n    return None\n"
+],
+[
+"dropped-loop",
+"def schedule(jobs):\n    jobs = sorted(jobs, key=lambda j: j[1])\n    end = None\n    n = 0\n    if False:\n        if end is None or s >= end:\n            end = e\n            n += 1\n    return n\n"
+],
+[
+"stub",
+"def schedule(jobs):\n    return None\n"
+]
+],
+"30-1": [
+[
+"inverted-result",
+"def schedule(jobs):\n    import bisect\n    js = sorted(jobs, key=lambda j: j[1])\n    ends = [j[1] for j in js]\n    best = [0] * (len(js) + 1)\n    for i, (s, e, w) in enumerate(js, 1):\n        k = bisect.bisect_right(ends, s, 0, i - 1)\n        best[i] = max(best[i - 1], best[k] + w)\n    return not best[len(js)]\n"
+],
+[
+"sign-flip",
+"def schedule(jobs):\n    import bisect\n    js = sorted(jobs, key=lambda j: j[1])\n    ends = [j[1] for j in js]\n    best = [0] * (len(js) + 1)\n    for i, (s, e, w) in enumerate(js, 1):\n        k = bisect.bisect_right(ends, s, 0, i + 1)\n        best[i] = max(best[i - 1], best[k] + w)\n    return best[len(js)]\n"
+],
+[
+"empty-body",
+"def schedule(jobs):\n    return None\n"
+],
+[
+"dropped-loop",
+"def schedule(jobs):\n    import bisect\n    js = sorted(jobs, key=lambda j: j[1])\n    ends = [j[1] for j in js]\n    best = [0] * (len(js) + 1)\n    if False:\n        k = bisect.bisect_right(ends, s, 0, i - 1)\n        best[i] = max(best[i - 1], best[k] + w)\n    return best[len(js)]\n"
+],
+[
+"stub",
+"def schedule(jobs):\n    return None\n"
+]
+],
+"30-2": [
+[
+"inverted-result",
+"def schedule(jobs):\n    order = sorted(range(len(jobs)), key=lambda i: jobs[i][1])\n    end = None\n    out = []\n    for i in order:\n        s, e = jobs[i][0], jobs[i][1]\n        if end is None or s >= end:\n            end = e\n            out.append(i)\n    return not sorted(out)\n"
+],
+[
+"empty-body",
+"def schedule(jobs):\n    return None\n"
+],
+[
+"dropped-loop",
+"def schedule(jobs):\n    order = sorted(range(len(jobs)), key=lambda i: jobs[i][1])\n    end = None\n    out = []\n    if False:\n        s, e = jobs[i][0], jobs[i][1]\n        if end is None or s >= end:\n            end = e\n            out.append(i)\n    return sorted(out)\n"
+],
+[
+"stub",
+"def schedule(jobs):\n    return None\n"
+]
+],
+"30-3": [
+[
+"inverted-result",
+"def schedule(jobs):\n    import heapq\n    free = []\n    n = 0\n    for s, e in sorted((j[0], j[1]) for j in jobs):\n        if free and free[0] <= s:\n            heapq.heapreplace(free, e)\n        else:\n            heapq.heappush(free, e)\n            n = max(n, len(free))\n    return not n\n"
+],
+[
+"empty-body",
+"def schedule(jobs):\n    return None\n"
+],
+[
+"dropped-loop",
+"def schedule(jobs):\n    import heapq\n    free = []\n    n = 0\n    if False:\n        if free and free[0] <= s:\n            heapq.heapreplace(free, e)\n        else:\n            heapq.heappush(free, e)\n            n = max(n, len(free))\n    return n\n"
+],
+[
+"stub",
+"def schedule(jobs):\n    return None\n"
+]
+],
+"30-4": [
+[
+"dropped-edge-case",
+"def schedule(jobs):\n    iv = sorted((j[0], j[1]) for j in jobs)\n    merged = [list(iv[0])]\n    for s, e in iv[1:]:\n        if s <= merged[-1][1]:\n            merged[-1][1] = max(merged[-1][1], e)\n        else:\n            merged.append([s, e])\n    span = merged[-1][1] - merged[0][0]\n    busy = sum(e - s for s, e in merged)\n    return span - busy\n"
+],
+[
+"inverted-result",
+"def schedule(jobs):\n    if not jobs:\n        return not 0\n    iv = sorted((j[0], j[1]) for j in jobs)\n    merged = [list(iv[0])]\n    for s, e in iv[1:]:\n        if s <= merged[-1][1]:\n            merged[-1][1] = max(merged[-1][1], e)\n        else:\n            merged.append([s, e])\n    span = merged[-1][1] - merged[0][0]\n    busy = sum(e - s for s, e in merged)\n    return span - busy\n"
+],
+[
+"sign-flip",
+"def schedule(jobs):\n    if not jobs:\n        return 0\n    iv = sorted((j[0], j[1]) for j in jobs)\n    merged = [list(iv[0])]\n    for s, e in iv[1:]:\n        if s <= merged[+1][1]:\n            merged[-1][1] = max(merged[-1][1], e)\n        else:\n            merged.append([s, e])\n    span = merged[-1][1] - merged[0][0]\n    busy = sum(e - s for s, e in merged)\n    return span - busy\n"
+],
+[
+"empty-body",
+"def schedule(jobs):\n    return None\n"
+],
+[
+"stub",
+"def schedule(jobs):\n    return None\n"
+]
+],
+"31-0": [
+[
+"off-by-one",
+"def paths(g):\n    if not g or g[0][0] == 1:\n        return 0\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m - 1)]\n    d[0][0] = 1\n    for i in range(m):\n        for j in range(n):\n            if g[i][j] == 1:\n                d[i][j] = 0\n                continue\n            if i:\n                d[i][j] += d[i - 1][j]\n            if j:\n                d[i][j] += d[i][j - 1]\n    return d[m - 1][n - 1]\n"
+],
+[
+"wrong-comparison",
+"def paths(g):\n    if not g or g[0][0] != 1:\n        return 0\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    d[0][0] = 1\n    for i in range(m):\n        for j in range(n):\n            if g[i][j] == 1:\n                d[i][j] = 0\n                continue\n            if i:\n                d[i][j] += d[i - 1][j]\n            if j:\n                d[i][j] += d[i][j - 1]\n    return d[m - 1][n - 1]\n"
+],
+[
+"dropped-edge-case",
+"def paths(g):\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    d[0][0] = 1\n    for i in range(m):\n        for j in range(n):\n            if g[i][j] == 1:\n                d[i][j] = 0\n                continue\n            if i:\n                d[i][j] += d[i - 1][j]\n            if j:\n                d[i][j] += d[i][j - 1]\n    return d[m - 1][n - 1]\n"
+],
+[
+"inverted-result",
+"def paths(g):\n    if not g or g[0][0] == 1:\n        return not 0\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    d[0][0] = 1\n    for i in range(m):\n        for j in range(n):\n            if g[i][j] == 1:\n                d[i][j] = 0\n                continue\n            if i:\n                d[i][j] += d[i - 1][j]\n            if j:\n                d[i][j] += d[i][j - 1]\n    return d[m - 1][n - 1]\n"
+],
+[
+"sign-flip",
+"def paths(g):\n    if not g or g[0][0] == 1:\n        return 0\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    d[0][0] = 1\n    for i in range(m):\n        for j in range(n):\n            if g[i][j] == 1:\n                d[i][j] = 0\n                continue\n            if i:\n                d[i][j] += d[i + 1][j]\n            if j:\n                d[i][j] += d[i][j - 1]\n    return d[m - 1][n - 1]\n"
+],
+[
+"empty-body",
+"def paths(g):\n    return None\n"
+],
+[
+"dropped-loop",
+"def paths(g):\n    if not g or g[0][0] == 1:\n        return 0\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    d[0][0] = 1\n    if False:\n        for j in range(n):\n            if g[i][j] == 1:\n                d[i][j] = 0\n                continue\n            if i:\n                d[i][j] += d[i - 1][j]\n            if j:\n                d[i][j] += d[i][j - 1]\n    return d[m - 1][n - 1]\n"
+],
+[
+"stub",
+"def paths(g):\n    return None\n"
+]
+],
+"31-1": [
+[
+"off-by-one",
+"def paths(g):\n    if not g:\n        return 0\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m - 1)]\n    for i in range(m):\n        for j in range(n):\n            best = 0 if i == 0 and j == 0 else min(\n                d[i - 1][j] if i else 10 ** 9, d[i][j - 1] if j else 10 ** 9)\n            d[i][j] = g[i][j] + best\n    return d[m - 1][n - 1]\n"
+],
+[
+"wrong-comparison",
+"def paths(g):\n    if not g:\n        return 0\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    for i in range(m):\n        for j in range(n):\n            best = 0 if i != 0 and j == 0 else min(\n                d[i - 1][j] if i else 10 ** 9, d[i][j - 1] if j else 10 ** 9)\n            d[i][j] = g[i][j] + best\n    return d[m - 1][n - 1]\n"
+],
+[
+"dropped-edge-case",
+"def paths(g):\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    for i in range(m):\n        for j in range(n):\n            best = 0 if i == 0 and j == 0 else min(\n                d[i - 1][j] if i else 10 ** 9, d[i][j - 1] if j else 10 ** 9)\n            d[i][j] = g[i][j] + best\n    return d[m - 1][n - 1]\n"
+],
+[
+"inverted-result",
+"def paths(g):\n    if not g:\n        return not 0\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    for i in range(m):\n        for j in range(n):\n            best = 0 if i == 0 and j == 0 else min(\n                d[i - 1][j] if i else 10 ** 9, d[i][j - 1] if j else 10 ** 9)\n            d[i][j] = g[i][j] + best\n    return d[m - 1][n - 1]\n"
+],
+[
+"sign-flip",
+"def paths(g):\n    if not g:\n        return 0\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    for i in range(m):\n        for j in range(n):\n            best = 0 if i == 0 and j == 0 else min(\n                d[i + 1][j] if i else 10 ** 9, d[i][j - 1] if j else 10 ** 9)\n            d[i][j] = g[i][j] + best\n    return d[m - 1][n - 1]\n"
+],
+[
+"empty-body",
+"def paths(g):\n    return None\n"
+],
+[
+"stub",
+"def paths(g):\n    return None\n"
+]
+],
+"31-2": [
+[
+"off-by-one",
+"def paths(g):\n    if not g:\n        return 0\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m - 1)]\n    for i in range(m):\n        for j in range(n):\n            best = 0 if i == 0 and j == 0 else max(\n                d[i - 1][j] if i else -(10 ** 9), d[i][j - 1] if j else -(10 ** 9))\n            d[i][j] = g[i][j] + best\n    return d[m - 1][n - 1]\n"
+],
+[
+"wrong-comparison",
+"def paths(g):\n    if not g:\n        return 0\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    for i in range(m):\n        for j in range(n):\n            best = 0 if i != 0 and j == 0 else max(\n                d[i - 1][j] if i else -(10 ** 9), d[i][j - 1] if j else -(10 ** 9))\n            d[i][j] = g[i][j] + best\n    return d[m - 1][n - 1]\n"
+],
+[
+"dropped-edge-case",
+"def paths(g):\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    for i in range(m):\n        for j in range(n):\n            best = 0 if i == 0 and j == 0 else max(\n                d[i - 1][j] if i else -(10 ** 9), d[i][j - 1] if j else -(10 ** 9))\n            d[i][j] = g[i][j] + best\n    return d[m - 1][n - 1]\n"
+],
+[
+"inverted-result",
+"def paths(g):\n    if not g:\n        return not 0\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    for i in range(m):\n        for j in range(n):\n            best = 0 if i == 0 and j == 0 else max(\n                d[i - 1][j] if i else -(10 ** 9), d[i][j - 1] if j else -(10 ** 9))\n            d[i][j] = g[i][j] + best\n    return d[m - 1][n - 1]\n"
+],
+[
+"sign-flip",
+"def paths(g):\n    if not g:\n        return 0\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    for i in range(m):\n        for j in range(n):\n            best = 0 if i == 0 and j == 0 else max(\n                d[i + 1][j] if i else -(10 ** 9), d[i][j - 1] if j else -(10 ** 9))\n            d[i][j] = g[i][j] + best\n    return d[m - 1][n - 1]\n"
+],
+[
+"empty-body",
+"def paths(g):\n    return None\n"
+],
+[
+"dropped-loop",
+"def paths(g):\n    if not g:\n        return 0\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    if False:\n        for j in range(n):\n            best = 0 if i == 0 and j == 0 else max(\n                d[i - 1][j] if i else -(10 ** 9), d[i][j - 1] if j else -(10 ** 9))\n            d[i][j] = g[i][j] + best\n    return d[m - 1][n - 1]\n"
+],
+[
+"stub",
+"def paths(g):\n    return None\n"
+]
+],
+"31-3": [
+[
+"off-by-one",
+"def paths(g):\n    if not g or g[0][0] == 1:\n        return 0\n    M = 1000000007\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m - 1)]\n    d[0][0] = 1\n    for i in range(m):\n        for j in range(n):\n            if g[i][j] == 1:\n                d[i][j] = 0\n                continue\n            if i:\n                d[i][j] = (d[i][j] + d[i - 1][j]) % M\n            if j:\n                d[i][j] = (d[i][j] + d[i][j - 1]) % M\n    return d[m - 1][n - 1]\n"
+],
+[
+"wrong-comparison",
+"def paths(g):\n    if not g or g[0][0] != 1:\n        return 0\n    M = 1000000007\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    d[0][0] = 1\n    for i in range(m):\n        for j in range(n):\n            if g[i][j] == 1:\n                d[i][j] = 0\n                continue\n            if i:\n                d[i][j] = (d[i][j] + d[i - 1][j]) % M\n            if j:\n                d[i][j] = (d[i][j] + d[i][j - 1]) % M\n    return d[m - 1][n - 1]\n"
+],
+[
+"dropped-edge-case",
+"def paths(g):\n    M = 1000000007\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    d[0][0] = 1\n    for i in range(m):\n        for j in range(n):\n            if g[i][j] == 1:\n                d[i][j] = 0\n                continue\n            if i:\n                d[i][j] = (d[i][j] + d[i - 1][j]) % M\n            if j:\n                d[i][j] = (d[i][j] + d[i][j - 1]) % M\n    return d[m - 1][n - 1]\n"
+],
+[
+"inverted-result",
+"def paths(g):\n    if not g or g[0][0] == 1:\n        return not 0\n    M = 1000000007\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    d[0][0] = 1\n    for i in range(m):\n        for j in range(n):\n            if g[i][j] == 1:\n                d[i][j] = 0\n                continue\n            if i:\n                d[i][j] = (d[i][j] + d[i - 1][j]) % M\n            if j:\n                d[i][j] = (d[i][j] + d[i][j - 1]) % M\n    return d[m - 1][n - 1]\n"
+],
+[
+"sign-flip",
+"def paths(g):\n    if not g or g[0][0] == 1:\n        return 0\n    M = 1000000007\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    d[0][0] = 1\n    for i in range(m):\n        for j in range(n):\n            if g[i][j] == 1:\n                d[i][j] = 0\n                continue\n            if i:\n                d[i][j] = (d[i][j] + d[i + 1][j]) % M\n            if j:\n                d[i][j] = (d[i][j] + d[i][j - 1]) % M\n    return d[m - 1][n - 1]\n"
+],
+[
+"empty-body",
+"def paths(g):\n    return None\n"
+],
+[
+"dropped-loop",
+"def paths(g):\n    if not g or g[0][0] == 1:\n        return 0\n    M = 1000000007\n    m, n = len(g), len(g[0])\n    d = [[0] * n for _ in range(m)]\n    d[0][0] = 1\n    if False:\n        for j in range(n):\n            if g[i][j] == 1:\n                d[i][j] = 0\n                continue\n            if i:\n                d[i][j] = (d[i][j] + d[i - 1][j]) % M\n            if j:\n                d[i][j] = (d[i][j] + d[i][j - 1]) % M\n    return d[m - 1][n - 1]\n"
+],
+[
+"stub",
+"def paths(g):\n    return None\n"
+]
+],
+"31-4": [
+[
+"wrong-comparison",
+"def paths(g):\n    if not g or g[0][0] != 1:\n        return -1\n    m, n = len(g), len(g[0])\n    if g[m - 1][n - 1] == 1:\n        return -1\n    from collections import deque\n    q = deque([(0, 0, 1)])\n    seen = {(0, 0)}\n    while q:\n        i, j, d = q.popleft()\n        if (i, j) == (m - 1, n - 1):\n            return d\n        for a, b in ((i + 1, j), (i, j + 1)):\n            if a < m and b < n and g[a][b] == 0 and (a, b) not in seen:\n                seen.add((a, b))\n                q.append((a, b, d + 1))\n    return -1\n"
+],
+[
+"dropped-edge-case",
+"def paths(g):\n    m, n = len(g), len(g[0])\n    if g[m - 1][n - 1] == 1:\n        return -1\n    from collections import deque\n    q = deque([(0, 0, 1)])\n    seen = {(0, 0)}\n    while q:\n        i, j, d = q.popleft()\n        if (i, j) == (m - 1, n - 1):\n            return d\n        for a, b in ((i + 1, j), (i, j + 1)):\n            if a < m and b < n and g[a][b] == 0 and (a, b) not in seen:\n                seen.add((a, b))\n                q.append((a, b, d + 1))\n    return -1\n"
+],
+[
+"inverted-result",
+"def paths(g):\n    if not g or g[0][0] == 1:\n        return not -1\n    m, n = len(g), len(g[0])\n    if g[m - 1][n - 1] == 1:\n        return -1\n    from collections import deque\n    q = deque([(0, 0, 1)])\n    seen = {(0, 0)}\n    while q:\n        i, j, d = q.popleft()\n        if (i, j) == (m - 1, n - 1):\n            return d\n        for a, b in ((i + 1, j), (i, j + 1)):\n            if a < m and b < n and g[a][b] == 0 and (a, b) not in seen:\n                seen.add((a, b))\n                q.append((a, b, d + 1))\n    return -1\n"
+],
+[
+"sign-flip",
+"def paths(g):\n    if not g or g[0][0] == 1:\n        return +1\n    m, n = len(g), len(g[0])\n    if g[m - 1][n - 1] == 1:\n        return -1\n    from collections import deque\n    q = deque([(0, 0, 1)])\n    seen = {(0, 0)}\n    while q:\n        i, j, d = q.popleft()\n        if (i, j) == (m - 1, n - 1):\n            return d\n        for a, b in ((i + 1, j), (i, j + 1)):\n            if a < m and b < n and g[a][b] == 0 and (a, b) not in seen:\n                seen.add((a, b))\n                q.append((a, b, d + 1))\n    return -1\n"
+],
+[
+"empty-body",
+"def paths(g):\n    return None\n"
+],
+[
+"dropped-loop",
+"def paths(g):\n    if not g or g[0][0] == 1:\n        return -1\n    m, n = len(g), len(g[0])\n    if g[m - 1][n - 1] == 1:\n        return -1\n    from collections import deque\n    q = deque([(0, 0, 1)])\n    seen = {(0, 0)}\n    while q:\n        i, j, d = q.popleft()\n        if (i, j) == (m - 1, n - 1):\n            return d\n        if False:\n            if a < m and b < n and g[a][b] == 0 and (a, b) not in seen:\n                seen.add((a, b))\n                q.append((a, b, d + 1))\n    return -1\n"
+],
+[
+"stub",
+"def paths(g):\n    return None\n"
+]
+],
+"32-0": [
+[
+"wrong-comparison",
+"def fields(s):\n    out, cur, q, i = [], [], False, 0\n    while i < len(s):\n        c = s[i]\n        if q:\n            if c != '\"' and i + 1 < len(s) and s[i + 1] == '\"':\n                cur.append('\"')\n                i += 1\n            elif c == '\"':\n                q = False\n            else:\n                cur.append(c)\n        elif c == '\"':\n            q = True\n        elif c == ',':\n            out.append(''.join(cur))\n            cur = []\n        else:\n            cur.append(c)\n        i += 1\n    out.append(''.join(cur))\n    return out\n"
+],
+[
+"inverted-result",
+"def fields(s):\n    out, cur, q, i = [], [], False, 0\n    while i < len(s):\n        c = s[i]\n        if q:\n            if c == '\"' and i + 1 < len(s) and s[i + 1] == '\"':\n                cur.append('\"')\n                i += 1\n            elif c == '\"':\n                q = False\n            else:\n                cur.append(c)\n        elif c == '\"':\n            q = True\n        elif c == ',':\n            out.append(''.join(cur))\n            cur = []\n        else:\n            cur.append(c)\n        i += 1\n    out.append(''.join(cur))\n    return not out\n"
+],
+[
+"empty-body",
+"def fields(s):\n    return None\n"
+],
+[
+"stub",
+"def fields(s):\n    return None\n"
+]
+],
+"32-1": [
+[
+"wrong-comparison",
+"def fields(s):\n    out, cur, q = [], [], False\n    for c in s:\n        if c != '\"':\n            q = not q\n        elif c == ',' and not q:\n            out.append(''.join(cur).strip())\n            cur = []\n        else:\n            cur.append(c)\n    out.append(''.join(cur).strip())\n    return out\n"
+],
+[
+"inverted-result",
+"def fields(s):\n    out, cur, q = [], [], False\n    for c in s:\n        if c == '\"':\n            q = not q\n        elif c == ',' and not q:\n            out.append(''.join(cur).strip())\n            cur = []\n        else:\n            cur.append(c)\n    out.append(''.join(cur).strip())\n    return not out\n"
+],
+[
+"empty-body",
+"def fields(s):\n    return None\n"
+],
+[
+"dropped-loop",
+"def fields(s):\n    out, cur, q = [], [], False\n    if False:\n        if c == '\"':\n            q = not q\n        elif c == ',' and not q:\n            out.append(''.join(cur).strip())\n            cur = []\n        else:\n            cur.append(c)\n    out.append(''.join(cur).strip())\n    return out\n"
+],
+[
+"stub",
+"def fields(s):\n    return None\n"
+]
+],
+"32-2": [
+[
+"wrong-comparison",
+"def fields(s):\n    n, q = 1, False\n    for c in s:\n        if c != '\"':\n            q = not q\n        elif c == ',' and not q:\n            n += 1\n    return n\n"
+],
+[
+"inverted-result",
+"def fields(s):\n    n, q = 1, False\n    for c in s:\n        if c == '\"':\n            q = not q\n        elif c == ',' and not q:\n            n += 1\n    return not n\n"
+],
+[
+"sign-flip",
+"def fields(s):\n    n, q = 1, False\n    for c in s:\n        if c == '\"':\n            q = not q\n        elif c == ',' and not q:\n            n -= 1\n    return n\n"
+],
+[
+"empty-body",
+"def fields(s):\n    return None\n"
+],
+[
+"dropped-loop",
+"def fields(s):\n    n, q = 1, False\n    if False:\n        if c == '\"':\n            q = not q\n        elif c == ',' and not q:\n            n += 1\n    return n\n"
+],
+[
+"stub",
+"def fields(s):\n    return None\n"
+]
+],
+"32-3": [
+[
+"inverted-result",
+"def fields(s):\n    k, _, v = s.partition(':')\n    return not (k.strip(), v.strip())\n"
+],
+[
+"empty-body",
+"def fields(s):\n    return None\n"
+],
+[
+"stub",
+"def fields(s):\n    return None\n"
+]
+],
+"32-4": [
+[
+"inverted-result",
+"def fields(s):\n    return not [p for p in s.split(';') if p]\n"
+],
+[
+"empty-body",
+"def fields(s):\n    return None\n"
+],
+[
+"stub",
+"def fields(s):\n    return None\n"
+]
+],
+"33-0": [
+[
+"inverted-result",
+"def compare(a, b):\n    pa = [int(x) for x in a.split('.')]\n    pb = [int(x) for x in b.split('.')]\n    n = max(len(pa), len(pb))\n    pa += [0] * (n - len(pa))\n    pb += [0] * (n - len(pb))\n    return not (pa > pb) - (pa < pb)\n"
+],
+[
+"sign-flip",
+"def compare(a, b):\n    pa = [int(x) for x in a.split('.')]\n    pb = [int(x) for x in b.split('.')]\n    n = max(len(pa), len(pb))\n    pa += [0] * (n + len(pa))\n    pb += [0] * (n - len(pb))\n    return (pa > pb) - (pa < pb)\n"
+],
+[
+"empty-body",
+"def compare(a, b):\n    return None\n"
+],
+[
+"stub",
+"def compare(a, b):\n    return None\n"
+]
+],
+"33-1": [
+[
+"empty-body",
+"def compare(a, b):\n    return None\n"
+],
+[
+"stub",
+"def compare(a, b):\n    return None\n"
+]
+],
+"33-2": [
+[
+"inverted-result",
+"def compare(a, b):\n    pa = [int(x) for x in a.split('.')] + [0, 0]\n    pb = [int(x) for x in b.split('.')] + [0, 0]\n    if pa[0] != pb[0]:\n        return not False\n    return pa[:3] >= pb[:3]\n"
+],
+[
+"sign-flip",
+"def compare(a, b):\n    pa = [int(x) for x in a.split('.')] - [0, 0]\n    pb = [int(x) for x in b.split('.')] + [0, 0]\n    if pa[0] != pb[0]:\n        return False\n    return pa[:3] >= pb[:3]\n"
+],
+[
+"empty-body",
+"def compare(a, b):\n    return None\n"
+],
+[
+"stub",
+"def compare(a, b):\n    return None\n"
+]
+],
+"33-3": [
+[
+"inverted-result",
+"def compare(a, b):\n    def key(x):\n        return not [int(p) for p in x.split('.')]\n    return sorted([a, b], key=key)\n"
+],
+[
+"empty-body",
+"def compare(a, b):\n    return None\n"
+],
+[
+"stub",
+"def compare(a, b):\n    return None\n"
+]
+],
+"33-4": [
+[
+"inverted-result",
+"def compare(a, b):\n    pa, pb = a.split('.'), b.split('.')\n    n = 0\n    for x, y in zip(pa, pb):\n        if x != y:\n            break\n        n += 1\n    return not n\n"
+],
+[
+"sign-flip",
+"def compare(a, b):\n    pa, pb = a.split('.'), b.split('.')\n    n = 0\n    for x, y in zip(pa, pb):\n        if x != y:\n            break\n        n -= 1\n    return n\n"
+],
+[
+"empty-body",
+"def compare(a, b):\n    return None\n"
+],
+[
+"dropped-loop",
+"def compare(a, b):\n    pa, pb = a.split('.'), b.split('.')\n    n = 0\n    if False:\n        if x != y:\n            break\n        n += 1\n    return n\n"
+],
+[
+"stub",
+"def compare(a, b):\n    return None\n"
+]
+]
+}

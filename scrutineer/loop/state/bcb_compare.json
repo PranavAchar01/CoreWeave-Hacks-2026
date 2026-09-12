@@ -1,0 +1,35 @@
+{
+  "benchmark": "BigCodeBench-Hard",
+  "n": 76,
+  "baseline": {
+    "harness": "starting",
+    "pass_at_1": 0.3289,
+    "solved": 25,
+    "cost_usd": 0.8395
+  },
+  "loop": {
+    "harness": "champion",
+    "pass_at_1": 0.2632,
+    "solved": 20,
+    "cost_usd": 0.9098
+  },
+  "delta_pp": -6.57,
+  "fixed": [
+    "bcb0302",
+    "bcb0502",
+    "bcb0678",
+    "bcb1003"
+  ],
+  "broken": [
+    "bcb0019",
+    "bcb0211",
+    "bcb0401",
+    "bcb0760",
+    "bcb0800",
+    "bcb0879",
+    "bcb0971",
+    "bcb0999",
+    "bcb1004"
+  ],
+  "p_two_sided": 0.26685
+}

@@ -1,0 +1,127 @@
+#!/usr/bin/env node
+// Concatenates src/ into the single artifact fragment scrutineer.html and syntax-checks the script.
+const fs = require('fs'), path = require('path'), cp = require('child_process');
+const root = __dirname, src = path.join(root, 'src');
+const ORDER = ['engine.js', 'car.js', 'world.js', 'sim.js', 'trackscene.js', 'team.js', 'garage.js', 'scenes.js', 'season.js', 'ui.js', 'trial.js', 'dash.js', 'story.js', 'main.js'];
+const present = ORDER.filter(f => fs.existsSync(path.join(src, f)));
+const missing = ORDER.filter(f => !present.includes(f));
+if (missing.length) console.log('build: skipping missing modules:', missing.join(', '));
+const js = present.map(f => `// ===== ${f} =====\n${fs.readFileSync(path.join(src, f), 'utf8')}`).join('\n');
+const css = fs.readFileSync(path.join(src, 'styles.css'), 'utf8');
+const html = fs.readFileSync(path.join(src, 'index.html'), 'utf8');
+// The loop's own output, when a season has been run. The broadcast reads it for the REGS
+// articles, so nothing technical on screen is invented by the UI.
+const bundlePath = path.join(root, 'loop', 'state', 'broadcast.json');
+let loopJs = '', seeded = false;
+if (fs.existsSync(bundlePath)) {
+  const raw = fs.readFileSync(bundlePath, 'utf8');
+  seeded = !!JSON.parse(raw).demo; // fail the build rather than ship a bundle the page cannot parse
+  loopJs = `window.SCRUTINEER_LOOP = ${raw};\n`;
+  // the blame matrix, so the page reports what was measured rather than what was written here
+  for (const [file, global] of [['partition.json', 'SCRUTINEER_PARTITION'],
+                                ['sides.json', 'SCRUTINEER_SIDES'],
+                                ['bcb_compare.json', 'SCRUTINEER_BCB']]) {
+    const f = path.join(root, 'loop', 'state', file);
+    if (fs.existsSync(f)) loopJs += `window.${global} = ${fs.readFileSync(f, 'utf8')};\n`;
+  }
+  console.log(`build: inlined loop bundle ${(raw.length / 1024).toFixed(0)} KB`);
+} else {
+  console.log('build: no loop bundle (run `scrutineer season --export` in loop/)');
+}
+const out = `<title>Scrutineer</title>\n<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&family=Press+Start+2P&family=VT323&display=swap">\n<style>\n${css}\n</style>\n${html}\n<script>\n${loopJs}${js}\n</script>\n`;
+fs.writeFileSync(path.join(root, 'scrutineer.html'), out);
+
+// The same page, wrapped as a standalone document for hosting. The artifact runtime supplies the
+// skeleton; a web host does not, so the site build adds it (and a CSP that keeps the visitor's
+// key from going anywhere except the relay).
+const siteDir = path.join(root, 'site', 'public');
+if (fs.existsSync(path.dirname(siteDir))) {
+  fs.mkdirSync(siteDir, { recursive: true });
+  const head = `<title>Scrutineer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&family=Press+Start+2P&family=VT323&display=swap">
+<style>
+${css}
+</style>`;
+  const doc = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="An agent that builds web interfaces and rebuilds its own harness. Every page it builds is a real document you can open and audit yourself.">
+<meta property="og:title" content="Scrutineer">
+<meta property="og:description" content="Watch an agent rewrite its own harness, run by run. Every interface it builds is a real page you can open and audit with axe-core yourself.">
+<meta name="theme-color" content="#06081A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2306081A'/%3E%3Cpath d='M2 3h4v4H2zM6 7h4v4H6zM10 3h4v4h-4zM2 11h4v4H2zM10 11h4v4h-4z' fill='%23F4C542'/%3E%3C/svg%3E">
+${head}
+</head>
+<body>
+${html}
+<script>
+${loopJs}${js}
+</script>
+</body>
+</html>`;
+  fs.writeFileSync(path.join(siteDir, 'index.html'), doc);
+  // The interfaces the agent built, copied in as real documents so each one has a URL a
+  // reviewer can open and audit independently. They have to be the pages the inlined bundle
+  // describes, so the seeded season's pages and a live season's pages live in separate
+  // directories and the bundle picks which one ships.
+  const pagesSrc = path.join(root, 'loop', 'state', seeded ? 'demo-pages' : 'pages');
+  if (fs.existsSync(pagesSrc)) {
+    const dst = path.join(siteDir, 'pages');
+    fs.rmSync(dst, { recursive: true, force: true });
+    fs.cpSync(pagesSrc, dst, { recursive: true });
+    const n = fs.readdirSync(dst).reduce((a, d) =>
+      a + fs.readdirSync(path.join(dst, d)).length, 0);
+    console.log(`build: copied ${n} ${seeded ? 'seeded' : 'built'} interface(s) `
+                + 'into site/public/pages');
+  }
+  console.log(`build: site/public/index.html ${(doc.length / 1024).toFixed(0)} KB`);
+}
+// ---------------------------------------------------------------------------------------
+// A second, separate site: the car across the whole season on one scrubber. Stubbed on purpose —
+// it reads the recorded season, so it is the same ten runs every time and nothing waits on a
+// model. Deployed as its own Vercel project so it has a link of its own.
+// ---------------------------------------------------------------------------------------
+const TL_ORDER = ['engine.js', 'car.js', 'world.js', 'sim.js', 'trackscene.js',
+                  'team.js', 'garage.js', 'timeline.js'];
+const tlSrc = TL_ORDER.map(f => fs.readFileSync(path.join(src, f), 'utf8')).join('\n');
+const tlHtml = fs.readFileSync(path.join(src, 'timeline.html'), 'utf8');
+const tlCss = fs.readFileSync(path.join(src, 'timeline.css'), 'utf8');
+const tlDoc = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scrutineer — the car, run by run</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<style>
+${tlCss}
+</style>
+</head>
+<body>
+${tlHtml}
+<script>
+${loopJs}${tlSrc}
+window.addEventListener('DOMContentLoaded', () => SCR.timeline.boot());
+</script>
+</body>
+</html>`;
+const tlDir = path.join(root, 'site-timeline', 'public');
+fs.mkdirSync(tlDir, { recursive: true });
+fs.writeFileSync(path.join(tlDir, 'index.html'), tlDoc);
+{
+  const t2 = path.join(root, '.build-check-tl.js'); fs.writeFileSync(t2, tlSrc);
+  const r2 = cp.spawnSync(process.execPath, ['--check', t2], { encoding: 'utf8' });
+  fs.unlinkSync(t2);
+  if (r2.status !== 0) { console.error(r2.stderr); process.exit(1); }
+}
+console.log(`build: site-timeline/public/index.html ${(tlDoc.length / 1024).toFixed(0)} KB`);
+
+// syntax check
+const tmp = path.join(root, '.build-check.js'); fs.writeFileSync(tmp, js);
+const r = cp.spawnSync(process.execPath, ['--check', tmp], { encoding: 'utf8' }); fs.unlinkSync(tmp);
+if (r.status !== 0) { console.error(r.stderr); process.exit(1); }
+if (/console\.log\(/.test(js)) console.log('build: WARNING console.log present in modules');
+if (/getContext\(\s*["']webgl/i.test(js)) console.log('build: WARNING WebGL used');
+console.log(`build: scrutineer.html ${(out.length / 1024).toFixed(0)} KB, modules: ${present.join(', ')}`);

@@ -1,0 +1,6 @@
+# PIT CREW — installer / CI. Prefix H.
+validate_schema: true
+run_smoke: true
+smoke_items: 5
+reject_on_stderr: true
+image: python:3.13

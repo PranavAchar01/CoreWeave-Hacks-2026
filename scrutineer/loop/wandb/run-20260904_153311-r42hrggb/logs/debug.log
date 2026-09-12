@@ -1,0 +1,21 @@
+2026-09-04 15:33:11,513 INFO    MainThread:42278 [wandb_setup.py:_flush():81] Current SDK version is 0.29.0
+2026-09-04 15:33:11,513 INFO    MainThread:42278 [wandb_setup.py:_flush():81] Configure stats pid to 42278
+2026-09-04 15:33:11,513 INFO    MainThread:42278 [wandb_setup.py:_flush():81] Loading settings from environment variables
+2026-09-04 15:33:11,514 INFO    MainThread:42278 [wandb_init.py:setup_run_log_directory():739] Logging user logs to /Users/pranavachar/coreweaves/scrutineer/loop/wandb/run-20260904_153311-r42hrggb/logs/debug.log
+2026-09-04 15:33:11,514 INFO    MainThread:42278 [wandb_init.py:setup_run_log_directory():740] Logging internal logs to /Users/pranavachar/coreweaves/scrutineer/loop/wandb/run-20260904_153311-r42hrggb/logs/debug-internal.log
+2026-09-04 15:33:11,514 INFO    MainThread:42278 [wandb_init.py:init():783] calling init triggers
+2026-09-04 15:33:11,514 INFO    MainThread:42278 [wandb_init.py:init():788] wandb.init called with sweep_config: {}
+config: {'generation': 0, 'role': 'AERO', 'mode': 'attended', 'rule_fired': 'gain_per_usd', 'picked': True, 'part': 'R-v0', '_wandb': {}}
+2026-09-04 15:33:11,514 INFO    MainThread:42278 [wandb_init.py:init():831] starting backend
+2026-09-04 15:33:12,800 INFO    MainThread:42278 [wandb_init.py:init():846] sending inform_init request
+2026-09-04 15:33:14,076 INFO    MainThread:42278 [wandb_init.py:init():851] backend started and connected
+2026-09-04 15:33:14,078 INFO    MainThread:42278 [wandb_init.py:init():921] updated telemetry
+2026-09-04 15:33:14,104 INFO    MainThread:42278 [wandb_init.py:init():944] communicating run to backend with 90.0 second timeout
+2026-09-04 15:33:14,578 INFO    MainThread:42278 [wandb_init.py:init():981] starting run threads in backend
+2026-09-04 15:33:14,695 INFO    MainThread:42278 [wandb_run.py:_console_start():2545] atexit reg
+2026-09-04 15:33:14,695 INFO    MainThread:42278 [wandb_run.py:_redirect():2395] redirect: off
+2026-09-04 15:33:14,701 INFO    MainThread:42278 [wandb_init.py:init():1019] run started, returning control to user process
+2026-09-04 15:33:14,702 INFO    MainThread:42278 [wandb_run.py:_finish():2316] finishing run achar-pranav-optivia/scrutineer/r42hrggb
+2026-09-04 15:33:14,702 INFO    MainThread:42278 [wandb_run.py:_atexit_cleanup():2512] got exitcode: 0
+2026-09-04 15:33:14,703 INFO    MainThread:42278 [wandb_run.py:_restore():2494] restore
+2026-09-04 15:33:14,703 INFO    MainThread:42278 [wandb_run.py:_restore():2500] restore done

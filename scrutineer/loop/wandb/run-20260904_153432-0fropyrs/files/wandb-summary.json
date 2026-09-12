@@ -1,0 +1,1 @@
+{"incidents":4,"_step":0,"ci_lo":39.8,"_runtime":0,"_timestamp":1.788561274730376e+09,"generation":11,"_wandb":{"runtime":0},"cost_usd":0.3378,"official_s":70.427,"variance":33.876,"claimed_s":69.047,"picked":0,"promoted":0,"ci_hi":79.961,"official_delta":0,"blame_s":59.805}

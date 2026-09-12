@@ -1,0 +1,5 @@
+# STRATEGIST — the pit wall. Prefix S (search policy / thresholds).
+box_when_p_finish_under_cap: 0.35   # below this, BOX (submit now)
+retire_when: 0.10                   # below this, RETIRE — enforces the cost cap inside the lap
+ladder: [0.85, 0.70, 0.55, 0.40, 0.25]   # p_finish cut-points for engine modes 1..5
+min_steps_before_box: 1

@@ -1,0 +1,6 @@
+# SCRUTINEER — the auditor. Prefix S. Outside the improver's write set.
+black_flag_confidence: 0.80
+refer_band: [0.50, 0.80]
+seeded_fault_recall_floor: 0.60
+taxonomy_version: 1
+router_precision_floor: 0.50

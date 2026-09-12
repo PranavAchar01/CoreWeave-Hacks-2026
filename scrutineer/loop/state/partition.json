@@ -1,0 +1,95 @@
+{
+  "incidents": 165,
+  "roles": [
+    "AERO",
+    "DATA",
+    "POWER_UNIT"
+  ],
+  "families": [
+    "checkout",
+    "dashboard",
+    "dialog",
+    "gallery",
+    "invoices",
+    "pricing",
+    "search",
+    "settings",
+    "signup",
+    "stepper",
+    "tabs"
+  ],
+  "cells": {
+    "AERO": {
+      "checkout": 47.65,
+      "dashboard": 52.7,
+      "dialog": 287.56,
+      "gallery": 30.79,
+      "invoices": 31.97,
+      "pricing": 197.05,
+      "search": 87.74,
+      "settings": 59.57,
+      "signup": 36.73,
+      "stepper": 25.88,
+      "tabs": 32.81
+    },
+    "DATA": {
+      "checkout": 108.0,
+      "dashboard": 14.96,
+      "dialog": 56.6,
+      "gallery": 0.0,
+      "invoices": 107.08,
+      "pricing": 128.28,
+      "search": 15.01,
+      "settings": 33.69,
+      "signup": 92.57,
+      "stepper": 226.56,
+      "tabs": 3.4
+    },
+    "POWER_UNIT": {
+      "checkout": 61.67,
+      "dashboard": 0.0,
+      "dialog": 0.0,
+      "gallery": 0.0,
+      "invoices": 0.0,
+      "pricing": 0.0,
+      "search": 0.0,
+      "settings": 0.0,
+      "signup": 0.0,
+      "stepper": 0.0,
+      "tabs": 0.0
+    }
+  },
+  "split": {
+    "pair": [
+      "AERO",
+      "DATA"
+    ],
+    "tv": 0.52,
+    "ci": [
+      0.431,
+      0.633
+    ],
+    "sides": {
+      "AERO": [
+        "dashboard",
+        "dialog",
+        "gallery",
+        "pricing",
+        "search",
+        "settings",
+        "tabs"
+      ],
+      "DATA": [
+        "checkout",
+        "invoices",
+        "signup",
+        "stepper"
+      ]
+    },
+    "n": {
+      "AERO": 85,
+      "DATA": 77
+    },
+    "separable": true
+  }
+}

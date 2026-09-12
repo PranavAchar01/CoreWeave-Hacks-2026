@@ -1,0 +1,18 @@
+{
+  "os":  "macOS-26.5.2-arm64-arm-64bit",
+  "python":  "CPython 3.12.13",
+  "startedAt":  "2026-09-04T22:34:32.442514Z",
+  "args":  [
+    "runs",
+    "--bundle",
+    "/tmp/season_v1_bundle.json",
+    "--group",
+    "season-v1",
+    "--report"
+  ],
+  "program":  "-m scrutineer.cli",
+  "root":  "/Users/pranavachar/coreweaves/scrutineer/loop",
+  "host":  "mac.lan",
+  "executable":  "/Users/pranavachar/coreweaves/scrutineer/loop/.venv/bin/python",
+  "writerId":  "drfqpm65w1og8vd12mmw5v95rudweo18"
+}

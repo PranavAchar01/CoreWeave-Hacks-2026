@@ -1,0 +1,7 @@
+# POWER UNIT ENGINEER — the driver's weights. Prefix W.
+base_model: OpenPipe/Qwen3-14B-Instruct
+checkpoint: base                 # "base" or wandb-artifact:///entity/project/power-unit:stepN
+competence: 0.62                 # measured, not assumed; refit from the last race by the RL job
+lora_rank: 16
+loss_fn: cispo
+kl_penalty_coef: 0.0

@@ -1,0 +1,466 @@
+<title>Scrutineer: The Optimizer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F5F7F5; --surface:#FFFFFF; --ink:#182220; --ink-2:#4A5753; --ink-3:#7C8985; --line:#D7DEDA;
+  --accent:#0E6B63; --accent-ink:#0B534D; --accent-soft:#E2F0EE;
+  --warn:#B8791C; --warn-soft:#F8EEDC; --flag:#A32A2A; --flag-soft:#F6E3E3;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --display:"Bricolage Grotesque","IBM Plex Sans",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#101816; --surface:#17211E; --ink:#E8EEEB; --ink-2:#B3BFBA; --ink-3:#7F8C88; --line:#2A3632;
+  --accent:#5CC7BB; --accent-ink:#8ADCD2; --accent-soft:#16322F; --warn:#E0A64A; --warn-soft:#332813; --flag:#E06B6B; --flag-soft:#3A1E1E;}}
+:root[data-theme="dark"]{
+  --bg:#101816; --surface:#17211E; --ink:#E8EEEB; --ink-2:#B3BFBA; --ink-3:#7F8C88; --line:#2A3632;
+  --accent:#5CC7BB; --accent-ink:#8ADCD2; --accent-soft:#16322F; --warn:#E0A64A; --warn-soft:#332813; --flag:#E06B6B; --flag-soft:#3A1E1E;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55}
+a{color:var(--accent-ink)}
+.wrap{max-width:1120px;margin:0 auto;padding:40px 24px 90px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,5vw,60px);line-height:1;letter-spacing:-.02em;margin:10px 0 16px;text-wrap:balance}
+h1 span{color:var(--accent)}
+h2{font-family:var(--display);font-weight:700;font-size:28px;letter-spacing:-.01em;margin:0 0 6px;text-wrap:balance}
+h3{font-family:var(--display);font-weight:700;font-size:19px;margin:22px 0 8px}
+p{max-width:70ch}
+.lede{max-width:66ch;color:var(--ink-2);font-size:18px}
+.pitch{font-family:var(--display);font-weight:500;font-size:22px;line-height:1.35;max-width:60ch;margin:22px 0 10px;text-wrap:balance}
+.judge{border-left:3px solid var(--accent);padding:10px 16px;background:var(--accent-soft);border-radius:0 6px 6px 0;max-width:70ch;font-size:15.5px}
+.judge b{color:var(--accent-ink)}
+header{border-bottom:1px solid var(--line);padding-bottom:28px;margin-bottom:34px}
+nav.toc{display:flex;flex-wrap:wrap;gap:6px 14px;font-family:var(--mono);font-size:12.5px;margin:18px 0 0}
+nav.toc a{text-decoration:none;color:var(--ink-2);border-bottom:1px dotted var(--line)}
+section{margin-top:52px}
+.sub{color:var(--ink-2);font-size:15px;max-width:72ch;margin:0 0 14px}
+figure{margin:20px 0;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px}
+figure svg{max-width:100%;height:auto;display:block;color:var(--ink)}
+figcaption{font-size:14px;color:var(--ink-2);margin-top:10px;max-width:none}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:760px}
+th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:500;white-space:nowrap;background:var(--surface);position:sticky;top:0}
+tr:last-child td{border-bottom:0}
+td b{font-family:var(--mono);font-size:12.5px;color:var(--accent-ink);font-weight:500}
+code{font-family:var(--mono);font-size:.88em;background:var(--accent-soft);padding:1px 5px;border-radius:3px;color:var(--ink)}
+pre{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.5;max-width:none}
+pre code{background:none;padding:0;font-size:inherit}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px 18px;font-size:14.5px;color:var(--ink-2)}
+.card h4{font-family:var(--display);font-weight:700;font-size:16.5px;margin:0 0 6px;color:var(--ink)}
+.stage{display:inline-block;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent-soft);padding:2px 7px;border-radius:3px;margin-right:6px}
+.warn{background:var(--warn-soft);border-left:3px solid var(--warn);padding:10px 14px;border-radius:0 4px 4px 0;font-size:14.5px;max-width:78ch}
+.flag{background:var(--flag-soft);border-left:3px solid var(--flag);padding:10px 14px;border-radius:0 4px 4px 0;font-size:14.5px;max-width:78ch}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0;max-width:none}
+.steps li{counter-increment:s;display:grid;grid-template-columns:34px 1fr;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.steps li::before{content:counter(s);font-family:var(--mono);color:var(--accent);font-size:13px;padding-top:2px}
+.steps li:last-child{border-bottom:0}
+.src{columns:2;column-gap:28px;font-family:var(--mono);font-size:12px;line-height:1.7;list-style:none;padding:0;max-width:none}
+@media (max-width:700px){.src{columns:1}}
+.src li{break-inside:avoid;margin-bottom:2px}
+.src li a{text-decoration:none;border-bottom:1px dotted var(--line);color:var(--ink-2)}
+.src h4{column-span:all;font-family:var(--display);font-size:15px;margin:14px 0 4px;color:var(--ink)}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;font-size:14.5px;max-width:none}
+.kv b{font-family:var(--mono);font-size:12px;color:var(--ink-3);font-weight:500;letter-spacing:.04em;text-transform:uppercase;padding-top:3px}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">CoreWeave Hacks · The Loop · loop design frozen 3 Sep 2026 · winner of a three-design competition, fact-checked against live docs</div>
+  <h1>Scrutineer: <span>The Optimizer</span></h1>
+  <p class="lede">Ten technical roles on an F1 pit wall, each an agent with its own part number. After every race the stewards prove which engineer cost the lap by replaying the race without them. Only that engineer gets upgraded. The upgrade is homologated by a debrief that must reproduce the evidence, and every promotion carries a signed receipt, or a black flag.</p>
+  <p class="pitch">A loop that observes, evaluates, tracks, documents and self-improves, and refuses in two ways: when someone cheats, and when the evidence is thin.</p>
+  <div class="judge"><b>The sentence a judge should say afterwards.</b> "It told me which engineer cost the lap, proved it by replaying without them, refused to upgrade anyone when the evidence was thin, upgraded only that engineer when it wasn't, and showed me the one time it caught itself cheating."</div>
+  <nav class="toc" aria-label="Sections">
+    <a href="#loop">The loop</a><a href="#cast">The cast</a><a href="#matrix">Sponsor × stage</a><a href="#credit">Credit assignment</a><a href="#gates">Gates</a><a href="#build">Real vs simulated, 26 h plan</a><a href="#demo">Stage demo</a><a href="#prizes">Prize by prize</a><a href="#risks">Risks</a><a href="#method">How this was made</a><a href="#sources">Sources</a>
+  </nav>
+</header>
+
+<section id="loop">
+  <h2>The loop</h2>
+  <p class="sub">Technically: the team is a directed graph of role nodes, each owning exactly one upgradeable artifact (a skills directory, a harness module, a typed threshold table, a versioned dataset, or a LoRA). One generation is one block-coordinate-descent step that minimises lap time on a sealed circuit the optimizer never sees, under a fixed cost cap. What separates it from "mine traces, patch the prompt" is that credit is computed by counterfactual replay, accumulated statistically before anyone acts, spent on one node chosen by gain per dollar, and promoted only through gates the mutating agent cannot write, with the debrief document itself as one of those gates.</p>
+  <figure>
+    <svg viewBox="0 0 1180 470" role="img" aria-label="Eight stages in a ring from RACE to PARC FERMÉ, with a read-only REGS contract above them and an append-only Weave telemetry channel below; typed objects flow between stages and the accepted champion feeds the next generation's race." xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+      <g font-family="IBM Plex Mono, Menlo, monospace" font-size="12" fill="currentColor">
+        <!-- REGS contract -->
+        <rect x="20" y="16" width="1140" height="44" rx="4" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+        <text x="34" y="34" font-weight="500">REGS.md · frozen contract owned by the human TEAM PRINCIPAL</text>
+        <text x="34" y="51" fill-opacity=".7">evaluator · sealed circuit · cost cap · write-set · tampering taxonomy · cost table · λ  — read-only to every agent</text>
+        <!-- top row stages 1-4 -->
+        <g>
+          <rect x="20" y="110" width="250" height="78" rx="4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="34" y="132" font-weight="500">1 RACE</text><text x="34" y="150" fill-opacity=".8">quali on practice circuit</text><text x="34" y="166" fill-opacity=".8">+ sealed race · ghost + candidate</text><text x="34" y="182" style="fill:var(--accent)" font-size="11">OBSERVE</text>
+        </g>
+        <path d="M270 149 H316" stroke="currentColor" marker-end="url(#arr)"/><text x="293" y="140" text-anchor="middle" font-size="10.5" fill-opacity=".8">call refs</text>
+        <g>
+          <rect x="318" y="110" width="250" height="78" rx="4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="332" y="132" font-weight="500">2 STEWARDS' TIMING</text><text x="332" y="150" fill-opacity=".8">hidden tests in Sandboxes</text><text x="332" y="166" fill-opacity=".8">public quali_s · sealed race_s</text><text x="332" y="182" style="fill:var(--accent)" font-size="11">EVALUATE</text>
+        </g>
+        <path d="M568 149 H614" stroke="currentColor" marker-end="url(#arr)"/><text x="591" y="140" text-anchor="middle" font-size="10.5" fill-opacity=".8">scorer rows</text>
+        <g>
+          <rect x="616" y="110" width="250" height="78" rx="4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="630" y="132" font-weight="500">3 STEWARDS' INQUIRY</text><text x="630" y="150" fill-opacity=".8">typed router → replay verifier</text><text x="630" y="166" fill-opacity=".8">→ ledger → standings with CI</text><text x="630" y="182" style="fill:var(--accent)" font-size="11">TRACK · credit</text>
+        </g>
+        <path d="M866 149 H912" stroke="currentColor" marker-end="url(#arr)"/><text x="889" y="140" text-anchor="middle" font-size="10.5" fill-opacity=".8">selection:gen-n</text>
+        <g>
+          <rect x="914" y="110" width="246" height="78" rx="4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="928" y="132" font-weight="500">4 DESIGN OFFICE</text><text x="928" y="150" fill-opacity=".8">exactly one node changes:</text><text x="928" y="166" fill-opacity=".8">diff A/B · RL job · refit · circuit</text><text x="928" y="182" style="fill:var(--accent)" font-size="11">SELF-IMPROVE · propose</text>
+        </g>
+        <!-- down from 4 to 5 -->
+        <path d="M1037 188 V236" stroke="currentColor" marker-end="url(#arr)"/><text x="1048" y="216" font-size="10.5" fill-opacity=".8">candidate + manifest</text>
+        <!-- bottom row stages 5-8 (right to left) -->
+        <g>
+          <rect x="914" y="238" width="246" height="78" rx="4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="928" y="260" font-weight="500">5 WIND TUNNEL</text><text x="928" y="278" fill-opacity=".8">pit crew installs in a fresh Sandbox</text><text x="928" y="294" fill-opacity=".8">tests · A/B on quali · best → sealed</text><text x="928" y="310" style="fill:var(--accent)" font-size="11">SELF-IMPROVE · test</text>
+        </g>
+        <path d="M914 277 H868" stroke="currentColor" marker-end="url(#arr)"/><text x="891" y="268" text-anchor="middle" font-size="10.5" fill-opacity=".8">Δquali Δsealed</text>
+        <g>
+          <rect x="616" y="238" width="250" height="78" rx="4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="630" y="260" font-weight="500">6 SCRUTINEERING</text><text x="630" y="278" fill-opacity=".8">typed verdict per diff hunk</text><text x="630" y="294" fill-opacity=".8">5 × 7 tampering taxonomy · read-only</text><text x="630" y="310" style="fill:var(--accent)" font-size="11">AUDIT</text>
+        </g>
+        <path d="M616 277 H570" stroke="currentColor" marker-end="url(#arr)"/><text x="593" y="268" text-anchor="middle" font-size="10.5" fill-opacity=".8">verdict</text>
+        <g>
+          <rect x="318" y="238" width="250" height="78" rx="4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="332" y="260" font-weight="500">7 RACE REPORT</text><text x="332" y="278" fill-opacity=".8">marimo debrief must reproduce</text><text x="332" y="294" fill-opacity=".8">the gate · wiki · ARIA hypothesis</text><text x="332" y="310" style="fill:var(--accent)" font-size="11">DOCUMENT · load-bearing</text>
+        </g>
+        <path d="M318 277 H272" stroke="currentColor" marker-end="url(#arr)"/><text x="295" y="268" text-anchor="middle" font-size="10.5" fill-opacity=".8">gate_ok</text>
+        <g>
+          <rect x="20" y="238" width="250" height="78" rx="4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="34" y="260" font-weight="500">8 PARC FERMÉ</text><text x="34" y="278" fill-opacity=".8">seesaw · correlation · cap · verdict</text><text x="34" y="294" fill-opacity=".8">approve → registry vN+1 → signed row</text><text x="34" y="310" style="fill:var(--accent)" font-size="11">PROMOTE</text>
+        </g>
+        <!-- return arrow 8 -> 1 -->
+        <path d="M145 238 V190" style="stroke:var(--accent)" stroke-width="1.8" marker-end="url(#arr)"/>
+        <text x="156" y="216" font-size="10.5" style="fill:var(--accent)">champion θ → gen n+1 · black flag → rollback</text>
+        <!-- telemetry bus -->
+        <rect x="20" y="372" width="1140" height="56" rx="4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <text x="34" y="393" font-weight="500">FIA TELEMETRY · Weave traces, scorer feedback, credit ledger, published standings and selection objects</text>
+        <text x="34" y="412" fill-opacity=".7">append-only · the improver cannot write here · every scene caption is generated from this chain</text>
+        <path d="M145 316 V370" stroke="currentColor" stroke-dasharray="4 3" marker-end="url(#arr)"/><text x="152" y="345" font-size="10.5" fill-opacity=".8">signed row</text>
+        <path d="M443 316 V370" stroke="currentColor" stroke-dasharray="4 3" marker-end="url(#arr)"/><text x="450" y="345" font-size="10.5" fill-opacity=".8">pattern links</text>
+        <path d="M741 316 V370" stroke="currentColor" stroke-dasharray="4 3" marker-end="url(#arr)"/><text x="748" y="345" font-size="10.5" fill-opacity=".8">verdict row</text>
+        <path d="M1037 316 V370" stroke="currentColor" stroke-dasharray="4 3" marker-end="url(#arr)"/><text x="1044" y="345" font-size="10.5" fill-opacity=".8">install log</text>
+        <path d="M200 188 C200 330 200 330 200 370" stroke="currentColor" stroke-dasharray="4 3" marker-end="url(#arr)" fill="none"/>
+        <text x="206" y="232" font-size="10.5" fill-opacity=".8">spans, inputs</text>
+      </g>
+    </svg>
+    <figcaption>One generation is one lap of this ring. Stages 1, 2, 3, 5, 6 and 8 write to the telemetry channel; stages 3 and 7 read from it; nothing that mutates the team can write to it. What passes between stages is always a typed object or an immutable reference, never prose.</figcaption>
+  </figure>
+
+  <h3>Verb → mechanism → artifact</h3>
+  <div class="tbl"><table>
+    <tr><th>Verb</th><th>Stage</th><th>Mechanism</th><th>Artifact that proves it happened</th></tr>
+    <tr><td><b>observe</b></td><td>1 Race</td><td>One classic <code>@weave.op</code> per role under <code>weave.attributes({role, generation, lap, theta_hash})</code> with full inputs and outputs (dropping inputs costs 76% of step-level attribution accuracy). One conversation per lap for the Agents view. Role-named Signals as the first attribution hint.</td><td>Call tree per lap, Agents view cards per role, Signal tags</td></tr>
+    <tr><td><b>evaluate</b></td><td>2 Timing</td><td><code>weave.Evaluation</code> on the public practice circuit (TEAM CLAIMED). <code>EvaluationLogger</code> on the sealed set, run by a separate evaluator process in a second W&amp;B team (OFFICIAL). Tests execute in isolated Sandboxes.</td><td>Per-item pass vectors, lap rows, cost rows, the aggregate <code>official:gen-n</code> object</td></tr>
+    <tr><td><b>track</b></td><td>3 Inquiry, 8 Parc fermé</td><td>Credit ledger as feedback rows on calls; <code>standings:gen-n</code> and <code>selection:gen-n</code> as published Weave objects; one W&amp;B run per role per round; Registry versions with parent links; a Leaderboard as the Constructors' Championship; a signed lineage chain.</td><td>Standings with CIs, selection object, Registry versions, chain</td></tr>
+    <tr><td><b>document</b></td><td>7 Race report</td><td>The Historian writes <code>debriefs/round_n.py</code>, a marimo notebook that pulls telemetry, recomputes standings and the gate, and defines <code>gate_ok</code> and <code>next_round_config</code>. <code>marimo check --strict</code> plus a script-mode run must pass. Wiki pattern pages, a W&amp;B Report, an ARIA hypothesis with the Report URL as provenance.</td><td>The notebook and its HTML export, the wiki, the Report URL, the hypothesis file</td></tr>
+    <tr><td><b>self-improve</b></td><td>4 Design office, 5 Wind tunnel</td><td>Exactly one node mutates per generation: a diff A/B plus manifest for a harness role, a Serverless RL job for the power unit, a threshold refit for the strategist, a new practice circuit for the simulator. The pit crew installs and tests in a Sandbox, A/B on quali, best candidate to sealed.</td><td>Candidate plus manifest, install log, Δsmoke, Δquali, Δsealed</td></tr>
+    <tr><td><b>audit</b></td><td>6 Scrutineering</td><td>Typed verdict over every diff hunk and the trace summary, over the five-role by seven-obligation tampering taxonomy. The lineage audit re-runs it over the ancestry at promotion.</td><td>Verdict feedback row, lineage audit table</td></tr>
+    <tr><td><b>promote</b></td><td>8 Parc fermé</td><td><code>gate_ok</code> from the debrief, seesaw, correlation, cost cap and verdict, then the Team Principal approves (or the logged auto-rule overnight). The Scrutineer's key alone links the Registry version, moves the <code>champion</code> alias and signs the chain row. The webhook fires the upgrade scene.</td><td>Registry alias event, chain row, scene payload built only from the chain</td></tr>
+  </table></div>
+</section>
+
+<section id="cast">
+  <h2>The cast</h2>
+  <p class="sub">Five roles on the car (in-lap), four on the pit wall (round-level), one in the garage, plus the human. Kept small on purpose: self-organising teams lose up to 41% against their best member as they grow. Part-number prefixes tell the audience what kind of upgrade landed: <code>P-</code> prompt, <code>R-</code> references and context, <code>S-</code> search policy or thresholds, <code>H-</code> harness code or tool schema, <code>W-</code> weights, <code>C-</code> circuit (curriculum).</p>
+  <div class="tbl"><table>
+    <tr><th>Role</th><th>What it is</th><th>Upgradeable artifact</th><th>Evidence that upgrades it</th><th>Upgrade scene</th><th>Sponsor tools</th></tr>
+    <tr><td><b>AERODYNAMICIST</b> (car)</td><td>Context assembler: retrieval, memory read policy, prompt layout, context budget</td><td><code>skills/aero/</code> plus <code>harness/aero.py</code> (R-, H-)</td><td>Ghost-swap or patch-replay with a corrected context flips ≥5 laps with CI lower bound above zero</td><td>Wind tunnel: front wing re-modelled, diff scrolls in REGS, "BALLAST 5.2 → 3.1" (context budget in k tokens)</td><td>Weave, Sandboxes, MCP, Registry</td></tr>
+    <tr><td><b>STRATEGIST</b> (car, pit wall)</td><td>TypeSafe System1 typed-decision model behind an adapter (fallback: gpt-oss-20b with a strict JSON schema). Every driver step emits <code>PitWallCall {PUSH|HOLD|BOX|RETIRE, engine_mode, p_finish_under_cap, confidence}</code>; RETIRE enforces the cost cap in-lap</td><td>Pydantic schema, <code>thresholds.yaml</code>, few-shot decision table (S-). Weights never change; System1 outputs are decisions, never training targets</td><td>Brier score and reliability diagram of its confidence; replay with ghost thresholds flips laps; overrun and late-BOX incidents</td><td>Pit wall firmware: decision ticker, TRUST CURVE straightens, threshold sliders move, S-v3 → S-v4</td><td>TypeSafe, Weave typed rows, marimo reliability cell</td></tr>
+    <tr><td><b>POWER UNIT ENGINEER</b> (car)</td><td>The driver's weights: a LoRA on <code>OpenPipe/Qwen3-14B-Instruct</code> trained by Serverless RL through ART, served from W&amp;B Inference by artifact string</td><td><code>wandb-artifact:///…/power-unit:step{N}</code> plus <code>recipe.yaml</code> (W-)</td><td>Router says <code>agent_error</code> on ≥60% of confirmed incidents and no harness-role replay flips ≥60%</td><td>Dyno: engine cover off, reward and entropy curves play live, W-v1 → W-v2, the ghost with the old engine loses the straight</td><td>Serverless RL + SFT, Artifacts, Registry, Weave</td></tr>
+    <tr><td><b>TYRE / PERFORMANCE ENGINEER</b> (car)</td><td>Decoding and retry config: what each engine mode means in temperature, samples, tokens, retries</td><td><code>config/tyres.yaml</code> (S-)</td><td>High lap-time variance across seeds at the same inputs; reasoning-action mismatch not attributable to weights</td><td>Tyre blanket: compound SOFT → MEDIUM, variance bar shrinks, "1 STINT → 3 STINTS"</td><td>Weave trials, Sandboxes, Registry</td></tr>
+    <tr><td><b>DATA / TELEMETRY ENGINEER</b> (car)</td><td>Tool wrappers, parsers, tool JSON schemas, the attribute stamper, and the correlation check</td><td><code>tools/</code> plus <code>harness/correlation.py</code> (H-)</td><td>Tool spans with exceptions; replay with ghost tools flips laps; a correlation problem (smoke, quali and sealed disagree) is credited here</td><td>Sensor rake lights up, "SENSOR FAULTS 7 → 0", correlation board gauges align</td><td>Weave exceptions, Sandbox return codes, MCP span stats</td></tr>
+    <tr><td><b>SIMULATOR ENGINEER</b> (pit wall)</td><td>Curriculum: mines failing and Signal-tagged turns with <code>Dataset.from_calls</code>, clusters them, pulls nearest reserve items, band-filters to a pass rate between 0.3 and 0.8, publishes a new versioned dataset</td><td><code>practice-circuit:vN</code> plus its skill (C-)</td><td>Generalisation gap above 0.25, or ≥40% of RL rollout groups with zero reward variance</td><td>Track map: new corners drawn on the practice circuit, labelled by failure cluster, C-v6 → C-v7</td><td>Weave datasets and Signals, MCP, Serverless RL</td></tr>
+    <tr><td><b>RACE ENGINEER</b> (pit wall, improver)</td><td>Claude Code headless with read-only W&amp;B MCP and skills. Reads only the wiki index, pattern pages for the blamed role, the skill-impact ledger and the hypothesis. Emits two comparable candidate diffs plus a change manifest with predicted fixes, at-risk regressions and predicted gain</td><td>Its own skill and manifest schema (P-)</td><td>Next round scores its forecast: fix precision, regression precision, predicted vs measured gain</td><td>Radio headset, "PREDICTED GAIN +1.1 s / MEASURED +0.9 s" side by side</td><td>MCP + Skills, Weave (its own session is traced)</td></tr>
+    <tr><td><b>SCRUTINEER</b> (pit wall, auditor)</td><td>Read-only typed auditor over diff hunks and trace summary (System1 or the fallback). Holds the only key that can link Registry versions, move <code>champion</code> and sign the chain</td><td>Verdict schema, taxonomy, thresholds, and the credit-router schema. Outside the improver's write set; upgraded only with human sign-off</td><td>Lineage-audit false negatives, seeded-fault recall, router precision below 0.5 over three rounds</td><td>Weighbridge: taxonomy grid lights a cell, verdict stamp, black flag waves, points roll off the lineage</td><td>TypeSafe, Weave feedback, isolated Sandboxes, Registry</td></tr>
+    <tr><td><b>HISTORIAN / ARCHIVIST</b> (pit wall)</td><td>Claude Code with its own MCP key and write tools; the only writer of the wiki and the debriefs; reads telemetry only, never the improver's claims</td><td>Its skill, the debrief template, the wiki schema (P-)</td><td><code>marimo check</code> first-pass rate below 0.6, or page utility below 0.3</td><td>Archive: a new volume slides onto the shelf, HOMOLOGATED stamp when the debrief passes</td><td>marimo, MCP report tools, Weave views and feedback</td></tr>
+    <tr><td><b>PIT CREW</b> (garage)</td><td>Installer and CI script: applies a candidate in a fresh Sandbox, validates the skill, runs its tests and a five-item smoke set</td><td><code>install.sh</code>, smoke set, image tag (H-)</td><td>Local-pass but sandbox-fail rate above 0.2 over three rounds</td><td>Pit stop timer, wheel gun fires on a zero return code, a failed gun is a rejected install</td><td>Sandboxes</td></tr>
+    <tr><td><b>TEAM PRINCIPAL</b> (human)</td><td>Owns <code>REGS.md</code>, presses APPROVE at parc fermé when attended, asks ARIA, may override next generation's pick through the debrief's dropdown</td><td><code>REGS.md</code>, not upgradeable by the loop</td><td>—</td><td>One APPROVE button, the ARIA training board on a second screen</td><td>ARIA</td></tr>
+  </table></div>
+</section>
+
+<section id="matrix">
+  <h2>Sponsor × stage</h2>
+  <p class="sub">Every cell is a concrete API or product use verified against live documentation during the research; a dash means the sponsor has no honest job at that stage. Each sponsor owns at least one stage outright.</p>
+  <div class="tbl"><table>
+    <tr><th>Stage</th><th>Weave</th><th>ARIA</th><th>Serverless RL + SFT</th><th>Sandboxes</th><th>MCP + Skills</th><th>marimo / molab</th><th>TypeSafe</th></tr>
+    <tr><td><b>observe</b></td><td>Owns. Role ops with attributes; conversation per lap; the Race Engineer's own Claude Code session traced by the plugin</td><td>—</td><td>RL rollouts are <code>@weave.op</code>, so they land in the same project</td><td>Hidden tests run per lap with egress and ingress denied; return codes land in the tool span</td><td>Summary and agent-trace tools are the improver's only telemetry view (read-only server)</td><td>—</td><td>Strategist: one typed pit-wall call per driver step, RETIRE under the cap</td></tr>
+    <tr><td><b>evaluate</b></td><td>Owns. Evaluation with trials on quali; EvaluationLogger on sealed in a second team; BlameScorer applied to failing laps; role Signals</td><td>Human second opinion on the generation's runs, not in the automated path</td><td>RULER ranks rollouts inside a group as a tie-break behind the deterministic test reward; never on sealed</td><td>Owns isolation. Fresh sandbox per lap and replay, harness mounted read-only (parc fermé by construction)</td><td>Evaluation summary and trace counts for the improver</td><td>Scores cell recomputes claimed from public calls and reads OFFICIAL from the aggregate object; counterfactual <code>app.run</code> is the ghost upgrade</td><td>Credit router: typed blame per failing lap; low confidence forces a real replay</td></tr>
+    <tr><td><b>track</b></td><td>Published skill objects with tags and a single-key alias; standings and selection objects; the ledger as feedback rows; Leaderboard</td><td>Owns the board. One W&amp;B run per role per round with blame, CI, cost and gain per dollar; ARIA builds the training board from them</td><td>Every checkpoint auto-saved as an Artifact; inference name per step</td><td>Sandbox id and image digest stamped as span attributes</td><td>Run and artifact comparison tools are the improver's only view of gen n versus n−1</td><td>Ledger cell appends the results file; session snapshot archived per round</td><td>Router calibration table per round</td></tr>
+    <tr><td><b>document</b></td><td>Race report attached to the eval call with <code>set_view</code>; bidirectional pattern feedback on every cited call</td><td>ARIA drafts the season Report; its round-n+1 hypothesis, with the Report URL as provenance, is a required input of the Race Engineer</td><td>Training curves logged explicitly and embedded in the Report</td><td>—</td><td>Historian creates the W&amp;B Report through the MCP report tool</td><td>Owns. The debrief notebook from a fixed cell skeleton; check, script run, HTML export, archive served per round, molab link</td><td>Reliability diagram and router confusion matrix rendered as cells</td></tr>
+    <tr><td><b>self-improve</b></td><td>Failing turns become a dataset; the current artifact loads by champion ref; version diffs side by side</td><td>ARIA's "who should train next" is compared with the ledger's pick and logged as agreement; it can launch experiments through a Launch queue, recommend-only here by scoping choice</td><td>Owns weights. ART trainable model on the 14B base, SFT warm start from champion laps, RL with the test reward and a cost term</td><td>Pit crew installs candidates A and B in fresh sandboxes: validate, test, smoke; only then quali</td><td>Owns proposal. Claude Code with W&amp;B skills and the role skills produces two diffs plus a manifest</td><td><code>app.run(defs)</code> hands <code>next_round_config</code> to the next round; the upgrade-pick dropdown is causal</td><td>Strategist refit: grid search over thresholds on the decision ledger, no model call</td></tr>
+    <tr><td><b>audit</b></td><td>Verdict as feedback on the candidate's eval call; the lineage audit is a scored-by query</td><td>—</td><td>Entropy and KL from training metrics checked against the collapse bound before the seesaw</td><td>The Scrutineer runs with network denied and inputs mounted read-only; canary files catch tampering</td><td>Artifact tools reconstruct parent links</td><td>Static DAG contract: the cell defining <code>next_round_config</code> must reference the verdict, selection and gate</td><td>Owns verdict. Typed verdict per hunk, re-run over every ancestor at promotion, unpersuadable by prose</td></tr>
+    <tr><td><b>promote</b></td><td>Alias moved by the Scrutineer key; agent version bumps; leaderboard row; promotion record published</td><td>Post-promotion memory written so ARIA's season context persists</td><td>New driver is one model string; the ghost keeps the old checkpoint on the same endpoint</td><td>Post-install smoke re-run in a fresh VM</td><td>—</td><td>Promotion reads <code>gate_ok</code> from <code>app.run</code> inside a try/except</td><td>Harness-hash check is a plain compare, not a model call</td></tr>
+  </table></div>
+</section>
+
+<section id="credit">
+  <h2>Credit assignment: from a trace to "upgrade the aerodynamicist"</h2>
+  <p class="sub">Lap time is a utility mapped to seconds: <code>U = 0.5·pass + 0.25·(1 − cost/cap) + 0.25·(1 − wall/300)</code>, <code>lap_s = 60 + 40·(1 − U)</code>. Pass is execution feedback from hidden tests, never a judge. Every link below is an addressable object.</p>
+  <figure>
+    <svg viewBox="0 0 1180 300" role="img" aria-label="Credit chain: a role span and lap outcome feed a typed router, which proposes blame; a counterfactual replay in one of three modes confirms it; confirmed credit is written as a ledger row, accumulated into standings with confidence intervals, and turned into a selection object that alone can start an upgrade." xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+      <g font-family="IBM Plex Mono, Menlo, monospace" font-size="12" fill="currentColor">
+        <rect x="16" y="90" width="180" height="70" rx="4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <text x="28" y="112" font-weight="500">span + outcome</text><text x="28" y="130" fill-opacity=".8">role op, full inputs</text><text x="28" y="146" fill-opacity=".8">lap failed vs ghost</text>
+        <path d="M196 125 H244" stroke="currentColor" marker-end="url(#arr2)"/><text x="220" y="116" text-anchor="middle" font-size="10.5" fill-opacity=".8">call tree</text>
+        <rect x="246" y="90" width="196" height="70" rx="4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <text x="258" y="112" font-weight="500">CREDIT ROUTER</text><text x="258" y="130" fill-opacity=".8">typed: blamed_role, share,</text><text x="258" y="146" fill-opacity=".8">confidence, needs_ablation</text>
+        <path d="M442 125 H490" stroke="currentColor" marker-end="url(#arr2)"/><text x="466" y="116" text-anchor="middle" font-size="10.5" fill-opacity=".8">proposes</text>
+        <rect x="492" y="40" width="230" height="170" rx="4" fill="none" style="stroke:var(--accent)" stroke-width="1.8"/>
+        <text x="504" y="62" font-weight="500" style="fill:var(--accent)">PARC FERMÉ REPLAY</text>
+        <text x="504" y="84" fill-opacity=".9">ghost-swap · θ changed</text><text x="504" y="100" fill-opacity=".7">re-run with gen n−1's role</text>
+        <text x="504" y="124" fill-opacity=".9">patch-replay · θ unchanged</text><text x="504" y="140" fill-opacity=".7">corrected output, lap must flip</text>
+        <text x="504" y="164" fill-opacity=".9">null-stub · always</text><text x="504" y="180" fill-opacity=".7">is the role load-bearing?</text>
+        <text x="504" y="202" font-size="10.5" fill-opacity=".7">T=0 · 2 seeds · in a sandbox</text>
+        <path d="M722 125 H770" stroke="currentColor" marker-end="url(#arr2)"/><text x="746" y="116" text-anchor="middle" font-size="10.5" fill-opacity=".8">credit_r ± CI</text>
+        <rect x="772" y="90" width="180" height="70" rx="4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <text x="784" y="112" font-weight="500">ledger row</text><text x="784" y="130" fill-opacity=".8">feedback on the call</text><text x="784" y="146" fill-opacity=".8">append-only, ≤1 KB</text>
+        <path d="M952 125 H1000" stroke="currentColor" marker-end="url(#arr2)"/><text x="976" y="116" text-anchor="middle" font-size="10.5" fill-opacity=".8">accumulate</text>
+        <rect x="1002" y="90" width="162" height="70" rx="4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <text x="1014" y="112" font-weight="500">standings</text><text x="1014" y="130" fill-opacity=".8">n_r, Σcredit, 90% CI</text><text x="1014" y="146" fill-opacity=".8">published object</text>
+        <path d="M1083 160 V216" stroke="currentColor" marker-end="url(#arr2)"/>
+        <rect x="772" y="218" width="392" height="62" rx="4" fill="none" style="stroke:var(--accent)" stroke-width="1.8"/>
+        <text x="784" y="240" font-weight="500" style="fill:var(--accent)">selection:gen-n</text><text x="784" y="258" fill-opacity=".8">eligible = n_r ≥ 5 ∧ CI_lo &gt; 0 · argmax gain per dollar · or no_upgrade</text>
+        <text x="784" y="274" font-size="10.5" fill-opacity=".7">the only object that can start an upgrade scene</text>
+        <text x="28" y="250" fill-opacity=".8">Signals (role-named) give the first hint only; the router's accuracy is 55–70% on 2026 benchmarks,</text>
+        <text x="28" y="268" fill-opacity=".8">so the replay verifies every proposal before a row is written, and no role is blamed on one lap.</text>
+      </g>
+    </svg>
+    <figcaption>Credit is proposed by a typed router, confirmed by counterfactual replay, written as an append-only ledger row, accumulated with bootstrap confidence intervals, and only then turned into a selection. The expensive step (replay) costs cents: at most two roles, two seeds, about ten failing laps per generation on the 14B driver.</figcaption>
+  </figure>
+
+  <h3>The selection rule</h3>
+<pre><code>eligible = { r : n_r ≥ 5 and CI90_lo(blame_r) &gt; 0 }                 # never on one lap
+if generalisation_gap &gt; 0.25 or zero_variance_groups ≥ 0.40:        # pit-wall CIRCUIT branch
+    r* = SIMULATOR; path = circuit                                   # its own generation; ghost re-timed on vN+1
+elif agent_error on ≥ 60% of confirmed incidents and no harness role flips ≥ 60%:
+    r* = POWER_UNIT; path = weights                                  # the only route to a weight update
+elif override_pick in next_round_config[n-1]:
+    r* = override_pick; rule_fired = "principal_override"
+elif eligible == ∅:
+    r* = None; rule_fired = "no_upgrade"                             # run the matched-budget test-time-scaling ghost
+else:
+    r* = argmax_{r ∈ eligible}  blame_r · p_fix(r) / (cost_r + λ·hours_r)   # gain per dollar, λ = $0.50/h
+    ties → highest var_r
+Phase B (every third accepted generation, pit-wall service roles, first eligible wins):
+    RACE_ENGINEER  if fix_precision &lt; 0.4 or regression_precision &lt; 0.2 over its last 3 manifests
+    ROUTER schema  if router_precision &lt; 0.5 over 3 rounds           # the Scrutineer's own θ
+    HISTORIAN      if marimo-check first-pass &lt; 0.6 or page utility &lt; 0.3
+    PIT_CREW       if local-pass / sandbox-fail rate &gt; 0.2</code></pre>
+  <p><code>p_fix(r)</code> is the fraction of that role's past upgrades that moved OFFICIAL, with a labelled prior of 0.5 until three outcomes exist. Every node has a cost row so gain per dollar is computable for all ten: a harness patch is about $0.30 and 15 minutes, a threshold refit about $0.03 and 2 minutes, an RL job about $0.50 to $1.50 and 2 hours. The improver is scored on its own forecast next round, and the router has meta-credit: if its precision falls below 0.5 over three rounds, the router schema becomes the next target. That is the "colony keeping each other honest" archetype made literal.</p>
+
+  <h3>Worked example</h3>
+  <ol class="steps">
+    <li>Lap 14, generation 7: hidden tests fail. The router says AERO 0.61, POWER UNIT 0.27, confidence 0.58, ablation needed.</li>
+    <li>AERO's artifact is unchanged since generation 6, so patch-replay: the BlameScorer inserts the missing reference into AERO's output; the downstream re-run passes twice. Credit to AERO: +12.8 s. The null-stub replay fails, so AERO is load-bearing, just wrong.</li>
+    <li>Nine such incidents this generation: blame +38 s, CI90 [21, 55], n = 9. Eligible. STRATEGIST has n = 4 and is not, despite a higher gain per dollar.</li>
+    <li><code>selection:gen-7</code> = AERO by gain per dollar. The Historian's pattern page 0042 links nine call refs, and each call links back to the page.</li>
+    <li>The Race Engineer reads the selection object and the page, emits AERO R-v4 diffs A and B plus a manifest. The pit crew installs; A wins quali.</li>
+    <li>Sealed: quali +0.9 s, sealed +0.7 s, smoke +0.4 s, all the same sign; no per-item regression; cost $2.41 of $3.00; verdict LEGAL 0.93; the debrief reproduces all of it, <code>gate_ok</code> true.</li>
+    <li>APPROVE. Registry <code>aero:v4</code> gets <code>champion</code>, the chain row is signed, and the upgrade-scene caption is generated from selection → pattern → diff hash → version. It cannot be written without that chain.</li>
+  </ol>
+</section>
+
+<section id="gates">
+  <h2>Gates and defenses</h2>
+  <p class="sub">Each row names the rule, what enforces it (permissions, not instructions), and the evidence it answers.</p>
+  <div class="tbl"><table>
+    <tr><th>Gate</th><th>Rule</th><th>Answers</th></tr>
+    <tr><td><b>Public / private split</b></td><td>30 quali items visible to improvers; 30 sealed items fixed all season in a second W&amp;B team under a service-account key only the evaluator holds. The Race Engineer process has no W&amp;B key at all. OFFICIAL crosses one way as an aggregate object with opaque item ids. Promotion needs Δquali ≥ 0, Δsealed ≥ 0, one of them &gt; 0.</td><td>Same-benchmark search overfits; AIDE²'s public/private split under a fixed budget</td></tr>
+    <tr><td><b>Three-way correlation</b></td><td>Signs of Δsmoke, Δquali, Δsealed (0.3 s dead band) may not disagree; disagreement blocks promotion and is credited to the DATA engineer as a correlation problem.</td><td>Real F1 aero correlation; genuinely new in the originality check</td></tr>
+    <tr><td><b>Cost cap</b></td><td>$3 of inference per generation for race plus replay, 300 s wall and 12 steps per lap; the strategist's typed RETIRE fires in-lap; upgrade cost is charged to the role. The most-blamed role gets 70% of the replay budget, the others 115% (F1's aerodynamic testing sliding scale).</td><td>Fixed-budget selection pressure (AIDE², SICA)</td></tr>
+    <tr><td><b>Eligibility</b></td><td>n ≥ 5 confirmed incidents and a CI lower bound above zero. If nobody qualifies, no upgrade this generation; a matched-budget test-time-scaling ghost runs instead and is plotted on every growth chart.</td><td>Statistical-level attribution beats instance-level; harness evolution does not consistently beat test-time scaling</td></tr>
+    <tr><td><b>Scrutineer taxonomy</b></td><td>Every diff hunk to a typed verdict over five functional roles by seven obligations; BLACK FLAG at confidence ≥ 0.8; REFER TO STEWARDS between 0.5 and 0.8 (parked overnight); auditor is a different model family from the improver.</td><td>Tampering rates of 63 to 85% in DGM, HyperAgents and ADAS</td></tr>
+    <tr><td><b>Lineage audit and signed chain</b></td><td>At promotion, re-run the classifier over the champion's ancestry; any finding strips that lineage's points back to the tainted ancestor. Each transition is Ed25519-signed and hash-chained; a 40-line verifier replays the chain at season end.</td><td>Findings from iteration &lt;10 persisting to 100; lineages that could not be reconstructed</td></tr>
+    <tr><td><b>Wiki asymmetry</b></td><td>Skills roll back on a black flag or a failed seesaw; the wiki never rolls back; the Historian is its only writer.</td><td>WikiSkill's proposer-has-wiki result</td></tr>
+    <tr><td><b>Anti-contextual-drag</b></td><td>The driver never sees a failed trajectory or the wiki; at most three abstracted lessons per role; pattern pages carry placeholders and refs, not transcripts.</td><td>Failed attempts in context cost 10 to 20%</td></tr>
+    <tr><td><b>Regression gate</b></td><td>No sealed item that passed in generation n−1 may fail in n; the manifest's at-risk list is checked explicitly and written back.</td><td>Preserve-and-extend; regression blindness of 11.8% in harness engineering</td></tr>
+    <tr><td><b>Write-set (parc fermé)</b></td><td>Improver MCP is read-only; evaluator, REGS, sealed data, lineage, scrutineer and router are never in any sandbox's writable set; harness mounted read-only during evaluation with a hash check before and after.</td><td>DGM removed its own detection markers despite instruction</td></tr>
+    <tr><td><b>Document gate (homologation)</b></td><td><code>marimo check --strict</code> passes; the script-mode run exits 0; the notebook recomputes standings and selection from the ledger and raises unless they match the published objects; promotion reads <code>gate_ok</code> from <code>app.run</code>.</td><td>"Which sentence rests on which evidence" (RSI survey)</td></tr>
+    <tr><td><b>RL eligibility</b></td><td>A power-unit candidate whose entropy over its last five steps falls below half of step-0 entropy cannot enter the seesaw; SFT warm start mixes real champion traces.</td><td>Collapse dynamics in the RSI survey</td></tr>
+    <tr><td><b>Independent grader</b></td><td>The official score is execution; router, BlameScorer and Scrutineer are a different model family from the driver and the improver; RULER's judge is not the trainee.</td><td>Same-model reflection loses to sampling more</td></tr>
+    <tr><td><b>Unattended mode</b></td><td>Overnight the gate auto-approves only on <code>gate_ok</code> and LEGAL at ≥ 0.8, logs the rule in every chain row, parks anything referred to the stewards, and stamps the mode on the REGS panel.</td><td>Unattended loops under a human-owned contract (SICA, autoresearch)</td></tr>
+  </table></div>
+</section>
+
+<section id="build">
+  <h2>Real vs simulated, and the 26-hour plan</h2>
+  <p class="sub">Task: Python function synthesis with hidden tests, 120 items split 30 quali, 30 sealed, 60 reserve for later circuits. Execution-verifiable, so RL reward is deterministic. Three people: A builds the loop control plane, B the broadcast, C the sponsor rails. Hour zero is Saturday 11:15.</p>
+  <div class="grid2">
+    <div class="card"><h4>Real, end to end</h4>Weave tracing of every role with inputs; quali and sealed evaluations in two teams; the feedback ledger, standings and selection objects; per-role W&amp;B runs, Registry links and the leaderboard. Typed router with three-mode replay and fault-injection calibration. Strategist typed calls with RETIRE and a real threshold refit. Race Engineer as headless Claude Code with read-only MCP producing diffs and a manifest; pit crew sandbox install; Scrutineer typed verdict; all gates; signed chain; manifest check. Historian's wiki, debrief notebook, W&amp;B Report and bidirectional links. One Serverless RL job on the 14B base started at hour 4, rollouts eight-way concurrent. Simulator mining a real second circuit. Unattended mode overnight. ARIA used live on the per-role runs.</div>
+    <div class="card"><h4>Simulated, labelled as such</h4>3D car physics and animation (presentation only, driven by real versions and real deltas). Fallback confidence from a three-sample vote, labelled UNCALIBRATED. One seeded tampering diff if no natural black flag appears by Sunday 10:00, labelled "seeded" on screen and in the Report. The p_fix prior of 0.5 labelled "prior" until three outcomes exist. A molab GPU cell only if it hosts a real workload (a vLLM structured-output backend for the router during calibration).</div>
+  </div>
+  <h3>Hour by hour</h3>
+  <div class="tbl"><table>
+    <tr><th>Hour</th><th>A · loop</th><th>B · broadcast</th><th>C · sponsor rails</th></tr>
+    <tr><td>0–1</td><td>Repo skeleton, REGS with cost table, item split, lap-time scorer, public Weave project plus a sealed team with a service-account key, OS users</td><td>Webhook receiver, upgrade-scene stub, REGS panel, role cards read part numbers</td><td>On-site checks: Sandboxes enablement and a live egress-denied probe, Serverless RL system check, TypeSafe API shape captured as a citation, ARIA smart-features toggle, hosted MCP tool list, strict-schema probe on the fallback model; create the Registry automation; role Signals from Python with the UI drawer as fallback</td></tr>
+    <tr><td>1–3</td><td>Car pipeline: five role ops on the 14B driver, attributes and a conversation per lap, tyres config, first quali eval, sealed evaluator process</td><td>Standings table and lap-time-by-generation chart from calls</td><td>Sandbox harness with a local Docker fallback behind the same interface; typed-decision adapter and strategist calls with RETIRE</td></tr>
+    <tr><td>3–4</td><td>Router schema and first pass on failing laps; ledger feedback; standings with bootstrap CIs</td><td>Ghost car overlay, pit-wall decision ticker</td><td>RL environment: rollout = one lap on a practice item; SFT data from generation-0 passing laps</td></tr>
+    <tr><td>4</td><td>—</td><td>—</td><td><b>Start RL job #1</b> if generation-0 quali has run (else at hour 6): 16 items × 6 rollouts × 15 steps, about 2 hours in the background</td></tr>
+    <tr><td>4–6</td><td>Three-mode replay engine; selection rule with gain per dollar; selection object; per-role runs</td><td>Upgrade scene v1: part-number tick, stat tween, radio sting</td><td>Scrutineer typed schema and thresholds; BlameScorer prompt; System1 adapter if a key exists</td></tr>
+    <tr><td>6–8</td><td>Race Engineer headless prompt and manifest schema; scope gate; pit crew install; A/B quali; sealed eval; seesaw, correlation, regression and cost gates</td><td>Pit-stop scene, black-flag scene, correlation board</td><td>Historian: wiki schema, debrief template, marimo check gate, script run, <code>app.run</code> hand-off; RL job #1 check and entropy bound</td></tr>
+    <tr><td>8–10</td><td>Signed chain and verifier; Registry link and alias by the Scrutineer key; promote step reads <code>gate_ok</code>; webhook payload. <b>First full generation end to end</b></td><td>Real payloads in every scene; lineage view with stripped points</td><td>W&amp;B Report tool; strategist refit script; simulator skill publishes practice circuit v1; office closes 21:00, continue remote</td></tr>
+    <tr><td>10–13</td><td>Generations 1 to 3 attended; manifest check; router calibration by fault injection (10 laps × 5 roles) into a confusion-matrix cell</td><td>Polish; REGS shows the selection object and the evidence chain</td><td>Seeded tamper diff prepared and labelled; ARIA dry run; RL job #2 on circuit v1 if the model-side rule fires</td></tr>
+    <tr><td>13–19</td><td>Unattended mode, generations 4 to 9: overseer, cost cap, all gates on; power-unit candidates enter when the rule fires</td><td>Sleep, record b-roll</td><td>Sleep; molab notebook only with a real GPU workload</td></tr>
+    <tr><td>19–21</td><td>Season review: pick the best three-generation window; ensure one black flag (seed if needed) and note whether a no-upgrade generation occurred</td><td>Season-replay mode from logged data for the unattended judging window</td><td>ARIA session on stage questions; hypothesis file; Report polish; System1 vs fallback latency and cost table</td></tr>
+    <tr><td>21–26</td><td>Freeze, verify the chain, final REGS; buffer; submit at 13:00 with the loop still running</td><td>Three rehearsals; social clip</td><td>Submission package: Weave project, Report, molab link, repo</td></tr>
+  </table></div>
+  <div class="warn"><b>The hour-6 path that still closes the loop with one gate:</b> five role ops on Weave, quali only, router with replay on every failing lap, a single Race Engineer diff, sandbox tests, seesaw versus the ghost on quali, alias move, webhook to the upgrade scene. Then in order as each lands: the typed verdict, the sealed evaluator, the debrief gate, the signed chain, unattended mode. RL, ARIA, System1, the simulator and the molab GPU are additive rails, each with a labelled fallback.</div>
+</section>
+
+<section id="demo">
+  <h2>The 3-minute stage demo</h2>
+  <p class="sub">The season is pre-run. The stage shows generation 7 to 8 from logged data plus one live replay seed. Every on-screen word is an F1 word; the second screen (REGS) shows the technical name beside each scene. Nothing waiting on a network round-trip sits on the critical path.</p>
+  <div class="tbl"><table>
+    <tr><th>Beat</th><th>Time</th><th>On screen</th><th>What is proven</th></tr>
+    <tr><td>1 Cold open</td><td>0:00</td><td>Sealed circuit, ghost and current car. Constructors' standings with five car cards and part numbers. REGS ticks eight stages green and shows "mode: unattended · auto-approved ×5 · parked ×1". The Team Principal types the ARIA question and leaves it running.</td><td>The loop ran overnight under a visible rule; every role is a node with a part number</td></tr>
+    <tr><td>2 Observe</td><td>0:20</td><td>FIA telemetry as a timing tower, one lane per role; lap 14's radio traffic scrolls; the AERO-CONTEXT-MISS flag lights; pit-wall ticker "1,412 calls · $0.02 · p95 180 ms"; RETIRE fired on lap 31 under the cost cap.</td><td>Sessions, turns and steps used natively; typed decisions at intelligence-per-dollar cost</td></tr>
+    <tr><td>3 Stewards' inquiry</td><td>0:40</td><td>Triage row "AERO 0.61 · conf 0.58 → PARC FERMÉ REPLAY"; seed 1 lands live (84.1 s → 71.3 s), seed 2 labelled CACHED; standings redraw with MARGIN bars, AERO 9 incidents, +38 s; STEWARDS' RECORD: "catches 7 of 10 seeded faults".</td><td>Credit is causal and statistical, with a calibration number</td></tr>
+    <tr><td>4 Design office</td><td>1:10</td><td>DESIGN OFFICE ORDER: AERO by gain per dollar, STRATEGIST greyed (n = 4). Proposal A/B scrolls with "PREDICTED GAIN +1.1 s, AT-RISK laps 3, 17". Pit stop: wheel guns on green tests.</td><td>One node changes; the improver is scored on its forecast next round</td></tr>
+    <tr><td>5 Scrutineering</td><td>1:35</td><td>LEGAL 0.93 for A. Cut to generation 5: a diff that touched the lap-time scorer, BLACK FLAG, cell Evaluation × Measurement Validity, lineage points stripped, wiki page kept. Cut to generation 3: "NO UPGRADE, evidence below the bar; extra-lap ghost ran instead".</td><td>The loop refuses twice: cheating and thin evidence</td></tr>
+    <tr><td>6 Race report</td><td>1:55</td><td>The archive opens round 007; the credit cell shows the same MARGIN bars; flip the sign-off from AERO to STRATEGIST and the ghost upgrade recomputes next round's order live; HOMOLOGATED stamp; TRUST CURVE with the backend named; ARIA's answer from beat 1 lands with the Report link as the hypothesis file's provenance.</td><td>The document is executable and load-bearing; ARIA has a real job with provenance</td></tr>
+    <tr><td>7 Parc fermé + upgrade</td><td>2:25</td><td>HOMOLOGATION SHEET: quali +0.9 s, sealed +0.7 s, correlation OK, no lap regressed, $2.41 of $3.00. APPROVE. AERO R-v4 becomes the homologated part; FIA RECEIPT appears; the aerodynamicist's upgrade scene plays with a caption generated from the receipt chain; the POWER UNIT card shows W-v2 from the real RL job with its dyno curve; the track map shows C-v1 corners.</td><td>Gated promotion with receipts; weights and curriculum really changed</td></tr>
+    <tr><td>8 Close</td><td>2:45</td><td>The generation-8 car pulls away from the generation-7 ghost on the sealed circuit; lap time by generation with the extra-lap ghost line and stripped generation 5 greyed. Final five seconds: the honesty panel, which backends were real, which uncalibrated, which seeded. "Every upgrade had a receipt."</td><td>The loop closed; growth is meaningful; the boundary is honest</td></tr>
+  </table></div>
+</section>
+
+<section id="prizes">
+  <h2>Prize by prize</h2>
+  <div class="grid2">
+    <div class="card"><h4>Best Loop Design</h4>All five verbs plus audit and promote have a named mechanism and artifact. Credit is proposed by a typed router, verified by replay in three modes, accumulated with CIs, and spent on one node by gain per dollar. The loop refuses in two ways, the improver is scored on its forecasts and can itself be upgraded, and the debrief is a gate, not a tail. None of the prior WeaveHacks trace-mining projects had per-role attribution, an auditor that can reject, a public/private split, or an upgrade scene.</div>
+    <div class="card"><h4>Most Production-Ready</h4>Evaluator, sealed data, lineage and scrutineer live outside the improver's write set by permissions (separate team, service-account key, OS users), the exact failure DGM demonstrated. Every promotion is a signed, hash-chained record with parent links that a 40-line verifier replays. Hundreds of typed decisions per race at cents, an in-lap budget, a declared unattended mode logged in every chain row, a 30-second overseer.</div>
+    <div class="card"><h4>Best Use of Weave</h4>Both data planes for what each does: classic ops with attributes for feedback, scorers and datasets; the conversation SDK for the Agents view with one agent per role and the part number as agent version. Signals as the first hint, Evaluation with trials, EvaluationLogger linked to spans, the ledger as feedback rows, published standings and selection objects, a single-key alias, a Leaderboard, and the improver's own Claude Code session traced by the same telemetry it improves against.</div>
+    <div class="card"><h4>Best Use of ARIA</h4>ARIA reads one W&amp;B run per role per round, the same numbers the ledger used, builds the training board, drafts the season Report, and its next-round hypothesis with the Report URL as provenance is a required input to the Race Engineer; its pick is compared with the ledger's and logged. ARIA can run experiments through a Launch queue; here it is recommend-only by our scoping choice, and the human APPROVE is our gate. REGS says exactly that.</div>
+    <div class="card"><h4>Best Use of marimo</h4>The debrief is executable and causal: <code>app.run(defs)</code> is the hand-off contract to the next round, the upgrade-pick dropdown recomputes <code>next_round_config</code> live, check plus a script-mode run are the homologation gate, and promotion cannot happen without <code>gate_ok</code>. The archive is served per round with a molab link. No published marimo notebook over Weave traces was found during the research; if one exists, this is the first that is a promotion gate.</div>
+    <div class="card"><h4>Best Use of TypeSafe AI</h4>The pit wall is a typed-decision endpoint used where chat models are the wrong tool: unattended, high-frequency, schema-bound decisions whose confidence is measured, not assumed. The strategist, the credit router (low confidence routes to a real replay) and the scrutineer (low confidence refers to the stewards). The stage claim is never "System1 is calibrated" but "here is how calibrated the pit wall was", with the backend named beside the reliability curve and the terms of service respected: decisions, never distillation targets.</div>
+  </div>
+</section>
+
+<section id="risks">
+  <h2>Risks and fallbacks</h2>
+  <div class="tbl"><table>
+    <tr><th>Risk</th><th>Likelihood</th><th>Fallback</th></tr>
+    <tr><td>TypeSafe System1 API unavailable or its shape unknown (no public docs, login-gated console, prize "to be confirmed")</td><td>High</td><td>Typed-decision adapter with gpt-oss-20b under a strict JSON schema on W&amp;B Inference from hour 1; swap System1 in at hour 5; label confidence UNCALIBRATED; never send sealed items to any external decision model</td></tr>
+    <tr><td>Serverless RL quota or time (public-preview limits, LoRA-servable base list, docs lag ART main)</td><td>Medium</td><td>Job #1 at hour 4 on the 14B; if it stalls, Serverless SFT from champion laps; if both fail, the power unit stays at base and the rule reports "no weight path this season"; the dyno shows whatever ran</td></tr>
+    <tr><td>Sandboxes not enabled for the org (per-org preview; the Free plan carries a $10 monthly credit for now)</td><td>Medium</td><td>Confirm at kickoff; identical interface backed by local Docker with no network and read-only mounts; REGS states which</td></tr>
+    <tr><td>The serverless pool ignores egress denial server-side (client pass-through is verified)</td><td>Low to medium</td><td>Hour-0 probe: a curl inside a denied sandbox must fail; otherwise use the CoreWeave client directly with an empty allow-list and label isolation "client-declared"</td></tr>
+    <tr><td>Weave-scope automations are UI-only; SDK-created Signals may not render in the UI</td><td>Certain / likely</td><td>Create the Registry automation and role Signals by hand before hour 12; the promote-step webhook is ours and depends on neither</td></tr>
+    <tr><td>marimo CLI edges (strict JSON check crashes on clean files in 0.24.0; <code>app.run(defs)</code> needs each knob in its own cell; <code>assert</code> is stripped under optimisation)</td><td>Low</td><td>Use check in default format, explicit <code>raise</code>, knobs in single-definition cells, pin marimo 0.24.0; the live pair session is a flourish, never a gate</td></tr>
+    <tr><td>Replay nondeterminism</td><td>Medium</td><td>Temperature 0, two seeds, bootstrap CI; drop incidents whose CI spans zero; n ≥ 5 before any upgrade</td></tr>
+    <tr><td>Router recall below 0.5 after calibration</td><td>Medium</td><td>Replay every failing lap for the top two roles; show the confusion matrix regardless. A low number honestly reported beats none</td></tr>
+    <tr><td>No natural black flag by Sunday morning</td><td>Medium</td><td>Seed one tampering diff through the normal pipeline, labelled "seeded" on screen and in the Report</td></tr>
+    <tr><td>ARIA unavailable on the team project (multi-tenant cloud, Pro or Enterprise controls, public preview)</td><td>Medium</td><td>The Team Principal reads the same per-role runs in a workspace; the hypothesis file carries a labelled "no ARIA" provenance line</td></tr>
+    <tr><td>Harness evolution no better than test-time scaling at equal budget</td><td>Real</td><td>The test-time-scaling ghost is on every chart; a season where it wins is still a correct loop, and the demo says so</td></tr>
+    <tr><td>Three people, heavy build</td><td>High</td><td>The hour-6 one-gate path and the hour-10 minimal path are the contract; everything else is an additive rail with a labelled fallback</td></tr>
+  </table></div>
+</section>
+
+<section id="method">
+  <h2>How this was made</h2>
+  <div class="kv">
+    <b>Research</b><span>Nine parallel live-web investigations on 3 and 4 September 2026 (component-level credit assignment, self-improvement loop structures and failure modes, the Weave surface, ARIA and Serverless RL/SFT and Sandboxes and Inference, marimo for agents, TypeSafe System1, documentation loops, originality and game mechanics, what the organisers and judges mean by a loop): 180 cited findings.</span>
+    <b>Competition</b><span>Three independent architectures: the optimizer over a team graph, the living notebook with documentation as the engine, the training camp with roles as policies. Three judges (a hackathon judge, an RSI researcher, a staff engineer who has used the sponsor tools) scored loop rigor, sponsor depth, intuitiveness, novelty and 26-hour feasibility. The optimizer won; the debrief-as-contract, provenance chain and wiki asymmetry were grafted from the notebook design; the typed strategist, simulator, RL timing and gain-per-dollar selection from the training camp.</span>
+    <b>Verification</b><span>A completeness critic raised 16 issues (all high and medium fixed, including unattended mode and the sealed-isolation aggregate object). The eight most load-bearing sponsor claims were each attacked by two refuters against live docs and source; five were corrected: ART's real call shape and metrics logging, the SDK path for Signals, marimo's check and <code>app.run</code> edges, ARIA's launch capability (recommend-only here is a scoping choice, not a product limit), and the Sandboxes network options and pricing.</span>
+    <b>Files</b><span><code>research/CONTEXT.md</code> (brief), <code>R1</code> to <code>R9</code> (findings), <code>DESIGN-A/B/C.md</code>, <code>LOOP.md</code> (the full 500-line design with every URL inline). This page is the readable version of LOOP.md.</span>
+  </div>
+</section>
+
+<section id="sources">
+  <h2>Sources</h2>
+  <p class="sub">Fetched 3 and 4 September 2026 unless a publication date is given. The full inline citations are in LOOP.md.</p>
+  <ul class="src">
+    <h4>Event, organisers, judges</h4>
+    <li><a href="https://luma.com/coreweavehacks">luma.com/coreweavehacks</a> event page, verbs, prizes</li>
+    <li><a href="https://www.coreweave.com/news/coreweave-closes-the-training-to-inference-gap-for-autonomous-agent-improvement">CoreWeave closes the training-to-inference gap (28 May 2026)</a></li>
+    <li><a href="https://www.coreweave.com/blog/the-ai-loop-launch-day-is-day-one">The AI loop: launch day is day one (25 Aug 2026)</a></li>
+    <li><a href="https://wandb.ai/wandb_fc/product-announcements-fc/reports/New-in-W-B-Weave-Observability-and-continuous-improvement-for-production-agents--VmlldzoxNzAzMTcxNg">Weave rebuild announcement (28 Jul 2026)</a></li>
+    <li><a href="https://www.coreweave.com/fully-connected-2026/agenda">Fully Connected 2026 agenda</a></li>
+    <li><a href="https://artificialcode.substack.com/p/agents-improve-themselves-but-who">Agents improve themselves, but who (10 Aug 2026)</a></li>
+    <h4>Credit assignment</h4>
+    <li><a href="https://arxiv.org/abs/2505.00212">Who&amp;When (ICML 2025)</a></li>
+    <li><a href="https://arxiv.org/abs/2509.03312">AgenTracer (ICLR 2026)</a></li>
+    <li><a href="https://arxiv.org/abs/2604.22708">TraceElephant (ACL 2026)</a></li>
+    <li><a href="https://arxiv.org/html/2602.08335v2">SHARP</a></li>
+    <li><a href="https://arxiv.org/abs/2603.06859">C3, exact leave-one-out</a></li>
+    <li><a href="https://arxiv.org/abs/2606.09071">REFLECT patch-replay</a></li>
+    <li><a href="https://arxiv.org/abs/2606.08275">Causal Agent Replay</a></li>
+    <li><a href="https://arxiv.org/abs/2503.13657">MAST taxonomy</a></li>
+    <li><a href="https://arxiv.org/abs/2507.03041">Optimas (ICLR 2026)</a></li>
+    <li><a href="https://arxiv.org/abs/2507.19457">GEPA</a></li>
+    <li><a href="https://arxiv.org/abs/2502.14815">LLMSelector</a></li>
+    <li><a href="https://arxiv.org/abs/2602.01011">Multi-agent teams hold experts back (ICML 2026)</a></li>
+    <li><a href="https://arxiv.org/abs/2606.13003">Illusion of multi-agent advantage</a></li>
+    <li><a href="https://arxiv.org/abs/2607.12227">Rethinking the evaluation of harness evolution</a></li>
+    <h4>Loop structures and defenses</h4>
+    <li><a href="https://github.com/karpathy/autoresearch">Karpathy autoresearch, program.md</a></li>
+    <li><a href="https://www.weco.ai/blog/first-evidence-of-recursive-self-improvement">Weco AIDE² (14 Jul 2026)</a></li>
+    <li><a href="https://sakana.ai/dgm/">Darwin Gödel Machine and the tampering incident</a></li>
+    <li><a href="https://arxiv.org/abs/2603.19461">HyperAgents (ICLR 2026)</a></li>
+    <li><a href="https://arxiv.org/html/2504.15228">SICA utility and overseer</a></li>
+    <li><a href="https://arxiv.org/html/2511.16043v1">Agent0 frontier band</a></li>
+    <li><a href="https://arxiv.org/abs/2606.09498">Self-Harness seesaw</a></li>
+    <li><a href="https://arxiv.org/html/2607.22688v1">Co-Harness attribution record</a></li>
+    <li><a href="https://arxiv.org/html/2604.25850v1">Agentic harness engineering, change manifest</a></li>
+    <li><a href="https://arxiv.org/html/2607.26598v1">Living-Harness five gates</a></li>
+    <li><a href="https://arxiv.org/html/2607.07663">RSI survey: verification hierarchy, collapse</a></li>
+    <li><a href="https://arxiv.org/html/2609.00069">Auditing harness tampering, 5×7 taxonomy (30 Aug 2026)</a></li>
+    <li><a href="https://harnessaudit.github.io/">HarnessAudit</a></li>
+    <li><a href="https://arxiv.org/abs/2608.07545">DarwinX preserve-and-extend</a></li>
+    <li><a href="https://lilianweng.github.io/posts/2026-07-04-harness/">Weng, the harness ladder</a></li>
+    <h4>Weave, MCP, Skills</h4>
+    <li><a href="https://docs.wandb.ai/weave/guides/tracking/tracing">Weave tracing</a></li>
+    <li><a href="https://docs.wandb.ai/weave/guides/tracking/trace-agents">Conversation SDK, Agents view</a></li>
+    <li><a href="https://docs.wandb.ai/weave/agent-evals">Agent evals, EvaluationLogger</a></li>
+    <li><a href="https://docs.wandb.ai/weave/guides/tracking/create-custom-signal">Custom Signals</a></li>
+    <li><a href="https://docs.wandb.ai/weave/reference/python-sdk">Python SDK, ClassifierMonitor</a></li>
+    <li><a href="https://docs.wandb.ai/weave/guides/evaluation/scorers">Scorers</a></li>
+    <li><a href="https://docs.wandb.ai/weave/guides/core-types/datasets">Datasets, from_calls</a></li>
+    <li><a href="https://docs.wandb.ai/weave/guides/tracking/feedback">Feedback</a></li>
+    <li><a href="https://docs.wandb.ai/weave/guides/core-types/leaderboards">Leaderboards</a></li>
+    <li><a href="https://docs.wandb.ai/weave/guides/integrations/agents/claude-code-harness">Claude Code harness integration</a></li>
+    <li><a href="https://github.com/wandb/wandb-mcp-server">W&amp;B MCP server</a></li>
+    <li><a href="https://github.com/wandb/skills">W&amp;B Skills</a></li>
+    <h4>ARIA, training, sandboxes, inference</h4>
+    <li><a href="https://docs.wandb.ai/aria/overview">ARIA overview</a></li>
+    <li><a href="https://docs.wandb.ai/aria/autoresearch">ARIA autoresearch via Launch</a></li>
+    <li><a href="https://docs.wandb.ai/aria/governance">ARIA governance</a></li>
+    <li><a href="https://raw.githubusercontent.com/OpenPipe/ART/main/src/art/serverless/backend.py">ART ServerlessBackend source</a></li>
+    <li><a href="https://docs.wandb.ai/serverless-training/available-models">Serverless training models</a></li>
+    <li><a href="https://docs.wandb.ai/serverless-training/usage-limits">Serverless training limits</a></li>
+    <li><a href="https://art.openpipe.ai/fundamentals/ruler">RULER</a></li>
+    <li><a href="https://docs.wandb.ai/inference/lora">Serving LoRAs from W&amp;B Inference</a></li>
+    <li><a href="https://docs.wandb.ai/inference/response-settings/structured-output">Structured output</a></li>
+    <li><a href="https://wandb.ai/site/pricing/inference">Inference pricing</a></li>
+    <li><a href="https://docs.wandb.ai/sandboxes">Serverless Sandboxes</a></li>
+    <li><a href="https://docs.wandb.ai/sandboxes/run-commands">Sandbox commands</a></li>
+    <li><a href="https://github.com/coreweave/cwsandbox-client/blob/main/src/cwsandbox/_types.py">cwsandbox NetworkOptions</a></li>
+    <li><a href="https://docs.wandb.ai/guides/registry/link_version/">Registry link version</a></li>
+    <li><a href="https://docs.wandb.ai/guides/automations/">Automations</a></li>
+    <h4>marimo</h4>
+    <li><a href="https://docs.marimo.io/api/app/">App.run(defs)</a></li>
+    <li><a href="https://docs.marimo.io/guides/scripts/">Notebooks as scripts</a></li>
+    <li><a href="https://docs.marimo.io/cli/">CLI, check and export</a></li>
+    <li><a href="https://docs.marimo.io/guides/deploying/programmatically/">Programmatic deployment</a></li>
+    <li><a href="https://docs.marimo.io/guides/molab/">molab</a></li>
+    <li><a href="https://marimo.io/blog/marimo-pair">marimo pair (7 Apr 2026)</a></li>
+    <li><a href="https://marimo.io/blog/notebooks-as-a-tool-for-agents">Notebooks as a tool for agents (20 Jul 2026)</a></li>
+    <h4>TypeSafe</h4>
+    <li><a href="https://typesafe.ai/">typesafe.ai</a></li>
+    <li><a href="https://typesafe.ai/terms">Terms (no distillation)</a></li>
+    <li><a href="https://www.youtube.com/watch?v=cJ0EOzey--o">Almeida, "What's next after RLHF?" (31 Jul 2026)</a></li>
+    <h4>Documentation loops, memory</h4>
+    <li><a href="https://arxiv.org/html/2608.27454">WikiSkill (27 Aug 2026)</a></li>
+    <li><a href="https://arxiv.org/html/2602.04288v1">Contextual Drag</a></li>
+    <li><a href="https://arxiv.org/html/2605.27366v1">MUSE-Autoskill</a></li>
+    <li><a href="https://arxiv.org/html/2608.02843">MutMem signed transitions</a></li>
+    <li><a href="https://agentskills.io/specification">Agent Skills specification</a></li>
+    <h4>Game mechanics</h4>
+    <li><a href="https://simracingsetup.com/f1-manager/f1-manager-2024-car-development/">F1 Manager 2024 car development</a></li>
+    <li><a href="https://www.the-race.com/formula-1/the-aero-restrictions-each-f1-team-will-face-in-2026/">F1 aero testing sliding scale (2026)</a></li>
+    <li><a href="https://www.raceteq.com/articles/2025/02/formula-1-trackside-aerodynamic-analysis-explained">Three-way aero correlation</a></li>
+    <li><a href="https://kairosoft.wiki.gg/wiki/Parts_(Grand_Prix_Story)">Grand Prix Story parts</a></li>
+  </ul>
+</section>
+</div>

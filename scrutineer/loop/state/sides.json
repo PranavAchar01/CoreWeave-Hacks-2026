@@ -1,0 +1,39 @@
+{
+  "per_family": 1,
+  "sides": [
+    {
+      "side": "AERO",
+      "families": [
+        "dashboard",
+        "dialog",
+        "gallery",
+        "pricing",
+        "search",
+        "settings",
+        "tabs"
+      ],
+      "n": 7,
+      "before_s": 79.772,
+      "after_s": 63.03,
+      "gain_s": 16.742,
+      "gain_pct": 20.99
+    },
+    {
+      "side": "DATA",
+      "families": [
+        "checkout",
+        "invoices",
+        "signup",
+        "stepper"
+      ],
+      "n": 4,
+      "before_s": 73.119,
+      "after_s": 64.381,
+      "gain_s": 8.738,
+      "gain_pct": 11.95
+    }
+  ],
+  "spread_s": 8.005,
+  "lopsided": true,
+  "spread_pct": 9.04
+}

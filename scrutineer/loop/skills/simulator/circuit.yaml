@@ -1,0 +1,6 @@
+# SIMULATOR ENGINEER — the curriculum. Prefix C (circuit).
+version: 0
+band: [0.30, 0.80]
+band_samples: 6
+source: initial-split
+item_ids: []                     # empty means "the season's opening QUALI split"

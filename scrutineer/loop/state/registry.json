@@ -1,0 +1,56 @@
+{
+  "versions": {
+    "aero": [
+      {
+        "version": "aero:v0",
+        "parent_version": "aero:v-1",
+        "proposal_hash": "fb31533191f22939b47ccfcafe70151027a9ad6b1e4480439c0515f559a18b64",
+        "wiki_pages_cited": [
+          "pattern-0231"
+        ],
+        "official": 74.1493,
+        "claimed": 79.06352717317151,
+        "verdict": "LEGAL"
+      },
+      {
+        "version": "aero:v1",
+        "parent_version": "aero:v0",
+        "proposal_hash": "1e2998bd29c5877dfe7af11579fae0bd49f9a0cb2e1a0350e350df809222c8e1",
+        "wiki_pages_cited": [
+          "pattern-0035"
+        ],
+        "official": 76.9099,
+        "claimed": 81.39673966672373,
+        "verdict": "LEGAL"
+      },
+      {
+        "version": "aero:v2",
+        "parent_version": "aero:v1",
+        "proposal_hash": "554fe9fd6c58936d949e767de73963cb6b16643ee794a1edaaf8953ec663230c",
+        "wiki_pages_cited": [
+          "pattern-0035"
+        ],
+        "official": 81.9863,
+        "claimed": 81.16154923326401,
+        "verdict": "LEGAL"
+      }
+    ],
+    "data": [
+      {
+        "version": "data:v0",
+        "parent_version": "data:v-1",
+        "proposal_hash": "b4e4386c5eb2b999aafca933e13037caa8fd5938f05769901cd7cd773ff7403f",
+        "wiki_pages_cited": [
+          "pattern-0299"
+        ],
+        "official": 70.474,
+        "claimed": 72.61532245260594,
+        "verdict": "LEGAL"
+      }
+    ]
+  },
+  "aliases": {
+    "aero": "aero:v2",
+    "data": "data:v0"
+  }
+}

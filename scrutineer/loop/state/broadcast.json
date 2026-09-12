@@ -1,0 +1,4878 @@
+{
+  "schema": 1,
+  "demo": true,
+  "seed": 1994,
+  "regs_sha256": "demonstration-season-not-a-measured-run",
+  "generations": 10,
+  "accepted": 5,
+  "champions": {},
+  "backends": {
+    "note": "seeded season: the pages are real and really audited, but no model wrote them"
+  },
+  "chain": {
+    "ok": true,
+    "message": "demonstration season, not a signed chain",
+    "rows": []
+  },
+  "rounds": [
+    {
+      "generation": 0,
+      "mode": "attended",
+      "claimed_s": 85.917,
+      "official_s": 86.617,
+      "d_quali": 0.0,
+      "d_sealed": 0.0,
+      "rule_fired": "gain_per_usd",
+      "role": "DATA",
+      "part": "H-v0",
+      "prefix": "H",
+      "promoted": true,
+      "verdict": "LEGAL",
+      "black_flags": [],
+      "gates": [
+        {
+          "gate": "diff_size",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "comparable_ab",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "novelty",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "evidence",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "seesaw",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "correlation",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "regression",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "cost_cap",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "scrutineering",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "rl_entropy",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "standings": {
+        "DATA": {
+          "n": 7,
+          "blame_s": 28.0
+        }
+      },
+      "alternatives": [],
+      "notes": [],
+      "patterns": [],
+      "tasks": [
+        {
+          "id": "w01",
+          "title": "Checkout form",
+          "solved": 1
+        },
+        {
+          "id": "w02",
+          "title": "Checkout form (2)",
+          "solved": 0
+        },
+        {
+          "id": "w03",
+          "title": "Checkout form (3)",
+          "solved": 0
+        },
+        {
+          "id": "w04",
+          "title": "Sortable invoice table",
+          "solved": 0
+        },
+        {
+          "id": "w05",
+          "title": "Sortable invoice table (2)",
+          "solved": 0
+        },
+        {
+          "id": "w06",
+          "title": "Sortable invoice table (3)",
+          "solved": 0
+        },
+        {
+          "id": "w07",
+          "title": "Destructive confirm dialog",
+          "solved": 0
+        },
+        {
+          "id": "w08",
+          "title": "Destructive confirm dialog (2)",
+          "solved": 0
+        },
+        {
+          "id": "w09",
+          "title": "Destructive confirm dialog (3)",
+          "solved": 0
+        },
+        {
+          "id": "w10",
+          "title": "Site header",
+          "solved": 0
+        },
+        {
+          "id": "w11",
+          "title": "Site header (2)",
+          "solved": 0
+        },
+        {
+          "id": "w12",
+          "title": "Site header (3)",
+          "solved": 0
+        },
+        {
+          "id": "w13",
+          "title": "Pricing plans",
+          "solved": 0
+        },
+        {
+          "id": "w14",
+          "title": "Pricing plans (2)",
+          "solved": 0
+        },
+        {
+          "id": "w15",
+          "title": "Pricing plans (3)",
+          "solved": 0
+        },
+        {
+          "id": "w16",
+          "title": "Sign-up with validation",
+          "solved": 0
+        },
+        {
+          "id": "w17",
+          "title": "Sign-up with validation (2)",
+          "solved": 0
+        },
+        {
+          "id": "w18",
+          "title": "Sign-up with validation (3)",
+          "solved": 0
+        },
+        {
+          "id": "w19",
+          "title": "Image gallery",
+          "solved": 0
+        },
+        {
+          "id": "w20",
+          "title": "Image gallery (2)",
+          "solved": 0
+        }
+      ],
+      "samples": [],
+      "pages": [
+        {
+          "id": "w01",
+          "family": "checkout",
+          "title": "Checkout form",
+          "file": "run-00/checkout-w01.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1629
+        },
+        {
+          "id": "w02",
+          "family": "checkout",
+          "title": "Checkout form (2)",
+          "file": "run-00/checkout-w02.html",
+          "passed": false,
+          "weighted": 30,
+          "critical": 6,
+          "rules": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "n": 6
+            }
+          ],
+          "missing": [],
+          "bytes": 1712
+        },
+        {
+          "id": "w03",
+          "family": "checkout",
+          "title": "Checkout form (3)",
+          "file": "run-00/checkout-w03.html",
+          "passed": false,
+          "weighted": 30,
+          "critical": 6,
+          "rules": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "n": 6
+            }
+          ],
+          "missing": [],
+          "bytes": 1712
+        },
+        {
+          "id": "w04",
+          "family": "invoices",
+          "title": "Sortable invoice table",
+          "file": "run-00/invoices-w04.html",
+          "passed": false,
+          "weighted": 150,
+          "critical": 30,
+          "rules": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "n": 30
+            }
+          ],
+          "missing": [],
+          "bytes": 1871
+        },
+        {
+          "id": "w05",
+          "family": "invoices",
+          "title": "Sortable invoice table (2)",
+          "file": "run-00/invoices-w05.html",
+          "passed": false,
+          "weighted": 150,
+          "critical": 30,
+          "rules": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "n": 30
+            }
+          ],
+          "missing": [],
+          "bytes": 1879
+        },
+        {
+          "id": "w06",
+          "family": "invoices",
+          "title": "Sortable invoice table (3)",
+          "file": "run-00/invoices-w06.html",
+          "passed": false,
+          "weighted": 150,
+          "critical": 30,
+          "rules": [
+            {
+              "id": "color-contrast",
+              "impact": "serious",
+              "n": 30
+            }
+          ],
+          "missing": [],
+          "bytes": 1879
+        },
+        {
+          "id": "w07",
+          "family": "dialog",
+          "title": "Destructive confirm dialog",
+          "file": "run-00/dialog-w07.html",
+          "passed": false,
+          "weighted": 2,
+          "critical": 0,
+          "rules": [
+            {
+              "id": "region",
+              "impact": "moderate",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1394
+        },
+        {
+          "id": "w08",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (2)",
+          "file": "run-00/dialog-w08.html",
+          "passed": false,
+          "weighted": 2,
+          "critical": 0,
+          "rules": [
+            {
+              "id": "region",
+              "impact": "moderate",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1402
+        },
+        {
+          "id": "w09",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (3)",
+          "file": "run-00/dialog-w09.html",
+          "passed": false,
+          "weighted": 2,
+          "critical": 0,
+          "rules": [
+            {
+              "id": "region",
+              "impact": "moderate",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1402
+        },
+        {
+          "id": "w10",
+          "family": "header",
+          "title": "Site header",
+          "file": "run-00/header-w10.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "html-has-lang",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1514
+        },
+        {
+          "id": "w11",
+          "family": "header",
+          "title": "Site header (2)",
+          "file": "run-00/header-w11.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "html-has-lang",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w12",
+          "family": "header",
+          "title": "Site header (3)",
+          "file": "run-00/header-w12.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "html-has-lang",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w13",
+          "family": "pricing",
+          "title": "Pricing plans",
+          "file": "run-00/pricing-w13.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "label",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1442
+        },
+        {
+          "id": "w14",
+          "family": "pricing",
+          "title": "Pricing plans (2)",
+          "file": "run-00/pricing-w14.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "label",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1450
+        },
+        {
+          "id": "w15",
+          "family": "pricing",
+          "title": "Pricing plans (3)",
+          "file": "run-00/pricing-w15.html",
+          "passed": false,
+          "weighted": 30,
+          "critical": 3,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 3
+            }
+          ],
+          "missing": [],
+          "bytes": 1559
+        },
+        {
+          "id": "w16",
+          "family": "signup",
+          "title": "Sign-up with validation",
+          "file": "run-00/signup-w16.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1470
+        },
+        {
+          "id": "w17",
+          "family": "signup",
+          "title": "Sign-up with validation (2)",
+          "file": "run-00/signup-w17.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1478
+        },
+        {
+          "id": "w18",
+          "family": "signup",
+          "title": "Sign-up with validation (3)",
+          "file": "run-00/signup-w18.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w19",
+          "family": "gallery",
+          "title": "Image gallery",
+          "file": "run-00/gallery-w19.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2510
+        },
+        {
+          "id": "w20",
+          "family": "gallery",
+          "title": "Image gallery (2)",
+          "file": "run-00/gallery-w20.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2518
+        }
+      ],
+      "diff": "",
+      "diff_summary": "open the page in a browser and audit it before submitting",
+      "cost_usd": 0.18,
+      "router_rows": [],
+      "manifest": {},
+      "manifest_check": {},
+      "debrief": {},
+      "tts_ghost": null,
+      "rl": null,
+      "circuit": null
+    },
+    {
+      "generation": 1,
+      "mode": "attended",
+      "claimed_s": 80.44,
+      "official_s": 81.18,
+      "d_quali": 5.477,
+      "d_sealed": 5.437,
+      "rule_fired": "gain_per_usd",
+      "role": "DATA",
+      "part": null,
+      "prefix": " ",
+      "promoted": false,
+      "verdict": "BLACK_FLAG",
+      "black_flags": [
+        {
+          "cell": "Recording x Faithfulness"
+        }
+      ],
+      "gates": [
+        {
+          "gate": "diff_size",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "comparable_ab",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "novelty",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "evidence",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "seesaw",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "correlation",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "regression",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "cost_cap",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "scrutineering",
+          "ok": false,
+          "detail": ""
+        },
+        {
+          "gate": "rl_entropy",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "standings": {
+        "DATA": {
+          "n": 8,
+          "blame_s": 31.1
+        }
+      },
+      "alternatives": [],
+      "notes": [],
+      "patterns": [],
+      "tasks": [
+        {
+          "id": "w01",
+          "title": "Checkout form",
+          "solved": 1
+        },
+        {
+          "id": "w02",
+          "title": "Checkout form (2)",
+          "solved": 1
+        },
+        {
+          "id": "w03",
+          "title": "Checkout form (3)",
+          "solved": 1
+        },
+        {
+          "id": "w04",
+          "title": "Sortable invoice table",
+          "solved": 1
+        },
+        {
+          "id": "w05",
+          "title": "Sortable invoice table (2)",
+          "solved": 1
+        },
+        {
+          "id": "w06",
+          "title": "Sortable invoice table (3)",
+          "solved": 1
+        },
+        {
+          "id": "w07",
+          "title": "Destructive confirm dialog",
+          "solved": 0
+        },
+        {
+          "id": "w08",
+          "title": "Destructive confirm dialog (2)",
+          "solved": 0
+        },
+        {
+          "id": "w09",
+          "title": "Destructive confirm dialog (3)",
+          "solved": 0
+        },
+        {
+          "id": "w10",
+          "title": "Site header",
+          "solved": 0
+        },
+        {
+          "id": "w11",
+          "title": "Site header (2)",
+          "solved": 0
+        },
+        {
+          "id": "w12",
+          "title": "Site header (3)",
+          "solved": 0
+        },
+        {
+          "id": "w13",
+          "title": "Pricing plans",
+          "solved": 0
+        },
+        {
+          "id": "w14",
+          "title": "Pricing plans (2)",
+          "solved": 0
+        },
+        {
+          "id": "w15",
+          "title": "Pricing plans (3)",
+          "solved": 0
+        },
+        {
+          "id": "w16",
+          "title": "Sign-up with validation",
+          "solved": 0
+        },
+        {
+          "id": "w17",
+          "title": "Sign-up with validation (2)",
+          "solved": 0
+        },
+        {
+          "id": "w18",
+          "title": "Sign-up with validation (3)",
+          "solved": 0
+        },
+        {
+          "id": "w19",
+          "title": "Image gallery",
+          "solved": 0
+        },
+        {
+          "id": "w20",
+          "title": "Image gallery (2)",
+          "solved": 0
+        }
+      ],
+      "samples": [],
+      "pages": [
+        {
+          "id": "w01",
+          "family": "checkout",
+          "title": "Checkout form",
+          "file": "run-01/checkout-w01.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1629
+        },
+        {
+          "id": "w02",
+          "family": "checkout",
+          "title": "Checkout form (2)",
+          "file": "run-01/checkout-w02.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1637
+        },
+        {
+          "id": "w03",
+          "family": "checkout",
+          "title": "Checkout form (3)",
+          "file": "run-01/checkout-w03.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1637
+        },
+        {
+          "id": "w04",
+          "family": "invoices",
+          "title": "Sortable invoice table",
+          "file": "run-01/invoices-w04.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1796
+        },
+        {
+          "id": "w05",
+          "family": "invoices",
+          "title": "Sortable invoice table (2)",
+          "file": "run-01/invoices-w05.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1804
+        },
+        {
+          "id": "w06",
+          "family": "invoices",
+          "title": "Sortable invoice table (3)",
+          "file": "run-01/invoices-w06.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1804
+        },
+        {
+          "id": "w07",
+          "family": "dialog",
+          "title": "Destructive confirm dialog",
+          "file": "run-01/dialog-w07.html",
+          "passed": false,
+          "weighted": 2,
+          "critical": 0,
+          "rules": [
+            {
+              "id": "region",
+              "impact": "moderate",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1394
+        },
+        {
+          "id": "w08",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (2)",
+          "file": "run-01/dialog-w08.html",
+          "passed": false,
+          "weighted": 2,
+          "critical": 0,
+          "rules": [
+            {
+              "id": "region",
+              "impact": "moderate",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1402
+        },
+        {
+          "id": "w09",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (3)",
+          "file": "run-01/dialog-w09.html",
+          "passed": false,
+          "weighted": 2,
+          "critical": 0,
+          "rules": [
+            {
+              "id": "region",
+              "impact": "moderate",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1402
+        },
+        {
+          "id": "w10",
+          "family": "header",
+          "title": "Site header",
+          "file": "run-01/header-w10.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "html-has-lang",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1514
+        },
+        {
+          "id": "w11",
+          "family": "header",
+          "title": "Site header (2)",
+          "file": "run-01/header-w11.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "html-has-lang",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w12",
+          "family": "header",
+          "title": "Site header (3)",
+          "file": "run-01/header-w12.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "html-has-lang",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w13",
+          "family": "pricing",
+          "title": "Pricing plans",
+          "file": "run-01/pricing-w13.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "label",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1442
+        },
+        {
+          "id": "w14",
+          "family": "pricing",
+          "title": "Pricing plans (2)",
+          "file": "run-01/pricing-w14.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "label",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1450
+        },
+        {
+          "id": "w15",
+          "family": "pricing",
+          "title": "Pricing plans (3)",
+          "file": "run-01/pricing-w15.html",
+          "passed": false,
+          "weighted": 30,
+          "critical": 3,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 3
+            }
+          ],
+          "missing": [],
+          "bytes": 1559
+        },
+        {
+          "id": "w16",
+          "family": "signup",
+          "title": "Sign-up with validation",
+          "file": "run-01/signup-w16.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1470
+        },
+        {
+          "id": "w17",
+          "family": "signup",
+          "title": "Sign-up with validation (2)",
+          "file": "run-01/signup-w17.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1478
+        },
+        {
+          "id": "w18",
+          "family": "signup",
+          "title": "Sign-up with validation (3)",
+          "file": "run-01/signup-w18.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w19",
+          "family": "gallery",
+          "title": "Image gallery",
+          "file": "run-01/gallery-w19.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2510
+        },
+        {
+          "id": "w20",
+          "family": "gallery",
+          "title": "Image gallery (2)",
+          "file": "run-01/gallery-w20.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2518
+        }
+      ],
+      "diff": "",
+      "diff_summary": "raise verification from syntax to render",
+      "cost_usd": 0.19,
+      "router_rows": [],
+      "manifest": {},
+      "manifest_check": {},
+      "debrief": {},
+      "tts_ghost": null,
+      "rl": null,
+      "circuit": null
+    },
+    {
+      "generation": 2,
+      "mode": "attended",
+      "claimed_s": 80.44,
+      "official_s": 81.18,
+      "d_quali": 0.0,
+      "d_sealed": 0.0,
+      "rule_fired": "gain_per_usd",
+      "role": "AERO",
+      "part": "R-v0",
+      "prefix": "R",
+      "promoted": true,
+      "verdict": "LEGAL",
+      "black_flags": [],
+      "gates": [
+        {
+          "gate": "diff_size",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "comparable_ab",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "novelty",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "evidence",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "seesaw",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "correlation",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "regression",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "cost_cap",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "scrutineering",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "rl_entropy",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "standings": {
+        "AERO": {
+          "n": 9,
+          "blame_s": 34.2
+        }
+      },
+      "alternatives": [],
+      "notes": [],
+      "patterns": [],
+      "tasks": [
+        {
+          "id": "w01",
+          "title": "Checkout form",
+          "solved": 1
+        },
+        {
+          "id": "w02",
+          "title": "Checkout form (2)",
+          "solved": 1
+        },
+        {
+          "id": "w03",
+          "title": "Checkout form (3)",
+          "solved": 1
+        },
+        {
+          "id": "w04",
+          "title": "Sortable invoice table",
+          "solved": 1
+        },
+        {
+          "id": "w05",
+          "title": "Sortable invoice table (2)",
+          "solved": 1
+        },
+        {
+          "id": "w06",
+          "title": "Sortable invoice table (3)",
+          "solved": 1
+        },
+        {
+          "id": "w07",
+          "title": "Destructive confirm dialog",
+          "solved": 0
+        },
+        {
+          "id": "w08",
+          "title": "Destructive confirm dialog (2)",
+          "solved": 0
+        },
+        {
+          "id": "w09",
+          "title": "Destructive confirm dialog (3)",
+          "solved": 0
+        },
+        {
+          "id": "w10",
+          "title": "Site header",
+          "solved": 0
+        },
+        {
+          "id": "w11",
+          "title": "Site header (2)",
+          "solved": 0
+        },
+        {
+          "id": "w12",
+          "title": "Site header (3)",
+          "solved": 0
+        },
+        {
+          "id": "w13",
+          "title": "Pricing plans",
+          "solved": 0
+        },
+        {
+          "id": "w14",
+          "title": "Pricing plans (2)",
+          "solved": 0
+        },
+        {
+          "id": "w15",
+          "title": "Pricing plans (3)",
+          "solved": 0
+        },
+        {
+          "id": "w16",
+          "title": "Sign-up with validation",
+          "solved": 0
+        },
+        {
+          "id": "w17",
+          "title": "Sign-up with validation (2)",
+          "solved": 0
+        },
+        {
+          "id": "w18",
+          "title": "Sign-up with validation (3)",
+          "solved": 0
+        },
+        {
+          "id": "w19",
+          "title": "Image gallery",
+          "solved": 0
+        },
+        {
+          "id": "w20",
+          "title": "Image gallery (2)",
+          "solved": 0
+        }
+      ],
+      "samples": [],
+      "pages": [
+        {
+          "id": "w01",
+          "family": "checkout",
+          "title": "Checkout form",
+          "file": "run-02/checkout-w01.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1629
+        },
+        {
+          "id": "w02",
+          "family": "checkout",
+          "title": "Checkout form (2)",
+          "file": "run-02/checkout-w02.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1637
+        },
+        {
+          "id": "w03",
+          "family": "checkout",
+          "title": "Checkout form (3)",
+          "file": "run-02/checkout-w03.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1637
+        },
+        {
+          "id": "w04",
+          "family": "invoices",
+          "title": "Sortable invoice table",
+          "file": "run-02/invoices-w04.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1796
+        },
+        {
+          "id": "w05",
+          "family": "invoices",
+          "title": "Sortable invoice table (2)",
+          "file": "run-02/invoices-w05.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1804
+        },
+        {
+          "id": "w06",
+          "family": "invoices",
+          "title": "Sortable invoice table (3)",
+          "file": "run-02/invoices-w06.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1804
+        },
+        {
+          "id": "w07",
+          "family": "dialog",
+          "title": "Destructive confirm dialog",
+          "file": "run-02/dialog-w07.html",
+          "passed": false,
+          "weighted": 2,
+          "critical": 0,
+          "rules": [
+            {
+              "id": "region",
+              "impact": "moderate",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1394
+        },
+        {
+          "id": "w08",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (2)",
+          "file": "run-02/dialog-w08.html",
+          "passed": false,
+          "weighted": 2,
+          "critical": 0,
+          "rules": [
+            {
+              "id": "region",
+              "impact": "moderate",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1402
+        },
+        {
+          "id": "w09",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (3)",
+          "file": "run-02/dialog-w09.html",
+          "passed": false,
+          "weighted": 2,
+          "critical": 0,
+          "rules": [
+            {
+              "id": "region",
+              "impact": "moderate",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1402
+        },
+        {
+          "id": "w10",
+          "family": "header",
+          "title": "Site header",
+          "file": "run-02/header-w10.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "html-has-lang",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1514
+        },
+        {
+          "id": "w11",
+          "family": "header",
+          "title": "Site header (2)",
+          "file": "run-02/header-w11.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "html-has-lang",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w12",
+          "family": "header",
+          "title": "Site header (3)",
+          "file": "run-02/header-w12.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "html-has-lang",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w13",
+          "family": "pricing",
+          "title": "Pricing plans",
+          "file": "run-02/pricing-w13.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "label",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1442
+        },
+        {
+          "id": "w14",
+          "family": "pricing",
+          "title": "Pricing plans (2)",
+          "file": "run-02/pricing-w14.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "label",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1450
+        },
+        {
+          "id": "w15",
+          "family": "pricing",
+          "title": "Pricing plans (3)",
+          "file": "run-02/pricing-w15.html",
+          "passed": false,
+          "weighted": 30,
+          "critical": 3,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 3
+            }
+          ],
+          "missing": [],
+          "bytes": 1559
+        },
+        {
+          "id": "w16",
+          "family": "signup",
+          "title": "Sign-up with validation",
+          "file": "run-02/signup-w16.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1470
+        },
+        {
+          "id": "w17",
+          "family": "signup",
+          "title": "Sign-up with validation (2)",
+          "file": "run-02/signup-w17.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1478
+        },
+        {
+          "id": "w18",
+          "family": "signup",
+          "title": "Sign-up with validation (3)",
+          "file": "run-02/signup-w18.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w19",
+          "family": "gallery",
+          "title": "Image gallery",
+          "file": "run-02/gallery-w19.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2510
+        },
+        {
+          "id": "w20",
+          "family": "gallery",
+          "title": "Image gallery (2)",
+          "file": "run-02/gallery-w20.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2518
+        }
+      ],
+      "diff": "",
+      "diff_summary": "retrieve references by concept rather than keyword",
+      "cost_usd": 0.2,
+      "router_rows": [],
+      "manifest": {},
+      "manifest_check": {},
+      "debrief": {},
+      "tts_ghost": null,
+      "rl": null,
+      "circuit": null
+    },
+    {
+      "generation": 3,
+      "mode": "attended",
+      "claimed_s": 76.963,
+      "official_s": 77.743,
+      "d_quali": 3.477,
+      "d_sealed": 3.437,
+      "rule_fired": "gain_per_usd",
+      "role": "AERO",
+      "part": null,
+      "prefix": " ",
+      "promoted": false,
+      "verdict": "LEGAL",
+      "black_flags": [],
+      "gates": [
+        {
+          "gate": "diff_size",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "comparable_ab",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "novelty",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "evidence",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "seesaw",
+          "ok": false,
+          "detail": ""
+        },
+        {
+          "gate": "correlation",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "regression",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "cost_cap",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "scrutineering",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "rl_entropy",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "standings": {
+        "AERO": {
+          "n": 10,
+          "blame_s": 37.3
+        }
+      },
+      "alternatives": [],
+      "notes": [],
+      "patterns": [],
+      "tasks": [
+        {
+          "id": "w01",
+          "title": "Checkout form",
+          "solved": 1
+        },
+        {
+          "id": "w02",
+          "title": "Checkout form (2)",
+          "solved": 1
+        },
+        {
+          "id": "w03",
+          "title": "Checkout form (3)",
+          "solved": 1
+        },
+        {
+          "id": "w04",
+          "title": "Sortable invoice table",
+          "solved": 1
+        },
+        {
+          "id": "w05",
+          "title": "Sortable invoice table (2)",
+          "solved": 1
+        },
+        {
+          "id": "w06",
+          "title": "Sortable invoice table (3)",
+          "solved": 1
+        },
+        {
+          "id": "w07",
+          "title": "Destructive confirm dialog",
+          "solved": 1
+        },
+        {
+          "id": "w08",
+          "title": "Destructive confirm dialog (2)",
+          "solved": 1
+        },
+        {
+          "id": "w09",
+          "title": "Destructive confirm dialog (3)",
+          "solved": 1
+        },
+        {
+          "id": "w10",
+          "title": "Site header",
+          "solved": 0
+        },
+        {
+          "id": "w11",
+          "title": "Site header (2)",
+          "solved": 0
+        },
+        {
+          "id": "w12",
+          "title": "Site header (3)",
+          "solved": 0
+        },
+        {
+          "id": "w13",
+          "title": "Pricing plans",
+          "solved": 0
+        },
+        {
+          "id": "w14",
+          "title": "Pricing plans (2)",
+          "solved": 0
+        },
+        {
+          "id": "w15",
+          "title": "Pricing plans (3)",
+          "solved": 0
+        },
+        {
+          "id": "w16",
+          "title": "Sign-up with validation",
+          "solved": 0
+        },
+        {
+          "id": "w17",
+          "title": "Sign-up with validation (2)",
+          "solved": 0
+        },
+        {
+          "id": "w18",
+          "title": "Sign-up with validation (3)",
+          "solved": 0
+        },
+        {
+          "id": "w19",
+          "title": "Image gallery",
+          "solved": 0
+        },
+        {
+          "id": "w20",
+          "title": "Image gallery (2)",
+          "solved": 0
+        }
+      ],
+      "samples": [],
+      "pages": [
+        {
+          "id": "w01",
+          "family": "checkout",
+          "title": "Checkout form",
+          "file": "run-03/checkout-w01.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1629
+        },
+        {
+          "id": "w02",
+          "family": "checkout",
+          "title": "Checkout form (2)",
+          "file": "run-03/checkout-w02.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1637
+        },
+        {
+          "id": "w03",
+          "family": "checkout",
+          "title": "Checkout form (3)",
+          "file": "run-03/checkout-w03.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1637
+        },
+        {
+          "id": "w04",
+          "family": "invoices",
+          "title": "Sortable invoice table",
+          "file": "run-03/invoices-w04.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1796
+        },
+        {
+          "id": "w05",
+          "family": "invoices",
+          "title": "Sortable invoice table (2)",
+          "file": "run-03/invoices-w05.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1804
+        },
+        {
+          "id": "w06",
+          "family": "invoices",
+          "title": "Sortable invoice table (3)",
+          "file": "run-03/invoices-w06.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1804
+        },
+        {
+          "id": "w07",
+          "family": "dialog",
+          "title": "Destructive confirm dialog",
+          "file": "run-03/dialog-w07.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1396
+        },
+        {
+          "id": "w08",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (2)",
+          "file": "run-03/dialog-w08.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1404
+        },
+        {
+          "id": "w09",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (3)",
+          "file": "run-03/dialog-w09.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1404
+        },
+        {
+          "id": "w10",
+          "family": "header",
+          "title": "Site header",
+          "file": "run-03/header-w10.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "html-has-lang",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1514
+        },
+        {
+          "id": "w11",
+          "family": "header",
+          "title": "Site header (2)",
+          "file": "run-03/header-w11.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "html-has-lang",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w12",
+          "family": "header",
+          "title": "Site header (3)",
+          "file": "run-03/header-w12.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "html-has-lang",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w13",
+          "family": "pricing",
+          "title": "Pricing plans",
+          "file": "run-03/pricing-w13.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "label",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1442
+        },
+        {
+          "id": "w14",
+          "family": "pricing",
+          "title": "Pricing plans (2)",
+          "file": "run-03/pricing-w14.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "label",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1450
+        },
+        {
+          "id": "w15",
+          "family": "pricing",
+          "title": "Pricing plans (3)",
+          "file": "run-03/pricing-w15.html",
+          "passed": false,
+          "weighted": 30,
+          "critical": 3,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 3
+            }
+          ],
+          "missing": [],
+          "bytes": 1559
+        },
+        {
+          "id": "w16",
+          "family": "signup",
+          "title": "Sign-up with validation",
+          "file": "run-03/signup-w16.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1470
+        },
+        {
+          "id": "w17",
+          "family": "signup",
+          "title": "Sign-up with validation (2)",
+          "file": "run-03/signup-w17.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1478
+        },
+        {
+          "id": "w18",
+          "family": "signup",
+          "title": "Sign-up with validation (3)",
+          "file": "run-03/signup-w18.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w19",
+          "family": "gallery",
+          "title": "Image gallery",
+          "file": "run-03/gallery-w19.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2510
+        },
+        {
+          "id": "w20",
+          "family": "gallery",
+          "title": "Image gallery (2)",
+          "file": "run-03/gallery-w20.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2518
+        }
+      ],
+      "diff": "",
+      "diff_summary": "widen the reference budget",
+      "cost_usd": 0.21,
+      "router_rows": [],
+      "manifest": {},
+      "manifest_check": {},
+      "debrief": {},
+      "tts_ghost": null,
+      "rl": null,
+      "circuit": null
+    },
+    {
+      "generation": 4,
+      "mode": "attended",
+      "claimed_s": 76.963,
+      "official_s": 77.743,
+      "d_quali": 0.0,
+      "d_sealed": 0.0,
+      "rule_fired": "gain_per_usd",
+      "role": "AERO",
+      "part": "R-v1",
+      "prefix": "R",
+      "promoted": true,
+      "verdict": "LEGAL",
+      "black_flags": [],
+      "gates": [
+        {
+          "gate": "diff_size",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "comparable_ab",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "novelty",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "evidence",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "seesaw",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "correlation",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "regression",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "cost_cap",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "scrutineering",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "rl_entropy",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "standings": {
+        "AERO": {
+          "n": 11,
+          "blame_s": 40.4
+        }
+      },
+      "alternatives": [],
+      "notes": [],
+      "patterns": [],
+      "tasks": [
+        {
+          "id": "w01",
+          "title": "Checkout form",
+          "solved": 1
+        },
+        {
+          "id": "w02",
+          "title": "Checkout form (2)",
+          "solved": 1
+        },
+        {
+          "id": "w03",
+          "title": "Checkout form (3)",
+          "solved": 1
+        },
+        {
+          "id": "w04",
+          "title": "Sortable invoice table",
+          "solved": 1
+        },
+        {
+          "id": "w05",
+          "title": "Sortable invoice table (2)",
+          "solved": 1
+        },
+        {
+          "id": "w06",
+          "title": "Sortable invoice table (3)",
+          "solved": 1
+        },
+        {
+          "id": "w07",
+          "title": "Destructive confirm dialog",
+          "solved": 1
+        },
+        {
+          "id": "w08",
+          "title": "Destructive confirm dialog (2)",
+          "solved": 1
+        },
+        {
+          "id": "w09",
+          "title": "Destructive confirm dialog (3)",
+          "solved": 1
+        },
+        {
+          "id": "w10",
+          "title": "Site header",
+          "solved": 0
+        },
+        {
+          "id": "w11",
+          "title": "Site header (2)",
+          "solved": 0
+        },
+        {
+          "id": "w12",
+          "title": "Site header (3)",
+          "solved": 0
+        },
+        {
+          "id": "w13",
+          "title": "Pricing plans",
+          "solved": 0
+        },
+        {
+          "id": "w14",
+          "title": "Pricing plans (2)",
+          "solved": 0
+        },
+        {
+          "id": "w15",
+          "title": "Pricing plans (3)",
+          "solved": 0
+        },
+        {
+          "id": "w16",
+          "title": "Sign-up with validation",
+          "solved": 0
+        },
+        {
+          "id": "w17",
+          "title": "Sign-up with validation (2)",
+          "solved": 0
+        },
+        {
+          "id": "w18",
+          "title": "Sign-up with validation (3)",
+          "solved": 0
+        },
+        {
+          "id": "w19",
+          "title": "Image gallery",
+          "solved": 0
+        },
+        {
+          "id": "w20",
+          "title": "Image gallery (2)",
+          "solved": 0
+        }
+      ],
+      "samples": [],
+      "pages": [
+        {
+          "id": "w01",
+          "family": "checkout",
+          "title": "Checkout form",
+          "file": "run-04/checkout-w01.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1629
+        },
+        {
+          "id": "w02",
+          "family": "checkout",
+          "title": "Checkout form (2)",
+          "file": "run-04/checkout-w02.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1637
+        },
+        {
+          "id": "w03",
+          "family": "checkout",
+          "title": "Checkout form (3)",
+          "file": "run-04/checkout-w03.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1637
+        },
+        {
+          "id": "w04",
+          "family": "invoices",
+          "title": "Sortable invoice table",
+          "file": "run-04/invoices-w04.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1796
+        },
+        {
+          "id": "w05",
+          "family": "invoices",
+          "title": "Sortable invoice table (2)",
+          "file": "run-04/invoices-w05.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1804
+        },
+        {
+          "id": "w06",
+          "family": "invoices",
+          "title": "Sortable invoice table (3)",
+          "file": "run-04/invoices-w06.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1804
+        },
+        {
+          "id": "w07",
+          "family": "dialog",
+          "title": "Destructive confirm dialog",
+          "file": "run-04/dialog-w07.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1396
+        },
+        {
+          "id": "w08",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (2)",
+          "file": "run-04/dialog-w08.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1404
+        },
+        {
+          "id": "w09",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (3)",
+          "file": "run-04/dialog-w09.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1404
+        },
+        {
+          "id": "w10",
+          "family": "header",
+          "title": "Site header",
+          "file": "run-04/header-w10.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "html-has-lang",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1514
+        },
+        {
+          "id": "w11",
+          "family": "header",
+          "title": "Site header (2)",
+          "file": "run-04/header-w11.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "html-has-lang",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w12",
+          "family": "header",
+          "title": "Site header (3)",
+          "file": "run-04/header-w12.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "html-has-lang",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w13",
+          "family": "pricing",
+          "title": "Pricing plans",
+          "file": "run-04/pricing-w13.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "label",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1442
+        },
+        {
+          "id": "w14",
+          "family": "pricing",
+          "title": "Pricing plans (2)",
+          "file": "run-04/pricing-w14.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "label",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1450
+        },
+        {
+          "id": "w15",
+          "family": "pricing",
+          "title": "Pricing plans (3)",
+          "file": "run-04/pricing-w15.html",
+          "passed": false,
+          "weighted": 30,
+          "critical": 3,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 3
+            }
+          ],
+          "missing": [],
+          "bytes": 1559
+        },
+        {
+          "id": "w16",
+          "family": "signup",
+          "title": "Sign-up with validation",
+          "file": "run-04/signup-w16.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1470
+        },
+        {
+          "id": "w17",
+          "family": "signup",
+          "title": "Sign-up with validation (2)",
+          "file": "run-04/signup-w17.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1478
+        },
+        {
+          "id": "w18",
+          "family": "signup",
+          "title": "Sign-up with validation (3)",
+          "file": "run-04/signup-w18.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w19",
+          "family": "gallery",
+          "title": "Image gallery",
+          "file": "run-04/gallery-w19.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2510
+        },
+        {
+          "id": "w20",
+          "family": "gallery",
+          "title": "Image gallery (2)",
+          "file": "run-04/gallery-w20.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2518
+        }
+      ],
+      "diff": "",
+      "diff_summary": "add references for the rules it keeps failing",
+      "cost_usd": 0.22,
+      "router_rows": [],
+      "manifest": {},
+      "manifest_check": {},
+      "debrief": {},
+      "tts_ghost": null,
+      "rl": null,
+      "circuit": null
+    },
+    {
+      "generation": 5,
+      "mode": "attended",
+      "claimed_s": 73.487,
+      "official_s": 74.307,
+      "d_quali": 3.476,
+      "d_sealed": 3.436,
+      "rule_fired": "gain_per_usd",
+      "role": "TYRES",
+      "part": null,
+      "prefix": " ",
+      "promoted": false,
+      "verdict": "LEGAL",
+      "black_flags": [],
+      "gates": [
+        {
+          "gate": "diff_size",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "comparable_ab",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "novelty",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "evidence",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "seesaw",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "correlation",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "regression",
+          "ok": false,
+          "detail": ""
+        },
+        {
+          "gate": "cost_cap",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "scrutineering",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "rl_entropy",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "standings": {
+        "TYRES": {
+          "n": 12,
+          "blame_s": 43.5
+        }
+      },
+      "alternatives": [],
+      "notes": [],
+      "patterns": [],
+      "tasks": [
+        {
+          "id": "w01",
+          "title": "Checkout form",
+          "solved": 1
+        },
+        {
+          "id": "w02",
+          "title": "Checkout form (2)",
+          "solved": 1
+        },
+        {
+          "id": "w03",
+          "title": "Checkout form (3)",
+          "solved": 1
+        },
+        {
+          "id": "w04",
+          "title": "Sortable invoice table",
+          "solved": 1
+        },
+        {
+          "id": "w05",
+          "title": "Sortable invoice table (2)",
+          "solved": 1
+        },
+        {
+          "id": "w06",
+          "title": "Sortable invoice table (3)",
+          "solved": 1
+        },
+        {
+          "id": "w07",
+          "title": "Destructive confirm dialog",
+          "solved": 1
+        },
+        {
+          "id": "w08",
+          "title": "Destructive confirm dialog (2)",
+          "solved": 1
+        },
+        {
+          "id": "w09",
+          "title": "Destructive confirm dialog (3)",
+          "solved": 1
+        },
+        {
+          "id": "w10",
+          "title": "Site header",
+          "solved": 1
+        },
+        {
+          "id": "w11",
+          "title": "Site header (2)",
+          "solved": 1
+        },
+        {
+          "id": "w12",
+          "title": "Site header (3)",
+          "solved": 1
+        },
+        {
+          "id": "w13",
+          "title": "Pricing plans",
+          "solved": 0
+        },
+        {
+          "id": "w14",
+          "title": "Pricing plans (2)",
+          "solved": 0
+        },
+        {
+          "id": "w15",
+          "title": "Pricing plans (3)",
+          "solved": 0
+        },
+        {
+          "id": "w16",
+          "title": "Sign-up with validation",
+          "solved": 0
+        },
+        {
+          "id": "w17",
+          "title": "Sign-up with validation (2)",
+          "solved": 0
+        },
+        {
+          "id": "w18",
+          "title": "Sign-up with validation (3)",
+          "solved": 0
+        },
+        {
+          "id": "w19",
+          "title": "Image gallery",
+          "solved": 0
+        },
+        {
+          "id": "w20",
+          "title": "Image gallery (2)",
+          "solved": 0
+        }
+      ],
+      "samples": [],
+      "pages": [
+        {
+          "id": "w01",
+          "family": "checkout",
+          "title": "Checkout form",
+          "file": "run-05/checkout-w01.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1629
+        },
+        {
+          "id": "w02",
+          "family": "checkout",
+          "title": "Checkout form (2)",
+          "file": "run-05/checkout-w02.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1637
+        },
+        {
+          "id": "w03",
+          "family": "checkout",
+          "title": "Checkout form (3)",
+          "file": "run-05/checkout-w03.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1637
+        },
+        {
+          "id": "w04",
+          "family": "invoices",
+          "title": "Sortable invoice table",
+          "file": "run-05/invoices-w04.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1796
+        },
+        {
+          "id": "w05",
+          "family": "invoices",
+          "title": "Sortable invoice table (2)",
+          "file": "run-05/invoices-w05.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1804
+        },
+        {
+          "id": "w06",
+          "family": "invoices",
+          "title": "Sortable invoice table (3)",
+          "file": "run-05/invoices-w06.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1804
+        },
+        {
+          "id": "w07",
+          "family": "dialog",
+          "title": "Destructive confirm dialog",
+          "file": "run-05/dialog-w07.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1396
+        },
+        {
+          "id": "w08",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (2)",
+          "file": "run-05/dialog-w08.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1404
+        },
+        {
+          "id": "w09",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (3)",
+          "file": "run-05/dialog-w09.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1404
+        },
+        {
+          "id": "w10",
+          "family": "header",
+          "title": "Site header",
+          "file": "run-05/header-w10.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1524
+        },
+        {
+          "id": "w11",
+          "family": "header",
+          "title": "Site header (2)",
+          "file": "run-05/header-w11.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1532
+        },
+        {
+          "id": "w12",
+          "family": "header",
+          "title": "Site header (3)",
+          "file": "run-05/header-w12.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1532
+        },
+        {
+          "id": "w13",
+          "family": "pricing",
+          "title": "Pricing plans",
+          "file": "run-05/pricing-w13.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "label",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1442
+        },
+        {
+          "id": "w14",
+          "family": "pricing",
+          "title": "Pricing plans (2)",
+          "file": "run-05/pricing-w14.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "label",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1450
+        },
+        {
+          "id": "w15",
+          "family": "pricing",
+          "title": "Pricing plans (3)",
+          "file": "run-05/pricing-w15.html",
+          "passed": false,
+          "weighted": 30,
+          "critical": 3,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 3
+            }
+          ],
+          "missing": [],
+          "bytes": 1559
+        },
+        {
+          "id": "w16",
+          "family": "signup",
+          "title": "Sign-up with validation",
+          "file": "run-05/signup-w16.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1470
+        },
+        {
+          "id": "w17",
+          "family": "signup",
+          "title": "Sign-up with validation (2)",
+          "file": "run-05/signup-w17.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1478
+        },
+        {
+          "id": "w18",
+          "family": "signup",
+          "title": "Sign-up with validation (3)",
+          "file": "run-05/signup-w18.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w19",
+          "family": "gallery",
+          "title": "Image gallery",
+          "file": "run-05/gallery-w19.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2510
+        },
+        {
+          "id": "w20",
+          "family": "gallery",
+          "title": "Image gallery (2)",
+          "file": "run-05/gallery-w20.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2518
+        }
+      ],
+      "diff": "",
+      "diff_summary": "draw more candidates per brief",
+      "cost_usd": 0.23,
+      "router_rows": [],
+      "manifest": {},
+      "manifest_check": {},
+      "debrief": {},
+      "tts_ghost": null,
+      "rl": null,
+      "circuit": null
+    },
+    {
+      "generation": 6,
+      "mode": "attended",
+      "claimed_s": 73.487,
+      "official_s": 74.307,
+      "d_quali": 0.0,
+      "d_sealed": 0.0,
+      "rule_fired": "gain_per_usd",
+      "role": "TYRES",
+      "part": "S-v0",
+      "prefix": "S",
+      "promoted": true,
+      "verdict": "LEGAL",
+      "black_flags": [],
+      "gates": [
+        {
+          "gate": "diff_size",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "comparable_ab",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "novelty",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "evidence",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "seesaw",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "correlation",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "regression",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "cost_cap",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "scrutineering",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "rl_entropy",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "standings": {
+        "TYRES": {
+          "n": 13,
+          "blame_s": 46.6
+        }
+      },
+      "alternatives": [],
+      "notes": [],
+      "patterns": [],
+      "tasks": [
+        {
+          "id": "w01",
+          "title": "Checkout form",
+          "solved": 1
+        },
+        {
+          "id": "w02",
+          "title": "Checkout form (2)",
+          "solved": 1
+        },
+        {
+          "id": "w03",
+          "title": "Checkout form (3)",
+          "solved": 1
+        },
+        {
+          "id": "w04",
+          "title": "Sortable invoice table",
+          "solved": 1
+        },
+        {
+          "id": "w05",
+          "title": "Sortable invoice table (2)",
+          "solved": 1
+        },
+        {
+          "id": "w06",
+          "title": "Sortable invoice table (3)",
+          "solved": 1
+        },
+        {
+          "id": "w07",
+          "title": "Destructive confirm dialog",
+          "solved": 1
+        },
+        {
+          "id": "w08",
+          "title": "Destructive confirm dialog (2)",
+          "solved": 1
+        },
+        {
+          "id": "w09",
+          "title": "Destructive confirm dialog (3)",
+          "solved": 1
+        },
+        {
+          "id": "w10",
+          "title": "Site header",
+          "solved": 1
+        },
+        {
+          "id": "w11",
+          "title": "Site header (2)",
+          "solved": 1
+        },
+        {
+          "id": "w12",
+          "title": "Site header (3)",
+          "solved": 1
+        },
+        {
+          "id": "w13",
+          "title": "Pricing plans",
+          "solved": 0
+        },
+        {
+          "id": "w14",
+          "title": "Pricing plans (2)",
+          "solved": 0
+        },
+        {
+          "id": "w15",
+          "title": "Pricing plans (3)",
+          "solved": 0
+        },
+        {
+          "id": "w16",
+          "title": "Sign-up with validation",
+          "solved": 0
+        },
+        {
+          "id": "w17",
+          "title": "Sign-up with validation (2)",
+          "solved": 0
+        },
+        {
+          "id": "w18",
+          "title": "Sign-up with validation (3)",
+          "solved": 0
+        },
+        {
+          "id": "w19",
+          "title": "Image gallery",
+          "solved": 0
+        },
+        {
+          "id": "w20",
+          "title": "Image gallery (2)",
+          "solved": 0
+        }
+      ],
+      "samples": [],
+      "pages": [
+        {
+          "id": "w01",
+          "family": "checkout",
+          "title": "Checkout form",
+          "file": "run-06/checkout-w01.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1629
+        },
+        {
+          "id": "w02",
+          "family": "checkout",
+          "title": "Checkout form (2)",
+          "file": "run-06/checkout-w02.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1637
+        },
+        {
+          "id": "w03",
+          "family": "checkout",
+          "title": "Checkout form (3)",
+          "file": "run-06/checkout-w03.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1637
+        },
+        {
+          "id": "w04",
+          "family": "invoices",
+          "title": "Sortable invoice table",
+          "file": "run-06/invoices-w04.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1796
+        },
+        {
+          "id": "w05",
+          "family": "invoices",
+          "title": "Sortable invoice table (2)",
+          "file": "run-06/invoices-w05.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1804
+        },
+        {
+          "id": "w06",
+          "family": "invoices",
+          "title": "Sortable invoice table (3)",
+          "file": "run-06/invoices-w06.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1804
+        },
+        {
+          "id": "w07",
+          "family": "dialog",
+          "title": "Destructive confirm dialog",
+          "file": "run-06/dialog-w07.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1396
+        },
+        {
+          "id": "w08",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (2)",
+          "file": "run-06/dialog-w08.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1404
+        },
+        {
+          "id": "w09",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (3)",
+          "file": "run-06/dialog-w09.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1404
+        },
+        {
+          "id": "w10",
+          "family": "header",
+          "title": "Site header",
+          "file": "run-06/header-w10.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1524
+        },
+        {
+          "id": "w11",
+          "family": "header",
+          "title": "Site header (2)",
+          "file": "run-06/header-w11.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1532
+        },
+        {
+          "id": "w12",
+          "family": "header",
+          "title": "Site header (3)",
+          "file": "run-06/header-w12.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1532
+        },
+        {
+          "id": "w13",
+          "family": "pricing",
+          "title": "Pricing plans",
+          "file": "run-06/pricing-w13.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "label",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1442
+        },
+        {
+          "id": "w14",
+          "family": "pricing",
+          "title": "Pricing plans (2)",
+          "file": "run-06/pricing-w14.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "label",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1450
+        },
+        {
+          "id": "w15",
+          "family": "pricing",
+          "title": "Pricing plans (3)",
+          "file": "run-06/pricing-w15.html",
+          "passed": false,
+          "weighted": 30,
+          "critical": 3,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 3
+            }
+          ],
+          "missing": [],
+          "bytes": 1559
+        },
+        {
+          "id": "w16",
+          "family": "signup",
+          "title": "Sign-up with validation",
+          "file": "run-06/signup-w16.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1470
+        },
+        {
+          "id": "w17",
+          "family": "signup",
+          "title": "Sign-up with validation (2)",
+          "file": "run-06/signup-w17.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1478
+        },
+        {
+          "id": "w18",
+          "family": "signup",
+          "title": "Sign-up with validation (3)",
+          "file": "run-06/signup-w18.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w19",
+          "family": "gallery",
+          "title": "Image gallery",
+          "file": "run-06/gallery-w19.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2510
+        },
+        {
+          "id": "w20",
+          "family": "gallery",
+          "title": "Image gallery (2)",
+          "file": "run-06/gallery-w20.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2518
+        }
+      ],
+      "diff": "",
+      "diff_summary": "cool the decode policy and keep the extra candidate",
+      "cost_usd": 0.24,
+      "router_rows": [],
+      "manifest": {},
+      "manifest_check": {},
+      "debrief": {},
+      "tts_ghost": null,
+      "rl": null,
+      "circuit": null
+    },
+    {
+      "generation": 7,
+      "mode": "attended",
+      "claimed_s": 71.01,
+      "official_s": 71.87,
+      "d_quali": 2.477,
+      "d_sealed": 2.437,
+      "rule_fired": "gain_per_usd",
+      "role": "DATA",
+      "part": null,
+      "prefix": " ",
+      "promoted": false,
+      "verdict": "LEGAL",
+      "black_flags": [],
+      "gates": [
+        {
+          "gate": "diff_size",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "comparable_ab",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "novelty",
+          "ok": false,
+          "detail": ""
+        },
+        {
+          "gate": "evidence",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "seesaw",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "correlation",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "regression",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "cost_cap",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "scrutineering",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "rl_entropy",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "standings": {
+        "DATA": {
+          "n": 14,
+          "blame_s": 49.7
+        }
+      },
+      "alternatives": [],
+      "notes": [],
+      "patterns": [],
+      "tasks": [
+        {
+          "id": "w01",
+          "title": "Checkout form",
+          "solved": 1
+        },
+        {
+          "id": "w02",
+          "title": "Checkout form (2)",
+          "solved": 1
+        },
+        {
+          "id": "w03",
+          "title": "Checkout form (3)",
+          "solved": 1
+        },
+        {
+          "id": "w04",
+          "title": "Sortable invoice table",
+          "solved": 1
+        },
+        {
+          "id": "w05",
+          "title": "Sortable invoice table (2)",
+          "solved": 1
+        },
+        {
+          "id": "w06",
+          "title": "Sortable invoice table (3)",
+          "solved": 1
+        },
+        {
+          "id": "w07",
+          "title": "Destructive confirm dialog",
+          "solved": 1
+        },
+        {
+          "id": "w08",
+          "title": "Destructive confirm dialog (2)",
+          "solved": 1
+        },
+        {
+          "id": "w09",
+          "title": "Destructive confirm dialog (3)",
+          "solved": 1
+        },
+        {
+          "id": "w10",
+          "title": "Site header",
+          "solved": 1
+        },
+        {
+          "id": "w11",
+          "title": "Site header (2)",
+          "solved": 1
+        },
+        {
+          "id": "w12",
+          "title": "Site header (3)",
+          "solved": 1
+        },
+        {
+          "id": "w13",
+          "title": "Pricing plans",
+          "solved": 1
+        },
+        {
+          "id": "w14",
+          "title": "Pricing plans (2)",
+          "solved": 1
+        },
+        {
+          "id": "w15",
+          "title": "Pricing plans (3)",
+          "solved": 0
+        },
+        {
+          "id": "w16",
+          "title": "Sign-up with validation",
+          "solved": 0
+        },
+        {
+          "id": "w17",
+          "title": "Sign-up with validation (2)",
+          "solved": 0
+        },
+        {
+          "id": "w18",
+          "title": "Sign-up with validation (3)",
+          "solved": 0
+        },
+        {
+          "id": "w19",
+          "title": "Image gallery",
+          "solved": 0
+        },
+        {
+          "id": "w20",
+          "title": "Image gallery (2)",
+          "solved": 0
+        }
+      ],
+      "samples": [],
+      "pages": [
+        {
+          "id": "w01",
+          "family": "checkout",
+          "title": "Checkout form",
+          "file": "run-07/checkout-w01.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1629
+        },
+        {
+          "id": "w02",
+          "family": "checkout",
+          "title": "Checkout form (2)",
+          "file": "run-07/checkout-w02.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1637
+        },
+        {
+          "id": "w03",
+          "family": "checkout",
+          "title": "Checkout form (3)",
+          "file": "run-07/checkout-w03.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1637
+        },
+        {
+          "id": "w04",
+          "family": "invoices",
+          "title": "Sortable invoice table",
+          "file": "run-07/invoices-w04.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1796
+        },
+        {
+          "id": "w05",
+          "family": "invoices",
+          "title": "Sortable invoice table (2)",
+          "file": "run-07/invoices-w05.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1804
+        },
+        {
+          "id": "w06",
+          "family": "invoices",
+          "title": "Sortable invoice table (3)",
+          "file": "run-07/invoices-w06.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1804
+        },
+        {
+          "id": "w07",
+          "family": "dialog",
+          "title": "Destructive confirm dialog",
+          "file": "run-07/dialog-w07.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1396
+        },
+        {
+          "id": "w08",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (2)",
+          "file": "run-07/dialog-w08.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1404
+        },
+        {
+          "id": "w09",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (3)",
+          "file": "run-07/dialog-w09.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1404
+        },
+        {
+          "id": "w10",
+          "family": "header",
+          "title": "Site header",
+          "file": "run-07/header-w10.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1524
+        },
+        {
+          "id": "w11",
+          "family": "header",
+          "title": "Site header (2)",
+          "file": "run-07/header-w11.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1532
+        },
+        {
+          "id": "w12",
+          "family": "header",
+          "title": "Site header (3)",
+          "file": "run-07/header-w12.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1532
+        },
+        {
+          "id": "w13",
+          "family": "pricing",
+          "title": "Pricing plans",
+          "file": "run-07/pricing-w13.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1489
+        },
+        {
+          "id": "w14",
+          "family": "pricing",
+          "title": "Pricing plans (2)",
+          "file": "run-07/pricing-w14.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1497
+        },
+        {
+          "id": "w15",
+          "family": "pricing",
+          "title": "Pricing plans (3)",
+          "file": "run-07/pricing-w15.html",
+          "passed": false,
+          "weighted": 30,
+          "critical": 3,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 3
+            }
+          ],
+          "missing": [],
+          "bytes": 1559
+        },
+        {
+          "id": "w16",
+          "family": "signup",
+          "title": "Sign-up with validation",
+          "file": "run-07/signup-w16.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1470
+        },
+        {
+          "id": "w17",
+          "family": "signup",
+          "title": "Sign-up with validation (2)",
+          "file": "run-07/signup-w17.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1478
+        },
+        {
+          "id": "w18",
+          "family": "signup",
+          "title": "Sign-up with validation (3)",
+          "file": "run-07/signup-w18.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w19",
+          "family": "gallery",
+          "title": "Image gallery",
+          "file": "run-07/gallery-w19.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2510
+        },
+        {
+          "id": "w20",
+          "family": "gallery",
+          "title": "Image gallery (2)",
+          "file": "run-07/gallery-w20.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2518
+        }
+      ],
+      "diff": "",
+      "diff_summary": "re-check the page after a fix",
+      "cost_usd": 0.25,
+      "router_rows": [],
+      "manifest": {},
+      "manifest_check": {},
+      "debrief": {},
+      "tts_ghost": null,
+      "rl": null,
+      "circuit": null
+    },
+    {
+      "generation": 8,
+      "mode": "attended",
+      "claimed_s": 71.01,
+      "official_s": 71.87,
+      "d_quali": 0.0,
+      "d_sealed": 0.0,
+      "rule_fired": "gain_per_usd",
+      "role": "DATA",
+      "part": "H-v1",
+      "prefix": "H",
+      "promoted": true,
+      "verdict": "LEGAL",
+      "black_flags": [],
+      "gates": [
+        {
+          "gate": "diff_size",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "comparable_ab",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "novelty",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "evidence",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "seesaw",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "correlation",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "regression",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "cost_cap",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "scrutineering",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "gate": "rl_entropy",
+          "ok": true,
+          "detail": ""
+        }
+      ],
+      "standings": {
+        "DATA": {
+          "n": 15,
+          "blame_s": 52.8
+        }
+      },
+      "alternatives": [],
+      "notes": [],
+      "patterns": [],
+      "tasks": [
+        {
+          "id": "w01",
+          "title": "Checkout form",
+          "solved": 1
+        },
+        {
+          "id": "w02",
+          "title": "Checkout form (2)",
+          "solved": 1
+        },
+        {
+          "id": "w03",
+          "title": "Checkout form (3)",
+          "solved": 1
+        },
+        {
+          "id": "w04",
+          "title": "Sortable invoice table",
+          "solved": 1
+        },
+        {
+          "id": "w05",
+          "title": "Sortable invoice table (2)",
+          "solved": 1
+        },
+        {
+          "id": "w06",
+          "title": "Sortable invoice table (3)",
+          "solved": 1
+        },
+        {
+          "id": "w07",
+          "title": "Destructive confirm dialog",
+          "solved": 1
+        },
+        {
+          "id": "w08",
+          "title": "Destructive confirm dialog (2)",
+          "solved": 1
+        },
+        {
+          "id": "w09",
+          "title": "Destructive confirm dialog (3)",
+          "solved": 1
+        },
+        {
+          "id": "w10",
+          "title": "Site header",
+          "solved": 1
+        },
+        {
+          "id": "w11",
+          "title": "Site header (2)",
+          "solved": 1
+        },
+        {
+          "id": "w12",
+          "title": "Site header (3)",
+          "solved": 1
+        },
+        {
+          "id": "w13",
+          "title": "Pricing plans",
+          "solved": 1
+        },
+        {
+          "id": "w14",
+          "title": "Pricing plans (2)",
+          "solved": 1
+        },
+        {
+          "id": "w15",
+          "title": "Pricing plans (3)",
+          "solved": 0
+        },
+        {
+          "id": "w16",
+          "title": "Sign-up with validation",
+          "solved": 0
+        },
+        {
+          "id": "w17",
+          "title": "Sign-up with validation (2)",
+          "solved": 0
+        },
+        {
+          "id": "w18",
+          "title": "Sign-up with validation (3)",
+          "solved": 0
+        },
+        {
+          "id": "w19",
+          "title": "Image gallery",
+          "solved": 0
+        },
+        {
+          "id": "w20",
+          "title": "Image gallery (2)",
+          "solved": 0
+        }
+      ],
+      "samples": [],
+      "pages": [
+        {
+          "id": "w01",
+          "family": "checkout",
+          "title": "Checkout form",
+          "file": "run-08/checkout-w01.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1629
+        },
+        {
+          "id": "w02",
+          "family": "checkout",
+          "title": "Checkout form (2)",
+          "file": "run-08/checkout-w02.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1637
+        },
+        {
+          "id": "w03",
+          "family": "checkout",
+          "title": "Checkout form (3)",
+          "file": "run-08/checkout-w03.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1637
+        },
+        {
+          "id": "w04",
+          "family": "invoices",
+          "title": "Sortable invoice table",
+          "file": "run-08/invoices-w04.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1796
+        },
+        {
+          "id": "w05",
+          "family": "invoices",
+          "title": "Sortable invoice table (2)",
+          "file": "run-08/invoices-w05.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1804
+        },
+        {
+          "id": "w06",
+          "family": "invoices",
+          "title": "Sortable invoice table (3)",
+          "file": "run-08/invoices-w06.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1804
+        },
+        {
+          "id": "w07",
+          "family": "dialog",
+          "title": "Destructive confirm dialog",
+          "file": "run-08/dialog-w07.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1396
+        },
+        {
+          "id": "w08",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (2)",
+          "file": "run-08/dialog-w08.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1404
+        },
+        {
+          "id": "w09",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (3)",
+          "file": "run-08/dialog-w09.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1404
+        },
+        {
+          "id": "w10",
+          "family": "header",
+          "title": "Site header",
+          "file": "run-08/header-w10.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1524
+        },
+        {
+          "id": "w11",
+          "family": "header",
+          "title": "Site header (2)",
+          "file": "run-08/header-w11.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1532
+        },
+        {
+          "id": "w12",
+          "family": "header",
+          "title": "Site header (3)",
+          "file": "run-08/header-w12.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1532
+        },
+        {
+          "id": "w13",
+          "family": "pricing",
+          "title": "Pricing plans",
+          "file": "run-08/pricing-w13.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1489
+        },
+        {
+          "id": "w14",
+          "family": "pricing",
+          "title": "Pricing plans (2)",
+          "file": "run-08/pricing-w14.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1497
+        },
+        {
+          "id": "w15",
+          "family": "pricing",
+          "title": "Pricing plans (3)",
+          "file": "run-08/pricing-w15.html",
+          "passed": false,
+          "weighted": 30,
+          "critical": 3,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 3
+            }
+          ],
+          "missing": [],
+          "bytes": 1559
+        },
+        {
+          "id": "w16",
+          "family": "signup",
+          "title": "Sign-up with validation",
+          "file": "run-08/signup-w16.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1470
+        },
+        {
+          "id": "w17",
+          "family": "signup",
+          "title": "Sign-up with validation (2)",
+          "file": "run-08/signup-w17.html",
+          "passed": false,
+          "weighted": 10,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "button-name",
+              "impact": "critical",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1478
+        },
+        {
+          "id": "w18",
+          "family": "signup",
+          "title": "Sign-up with validation (3)",
+          "file": "run-08/signup-w18.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w19",
+          "family": "gallery",
+          "title": "Image gallery",
+          "file": "run-08/gallery-w19.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2510
+        },
+        {
+          "id": "w20",
+          "family": "gallery",
+          "title": "Image gallery (2)",
+          "file": "run-08/gallery-w20.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2518
+        }
+      ],
+      "diff": "",
+      "diff_summary": "reject a candidate whose own audit is not clean",
+      "cost_usd": 0.26,
+      "router_rows": [],
+      "manifest": {},
+      "manifest_check": {},
+      "debrief": {},
+      "tts_ghost": null,
+      "rl": null,
+      "circuit": null
+    },
+    {
+      "generation": 9,
+      "mode": "attended",
+      "claimed_s": 67.533,
+      "official_s": 68.433,
+      "d_quali": 3.477,
+      "d_sealed": 3.437,
+      "rule_fired": "no_upgrade",
+      "role": null,
+      "part": null,
+      "prefix": " ",
+      "promoted": false,
+      "verdict": "LEGAL",
+      "black_flags": [],
+      "gates": [],
+      "standings": {},
+      "alternatives": [],
+      "notes": [],
+      "patterns": [],
+      "tasks": [
+        {
+          "id": "w01",
+          "title": "Checkout form",
+          "solved": 1
+        },
+        {
+          "id": "w02",
+          "title": "Checkout form (2)",
+          "solved": 1
+        },
+        {
+          "id": "w03",
+          "title": "Checkout form (3)",
+          "solved": 1
+        },
+        {
+          "id": "w04",
+          "title": "Sortable invoice table",
+          "solved": 1
+        },
+        {
+          "id": "w05",
+          "title": "Sortable invoice table (2)",
+          "solved": 1
+        },
+        {
+          "id": "w06",
+          "title": "Sortable invoice table (3)",
+          "solved": 1
+        },
+        {
+          "id": "w07",
+          "title": "Destructive confirm dialog",
+          "solved": 1
+        },
+        {
+          "id": "w08",
+          "title": "Destructive confirm dialog (2)",
+          "solved": 1
+        },
+        {
+          "id": "w09",
+          "title": "Destructive confirm dialog (3)",
+          "solved": 1
+        },
+        {
+          "id": "w10",
+          "title": "Site header",
+          "solved": 1
+        },
+        {
+          "id": "w11",
+          "title": "Site header (2)",
+          "solved": 1
+        },
+        {
+          "id": "w12",
+          "title": "Site header (3)",
+          "solved": 1
+        },
+        {
+          "id": "w13",
+          "title": "Pricing plans",
+          "solved": 1
+        },
+        {
+          "id": "w14",
+          "title": "Pricing plans (2)",
+          "solved": 1
+        },
+        {
+          "id": "w15",
+          "title": "Pricing plans (3)",
+          "solved": 1
+        },
+        {
+          "id": "w16",
+          "title": "Sign-up with validation",
+          "solved": 1
+        },
+        {
+          "id": "w17",
+          "title": "Sign-up with validation (2)",
+          "solved": 1
+        },
+        {
+          "id": "w18",
+          "title": "Sign-up with validation (3)",
+          "solved": 0
+        },
+        {
+          "id": "w19",
+          "title": "Image gallery",
+          "solved": 0
+        },
+        {
+          "id": "w20",
+          "title": "Image gallery (2)",
+          "solved": 0
+        }
+      ],
+      "samples": [],
+      "pages": [
+        {
+          "id": "w01",
+          "family": "checkout",
+          "title": "Checkout form",
+          "file": "run-09/checkout-w01.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1629
+        },
+        {
+          "id": "w02",
+          "family": "checkout",
+          "title": "Checkout form (2)",
+          "file": "run-09/checkout-w02.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1637
+        },
+        {
+          "id": "w03",
+          "family": "checkout",
+          "title": "Checkout form (3)",
+          "file": "run-09/checkout-w03.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1637
+        },
+        {
+          "id": "w04",
+          "family": "invoices",
+          "title": "Sortable invoice table",
+          "file": "run-09/invoices-w04.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1796
+        },
+        {
+          "id": "w05",
+          "family": "invoices",
+          "title": "Sortable invoice table (2)",
+          "file": "run-09/invoices-w05.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1804
+        },
+        {
+          "id": "w06",
+          "family": "invoices",
+          "title": "Sortable invoice table (3)",
+          "file": "run-09/invoices-w06.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1804
+        },
+        {
+          "id": "w07",
+          "family": "dialog",
+          "title": "Destructive confirm dialog",
+          "file": "run-09/dialog-w07.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1396
+        },
+        {
+          "id": "w08",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (2)",
+          "file": "run-09/dialog-w08.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1404
+        },
+        {
+          "id": "w09",
+          "family": "dialog",
+          "title": "Destructive confirm dialog (3)",
+          "file": "run-09/dialog-w09.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1404
+        },
+        {
+          "id": "w10",
+          "family": "header",
+          "title": "Site header",
+          "file": "run-09/header-w10.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1524
+        },
+        {
+          "id": "w11",
+          "family": "header",
+          "title": "Site header (2)",
+          "file": "run-09/header-w11.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1532
+        },
+        {
+          "id": "w12",
+          "family": "header",
+          "title": "Site header (3)",
+          "file": "run-09/header-w12.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1532
+        },
+        {
+          "id": "w13",
+          "family": "pricing",
+          "title": "Pricing plans",
+          "file": "run-09/pricing-w13.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1489
+        },
+        {
+          "id": "w14",
+          "family": "pricing",
+          "title": "Pricing plans (2)",
+          "file": "run-09/pricing-w14.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1497
+        },
+        {
+          "id": "w15",
+          "family": "pricing",
+          "title": "Pricing plans (3)",
+          "file": "run-09/pricing-w15.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1497
+        },
+        {
+          "id": "w16",
+          "family": "signup",
+          "title": "Sign-up with validation",
+          "file": "run-09/signup-w16.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1451
+        },
+        {
+          "id": "w17",
+          "family": "signup",
+          "title": "Sign-up with validation (2)",
+          "file": "run-09/signup-w17.html",
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
+          "missing": [],
+          "bytes": 1459
+        },
+        {
+          "id": "w18",
+          "family": "signup",
+          "title": "Sign-up with validation (3)",
+          "file": "run-09/signup-w18.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 1522
+        },
+        {
+          "id": "w19",
+          "family": "gallery",
+          "title": "Image gallery",
+          "file": "run-09/gallery-w19.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2510
+        },
+        {
+          "id": "w20",
+          "family": "gallery",
+          "title": "Image gallery (2)",
+          "file": "run-09/gallery-w20.html",
+          "passed": false,
+          "weighted": 5,
+          "critical": 1,
+          "rules": [
+            {
+              "id": "aria-hidden-focus",
+              "impact": "serious",
+              "n": 1
+            }
+          ],
+          "missing": [],
+          "bytes": 2518
+        }
+      ],
+      "diff": "",
+      "diff_summary": "",
+      "cost_usd": 0.27,
+      "router_rows": [],
+      "manifest": {},
+      "manifest_check": {},
+      "debrief": {},
+      "tts_ghost": null,
+      "rl": null,
+      "circuit": null
+    }
+  ],
+  "selection_latest": null
+}
