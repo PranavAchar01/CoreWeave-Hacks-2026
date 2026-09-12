@@ -70,6 +70,28 @@ ground out of sample: **the loop overfit its own sealed split**. On HumanEval th
 flat null (94.7% both ways, *p* = 1.0, n=114) on a benchmark too saturated to measure a harness at
 all — its baseline fails 6 of 114.
 
+## Sponsor tools, and what each one actually does here
+
+Every rail sits behind an adapter that reports whether it served live or as a labelled stand-in.
+`uv run scrutineer doctor` prints that table, and the honesty panel on the site prints it too — so
+this list can be checked rather than taken on trust.
+
+| tool | what it does in the loop |
+|---|---|
+| **W&B Inference** | the model the agent runs on. OpenAI-compatible client against `api.inference.wandb.ai`, routed and billed through `entity/project`. |
+| **W&B Weave** | every generation traced — build, audit, replay, blame, gate. The Evals tab carries the held-out scores the gates read. |
+| **W&B Runs** | one run per component, so credit assigned to RETRIEVAL or VERIFICATION is a curve you can open, not a number in a log. |
+| **W&B Registry** | each harness version registered with an alias, so the thing that raced is the thing that was promoted. |
+| **W&B Serverless RL** | `scrutineer train` registers a real LoRA job and collects rollouts through the trainer's own client. |
+| **W&B Sandboxes** | the agent's own code runs isolated rather than in-process. |
+| **ARIA** | the board the loop reports generations to. |
+| **TypeSafe System1** | typed decisions for the pit wall, the credit router and the scrutineer, in place of the local policy. |
+| **marimo** | the debrief. Each generation writes an executable notebook that has to reproduce the promotion decision, and a promotion that cannot be reproduced is refused. |
+
+Two of these did not go our way and are documented as such: serving a fine-tuned checkpoint is not
+available on this account, so RL rollouts never reach a model, and managed sandboxes are enabled
+per organisation on request. Both are labelled stand-ins in `doctor`, never quietly faked.
+
 ## Running it
 
 ```bash
