@@ -701,6 +701,7 @@ function ghostGap() {
 // down them under a limiter by the same physics as everywhere else, with a lateral offset.
 // ---------------------------------------------------------------------------------------
 const LIMITER = 22, BOX_HOLD = 2.4, BLEND = 34;   // m/s, seconds, metres to cross into the lane
+const PIT_DECEL = 5.5;                            // m/s^2 on the way into the box
 const pit = track.pit = { state: 'off', pending: null, t: 0, clock: 0 };
 
 function pitLane() { return track.scene && track.scene.world && track.scene.world.pit; }
@@ -734,7 +735,7 @@ function aheadOf(idx) {
 function pitStep(dt) {
   const p = pitLane();
   if (!p || pit.state === 'off') return undefined;
-  const car = track.car, lane = p.lane;
+  const car = track.car, lane = p.lane, circ = track.scene.circ;
 
   if (pit.state === 'called') {
     // wait for the entry to come round; start crossing once it is close
@@ -748,13 +749,19 @@ function pitStep(dt) {
     // cross into the lane over the first stretch past the entry, not in one step
     const past = -aheadOf(p.entry);
     car.off = lane * Math.max(0, Math.min(1, past / BLEND));
+    // Brake onto the box, not merely to a halt somewhere near it. A flat zero cap thirty metres
+    // out just meant the car shed speed at whatever rate it could and parked where it ran out —
+    // seventeen metres short of the stall, every time. The cap follows v = sqrt(2ad) instead, so
+    // it is still moving at ten metres out and reaches zero at the box.
     const d = aheadOf(p.box);
-    // Brake into the box rather than arriving at it still doing eighty, so the clock measures
-    // a car that is actually stationary.
-    if (d < 30 || d > 200) {
-      if (car.speed < 0.8) { pit.state = 'stopped'; pit.t = 0; car.off = lane; }
+    if (d <= 0.3 || (car.speed < 0.7 && d < 2.5)) {
+      // park it on the mark rather than a few centimetres either side of it
+      car.s = ((p.box * circ.step) % circ.len + circ.len) % circ.len;
+      car.speed = 0; car.off = lane;
+      pit.state = 'stopped'; pit.t = 0;
       return 0;
     }
+    if (d > 0 && d < 60) return Math.min(LIMITER, Math.sqrt(2 * PIT_DECEL * d));
     return LIMITER;
   }
 
@@ -1407,7 +1414,11 @@ function phase(name) {
   if (name === 'CHANGE') {
     st.dur = 7;
     button('WRITING THE CHANGE', false);
-    if (!r.diff) { phase('RESULT'); return; }
+    // A run that wrote nothing goes to the result. A run that wrote something but exported no
+    // diff text still has a change to describe and still has ten gates to clear — bailing to
+    // RESULT on a missing diff took the gates down with it, so the ten checks the whole thing
+    // rests on never played at all during normal viewing.
+    if (!r.role && !r.diff_summary) { phase((r.gates || []).length ? 'GATES' : 'RESULT'); return; }
     const p = BY_KEY[r.role] || { name: r.role };
     say(`The race engineer wrote a change to <b>${esc(p.name)}</b>: `
       + `<span class="num">${esc(r.diff_summary || 'a revision')}</span>. `
@@ -1476,6 +1487,10 @@ function phase(name) {
     keepScore(r, true);
     button(st.i + 1 < st.rounds.length ? 'RUN AGAIN' : 'START OVER', true);
     st.playing = false;
+    // RESULT is the end of the phase list, so the frame loop stops advancing here. Nothing
+    // re-armed the run timer, which meant the season played exactly one run and stood still
+    // for ever after. Arm it: the loop runs on its own or it is not a loop.
+    scheduleNext(Math.round(st.dur * 1000));
     return;
   }
 }
@@ -1577,6 +1592,15 @@ function showBlame(r, blame) {
 function showDiff(r) {
   const host = work('THE CHANGE IT MADE TO ITSELF', r.part ? `now ${r.part}` : '');
   if (!host) return;
+  if (!r.diff) {
+    // No diff text in the bundle: say what the change was rather than print an empty box.
+    const p = el('p', 'page-note');
+    p.innerHTML = `<b>${esc((BY_KEY[r.role] || { name: r.role || '' }).name)}</b> \u2014 `
+      + `${esc(r.diff_summary || 'a revision')}. The diff itself is not in this export; the `
+      + 'change was written against that component\u2019s own files and is in the signed chain.';
+    host.append(p);
+    return;
+  }
   const box = el('div', 'code');
   box.innerHTML = (r.diff || '').split('\n').slice(0, 40).map(line => {
     const c = line.startsWith('+++') || line.startsWith('---') ? '' :

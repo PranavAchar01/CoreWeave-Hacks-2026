@@ -6102,8 +6102,10 @@ Wd.build = function (c, opts = {}) {
         const crew = (q, m) => { box(q[0], 0.42, q[2], 0.34, 0.84, 0.34, m);
           box(q[0], 1.02, q[2], 0.42, 0.36, 0.42, M.BODY);
           box(q[0], 1.32, q[2], 0.3, 0.26, 0.3, m); };
-        for (const [d, w, m] of [[-1, 2.95, M.GOLD], [1, 2.95, M.GOLD],
-                                 [-1, 4.3, M.CYAN], [1, 4.3, M.CYAN], [0, 4.6, M.STRIPE]]) {
+        // Clear of the car, which sits on the lane centre at ROAD_W + 3.5 and is about a
+        // metre wide over the wheels.
+        for (const [d, w, m] of [[-1, 2.35, M.GOLD], [1, 2.35, M.GOLD],
+                                 [-1, 4.75, M.CYAN], [1, 4.75, M.CYAN], [0, 5.1, M.STRIPE]]) {
           const q = pos(BOX + d, side * (ROAD_W + w));
           if (clearOfTrack(q[0], q[2], ROAD_W - 1.2)) crew(q, m);
         }
