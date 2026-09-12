@@ -79,6 +79,9 @@ const fx = (n, d = 2) => (n === null || n === undefined || isNaN(n)) ? '—' : N
 const st = S.state = {
   rounds: [], i: -1, phase: 'INTRO', t: 0, dur: 0, levels: {}, shown: 0,
   playing: false, best: null, first: null, solvedNow: 0, seenTasks: [], bundle: null,
+  // The race is the default and it never stops. `garage` is a place you choose to go, and
+  // `pending` is the change waiting there for you — the loop carries on racing either way.
+  view: 'track', garage: false, pending: null,
 };
 
 function levelsAt(n) {
@@ -330,6 +333,7 @@ S.init = function (app) {
   buildRig();
   if (SCR.dash) SCR.dash.build();
   wire();
+  paintMode();
   enterIntro();
   detectLive().then(ok => {
     if (ok) enterLiveIntro();
@@ -383,6 +387,7 @@ function paintRig(bumped) {
 function focusPart(key) {
   const g = SCR.scenes.garage;
   for (const n of document.querySelectorAll('.part')) n.classList.toggle('sel', n.dataset.part === key);
+  if (!st.garage) { st.garage = true; paintMode(); }
   if (A.sceneName !== 'garage') showGarage();
   if (g) { const ui = (BY_KEY[key] || {}).ui; g.select(ui); g.setCamera('STATION_' + ui); }
   const p = BY_KEY[key];
@@ -508,9 +513,9 @@ function scheduleNext(ms) {
 // ---------------------------------------------------------------------------------------
 // scenes
 // ---------------------------------------------------------------------------------------
-function harnessSpec() {
+function harnessSpec(levels) {
   // the car is the harness: each component that levels up changes a part you can see
-  const lv = st.levels, C = SCR.car;
+  const lv = levels || st.levels, C = SCR.car;
   const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
   return {
     ...C.GEN01,
@@ -534,8 +539,10 @@ function teamFor() {
   return team;
 }
 
+// The garage is only ever entered on purpose. Every phase that used to cut to it now just
+// asks, and the ask is silently dropped while the race is on screen.
 function showGarage(role, close) {
-  const g = SCR.scenes.garage; if (!g) return;
+  const g = SCR.scenes.garage; if (!g || !st.garage) return;
   if (A.sceneName !== 'garage') A.setScene('garage', { spec: harnessSpec(), era: 0 });
   g.setTeam(teamFor(), harnessSpec());
   const ui = role ? (BY_KEY[role] || {}).ui : null;
@@ -545,37 +552,896 @@ function showGarage(role, close) {
   g.setCamera(close && ui ? 'STATION_' + ui : 'OVERVIEW');
 }
 
+// ---------------------------------------------------------------------------------------
+// race mode vs garage mode
+//
+// Race mode is the whole screen: the car, and nothing else. The harness rail, the narration
+// line, the meters and the work panel all belong to the garage, because that is where you go
+// to read about a change. TELEMETRY carries every number in either mode.
+// ---------------------------------------------------------------------------------------
+function paintMode() {
+  const app = $('app');
+  if (app) app.classList.toggle('race', st.view === 'track' && !st.garage);
+  const back = $('trackBack'); if (back) back.hidden = !(st.view === 'track' && st.garage);
+  if (st.garage) { const call = $('garageCall'); if (call) call.hidden = true; }
+}
+
+// Raised only when the loop actually kept a change. It waits; it does not interrupt.
+function callToGarage(r) {
+  st.pending = r;
+  const call = $('garageCall'); if (!call || st.garage) return;
+  const p = BY_KEY[r.role] || { name: r.role || '', does: '' };
+  const eye = $('gcEyebrow'), what = $('gcWhat');
+  if (eye) eye.textContent = `${p.name} \u2192 L${st.levels[r.role] || 1}`;
+  if (what) what.textContent = r.diff_summary || p.does || 'a revision to the harness';
+  call.hidden = false;
+}
+
+function openGarage() {
+  const r = st.pending;
+  st.garage = true;
+  paintMode();
+  showGarage(r && r.role, !!r);
+  if (r) {
+    const g = SCR.scenes.garage, ui = (BY_KEY[r.role] || {}).ui;
+    if (g && g.playUpgrade && ui) {
+      g.playUpgrade(ui, { name: (r.part || 'REVISION'), blurb: r.diff_summary || '',
+        tier: Math.min(3, (st.levels[r.role] || 1) - 1) });
+    }
+    const p = BY_KEY[r.role] || { name: r.role || '' };
+    say(`<b>${esc(p.name)}</b> is now level <span class="num">${st.levels[r.role] || 1}</span>. `
+      + `<span class="num">${esc(r.diff_summary || 'a revision')}</span> — written by the agent `
+      + 'against its own files, and kept because it cleared all ten checks.');
+  }
+  paintRig(r && r.role);
+}
+
+function closeGarage() {
+  st.garage = false; st.pending = null;
+  paintMode();
+  enterTrack();
+}
+
+// The race, resumed rather than restarted — unless the season has moved to the next run, which
+// is a different circuit, built with however much of the improvement has landed by then.
+function enterTrack(newRound) {
+  if (A.sceneName !== 'run') { A.setScene('run'); return; }
+  if (newRound && track.seed !== trackSeed()) { A.setScene('run'); return; }
+  if (track.refit) track.refit();
+}
+
+// How much of the season's improvement has landed, 0..1. The circuit is built around this:
+// early runs race a bare track on a quiet evening, late ones a full house under lights.
+function progress() {
+  const maxKept = st.rounds.filter(r => r.promoted).length;
+  const got = Object.values(st.levels).reduce((a, b) => a + b, 0) - ALL.length;
+  return maxKept ? Math.max(0, Math.min(1, got / maxKept)) : 0;
+}
+
+// Two runs of this page should not be the same race. Unless a seed was asked for on the URL —
+// screenshots and the diagnostic harness need that — every session gets its own salt, so the
+// circuits it draws and the way the director covers them are new each time.
+let SALT = null;
+function salt() {
+  if (SALT === null) SALT = (A.params && A.params.seed) ? 0 : (Math.random() * 0x7FFFFFFF) | 0;
+  return SALT;
+}
+// Clamped at run 1: before the first run starts st.i is -1, so the intro used to build a
+// circuit nobody ever races, and two seconds later the first run rebuilt a different one. The
+// track you see on load is the track run 1 is about to be raced on.
+const trackSeed = () => (A.seed + Math.max(0, st.i) * 7 + salt()) | 0;
+
 const track = { name: 'run' };
 track.enter = function () {
-  const circ = SCR.world.makeCircuit(A.seed + st.i * 7), world = SCR.world.build(circ);
+  pitAbort();
+  const seed = trackSeed();
+  const circ = SCR.world.makeCircuit(seed);
+  // Where this one is: the sky and the ground the world is painted in.
+  SCR.world.applyVenue(R, circ.venue);
+  const world = SCR.world.build(circ, { detail: progress() });
+  track.seed = seed;
   track.spec = harnessSpec();
   track.dd = SCR.car.derive(track.spec);
   track.mesh = SCR.car.build(track.spec, 0);
   track.car = SCR.car.newState();
   SCR.sim.physics(track.car, track.dd, track.spec, circ, 0, {});
-  track.scene = SCR.trackScene.create({ R, world, car: track.car });
-  track.scene.setMode('CHASE');   // always frames the car; TV cuts in once it is moving
-  track.camT = 0;
+  // The car the agent was on run 1, on the same circuit, from the same standing start. It is
+  // not a handicap or a target time — it is the run-1 harness put through the same physics, so
+  // the gap that opens is exactly the improvement the loop has actually kept.
+  track.ghostSpec = harnessSpec(levelsAt(0));
+  track.ghostDd = SCR.car.derive(track.ghostSpec);
+  track.ghostMesh = SCR.car.build(track.ghostSpec, 0);
+  track.ghost = SCR.car.newState();
+  SCR.sim.physics(track.ghost, track.ghostDd, track.ghostSpec, circ, 0, {});
+  // The director carries its own seed, so the same circuit is covered differently each session.
+  track.scene = SCR.trackScene.create({ R, world, car: track.car, ghost: track.ghost,
+    seed: (seed ^ 0x5F3759D) | 0 });
+  track.scene.ghostActive = ghostWorthShowing();
+  track.scene.setMode('AUTO');
+  track.circuitName = circ.name;
+  track.venue = circ.venue;
+  track.shape = circ.shape;
 };
 track.update = function (dt) {
-  SCR.sim.physics(track.car, track.dd, track.spec, track.scene.circ, dt, { fx: track.scene.fx });
+  const circ = track.scene.circ;
+  const lapWas = track.car.lapsDone;
+  const cap = pitStep(dt);
+  SCR.sim.physics(track.car, track.dd, track.spec, circ, dt,
+    { fx: track.scene.fx, speedCap: cap });
+  if (track.scene.ghostActive) {
+    SCR.sim.physics(track.ghost, track.ghostDd, track.ghostSpec, circ, dt, {});
+    // The ghost is a lap reference, not a cumulative one. Both cars start every lap together at
+    // the line, so what you watch open up is the time this harness gains over the old one in a
+    // single lap — and you get to watch it happen again every lap instead of once.
+    if (track.car.lapsDone !== lapWas) {
+      track.ghost.s = track.car.s;
+      track.ghost.lapsDone = track.car.lapsDone;
+      track.ghost.lap = track.car.lap;
+      if (track.scene.duel) track.scene.duel();
+    }
+  }
   SCR.sim.stepSparks(track.scene.fx, dt);
-  track.camT += dt;
-  if (track.camT > 5.0) { track.camT = 0;
-    const modes = ['CHASE', 'TV', 'HELI', 'ONBOARD', 'CHASE'];
-    track.cut = ((track.cut || 0) + 1) % modes.length;
-    track.scene.setMode(modes[track.cut]); }
   track.scene.updateCamera(dt);
 };
-track.render = function () { track.scene.render({ car: track.mesh }); };
+track.render = function () { track.scene.render({ car: track.mesh, ghost: track.ghostMesh }); };
+
+// Nothing to compare against until at least one change has stuck.
+function ghostWorthShowing() {
+  return Object.values(st.levels).some(v => v > 1);
+}
+
+// How far ahead of its old self the agent is, in seconds: the distance between the two cars,
+// over the speed the old car is doing. That is what a gap is.
+function ghostGap() {
+  if (!track.scene || !track.scene.ghostActive || !track.ghost) return null;
+  const len = track.scene.circ.len;
+  let d = track.car.s - track.ghost.s;
+  if (d > len / 2) d -= len; if (d < -len / 2) d += len;
+  const v = Math.max(8, track.ghost.speed);
+  return { d, s: d / v };
+}
+// ---------------------------------------------------------------------------------------
+// The pit stop.
+//
+// A kept change is a part fitted to the car, so the car comes in and has it fitted. The lane,
+// the box and the openings in the armco are real geometry from world.build; the car is driven
+// down them under a limiter by the same physics as everywhere else, with a lateral offset.
+// ---------------------------------------------------------------------------------------
+const LIMITER = 22, BOX_HOLD = 2.4, BLEND_MAX = 95;   // m/s, seconds, metres to cross the lane
+const PIT_DECEL = 5.5;                            // m/s^2 on the way into the box
+// Crossing in and out on a straight ramp leaves a kink at each end, because the car's sideways
+// speed jumps from nothing to full and back. Smoothstep starts and finishes at zero.
+const ease = t => { const k = Math.max(0, Math.min(1, t)); return k * k * (3 - 2 * k); };
+const pit = track.pit = { state: 'off', pending: null, t: 0, clock: 0 };
+
+function pitLane() { return track.scene && track.scene.world && track.scene.world.pit; }
+
+// Ask for a stop. It happens the next time the car reaches the pit entry, the way it would.
+function callToPits(r) {
+  if (!pitLane() || !r || !r.role) return false;
+  pit.pending = { role: r.role, part: r.part || 'REVISION', summary: r.diff_summary || '' };
+  if (pit.state === 'off') pit.state = 'called';
+  return true;
+}
+
+function pitAbort() {
+  if (pit.thenCall && pit.state !== 'off') { callToGarage(pit.thenCall); }
+  pit.thenCall = null;
+  pit.state = 'off'; pit.pending = null; pit.fitted = null;
+  if (track.car) { track.car.off = 0; track.car.lift = 0; }
+  if (track.scene && (track.scene.mode === 'PITLANE' || track.scene.mode === 'STUDIO')) track.scene.setMode('AUTO');
+}
+
+// distance from the car to a circuit index, forwards along the lap
+function aheadOf(idx) {
+  const circ = track.scene.circ;
+  let d = idx * circ.step - track.car.s;
+  while (d < -circ.len / 2) d += circ.len;
+  while (d > circ.len / 2) d -= circ.len;
+  return d;
+}
+
+// Returns the speed cap to apply this frame, or undefined.
+function pitStep(dt) {
+  const p = pitLane();
+  if (!p || pit.state === 'off') return undefined;
+  const car = track.car, lane = p.lane, circ = track.scene.circ;
+  // How much road there is to cross the lane in. A car cannot step ten metres sideways in forty
+  // metres of track without sliding, so the crossing is spread over as much of the run to the
+  // box (and from the box to the exit) as is available, up to a sensible maximum.
+  const inRun = Math.max(20, (p.box - p.entry) * circ.step * 0.75);
+  const outRun = Math.max(20, (p.exit - p.box) * circ.step * 0.75);
+  const blendIn = Math.min(BLEND_MAX, inRun), blendOut = Math.min(BLEND_MAX, outRun);
+
+  if (pit.state === 'called') {
+    // wait for the entry to come round; start crossing once it is close
+    const d = aheadOf(p.entry);
+    if (d > 0 && d < 6) { pit.state = 'enter'; pit.t = 0; pit.clock = 0; }
+    // Come down to the limiter on a profile that arrives at it exactly at the entry, rather
+    // than standing on the brakes the moment the entry is within range.
+    if (d > 0 && d < 170) return Math.sqrt(LIMITER * LIMITER + 2 * PIT_DECEL * d);
+    return undefined;
+  }
+
+  if (pit.state === 'enter') {
+    if (track.scene && track.scene.mode !== 'PITLANE') track.scene.setMode('PITLANE');
+    // cross into the lane over the first stretch past the entry, eased at both ends
+    const past = -aheadOf(p.entry);
+    car.off = lane * ease(past / blendIn);
+    // Brake onto the box, not merely to a halt somewhere near it. A flat zero cap thirty metres
+    // out just meant the car shed speed at whatever rate it could and parked where it ran out —
+    // seventeen metres short of the stall, every time. The cap follows v = sqrt(2ad) instead, so
+    // it is still moving at ten metres out and reaches zero at the box.
+    const d = aheadOf(p.box);
+    if (d <= 0.3 || (car.speed < 0.7 && d < 2.5)) {
+      // park it on the mark rather than a few centimetres either side of it
+      car.s = ((p.box * circ.step) % circ.len + circ.len) % circ.len;
+      car.speed = 0; car.off = lane;
+      pit.state = 'stopped'; pit.t = 0;
+      return 0;
+    }
+    if (d > 0 && d < 60) return Math.min(LIMITER, Math.sqrt(2 * PIT_DECEL * d));
+    return LIMITER;
+  }
+
+  if (pit.state === 'stopped') {
+    car.off = lane;
+    pit.t += dt; pit.clock = pit.t;
+    // On the jacks while it is worked on, and dropped on release.
+    const up = Math.min(1, pit.t / 0.35) * (pit.t > BOX_HOLD - 0.3 ? Math.max(0, (BOX_HOLD - pit.t) / 0.3) : 1);
+    car.lift = 0.11 * up;
+    // The part goes on halfway through the stop, so the car that leaves is the new one.
+    if (pit.t > BOX_HOLD * 0.5 && pit.pending) {
+      const done = pit.pending;
+      st.levels = levelsAt(st.i + 1);
+      paintRig(done.role);
+      track.refit();
+      pit.fitted = done; pit.pending = null;
+      paintRail(done.role);
+      showSting(done.role, st.levels[done.role] || 1, done.summary);
+    }
+    if (pit.t >= BOX_HOLD) { pit.state = 'exit'; pit.t = 0; car.lift = 0; }
+    return 0;
+  }
+
+  if (pit.state === 'exit') {
+    const d = aheadOf(p.exit);
+    car.off = lane * ease(d / blendOut);
+    pit.t += dt;
+    if (pit.t > 1.6 && track.scene && track.scene.mode === 'PITLANE') track.scene.setMode('AUTO');
+    if ((d <= 0.6 && d > -30) || pit.t > 12) {
+      car.off = 0; car.lift = 0; pit.state = 'off'; pit.fitted = null;
+      if (pit.thenCall) { callToGarage(pit.thenCall); pit.thenCall = null; }
+    }
+    // Hold the limiter while any part of the car is still off the racing line, then let it go
+    // rather than dropping the cap the instant the exit line passes.
+    return Math.abs(car.off) > Math.abs(lane) * 0.06 ? LIMITER : undefined;
+  }
+  return undefined;
+}
+
+function paintPit() {
+  const host = $('rhPit'); if (!host) return;
+  const on = pit.state !== 'off';
+  host.hidden = !on;
+  // The stop owns the bottom of the screen while it is happening; an offer to go and read about
+  // a change can wait until the car is back out.
+  const call = $('garageCall');
+  if (call) {
+    if (on) call.hidden = true;
+    else if (st.pending && !st.garage) call.hidden = false;
+  }
+  if (!on) return;
+  const what = pit.pending || pit.fitted || {};
+  const p = BY_KEY[what.role] || { name: what.role || '' };
+  const label = pit.state === 'called' ? 'BOX BOX'
+    : pit.state === 'enter' ? 'PIT ENTRY'
+    : pit.state === 'stopped' ? 'IN THE BOX' : 'PIT EXIT';
+  host.className = 'rh-pit' + (pit.state === 'exit' ? ' done' : '');
+  put('pitState', label);
+  put('pitClock', pit.state === 'stopped' ? pit.clock.toFixed(1) + 's'
+    : pit.state === 'exit' ? BOX_HOLD.toFixed(1) + 's' : '');
+  const n = $('pitWhat');
+  const html = `<b>${esc(p.name)}</b> \u2014 ${esc(what.summary || 'a revision to the harness')}`;
+  if (n && n.dataset.h !== html) { n.innerHTML = html; n.dataset.h = html; }
+}
+
+// A kept change reaches the car without stopping it: new bodywork, same lap, same corner.
+track.refit = function () {
+  if (!track.scene) return;
+  const spec = harnessSpec();
+  if (JSON.stringify(spec) === JSON.stringify(track.spec)) return;
+  track.spec = spec;
+  track.dd = SCR.car.derive(spec);
+  track.mesh = SCR.car.build(spec, 0);
+  track.scene.ghostActive = ghostWorthShowing();
+};
 SCR.scenes.run = track;
+
+// ---------------------------------------------------------------------------------------
+// The world feed: the broadcast furniture over the race. Everything in the timing tower comes
+// out of the loop's own bundle. The only invented readings are the car's speed and gear, and
+// those are the car — not a measurement of the agent.
+// ---------------------------------------------------------------------------------------
+const PHASE_TAG = {
+  RUN:      ['BUILDING', 'build'],
+  SCORE:    ['SCORING', ''],
+  DIAGNOSE: ['FINDING THE CAUSE', 'blame'],
+  SELECT:   ['SELECTING', 'blame'],
+  CHANGE:   ['WRITING A CHANGE', 'change'],
+  GATES:    ['CHECKING', 'gates'],
+  RESULT:   ['RESULT', ''],
+  INTRO:    ['STANDING BY', ''],
+};
+// ---------------------------------------------------------------------------------------
+// Sectors. Not a grouping invented for the picture: the loop read its own ledger as a
+// component x family matrix and found the families separate into two populations, one
+// limited by RETRIEVAL and one by VERIFICATION. Those are S1 and S2. S3 is what fell
+// outside the partition. loop/state/sides.json is where the split comes from.
+// ---------------------------------------------------------------------------------------
+const SECTORS = [
+  { name: 'FORMS & TABLES', families: ['checkout', 'invoices', 'signup', 'stepper'] },
+  { name: 'COMPONENTS', families: ['dialog', 'gallery', 'pricing', 'dashboard', 'search', 'settings', 'tabs'] },
+  { name: 'SITE CHROME', families: [] },        // anything the partition did not cover
+];
+const SECTOR_OF = (() => {
+  const m = {};
+  SECTORS.forEach((s, i) => s.families.forEach(f => { m[f] = i; }));
+  return f => (m[f] === undefined ? 2 : m[f]);
+})();
+
+function sectorOfTask(r, k) {
+  const p = pageFor(r, k);
+  return SECTOR_OF(p && p.family);
+}
+
+// clean / total per sector for one run, optionally only as far as the run has got
+function sectorStats(r, upTo) {
+  const out = SECTORS.map(() => ({ n: 0, clean: 0 }));
+  const tasks = (r && r.tasks) || [];
+  for (let k = 0; k < tasks.length; k++) {
+    const si = sectorOfTask(r, k);
+    out[si].n++;
+    if ((upTo === undefined || k < upTo) && tasks[k].solved > 0) out[si].clean++;
+  }
+  return out;
+}
+
+// F1's own colours: purple is the best that sector has ever been, green is better than where
+// it started, yellow is no better.
+function sectorTone(si, runIdx, stats) {
+  const first = sectorStats(st.rounds[0])[si];
+  let best = -1;
+  for (let i = 0; i < runIdx; i++) best = Math.max(best, sectorStats(st.rounds[i])[si].clean);
+  const now = stats[si].clean;
+  if (now > best && now > first.clean) return 'purple';
+  if (now > first.clean) return 'green';
+  return now ? 'yellow' : 'none';
+}
+
+const hud = { built: false, n: -1, cells: [], last: {}, fastSig: '' };
+
+// Only write to the DOM when the text actually changed: this runs every frame.
+function put(id, txt, cls) {
+  const el_ = $(id); if (!el_) return;
+  if (hud.last[id] !== txt) { el_.textContent = txt; hud.last[id] = txt; }
+  if (cls !== undefined && el_.className !== cls) el_.className = cls;
+}
+
+// The audit result for one interface, keyed the way the bundle keys it. tasks[] carries the
+// verdict; pages[] carries what the browser actually found.
+function pageFor(r, k) {
+  const t = (r && r.tasks) ? r.tasks[k] : null;
+  if (!t) return null;
+  const pages = (r && r.pages) || [];
+  return pages.find(p => p.id === t.id) || pages[k] || null;
+}
+
+// "color-contrast x6 serious" — the rule the page broke, in axe's own words.
+function ruleText(p) {
+  if (!p) return '';
+  const bits = (p.rules || []).map(x => `${x.id}${x.n > 1 ? ' \u00D7' + x.n : ''}`);
+  for (const m of (p.missing || [])) bits.push(`missing: ${m}`);
+  return bits.join(' \u00B7 ');
+}
+
+function stripFor(tasks, r) {
+  const host = $('rhStrip'); if (!host) return;
+  if (hud.n !== tasks.length) {
+    host.textContent = ''; hud.cells = [];
+    for (let k = 0; k < tasks.length; k++) {
+      const n = el('div', 'rh-cell');
+      n.dataset.k = String(k);
+      n.addEventListener('mouseenter', () => showTip(k));
+      n.addEventListener('mouseleave', hideTip);
+      host.append(n); hud.cells.push(n);
+    }
+    hud.n = tasks.length;
+  }
+  void r;
+}
+
+// Any cell answers for itself: which brief it was, whether it passed, and what the browser
+// found if it did not.
+function showTip(k) {
+  const tip = $('rhTip'), cell = hud.cells[k]; if (!tip || !cell) return;
+  const r = st.rounds[st.i]; if (!r) return;
+  const t = (r.tasks || [])[k]; if (!t) return;
+  const revealed = st.phase !== 'RUN' || k < st.shown;
+  const p = pageFor(r, k), ok = t.solved > 0;
+  tip.textContent = '';
+  const si = sectorOfTask(r, k);
+  const head = el('div', 't-head', `LAP ${k + 1} \u00B7 S${si + 1} ${SECTORS[si].name}`
+    + ` \u00B7 ${(t.title || t.id).toUpperCase()}`);
+  tip.append(head);
+  if (!revealed) {
+    tip.append(el('div', 't-rule', 'not built yet this run'));
+  } else {
+    tip.append(el('div', 't-verdict ' + (ok ? 'ok' : 'no'),
+      ok ? '\u2713 CLEAN \u00B7 NO VIOLATIONS' : '\u2717 FAILED'
+        + (p && p.weighted ? ` \u00B7 ${p.weighted} WEIGHTED` : '')));
+    const why = ruleText(p);
+    if (why) { const n = el('div', 't-rule'); n.innerHTML = `<i>${esc(why)}</i>`; tip.append(n); }
+    if (p && p.file) tip.append(el('div', 't-file', `pages/${p.file}`));
+  }
+  tip.hidden = false;
+  // pin it above the cell, kept inside the picture
+  const box = cell.getBoundingClientRect(), stage = $('viewTrack').getBoundingClientRect();
+  const w = tip.offsetWidth || 200;
+  let left = box.left - stage.left + box.width / 2 - w / 2;
+  left = Math.max(6, Math.min(stage.width - w - 6, left));
+  tip.style.left = left + 'px';
+  tip.style.top = Math.max(6, box.top - stage.top - tip.offsetHeight - 8) + 'px';
+}
+function hideTip() { const tip = $('rhTip'); if (tip) tip.hidden = true; }
+
+// ---------------------------------------------------------------------------------------
+// The timing tower, and the championship.
+//
+// The loop only reports a component once its blame clears the evidence bar, so most runs name
+// exactly one. That is the honest shape of the data and the tower says so rather than padding
+// itself out to ten rows of zeroes.
+// ---------------------------------------------------------------------------------------
+function blameTower(r) {
+  const rows = Object.entries(r.standings || {})
+    .filter(([, v]) => v && v.n)
+    .sort((a, b) => b[1].blame_s - a[1].blame_s);
+  const host = $('rhStand');
+  host.textContent = '';
+  const h = el('div', 'st-head');
+  h.innerHTML = `<span>BLAME</span><i>RUN ${st.i + 1}</i>`;
+  host.append(h);
+  if (!rows.length) {
+    host.append(el('div', 'st-none',
+      'No component cleared the evidence bar. Nothing is blamed, and nothing changes.'));
+    return;
+  }
+  const cols = el('div', 'st-cols');
+  cols.innerHTML = '<span></span><span>COMPONENT</span><span>LOST</span><span>CASES</span><span></span>';
+  host.append(cols);
+  rows.forEach(([key, v], i) => {
+    const p = BY_KEY[key] || { name: key };
+    const n = el('div', 'st-row' + (i === 0 ? ' lead' : '') + (key === r.role ? ' chosen' : ''));
+    n.innerHTML = `<b>${i + 1}</b><span>${esc(p.name)}</span>`
+      + `<i>${fx(v.blame_s, 1)}s</i><u>${v.n}</u><span></span>`;
+    host.append(n);
+  });
+  const quiet = ALL.length - rows.length;
+  host.append(el('div', 'st-note',
+    `${quiet} others: no confirmed incidents this run. Blame is only recorded when correcting `
+    + 'the component actually flips the failure.'));
+}
+
+// Across the season so far: how often each component was blamed, and how often the change
+// written against it survived the gates.
+function championship(upTo) {
+  const tally = {};
+  for (let i = 0; i < upTo; i++) {
+    const r = st.rounds[i]; if (!r || !r.role) continue;
+    const t = tally[r.role] || (tally[r.role] = { blamed: 0, kept: 0, lost: 0 });
+    t.blamed++;
+    if (r.promoted) t.kept++;
+    const sd = (r.standings || {})[r.role];
+    if (sd) t.lost = Math.max(t.lost, sd.blame_s);
+  }
+  const rows = Object.entries(tally).sort((a, b) => b[1].kept - a[1].kept || b[1].blamed - a[1].blamed);
+  const host = $('rhStand');
+  host.textContent = '';
+  const h = el('div', 'st-head');
+  h.innerHTML = `<span>CHAMPIONSHIP</span><i>AFTER RUN ${upTo}</i>`;
+  host.append(h);
+  if (!rows.length) { host.append(el('div', 'st-none', 'No component has been changed yet.')); return; }
+  const cols = el('div', 'st-cols');
+  cols.innerHTML = '<span></span><span>COMPONENT</span><span>BLAMED</span><span>KEPT</span><span>LV</span>';
+  host.append(cols);
+  rows.forEach(([key, t], i) => {
+    const p = BY_KEY[key] || { name: key };
+    const n = el('div', 'st-row' + (i === 0 ? ' lead' : '') + (t.kept ? ' kept' : ''));
+    n.innerHTML = `<b>${i + 1}</b><span>${esc(p.name)}</span>`
+      + `<i>${t.blamed}</i><u>${t.kept}</u><span>L${st.levels[key] || 1}</span>`;
+    host.append(n);
+  });
+}
+
+function standings(r) {
+  const host = $('rhStand'); if (!host) return;
+  // Up while the loop is working out the cause and acting on it; the championship between runs.
+  // Down while it is building, so the picture is clean when there is nothing to rank.
+  const live = ['DIAGNOSE', 'SELECT', 'CHANGE', 'GATES'].includes(st.phase);
+  const table = st.phase === 'RESULT' || st.phase === 'INTRO';
+  host.hidden = !(r && (live || table));
+  if (host.hidden) { host.dataset.sig = ''; return; }
+  const sig = live ? `b${st.i}` : `c${st.i}|${st.phase}`;
+  if (host.dataset.sig === sig) return;
+  host.dataset.sig = sig;
+  if (live) blameTower(r); else championship(st.i + 1);
+}
+
+function sectors(r, tasks) {
+  const host = $('rhSectors'); if (!host) return;
+  if (!r || !tasks.length) { host.hidden = true; return; }
+  host.hidden = false;
+  const upTo = st.phase === 'RUN' ? st.shown : undefined;
+  const stats = sectorStats(r, upTo);
+  const sig = `${st.i}|${stats.map(x => x.clean + '/' + x.n).join(',')}|${st.phase === 'RUN' ? 'r' : 's'}`;
+  if (host.dataset.sig === sig) return;
+  host.dataset.sig = sig;
+  host.textContent = '';
+  SECTORS.forEach((sec, i) => {
+    // A sector only earns a colour once the run has been through all of it.
+    const done = st.phase !== 'RUN' || st.shown >= tasks.length;
+    const tone = done ? sectorTone(i, st.i, stats) : 'none';
+    const n = el('div', 'rh-sec ' + tone);
+    n.innerHTML = `<b>S${i + 1}</b><span>${esc(sec.name)}</span>`
+      + `<i>${stats[i].clean}/${stats[i].n}</i><u></u>`;
+    host.append(n);
+  });
+}
+
+// The purple flag, and only on a genuine season best.
+function fastestLap(r) {
+  const host = $('rhFastest'); if (!host) return;
+  // Run 1 is trivially the best there has been, and flashing the flag for it would cheapen
+  // every time it is raised afterwards.
+  const show = r && st.i > 0 && st.phase !== 'RUN' && r.official_s !== undefined
+    && st.rounds.slice(0, st.i).every(x => x.official_s > r.official_s);
+  const sig = show ? `${st.i}` : '';
+  if (hud.fastSig === sig) return;
+  hud.fastSig = sig;
+  host.hidden = !show;
+  if (show) put('rhFastestVal', `${fx(r.official_s)} \u00B7 SEASON BEST`);
+}
+
+// ---------------------------------------------------------------------------------------
+// Project a point in the world onto the picture, in stage pixels. The canvas letterboxes
+// inside its box (object-fit: contain), so the buffer has to be mapped through the contained
+// rect rather than treated as a straight percentage of the box.
+// ---------------------------------------------------------------------------------------
+const proj = { box: null, at: 0, cv: [0, 0, 0] };
+function project(x, y, z) {
+  const cam = R.cam, W = R.W, H = R.H;
+  R.toView(x, y, z, proj.cv);
+  const vz = proj.cv[2];
+  if (vz <= 0.25) return null;                      // behind the camera
+  const focal = (H / 2) / Math.tan((cam.fov * Math.PI / 180) / 2);
+  const sx = W / 2 + proj.cv[0] * focal / vz;
+  const sy = H / 2 - proj.cv[1] * focal / vz;
+  if (sx < -40 || sx > W + 40 || sy < -40 || sy > H + 40) return null;
+  const now = E.time;
+  if (!proj.box || now - proj.at > 0.5) {           // layout read, but not every frame
+    const n = $('viewTrack'); if (!n) return null;
+    const r = n.getBoundingClientRect();
+    proj.box = { w: r.width, h: r.height }; proj.at = now;
+  }
+  const scale = Math.min(proj.box.w / W, proj.box.h / H);
+  return { x: (proj.box.w - W * scale) / 2 + sx * scale,
+           y: (proj.box.h - H * scale) / 2 + sy * scale, z: vz };
+}
+
+// What each visible part of the car is actually made of, in harness terms. The mapping is
+// harnessSpec() read backwards, so the caption can only ever say what the car is really built
+// from.
+const PART_IS = {
+  frontWing: lv => `${lv.AERO > 1 ? lv.AERO + ' elements' : 'a single element'} \u2014 how much context it assembles`,
+  rearWing: lv => `set for ${lv.AERO > 2 ? 'downforce' : 'low drag'} \u2014 the same retrieval budget, seen from behind`,
+  floor: lv => `${lv.DATA > 1 ? 'sealed' : 'flat'} \u2014 what it checks before it submits`,
+  engine: lv => `${lv.POWER_UNIT > 1 ? 'a tuned checkpoint' : 'the base model'} \u2014 the model doing the work`,
+  tyres: lv => `${lv.TYRES > 2 ? 'soft' : lv.TYRES > 1 ? 'medium' : 'hard'} \u2014 how boldly it decodes`,
+  drs: lv => (lv.SIMULATOR > 1 ? 'open on the straights \u2014 the practice set it mined for itself'
+    : '<i>not fitted \u2014 it has not earned a curriculum yet</i>'),
+  brakes: lv => `${lv.PIT_CREW > 1 ? 'uprated' : 'standard'} \u2014 how a change is installed and smoke-tested`,
+};
+
+// Ten bars, one per component, height by level. A status readout that happens to celebrate.
+// The flare has to outlive the frame that raised it, or the next repaint takes it straight
+// back off again.
+const rail = { built: false, sig: '', bump: '', until: 0 };
+function paintRail(bumped) {
+  const host = $('rhRail'); if (!host) return;
+  if (bumped) { rail.bump = bumped; rail.until = E.time + 1.8; }
+  if (rail.bump && E.time > rail.until) rail.bump = '';
+  bumped = rail.bump;
+  if (!rail.built) {
+    rail.built = true;
+    for (const p of ALL) {
+      const b = el('i'); b.dataset.k = p.key;
+      b.style.setProperty('--hue', `var(--${HUE[p.key] || 'cyan'})`);
+      b.title = p.name;
+      host.append(b);
+    }
+  }
+  // Scale against the highest level any component could reach this season, not against the
+  // current leader: otherwise promoting one component visibly shrinks all the others, which
+  // reads as them getting worse when nothing happened to them at all.
+  const ceiling = Math.max(2, 1 + st.rounds.filter(x => x.promoted).length);
+  const max = ceiling;
+  const sig = ALL.map(p => st.levels[p.key] || 1).join(',') + '|' + (bumped || '');
+  if (rail.sig === sig) return;
+  rail.sig = sig;
+  for (const b of host.children) {
+    const lv = st.levels[b.dataset.k] || 1;
+    b.style.height = (22 + 78 * (lv - 1) / (max - 1 || 1)).toFixed(0) + '%';
+    b.classList.toggle('up', b.dataset.k === bumped);
+  }
+}
+
+// The part going on, while it goes on: what changed on the car, and the clock running down.
+const SPEC_LABEL = { frontWing: 'front wing', rearWing: 'rear wing', floor: 'floor',
+  engine: 'power unit', tyres: 'tyres', drs: 'DRS', fin: 'fin', brakes: 'brakes',
+  gearbox: 'gearbox', ballast: 'ballast', sidepods: 'sidepods' };
+function fitPanel() {
+  const host = $('pitFit'); if (!host) return;
+  const on = pit.state === 'stopped' || pit.state === 'exit';
+  host.hidden = !on;
+  if (!on) { host.dataset.sig = ''; return; }
+  const before = harnessSpec(levelsAt(st.i)), after = harnessSpec(levelsAt(st.i + 1));
+  const k = Object.keys(after).find(key => String(after[key]) !== String(before[key]));
+  const sig = `${st.i}|${k}`;
+  if (host.dataset.sig !== sig) {
+    host.dataset.sig = sig;
+    put('pfPart', k ? (SPEC_LABEL[k] || k).toUpperCase() : 'SETUP');
+    put('pfFrom', k ? String(before[k]) : '\u2014');
+    put('pfTo', k ? String(after[k]) : '\u2014');
+  }
+  const bar = $('pfBar');
+  if (bar) bar.style.width = Math.round(100 * Math.min(1, pit.clock / BOX_HOLD)) + '%';
+}
+
+// The sting. Raised once, at the moment the part is actually fitted.
+const sting = { timer: 0 };
+function showSting(role, level, summary) {
+  const n = $('rhWipe'); if (!n) return;
+  const p = BY_KEY[role] || { name: role || '' };
+  put('wipeName', p.name);
+  put('wipeLv', `L${level}`);
+  const w = $('wipeWhat');
+  if (w) w.textContent = summary || '';
+  n.hidden = false;
+  n.classList.remove('on');
+  void n.offsetWidth;                     // restart the animation rather than reuse the old one
+  n.classList.add('on');
+  clearTimeout(sting.timer);
+  sting.timer = setTimeout(() => { n.classList.remove('on'); n.hidden = true; }, 2700);
+}
+
+// The showcase caption: the part in shot, and the component it belongs to.
+function detailCaption() {
+  const n = $('rhDetail'); if (!n) return;
+  const sp = track.scene && track.scene.detail;
+  const on = sp && st.view === 'track' && !st.garage && $('rhFastest').hidden;
+  if (!on) { if (!n.hidden) n.hidden = true; n.dataset.sig = ''; return; }
+  const owner = BY_KEY[sp.key] || { name: sp.key, does: '' };
+  const lv = st.levels[sp.key] || 1;
+  const sig = `${sp.part}|${lv}`;
+  n.hidden = false;
+  if (n.dataset.sig === sig) return;
+  n.dataset.sig = sig;
+  put('rdPart', sp.label);
+  put('rdOwner', `${owner.name} \u00B7 L${lv}`);
+  const d = $('rdDoes');
+  const html = (PART_IS[sp.part] || (() => owner.does))(st.levels);
+  if (d && d.dataset.h !== html) { d.innerHTML = html; d.dataset.h = html; }
+}
+
+// The ghost is the same agent one season earlier, not a rival. Say so, on the car.
+function ghostTag() {
+  const n = $('ghostTag'); if (!n) return;
+  const sc = track.scene;
+  const on = sc && sc.ghostActive && track.ghost && st.view === 'track' && !st.garage;
+  if (!on) { if (!n.hidden) n.hidden = true; return; }
+  // a little above the roll hoop, and only while it is close enough to read
+  const p = project(track.ghost.x, 1.5, track.ghost.z);
+  if (!p || p.z > 140) { if (!n.hidden) n.hidden = true; return; }
+  n.hidden = false;
+  // Keep it in the picture: the tag is centred on the car and would otherwise hang off the
+  // edge when the ghost is near the side of frame.
+  const w = n.offsetWidth || 130, h = n.offsetHeight || 30;
+  const box = proj.box || { w: 0, h: 0 };
+  const x = Math.max(w / 2 + 4, Math.min(box.w - w / 2 - 4, p.x));
+  const y = Math.max(h + 4, Math.min(box.h - 4, p.y));
+  n.style.left = x.toFixed(1) + 'px';
+  n.style.top = y.toFixed(1) + 'px';
+  n.style.opacity = p.z > 105 ? String(Math.max(0, (140 - p.z) / 35)) : '1';
+}
+
+// The caption under the strip: the interface in progress, and what happened to it.
+function caption(r, tasks) {
+  const n = $('rhCap'); if (!n) return;
+  let html = '';
+  if (r && tasks.length) {
+    if (st.phase === 'RUN' && st.shown > 0) {
+      const k = st.shown - 1, t = tasks[k], p = pageFor(r, k), ok = t.solved > 0;
+      const why = ok ? '' : ruleText(p);
+      html = `LAP ${k + 1} \u00B7 <b>${esc((t.title || t.id).toUpperCase())}</b> \u00B7 `
+        + (ok ? '<span class="ok">CLEAN</span>'
+              : `<span class="no">FAILED</span>${why ? ` \u00B7 <span class="why">${esc(why)}</span>` : ''}`);
+    } else if (st.phase !== 'RUN') {
+      const clean = tasks.reduce((a, t) => a + (t.solved > 0 ? 1 : 0), 0);
+      html = `RUN ${st.i + 1} COMPLETE \u00B7 <b>${clean} OF ${tasks.length}</b> CLEAN `
+        + '\u00B7 HOVER A LAP FOR WHAT THE BROWSER FOUND';
+    } else {
+      html = 'STANDING BY';
+    }
+  }
+  if (hud.cap !== html) { n.innerHTML = html; hud.cap = html; }
+}
+
+// What is actually different about the agent since run 1. Quiet, and only ever the components
+// that really moved.
+function sinceRunOne() {
+  const host = $('rhSince'); if (!host) return;
+  const first = st.rounds[0], r = st.rounds[st.i];
+  const moved = ALL.filter(p => (st.levels[p.key] || 1) > 1);
+  if (st.i < 1 || !first || !moved.length) { host.hidden = true; host.dataset.sig = ''; return; }
+  const scored = r && st.phase !== 'RUN';
+  const nowClean = scored ? (r.tasks || []).reduce((a, t) => a + (t.solved > 0 ? 1 : 0), 0)
+    : (st.phase === 'RUN' ? st.solvedNow : null);
+  const firstClean = (first.tasks || []).reduce((a, t) => a + (t.solved > 0 ? 1 : 0), 0);
+  const total = (first.tasks || []).length;
+  const sig = `${st.i}|${st.phase === 'RUN' ? 'r' : 's'}|${nowClean}|${moved.map(p => p.key + st.levels[p.key]).join(',')}`;
+  if (host.dataset.sig === sig) return;
+  host.dataset.sig = sig;
+  host.hidden = false;
+  host.textContent = '';
+  host.append(el('div', 's-it', `ITERATION ${st.i + 1} OF ${st.rounds.length}`));
+  const parts = moved.map(p => `<b>${esc(p.name)}</b> L1\u2192L${st.levels[p.key]}`).join('  ');
+  const a = el('div', 's-line s-parts');
+  a.innerHTML = `<span>changed</span><b>${parts}</b>`;
+  host.append(a);
+  if (nowClean !== null) {
+    const b = el('div', 's-line');
+    b.innerHTML = `<span>clean</span><b><i>${firstClean}</i> \u2192 <em>${nowClean}</em> of ${total}</b>`;
+    host.append(b);
+  }
+  if (scored) {
+    const d = first.official_s - r.official_s;
+    const cc = el('div', 's-line');
+    cc.innerHTML = `<span>held-out</span><b><i>${fx(first.official_s)}</i> \u2192 `
+      + `<em>${fx(r.official_s)}</em> (${d >= 0 ? '\u2212' : '+'}${fx(Math.abs(d))})</b>`;
+    host.append(cc);
+  }
+}
+
+function gatesPanel(r) {
+  const host = $('rhGates'); if (!host) return;
+  const gates = (r && r.gates) || [];
+  const show = gates.length && (st.phase === 'GATES' || st.phase === 'RESULT');
+  host.hidden = !show;
+  if (!show) { host.dataset.sig = ''; return; }
+  const shown = st.phase === 'GATES' ? Math.min(gates.length, st.shown) : gates.length;
+  const sig = `${st.i}:${shown}`;
+  if (host.dataset.sig === sig) return;
+  host.dataset.sig = sig;
+  host.textContent = '';
+  for (let k = 0; k < shown; k++) {
+    const g = gates[k], n = el('div', 'g ' + (g.ok ? 'ok' : 'no'));
+    n.innerHTML = `<i>${g.ok ? '\u2713' : '\u2717'}</i><span>${esc(GATE_SAYS[g.gate] || g.gate)}</span>`;
+    host.append(n);
+  }
+}
+
+function paintHud() {
+  if (st.view !== 'track' || st.garage) return;
+  const r = st.rounds[st.i] || null, tasks = (r && r.tasks) || [];
+
+  put('rhCircuit', (track.circuitName || 'SEALED CIRCUIT')
+    + (track.venue ? ' \u00B7 ' + track.venue.name : ''));
+  const live_ = $('rhLive');
+  if (live_) live_.className = 'rh-live' + (auto.paused ? ' held' : '');
+  put('rhRun', st.rounds.length ? `RUN ${Math.max(1, st.i + 1)} / ${st.rounds.length}` : 'STANDING BY');
+
+  // A lap is one interface: built, opened in a browser, audited.
+  const done = st.phase === 'RUN' ? st.shown : (r ? tasks.length : 0);
+  put('rhLap', tasks.length ? `${done} / ${tasks.length}` : '\u2014');
+  const cur = st.phase === 'RUN' ? tasks[Math.max(0, st.shown - 1)] : null;
+  put('rhTask', cur ? (cur.title || cur.id) : (r ? 'RUN COMPLETE' : '\u2014'));
+
+  const clean = st.phase === 'RUN' ? st.solvedNow
+    : (r ? tasks.reduce((a, t) => a + (t.solved > 0 ? 1 : 0), 0) : 0);
+  put('rhClean', tasks.length ? `${clean} / ${tasks.length}` : '\u2014');
+  const cleanRow = $('rhClean'); if (cleanRow && cleanRow.parentElement)
+    cleanRow.parentElement.className = 'rh-row' + (clean ? ' clean' : '');
+
+  // The score only exists once the run has been scored; showing this run's number while it is
+  // still building would be printing an answer before it was measured.
+  const scored = r && st.phase !== 'RUN';
+  const shownScore = scored ? r.official_s : (st.i > 0 ? st.rounds[st.i - 1].official_s : null);
+  put('rhScore', shownScore === null || shownScore === undefined ? '\u2014' : fx(shownScore));
+  const ref = st.i > 0 ? st.rounds[st.i - 1].official_s : null;
+  let dTxt = '', dCls = '';
+  if (scored && ref !== null) {
+    const d = ref - r.official_s;
+    dTxt = (d >= 0 ? '\u2212' : '+') + fx(Math.abs(d));
+    dCls = d > 0.005 ? 'good' : d < -0.005 ? 'bad' : '';
+  } else if (!scored && ref !== null) dTxt = 'last run';
+  put('rhDelta', dTxt, dCls);
+
+  const lv = Object.values(st.levels).reduce((a, b) => a + b, 0);
+  const kept = st.rounds.slice(0, Math.max(0, st.i)).filter(x => x.promoted).length
+    + ((r && r.promoted && (st.phase === 'RESULT')) ? 1 : 0);
+  put('rhHarness', `L${lv} \u00B7 ${kept} kept`);
+
+  const blameRow = $('rhBlameRow');
+  const showBlameRow = r && r.role && ['DIAGNOSE', 'SELECT', 'CHANGE', 'GATES', 'RESULT'].includes(st.phase);
+  if (blameRow) blameRow.hidden = !showBlameRow;
+  if (showBlameRow) put('rhBlame', (BY_KEY[r.role] || { name: r.role }).name, 'blame');
+
+  let [tag, cls] = PHASE_TAG[st.phase] || ['RUNNING', ''];
+  if (st.phase === 'RESULT' && r) { if (r.promoted) { tag = 'CHANGE KEPT'; cls = 'kept'; }
+    else if (r.rule_fired === 'no_upgrade') { tag = 'NOTHING TO CHANGE'; cls = ''; }
+    else { tag = 'CHANGE DROPPED'; cls = 'dropped'; } }
+  put('rhPhase', tag, 'rh-phase' + (cls ? ' ' + cls : ''));
+
+  // The car's own instruments.
+  const car = track.car, dd = track.dd;
+  if (car && dd) {
+    const kmh = Math.round(car.speed * 3.6);
+    put('rhSpeed', String(kmh));
+    const bar = $('rhSpeedBar');
+    if (bar) bar.style.width = Math.round(100 * Math.min(1, car.speed / (dd.topSpeed + 8))) + '%';
+    const gears = dd.gears || 6;
+    const g = car.speed < 4 ? 'N'
+      : String(Math.max(1, Math.min(gears, Math.ceil(car.speed / (dd.topSpeed / gears)))));
+    put('rhGear', g);
+    put('rhDrs', 'DRS', 'rh-drs' + (car.drsOn ? ' on' : ''));
+  }
+
+  // How far ahead of the run-1 harness the car is, right now, on this circuit.
+  const gapRow = $('rhGapRow'), gap = ghostGap();
+  const gapReady = gap && Math.abs(gap.d) > 4;
+  if (gapRow) gapRow.hidden = !gapReady;
+  if (gapReady) {
+    put('rhGap', (gap.s >= 0 ? '+' : '\u2212') + fx(Math.abs(gap.s)) + 's', gap.s < -0.02 ? 'behind' : '');
+  }
+
+  detailCaption();
+  ghostTag();
+  paintPit();
+  fitPanel();
+  paintRail();
+  standings(r);
+  sectors(r, tasks);
+  fastestLap(r);
+  sinceRunOne();
+  caption(r, tasks);
+  stripFor(tasks, r);
+  for (let k = 0; k < hud.cells.length; k++) {
+    const t = tasks[k];
+    const revealed = st.phase === 'RUN' ? k < st.shown : true;
+    const want = 'rh-cell s' + sectorOfTask(r, k)
+      + (revealed ? (t.solved > 0 ? ' ok' : ' no') : '')
+      + (st.phase === 'RUN' && k === st.shown - 1 ? ' now' : '');
+    if (hud.cells[k].className !== want) hud.cells[k].className = want;
+  }
+  gatesPanel(r);
+}
 
 // ---------------------------------------------------------------------------------------
 // phases
 // ---------------------------------------------------------------------------------------
 function enterIntro() {
   st.phase = 'INTRO'; st.playing = false;
-  showGarage();
+  if (st.garage) showGarage(); else enterTrack();
   const first = st.rounds[0], last = st.rounds[st.rounds.length - 1];
   const kept = st.rounds.filter(r => r.promoted).length;
   const t0 = (first && (first.tasks || []).filter(t => t.solved > 0).length) || 0;
@@ -588,7 +1454,7 @@ function enterIntro() {
     : `It ran ${st.rounds.length} times and kept <b>${kept}</b> of the changes it wrote.`;
   say('An agent that builds web interfaces, drawn as a garage. Six components decide how it '
     + 'works — and it rewrites them itself. '
-    + promise + ' Press <b>RUN THE AGENT</b>.');
+    + promise + ' It is running now; the garage opens when it keeps one.');
   meters([
     { label: 'RUNS COMPLETED', value: '0' },
     { label: 'INTERFACES CLEAN', value: '—' },
@@ -606,8 +1472,8 @@ function enterIntro() {
     const b = el('div');
     b.innerHTML = '<p style="margin:0;font-family:\'VT323\',monospace;font-size:17px;line-height:19px;'
       + 'color:var(--caption)">Nothing here is a mock-up. Every score, change and refusal on this '
-      + 'page came from that loop actually running against a real model. Press the button to step '
-      + `through it, one run at a time — ${st.rounds.length} of them.</p>`;
+      + 'page came from that loop actually running against a real model — '
+      + `${st.rounds.length} runs of it.</p>`;
     box.append(a, b); host.append(box);
   }
   button('RUN THE AGENT', st.rounds.length > 0);
@@ -616,9 +1482,9 @@ function enterIntro() {
 
 function enterLiveIntro() {
   const rc = $('runCount'); if (rc) rc.textContent = 'LIVE · ON THIS MACHINE';
-  say('This is the loop running on your own machine. Press <b>RUN THE AGENT</b> and it will '
-    + 'actually build interfaces — writing each one, opening it in a browser, and auditing it — '
-    + 'then work out which of its own components caused the failures and try to fix one. '
+  say('This is the loop running on your own machine. It is '
+    + 'actually building interfaces — writing each one, opening it in a browser, and auditing it — '
+    + 'then working out which of its own components caused the failures and trying to fix one. '
     + 'It takes a few minutes, because it is really doing it.');
   const host = work('LIVE', 'nothing here is a recording');
   if (host) {
@@ -634,10 +1500,16 @@ function enterLiveIntro() {
 function startRun() {
   if (live.on) return startLiveRun();
   if (st.playing) return;
+  // A stop that has been called but not served holds the next run, the way a race does not
+  // restart until the car has come back out.
+  if (pit.state !== 'off') { scheduleNext(700); return; }
   st.i++;
   if (st.i >= st.rounds.length) {
-    // round the cycle again from the beginning, the way a loop does
-    st.i = -1; st.levels = levelsAt(0); enterIntro(); scheduleNext(2200); return;
+    // Round the cycle again from the beginning, the way a loop does — without ever leaving
+    // the track, because the point of this view is that the agent is always running.
+    st.i = 0; st.levels = levelsAt(0);
+    const call = $('garageCall'); if (call) call.hidden = true;
+    st.pending = null;
   }
   st.levels = levelsAt(st.i);
   st.playing = true;
@@ -655,7 +1527,7 @@ function phase(name) {
 
   if (name === 'RUN') {
     st.seenTasks = []; st.solvedNow = 0;
-    A.setScene('run');
+    if (!st.garage) enterTrack(true);
     const n = (r.tasks || []).length || 20;
     st.dur = Math.max(7, Math.min(15, n * 0.55));
     button('RUNNING…', false);
@@ -722,7 +1594,11 @@ function phase(name) {
   if (name === 'CHANGE') {
     st.dur = 7;
     button('WRITING THE CHANGE', false);
-    if (!r.diff) { phase('RESULT'); return; }
+    // A run that wrote nothing goes to the result. A run that wrote something but exported no
+    // diff text still has a change to describe and still has ten gates to clear — bailing to
+    // RESULT on a missing diff took the gates down with it, so the ten checks the whole thing
+    // rests on never played at all during normal viewing.
+    if (!r.role && !r.diff_summary) { phase((r.gates || []).length ? 'GATES' : 'RESULT'); return; }
     const p = BY_KEY[r.role] || { name: r.role };
     say(`The race engineer wrote a change to <b>${esc(p.name)}</b>: `
       + `<span class="num">${esc(r.diff_summary || 'a revision')}</span>. `
@@ -753,15 +1629,17 @@ function phase(name) {
     st.dur = 6.5;
     const p = BY_KEY[r.role] || { name: r.role || '' };
     if (r.promoted) {
-      st.levels = levelsAt(st.i + 1);
-      paintRig(r.role);
-      showGarage(r.role, true);
-      // the station rebuilds itself with the new equipment, in shot
-      const g = SCR.scenes.garage, ui = (BY_KEY[r.role] || {}).ui;
-      if (g && g.playUpgrade && ui) {
-        g.playUpgrade(ui, { name: (r.part || 'REVISION'), blurb: r.diff_summary || '',
-          tier: Math.min(3, (st.levels[r.role] || 1) - 1) });
+      // The part is fitted in the box, not in mid-air: call the car in and let the stop apply
+      // it. If there is no pit lane on this circuit, fit it where it stands.
+      if (!st.garage && callToPits(r)) {
+        st.dur = 14;                     // hold the result until the stop has been served
+        pit.thenCall = r;                // the garage is offered after the stop, not over it
+      } else {
+        st.levels = levelsAt(st.i + 1);
+        paintRig(r.role);
+        if (!st.garage) enterTrack();
       }
+      if (!pit.thenCall) callToGarage(r);
       const next = st.rounds[st.i + 1];
       say(`Approved. <b>${esc(p.name)}</b> is now level <span class="num">${st.levels[r.role]}</span>`
         + (next ? `, and the next run scored <span class="num">${fx(next.official_s)}</span> — `
@@ -789,6 +1667,10 @@ function phase(name) {
     keepScore(r, true);
     button(st.i + 1 < st.rounds.length ? 'RUN AGAIN' : 'START OVER', true);
     st.playing = false;
+    // RESULT is the end of the phase list, so the frame loop stops advancing here. Nothing
+    // re-armed the run timer, which meant the season played exactly one run and stood still
+    // for ever after. Arm it: the loop runs on its own or it is not a loop.
+    scheduleNext(Math.round(st.dur * 1000));
     return;
   }
 }
@@ -890,6 +1772,15 @@ function showBlame(r, blame) {
 function showDiff(r) {
   const host = work('THE CHANGE IT MADE TO ITSELF', r.part ? `now ${r.part}` : '');
   if (!host) return;
+  if (!r.diff) {
+    // No diff text in the bundle: say what the change was rather than print an empty box.
+    const p = el('p', 'page-note');
+    p.innerHTML = `<b>${esc((BY_KEY[r.role] || { name: r.role || '' }).name)}</b> \u2014 `
+      + `${esc(r.diff_summary || 'a revision')}. The diff itself is not in this export; the `
+      + 'change was written against that component\u2019s own files and is in the signed chain.';
+    host.append(p);
+    return;
+  }
   const box = el('div', 'code');
   box.innerHTML = (r.diff || '').split('\n').slice(0, 40).map(line => {
     const c = line.startsWith('+++') || line.startsWith('---') ? '' :
@@ -1020,6 +1911,7 @@ function showOutcome(r) {
 // per-frame: reveal tasks and gates in time with the run
 // ---------------------------------------------------------------------------------------
 S.frame = function (dt) {
+  paintHud();
   paintTags(st.phase === 'DIAGNOSE' || st.phase === 'CHANGE' || st.phase === 'GATES'
     || st.phase === 'RESULT' ? (st.rounds[st.i] || {}).role : null);
   if (tween.to !== null && tween.t < tween.dur) { tween.t += dt; paintTween(); }
@@ -1092,7 +1984,7 @@ function showView(which) {
   const dash = $('dash');
   if (dash) {
     dash.hidden = which !== 'dash';
-    if (which === 'dash') { if (SCR.dash) SCR.dash.show(); st.view = which; paintTabs(which); return; }
+    if (which === 'dash') { if (SCR.dash) SCR.dash.show(); st.view = which; paintTabs(which); paintMode(); return; }
     if (SCR.dash) SCR.dash.hide();
   }
   for (const [k, id] of Object.entries(VIEWS)) {
@@ -1103,6 +1995,7 @@ function showView(which) {
   // the work panel belongs to the run itself; the other two views carry their own detail, and
   // leaving it up under them just prints the same curve or the same table twice on one screen.
   const wk = $('work'); if (wk) wk.hidden = which !== 'track';
+  paintMode();
 }
 
 
@@ -1114,6 +2007,10 @@ function wire() {
   for (const [id, which] of tabs) {
     const t = $(id); if (t) t.addEventListener('click', () => showView(which));
   }
+  const go = $('gcGo');
+  if (go) go.addEventListener('click', openGarage);
+  const back = $('trackBack');
+  if (back) back.addEventListener('click', closeGarage);
   const rb = $('regsBtn');
   if (rb) rb.addEventListener('click', () => { if (SCR.ui && SCR.ui.toggleRegs) SCR.ui.toggleRegs(); });
   const tb = $('tryBtn');
@@ -1123,6 +2020,8 @@ function wire() {
     if (ev.key === ' ') { ev.preventDefault(); setHold(!auto.paused); }
     if (ev.key === '1') showView('track');
     if (ev.key === '2') showView('dash');
+    if (ev.key === 'g' || ev.key === 'G') { if (st.garage) closeGarage(); else openGarage(); }
+    if (ev.key === 'Escape' && st.garage) closeGarage();
   });
 }
 
@@ -1141,5 +2040,6 @@ S.seekTo = function (runIndex, phaseName) {
 };
 
 S.diag = () => ({ story: { phase: st.phase, run: st.i + 1, of: st.rounds.length,
-  playing: st.playing, levels: st.levels, shown: st.shown } });
+  playing: st.playing, levels: st.levels, shown: st.shown, scene: A && A.sceneName,
+  garage: st.garage, pending: !!st.pending } });
 })(window.SCR = window.SCR || {});

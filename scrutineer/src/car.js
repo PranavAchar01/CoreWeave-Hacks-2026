@@ -273,7 +273,7 @@ E.hooks[M.LIVERY] = function (mx, my, mz, aux) {
   return t > E.bayer(Math.floor(mz / 0.028) * 3, Math.floor((mx * 0.8 + my) / 0.028) * 3) ? dark : light;
 };
 // ---------- state + transform ----------
-C.newState = () => ({ x: 0, y: 0, z: 0, yaw: 0, roll: 0, pitch: 0, spin: 0, steer: 0, speed: 0, s: 0, lap: 1, lapStart: 0, best: null, last: null, sector: 0, drsAngle: 0, drsOn: false, lapsDone: 0, braking: false, fanSpin: 0, sectorTimes: [], lapTimes: [] });
+C.newState = () => ({ x: 0, y: 0, z: 0, yaw: 0, roll: 0, pitch: 0, spin: 0, steer: 0, speed: 0, s: 0, lap: 1, lapStart: 0, best: null, last: null, sector: 0, drsAngle: 0, drsOn: false, lapsDone: 0, off: 0, offPrev: 0, lift: 0, braking: false, fanSpin: 0, sectorTimes: [], lapTimes: [] });
 // a parked car for the garage / parc fermé / finale: static pose at a position and heading
 C.displayState = (x = 0, z = 0, yaw = 0) => ({ ...C.newState(), x, z, yaw });
 // returns xform(x,y,z,group,out) for a car state. opts: lift (raise the body on jacks), wheelDrop (wheels rest on the floor

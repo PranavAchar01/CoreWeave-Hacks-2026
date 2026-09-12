@@ -233,6 +233,309 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   background:transparent;color:var(--mid);border:1px solid var(--studio);padding:8px;cursor:pointer}
 .ghost-btn:hover{color:var(--white);border-color:var(--mid)}
 
+/* =========================================================================
+   RACE MODE — the default. The race is the whole picture: no harness rail, no
+   narration line, no meters, no work panel. The agent is always running, and
+   the only thing that ever appears over the track is the call to the garage
+   when the loop has actually kept a change. TELEMETRY still carries every
+   number, so nothing here is the only copy of anything.
+   ========================================================================= */
+.app.race{grid-template-rows:52px minmax(0,1fr) 0;max-width:none;max-height:none;height:100vh}
+.app.race .body{grid-template-columns:minmax(0,1fr);gap:0;padding:0}
+.app.race .rig,.app.race .say,.app.race .meters,.app.race .work{display:none}
+.app.race .view{gap:0}
+.app.race .view .stage-box{flex:1;aspect-ratio:auto;width:100%;max-width:none;height:100%;
+  margin:0;border:0;border-top:2px solid var(--studio)}
+.top-ghost{margin-top:0;padding:6px 9px;font-size:6px}
+
+/* The garage call. It sits on the track and waits; the loop does not stop for it. */
+.garage-call{pointer-events:auto;display:flex;align-items:center;gap:12px;max-width:100%;
+  background:rgba(6,8,26,.92);border:2px solid var(--gold);padding:9px 12px}
+.gc-eyebrow{font-family:"Press Start 2P","Courier New",monospace;font-size:7px;color:var(--gold);
+  letter-spacing:.5px;white-space:nowrap}
+.gc-what{font-family:"VT323","Courier New",monospace;font-size:19px;line-height:19px;
+  color:var(--caption);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gc-go{font-family:"Press Start 2P","Courier New",monospace;font-size:8px;padding:9px 13px;
+  background:var(--gold);color:var(--ink);border:0;cursor:pointer;letter-spacing:.5px;
+  white-space:nowrap;animation:runpulse 1.6s ease-in-out infinite}
+.gc-go:hover{background:#FFD75E}
+@media (prefers-reduced-motion:reduce){.gc-go{animation:none}}
+.track-back{position:absolute;left:14px;top:14px;z-index:4;
+  font-family:"Press Start 2P","Courier New",monospace;font-size:7px;padding:8px 11px;
+  background:rgba(6,8,26,.92);color:var(--caption);border:1px solid var(--mid);cursor:pointer}
+.track-back:hover{color:var(--white);border-color:var(--gold)}
+@media (max-width:720px){.garage-call{flex-wrap:wrap;justify-content:center}.gc-what{display:none}}
+
+/* =========================================================================
+   THE WORLD FEED — the broadcast furniture that sits on the race itself.
+   Corner-anchored the way a live F1 feed is: session and circuit top-left,
+   the timing tower top-right, the car's own instruments bottom-left, and the
+   lap strip across the bottom. Hidden entirely outside race mode.
+   ========================================================================= */
+/* One grid, nine cells, one gutter. Each panel is pinned to the edge of its own cell, so a
+   panel that grows a row, or disappears entirely, cannot shift any of the others. */
+.rhud{position:absolute;inset:0;pointer-events:none;z-index:3;
+  font-family:"Press Start 2P","Courier New",monospace;font-size:7px;text-transform:uppercase;
+  display:grid;gap:10px;padding:14px;box-sizing:border-box;
+  grid-template-columns:minmax(0,auto) minmax(0,1fr) minmax(0,auto);
+  grid-template-rows:auto minmax(0,1fr) auto auto auto;
+  grid-template-areas:
+    "tl  tc  tr"
+    "tl  cc  mr"
+    "bl  cc2 br"
+    "bc  bc  bc"
+    "lap lap lap"}
+.app:not(.race) .rhud{display:none}
+.rh-tl{grid-area:tl;align-self:start;justify-self:start}
+.rh-tc{grid-area:tc;align-self:start;justify-self:center;min-width:0}
+.rh-tr{grid-area:tr;align-self:start;justify-self:end}
+
+.rh-bl{grid-area:bl;align-self:end;justify-self:start}
+.rh-bc{grid-area:bc;align-self:end;justify-self:center;max-width:100%;display:flex;
+  flex-direction:column;align-items:center;gap:8px}
+.rh-br{grid-area:br;align-self:end;justify-self:end}
+.rh-lapbar{grid-area:lap;align-self:end}
+
+.rh-tl{display:flex;flex-direction:column;align-items:flex-start;gap:6px;max-width:340px}
+.rh-tl-top{display:flex;align-items:center;gap:8px}
+.rh-live{background:var(--red);color:var(--white);padding:5px 7px;letter-spacing:.5px}
+.rh-live.held{background:var(--mid)}
+.rh-circuit{background:rgba(6,8,26,.86);color:var(--caption);padding:5px 8px;letter-spacing:.5px}
+
+.rh-tr{width:214px;display:flex;flex-direction:column;gap:4px}
+.rh-tower{background:rgba(6,8,26,.9);border-left:3px solid var(--gold)}
+.rh-t-head{display:flex;justify-content:space-between;align-items:baseline;gap:6px;
+  padding:6px 8px;border-bottom:1px solid var(--studio);color:var(--white)}
+.rh-t-head i{font-style:normal;font-size:6px;color:var(--gold)}
+.rh-row{display:grid;grid-template-columns:62px minmax(0,1fr) auto;align-items:baseline;gap:6px;
+  padding:4px 8px;border-bottom:1px solid rgba(18,26,74,.7)}
+.rh-row>span{font-size:6px;color:var(--mid);letter-spacing:.3px}
+.rh-row>b{font-family:"VT323","Courier New",monospace;font-size:19px;line-height:15px;
+  color:var(--white);font-variant-numeric:tabular-nums;text-align:right;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rh-row>i{font-style:normal;font-family:"VT323","Courier New",monospace;font-size:16px;
+  line-height:15px;color:var(--mid);font-variant-numeric:tabular-nums}
+.rh-row.rh-lap>b{font-size:23px;line-height:17px;color:var(--gold)}
+.rh-row.rh-hero{background:rgba(18,26,74,.55)}
+.rh-row.rh-hero>b{font-size:23px;line-height:17px;color:var(--gold)}
+.rh-row.rh-hero>i.good{color:var(--green)}.rh-row.rh-hero>i.bad{color:var(--red)}
+.rh-row.rh-gap>b{color:var(--cyan)}.rh-row.rh-gap>b.behind{color:var(--red)}
+.rh-row.clean>b{color:var(--green)}
+.rh-row>b.blame{color:var(--amber);font-size:15px}
+.rh-phase{align-self:flex-end;background:var(--gold);color:var(--ink);padding:6px 9px;
+  letter-spacing:.5px}
+.rh-phase.build{background:var(--cyan)}.rh-phase.blame{background:var(--amber)}
+.rh-phase.change{background:var(--purple);color:var(--white)}
+.rh-phase.gates{background:var(--white);color:var(--ink)}
+.rh-phase.kept{background:var(--green);color:var(--ink)}
+.rh-phase.dropped{background:var(--red);color:var(--white)}
+
+.rh-bl{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.rh-car{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.rh-speed{display:flex;align-items:baseline;gap:5px;background:rgba(6,8,26,.86);padding:4px 8px}
+.rh-speed b{font-family:"VT323","Courier New",monospace;font-size:34px;line-height:24px;
+  color:var(--white);font-variant-numeric:tabular-nums}
+.rh-speed em{font-style:normal;font-size:6px;color:var(--mid)}
+.rh-bar{width:132px;height:6px;background:rgba(6,8,26,.86)}
+.rh-bar i{display:block;height:100%;width:0;background:var(--cyan)}
+.rh-drive{display:flex;gap:4px}
+.rh-gear{background:var(--studio);color:var(--white);padding:5px 9px;min-width:20px;text-align:center}
+.rh-drs{background:var(--studio);color:var(--mid);padding:5px 7px}
+.rh-drs.on{background:var(--green);color:var(--ink)}
+
+.rh-br{display:flex;flex-direction:column;gap:2px;
+  background:rgba(6,8,26,.9);padding:6px 8px;border-left:3px solid var(--white);max-width:250px}
+.rh-br .g{display:grid;grid-template-columns:11px minmax(0,1fr);gap:6px;align-items:baseline;
+  font-family:"VT323","Courier New",monospace;font-size:15px;line-height:15px;
+  color:var(--mid);text-transform:none}
+.rh-br .g i{font-style:normal;font-family:"Press Start 2P","Courier New",monospace;font-size:7px}
+.rh-br .g.ok{color:var(--caption)}.rh-br .g.ok i{color:var(--green)}
+.rh-br .g.no{color:var(--white)}.rh-br .g.no i{color:var(--red)}
+.rh-br .g span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* One cell per interface. This is what a lap is on this circuit. */
+.rh-strip{position:absolute;left:14px;right:14px;bottom:14px;display:flex;gap:2px;
+  align-items:stretch;height:18px}
+.rh-cell{flex:1;min-width:0;background:rgba(18,26,74,.6);border-bottom:3px solid var(--mid)}
+.rh-cell.ok{background:rgba(47,217,104,.22);border-bottom-color:var(--green)}
+.rh-cell.no{background:rgba(227,30,45,.22);border-bottom-color:var(--red)}
+.rh-cell.now{outline:2px solid var(--gold);outline-offset:-2px}
+
+/* What is different about the agent since run 1. Quiet by design — the same weight as the
+   circuit name above it, and it only says the components that actually changed. */
+.rh-since{background:rgba(6,8,26,.72);padding:6px 8px;border-left:2px solid var(--studio);
+  display:flex;flex-direction:column;gap:3px;font-size:6px;letter-spacing:.3px;color:var(--mid)}
+.rh-since .s-it{color:var(--caption)}
+.rh-since .s-line{display:grid;grid-template-columns:52px minmax(0,1fr);gap:7px;align-items:baseline;
+  font-family:"VT323","Courier New",monospace;font-size:15px;line-height:14px;text-transform:none}
+.rh-since .s-line>span{font-family:"Press Start 2P","Courier New",monospace;font-size:6px;
+  color:var(--mid);text-transform:uppercase}
+.rh-since .s-line>b{color:var(--caption);font-weight:400;font-variant-numeric:tabular-nums;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rh-since .s-line>b em{font-style:normal;color:var(--green)}
+.rh-since .s-line>b i{font-style:normal;color:var(--mid)}
+.rh-since .s-parts>b{color:var(--caption);white-space:normal;overflow:visible;line-height:16px}
+.rh-since .s-parts>b b{color:var(--gold)}
+
+/* The lap bar: the caption reads the interface in progress, the cells answer on hover. */
+.rh-lapbar{display:flex;flex-direction:column;gap:4px}
+.rh-cap{font-size:7px;letter-spacing:.4px;color:var(--mid);height:9px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rh-cap b{color:var(--caption)}
+.rh-cap .ok{color:var(--green)}
+.rh-cap .no{color:var(--red)}
+.rh-cap .why{color:var(--amber)}
+.rh-strip{position:static;display:flex;gap:2px;align-items:stretch;height:18px}
+.rh-cell{pointer-events:auto;cursor:default}
+.rh-cell:hover{filter:brightness(1.7)}
+
+.rh-tip{position:absolute;z-index:6;pointer-events:none;max-width:280px;
+  background:rgba(6,8,26,.96);border:1px solid var(--mid);padding:7px 9px;
+  display:flex;flex-direction:column;gap:4px}
+.rh-tip .t-head{font-size:7px;color:var(--white);letter-spacing:.4px}
+.rh-tip .t-verdict{font-size:7px}
+.rh-tip .t-verdict.ok{color:var(--green)}.rh-tip .t-verdict.no{color:var(--red)}
+.rh-tip .t-rule{font-family:"VT323","Courier New",monospace;font-size:15px;line-height:15px;
+  color:var(--caption);text-transform:none}
+.rh-tip .t-rule i{font-style:normal;color:var(--amber)}
+.rh-tip .t-file{font-family:"VT323","Courier New",monospace;font-size:14px;line-height:14px;
+  color:var(--mid);text-transform:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* The pit stop. Bottom centre, above the lap strip, only while the car is in the lane. */
+.rh-pit{min-width:250px;max-width:100%;background:rgba(6,8,26,.94);
+  border:2px solid var(--cyan);padding:8px 12px}
+.rh-pit .pit-head{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+  font-size:9px;letter-spacing:1px;color:var(--cyan)}
+.rh-pit .pit-head i{font-style:normal;font-family:"VT323","Courier New",monospace;font-size:24px;
+  line-height:16px;color:var(--white);font-variant-numeric:tabular-nums}
+.rh-pit .pit-what{margin-top:5px;font-family:"VT323","Courier New",monospace;font-size:17px;
+  line-height:17px;color:var(--caption);text-transform:none}
+.rh-pit .pit-what b{color:var(--gold)}
+.rh-pit.done{border-color:var(--green)}
+.rh-pit.done .pit-head{color:var(--green)}
+
+/* The component rail: ten bars under the tower, one per component, height by level. Quiet by
+   design — it is a status readout, not a light show — but the one that just went up flares. */
+.rh-rail{display:flex;gap:2px;align-items:flex-end;height:16px;
+  background:rgba(6,8,26,.86);padding:3px 4px}
+.rh-rail i{flex:1;min-width:0;display:block;background:var(--hue,var(--mid));opacity:.45;
+  height:22%;transition:height .5s ease-out,opacity .5s ease-out}
+.rh-rail i.up{opacity:1;animation:railup 1.6s ease-out}
+@keyframes railup{0%{box-shadow:0 0 0 0 currentColor;filter:brightness(2.2)}
+  100%{box-shadow:0 0 0 5px transparent;filter:brightness(1)}}
+@media (prefers-reduced-motion:reduce){.rh-rail i{transition:none}.rh-rail i.up{animation:none}}
+
+/* The part going on, in the box, while it goes on. */
+.pit-fit{margin-top:6px;border-top:1px solid var(--studio);padding-top:6px}
+.pit-fit .pf-row{display:flex;align-items:baseline;gap:7px;font-size:7px;color:var(--mid)}
+.pit-fit .pf-row b{font-family:"VT323","Courier New",monospace;font-size:19px;line-height:13px;
+  color:var(--caption);font-variant-numeric:tabular-nums}
+.pit-fit .pf-row b.to{color:var(--green)}
+.pit-fit .pf-row em{font-style:normal;color:var(--mid)}
+.pit-fit .pf-bar{margin-top:5px;height:5px;background:var(--night)}
+.pit-fit .pf-bar i{display:block;height:100%;width:0;background:var(--cyan)}
+
+/* The sting. A bar sweeps the picture once when a change is kept, then leaves. */
+.rh-wipe{position:absolute;left:0;right:0;top:34%;z-index:7;pointer-events:none;overflow:hidden}
+.rh-wipe .wipe-bar{display:flex;align-items:baseline;gap:12px;padding:12px 20px;
+  background:linear-gradient(90deg,var(--green) 0 6px,rgba(6,8,26,.96) 6px);
+  border-top:1px solid rgba(47,217,104,.5);border-bottom:1px solid rgba(47,217,104,.5);
+  transform:translateX(-102%);white-space:nowrap;overflow:hidden}
+.rh-wipe.on .wipe-bar{animation:wipein 2.6s cubic-bezier(.16,.84,.3,1) forwards}
+@keyframes wipein{
+  0%{transform:translateX(-102%)} 18%{transform:translateX(0)}
+  78%{transform:translateX(0)} 100%{transform:translateX(102%)}}
+.rh-wipe .wipe-tag{font-size:7px;color:var(--green);letter-spacing:1px}
+.rh-wipe b{font-size:13px;color:var(--white);letter-spacing:1px}
+.rh-wipe i{font-style:normal;font-family:"VT323","Courier New",monospace;font-size:24px;
+  line-height:15px;color:var(--gold)}
+.rh-wipe .wipe-what{font-family:"VT323","Courier New",monospace;font-size:18px;line-height:14px;
+  color:var(--caption);text-transform:none;overflow:hidden;text-overflow:ellipsis}
+@media (prefers-reduced-motion:reduce){.rh-wipe .wipe-bar{transform:none}
+  .rh-wipe.on .wipe-bar{animation:none}}
+
+/* The showcase caption: which part is in shot, and whose part it is. */
+.rh-detail{display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:rgba(6,8,26,.88);border-top:2px solid var(--gold);padding:7px 12px;text-align:center}
+.rh-detail .rd-cam{font-size:6px;color:var(--mid);letter-spacing:.6px}
+.rh-detail .rd-main{display:flex;align-items:baseline;gap:8px}
+.rh-detail .rd-main b{font-size:9px;color:var(--white);letter-spacing:.6px}
+.rh-detail .rd-main em{font-style:normal;font-size:7px;color:var(--gold);letter-spacing:.4px}
+.rh-detail .rd-does{font-family:"VT323","Courier New",monospace;font-size:15px;line-height:14px;
+  color:var(--caption);text-transform:none}
+.rh-detail .rd-does i{font-style:normal;color:var(--mid)}
+
+/* The ghost's label, projected onto the car it belongs to. Dimmed and dithered-looking, the
+   way the car itself is, so it reads as the same object. */
+.ghost-tag{position:absolute;z-index:4;display:flex;flex-direction:column;align-items:center;
+  transform:translate(-50%,-100%);pointer-events:none}
+.ghost-tag .gt-text{display:flex;align-items:baseline;gap:6px;
+  background:rgba(6,8,26,.82);border:1px solid var(--cyan);padding:4px 7px;white-space:nowrap}
+.ghost-tag .gt-text b{font-size:7px;color:var(--cyan);letter-spacing:.5px}
+.ghost-tag .gt-text i{font-style:normal;font-family:"VT323","Courier New",monospace;font-size:14px;
+  line-height:12px;color:var(--caption);text-transform:none}
+.ghost-tag .gt-pin{width:1px;height:14px;background:var(--cyan);opacity:.75}
+
+/* Timing tower / championship. Left edge, under the season summary. */
+.rh-stand{width:236px;max-width:100%;background:rgba(6,8,26,.9);
+  border-left:3px solid var(--gold);padding:0 0 4px}
+.rh-stand .st-head{display:flex;justify-content:space-between;align-items:baseline;gap:6px;
+  padding:6px 8px;border-bottom:1px solid var(--studio);font-size:7px;color:var(--white)}
+.rh-stand .st-head i{font-style:normal;font-size:6px;color:var(--gold)}
+.rh-stand .st-cols{display:grid;grid-template-columns:12px minmax(0,1fr) 34px 30px 22px;gap:5px;
+  padding:3px 8px;font-size:5px;color:var(--mid);border-bottom:1px solid rgba(18,26,74,.6)}
+.rh-stand .st-row{display:grid;grid-template-columns:12px minmax(0,1fr) 34px 30px 22px;gap:5px;
+  align-items:baseline;padding:4px 8px;border-bottom:1px solid rgba(18,26,74,.45);font-size:6px}
+.rh-stand .st-row>b{color:var(--mid)}
+.rh-stand .st-row>span{color:var(--caption);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rh-stand .st-row>i,.rh-stand .st-row>u{font-style:normal;text-decoration:none;
+  font-family:"VT323","Courier New",monospace;font-size:16px;line-height:12px;
+  color:var(--white);font-variant-numeric:tabular-nums;text-align:right}
+.rh-stand .st-row.lead{background:rgba(255,163,24,.14)}
+.rh-stand .st-row.lead>b,.rh-stand .st-row.lead>span{color:var(--amber)}
+.rh-stand .st-row.chosen>span::after{content:" \25C0";color:var(--gold)}
+.rh-stand .st-row.kept>u{color:var(--green)}
+.rh-stand .st-none{padding:5px 8px;font-size:6px;color:var(--mid);line-height:10px}
+.rh-stand .st-note{padding:5px 8px;font-size:6px;color:var(--mid);line-height:11px;
+  border-top:1px solid rgba(18,26,74,.6)}
+
+/* Sector board. Three rows, the way a timing screen carries S1/S2/S3. */
+.rh-sectors{display:flex;flex-direction:column;gap:2px;
+  background:rgba(6,8,26,.86);padding:6px 8px;border-left:3px solid var(--studio)}
+.rh-sec{display:grid;grid-template-columns:14px 96px 42px 26px;gap:6px;align-items:center;
+  font-size:6px;letter-spacing:.3px;color:var(--mid)}
+.rh-sec>b{color:var(--caption)}
+.rh-sec>span{color:var(--caption);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rh-sec>i{font-style:normal;font-family:"VT323","Courier New",monospace;font-size:15px;
+  line-height:13px;color:var(--white);font-variant-numeric:tabular-nums;text-align:right}
+.rh-sec>u{text-decoration:none;height:9px;background:var(--mid);display:block}
+.rh-sec.purple>u{background:var(--purple)} .rh-sec.purple>b{color:var(--purple)}
+.rh-sec.green>u{background:var(--green)}  .rh-sec.green>b{color:var(--green)}
+.rh-sec.yellow>u{background:var(--amber)} .rh-sec.yellow>b{color:var(--amber)}
+.rh-sec.none>u{background:var(--studio)}
+
+/* which sector a lap belongs to, on the cell itself */
+.rh-cell{border-top:2px solid transparent}
+.rh-cell.s0{border-top-color:rgba(61,210,255,.55)}
+.rh-cell.s1{border-top-color:rgba(176,75,255,.55)}
+.rh-cell.s2{border-top-color:rgba(255,163,24,.55)}
+
+/* The purple flag. Only ever raised on a genuine season best. */
+.rh-fastest{display:flex;align-items:baseline;gap:10px;background:var(--purple);
+  color:var(--white);padding:8px 14px;font-size:9px;letter-spacing:1px;
+  animation:fastin .35s ease-out}
+.rh-fastest i{font-style:normal;font-family:"VT323","Courier New",monospace;font-size:20px;
+  line-height:14px;font-variant-numeric:tabular-nums}
+@keyframes fastin{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){.rh-fastest{animation:none}}
+
+@media (max-width:900px){.rh-tr{width:172px}.rh-br{display:none}.rh-since{display:none}
+  .rh-sectors{display:none}}
+@media (max-height:620px){.rh-bl,.rh-stand{display:none}}
+@media (max-height:480px){.rh-lapbar{display:none}}
+
+
+
 .work{border-top:2px solid var(--studio);padding:9px 16px 12px;min-height:0;overflow:auto}
 .work-head{font-family:"Press Start 2P","Courier New",monospace;font-size:8px;color:var(--gold);
   margin-bottom:7px;display:flex;gap:10px;align-items:baseline}

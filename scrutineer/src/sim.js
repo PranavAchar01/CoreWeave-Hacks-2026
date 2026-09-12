@@ -17,6 +17,9 @@ S.physics = function (c, dd, sp, circ, dt, opts = {}) {
   const top = dd.topSpeed + (drsZone ? dd.drsBoost : 0);
   const jitter = opts.noise ? 1 + opts.noise() * 0.06 * (1 - Math.min(1, dd.consistency)) : 1;   // driver inconsistency (tyre & performance role)
   let vAllow = Math.min(top, cornerSpeed(curv, dd, wearF) * learnF * jitter);
+  // A pit lane has a limiter, and a pit box is a stop. Both are a ceiling on what the car is
+  // allowed to be doing, so they belong here rather than as a separate mode.
+  if (opts.speedCap !== undefined) vAllow = Math.min(vAllow, opts.speedCap);
   for (let d = 6; d <= 130; d += 6) { const kk = at(Math.floor((c.s + d) / STEP)).curv; const va2 = Math.min(top, cornerSpeed(kk, dd, wearF) * learnF); vAllow = Math.min(vAllow, Math.sqrt(va2 * va2 + 2 * dd.braking * d)); }
   const prev = c.speed;
   if (c.speed < vAllow) c.speed = Math.min(vAllow, c.speed + dd.accel * (1 - 0.8 * c.speed / top) * dt); else c.speed = Math.max(vAllow, c.speed - dd.braking * dt);
@@ -27,6 +30,15 @@ S.physics = function (c, dd, sp, circ, dt, opts = {}) {
   if (c.s >= LAP) { c.s -= LAP; c.lap++; c.lapsDone++; const tNow = (opts.timeNow ?? E.time), lt = tNow - c.lapStart; c.sectorTimes[2] = tNow - (c.sectorStart ?? c.lapStart); c.lastLapSectors = c.sectorTimes.slice(0, 3); c.lapTimes.push(lt); c.last = lt; c.best = c.best === null ? lt : Math.min(c.best, lt); c.lapStart = tNow; c.sectorStart = tNow; c.sectorTimes = []; }
   c.x = a.x + (b.x - a.x) * f; c.z = a.z + (b.z - a.z) * f; c.y = 0;
   const tx = a.tx + (b.tx - a.tx) * f, tz = a.tz + (b.tz - a.tz) * f; c.yaw = Math.atan2(tx, tz);
+  // Lateral offset from the centreline, used to put the car in the pit lane. The heading picks
+  // up a little of the rate of change so it points where it is going while it crosses.
+  if (c.off) {
+    const nx = -tz, nz = tx;
+    c.x += nx * c.off; c.z += nz * c.off;
+    const dOff = (c.off - (c.offPrev === undefined ? c.off : c.offPrev)) / Math.max(dt, 1e-3);
+    c.yaw += Math.max(-0.35, Math.min(0.35, dOff / Math.max(6, c.speed)));
+  }
+  c.offPrev = c.off || 0;
   c.steer = Math.max(-0.35, Math.min(0.35, curv * 22));
   c.roll += ((-curv * 9 * (c.speed / dd.topSpeed)) - c.roll) * Math.min(1, dt * 6);
   c.pitch += (((c.speed - prev) / Math.max(dt, 1e-3)) * -0.0012 - c.pitch) * Math.min(1, dt * 5);

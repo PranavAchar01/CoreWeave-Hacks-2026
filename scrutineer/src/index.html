@@ -1,5 +1,5 @@
-<!-- Scrutineer. One view, one button, and the agent's own work underneath it. -->
-<div class="app" id="app">
+<!-- Scrutineer. The race runs continuously; the garage is somewhere you choose to go. -->
+<div class="app race" id="app">
   <header class="top">
     <div class="mark">SCRUTINEER</div>
     <div class="tag">an agent that builds web interfaces, and rebuilds its own harness</div>
@@ -8,7 +8,12 @@
       <button class="view-tab dash-tab" id="tabDash" role="tab">TELEMETRY</button>
     </div>
     <div class="top-right">
+<<<<<<< HEAD
       <a class="pitlink" href="/pit" target="_blank" rel="noopener" title="the car, on a card that stays on top of everything">PIT BOARD &#8599;</a>
+=======
+      <button class="ghost-btn top-ghost" id="regsBtn">how this works</button>
+      <button class="ghost-btn top-ghost" id="tryBtn">run it yourself</button>
+>>>>>>> origin/main
       <span class="runcount" id="runCount"></span>
       <button class="hold" id="holdBtn" title="the loop runs on its own; this only pauses it">
         <span class="dot"></span>RUNNING</button>
@@ -22,16 +27,124 @@
         <div class="hud" id="hud"></div>
         <div class="cards" id="cards"></div>
         <div class="overlay" id="overlay" hidden></div>
+
+        <!-- The world feed. Every value in it is read from the loop's own bundle; the only
+             invented numbers are the car's speed and gear, which are the car, not a result. -->
+        <div class="rhud" id="raceHud">
+          <!-- Nine cells on a grid, not nine hand-placed boxes. Every panel sits in its own
+               cell and is pinned to the edge it belongs to, so a panel that grows or
+               disappears cannot push another one out of line. -->
+          <div class="rh-tl">
+            <div class="rh-tl-top">
+              <span class="rh-live" id="rhLive">LIVE</span>
+              <span class="rh-circuit" id="rhCircuit"></span>
+            </div>
+            <!-- The iteration, and what is actually different about the agent since run 1.
+                 Deliberately quiet: there to be read, not to be announced. -->
+            <div class="rh-since" id="rhSince" hidden></div>
+            <!-- The timing tower: who is being blamed in this run, and the championship
+                 across the season so far. Hangs under the block above it. -->
+            <div class="rh-stand" id="rhStand" hidden></div>
+          </div>
+
+          <div class="rh-tc">
+            <div class="rh-fastest" id="rhFastest" hidden>
+              <b>FASTEST LAP</b><i id="rhFastestVal"></i>
+            </div>
+            <!-- The showcase shot naming the part it is looking at, and which component owns
+                 it. The car is the harness, so every part of it answers to one. -->
+            <div class="rh-detail" id="rhDetail" hidden>
+              <span class="rd-cam">CAM &middot; DETAIL</span>
+              <span class="rd-main"><b id="rdPart"></b><em id="rdOwner"></em></span>
+              <span class="rd-does" id="rdDoes"></span>
+            </div>
+          </div>
+
+          <div class="rh-tr">
+            <div class="rh-tower">
+              <div class="rh-t-head"><b>SCRUTINEER</b><i id="rhRun">RUN 1 / 10</i></div>
+              <div class="rh-row rh-lap"><span>LAP</span><b id="rhLap">0 / 20</b></div>
+              <div class="rh-row"><span>BUILDING</span><b id="rhTask">&mdash;</b></div>
+              <div class="rh-row"><span>CLEAN</span><b id="rhClean">0</b></div>
+              <div class="rh-row rh-hero"><span>HELD-OUT</span><b id="rhScore">&mdash;</b><i id="rhDelta"></i></div>
+              <div class="rh-row"><span>HARNESS</span><b id="rhHarness">L10</b></div>
+              <div class="rh-row" id="rhBlameRow" hidden><span>BLAMED</span><b id="rhBlame"></b></div>
+              <div class="rh-row rh-gap" id="rhGapRow" hidden><span>VS RUN 1</span><b id="rhGap"></b></div>
+            </div>
+            <div class="rh-phase" id="rhPhase">BUILDING</div>
+            <!-- Ten components, one bar each. Quiet until one of them is upgraded. -->
+            <div class="rh-rail" id="rhRail"></div>
+          </div>
+
+          <div class="rh-bl">
+            <!-- Sectors. Not invented: the loop measured the task families as two separate
+                 populations, and these are those sides. Purple is the best that sector has
+                 ever been this season, green is better than run 1, yellow is no better. -->
+            <div class="rh-sectors" id="rhSectors"></div>
+            <div class="rh-car">
+              <div class="rh-speed"><b id="rhSpeed">0</b><em>KM/H</em></div>
+              <div class="rh-bar"><i id="rhSpeedBar"></i></div>
+              <div class="rh-drive"><span class="rh-gear" id="rhGear">N</span><span class="rh-drs" id="rhDrs">DRS</span></div>
+            </div>
+          </div>
+
+          <div class="rh-bc">
+            <!-- The stop itself. The part named here is the component the loop changed. -->
+            <div class="rh-pit" id="rhPit" hidden>
+              <div class="pit-head"><b id="pitState">BOX BOX</b><i id="pitClock"></i></div>
+              <div class="pit-what" id="pitWhat"></div>
+              <!-- The part going on, while it goes on. -->
+              <div class="pit-fit" id="pitFit" hidden>
+                <div class="pf-row"><span id="pfPart"></span><b id="pfFrom"></b><em>&rarr;</em><b class="to" id="pfTo"></b></div>
+                <div class="pf-bar"><i id="pfBar"></i></div>
+              </div>
+            </div>
+            <!-- The only thing that ever interrupts the race: the loop kept a change, and the
+                 garage is where you can go and look at it. Nothing moves until you press it. -->
+            <div class="garage-call" id="garageCall" hidden>
+              <span class="gc-eyebrow" id="gcEyebrow">UPGRADE FITTED</span>
+              <span class="gc-what" id="gcWhat"></span>
+              <button class="gc-go" id="gcGo">OPEN THE GARAGE</button>
+            </div>
+          </div>
+
+          <div class="rh-br" id="rhGates" hidden></div>
+
+          <!-- Laps, as the thing a lap actually is here: one interface, built and audited.
+               The caption names the one in progress; every cell answers for itself on hover. -->
+          <div class="rh-lapbar">
+            <div class="rh-cap" id="rhCap"></div>
+            <div class="rh-strip" id="rhStrip"></div>
+          </div>
+
+          <!-- Pinned to the ghost car so it is never mistaken for a rival: it is this same
+               agent as it was on run 1. -->
+          <div class="ghost-tag" id="ghostTag" hidden>
+            <span class="gt-pin"></span>
+            <span class="gt-text"><b>RUN 1</b><i>the harness before</i></span>
+          </div>
+
+          <!-- The sting when a change is kept. -->
+          <div class="rh-wipe" id="rhWipe" hidden>
+            <div class="wipe-bar">
+              <span class="wipe-tag">CHANGE KEPT</span>
+              <b id="wipeName"></b><i id="wipeLv"></i>
+              <span class="wipe-what" id="wipeWhat"></span>
+            </div>
+          </div>
+
+          <div class="rh-tip" id="rhTip" hidden></div>
+        </div>
+        </div>
+        <button class="track-back" id="trackBack" hidden>&larr; BACK TO THE TRACK</button>
       </div>
-      <p class="say" id="say">Six components decide how this agent works. Press <b>RUN THE AGENT</b>.</p>
+      <p class="say" id="say">Six components decide how this agent works.</p>
       <div class="meters" id="meters"></div>
     </section>
 
     <aside class="rig" aria-label="The harness">
       <div class="rig-head"><span>THE HARNESS</span><span class="rig-sub" id="rigSub">six components</span></div>
       <div class="rig-list" id="rig"></div>
-      <button class="ghost-btn" id="regsBtn">how this works</button>
-      <button class="ghost-btn" id="tryBtn">run it yourself &middot; your own key</button>
     </aside>
   </main>
 

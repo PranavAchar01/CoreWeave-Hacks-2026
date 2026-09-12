@@ -6,9 +6,94 @@
 const E = SCR.engine, M = E.M, Wd = SCR.world = {};
 const { box, Q, T } = E;
 const ROAD_W = Wd.ROAD_W = 6;
+// How full the grandstands are drawn, 0..1. build() sets it from opts.detail, so a circuit
+// early in the season is a half-empty Thursday and a late one is a full house.
+Wd.crowdFill = 0.8;
+// How much of the circuit either side of a point counts as "the corner you are standing on"
+// when working out how much room there is beside the track. Lower is stricter.
+Wd.ROOM_NEAR = 4;
+// ---------------------------------------------------------------------------------------
+// Venues. A circuit is somewhere, and where it is decides the sky, the ground and the light.
+// Each one repaints the material ramps the world is drawn in, so the same geometry reads as a
+// desert at dusk, a parkland afternoon or a street race at night.
+// ---------------------------------------------------------------------------------------
+const VENUES = Wd.VENUES = [
+  { name: 'NIGHT', sky: {} },      // the original: floodlit, mountains, a moon and stars
+  { name: 'DESERT DUSK',
+    sky: { night: '#2A1838', studio: '#6A3450', dusk: '#C85A2A', glow: '#FF8C3A',
+           mount: '#4A2C48', mount2: '#2A1832', ground: '#6E5F44',
+           cityA: '#FFD27A', cityB: '#FFA318', stars: false, moon: false },
+    mats: { GRASS: ['#4A4030', '#6E5F44', '#8C7B58', '#B09C72'],
+            GRASS2: ['#443A2C', '#665840', '#857452', '#A8946C'],
+            GRAVEL: ['#6E5F44', '#8C7B58', '#B09C72', '#D8C79A'] } },
+  { name: 'PARKLAND',
+    sky: { night: '#4E86C8', studio: '#9CC5F0', dusk: '#D6E8FB', glow: '#FFFFFF',
+           mount: '#3A5A7A', mount2: '#2A4058', ground: '#1F6B3C',
+           cityA: '#E8EBF5', cityB: '#C8CBD8', stars: false, moon: false },
+    mats: { GRASS: ['#123F24', '#1F6B3C', '#2E8A4E', '#5CB878'],
+            GRASS2: ['#0F3A20', '#1A5C33', '#27784A', '#4FA468'] } },
+  { name: 'AUTUMN',
+    sky: { night: '#3A3050', studio: '#8A7288', dusk: '#D08A4A', glow: '#F0B070',
+           mount: '#4A3A52', mount2: '#2E2438', ground: '#6B3A26',
+           cityA: '#FFD27A', cityB: '#E8EBF5', stars: false, moon: false },
+    mats: { GRASS: ['#3A1E14', '#6B3A26', '#96612F', '#BE8248'],
+            GRASS2: ['#33200E', '#5E3A08', '#A86E10', '#D89A30'],
+            GRAVEL: ['#4A3020', '#6B4420', '#96612F', '#BE8248'] } },
+  { name: 'COASTAL SUNSET',
+    sky: { night: '#14235A', studio: '#3A4CA8', dusk: '#E0567A', glow: '#FFA318',
+           mount: '#222E6A', mount2: '#131A40', ground: '#123F24',
+           cityA: '#FFA318', cityB: '#3DD2FF', stars: false, moon: false } },
+  { name: 'WINTER',
+    sky: { night: '#6F87A4', studio: '#AEBDD2', dusk: '#E4E8F2', glow: '#FFFFFF',
+           mount: '#8A8FA6', mount2: '#6A6F8A', ground: '#AEB6C6',
+           cityA: '#E8EBF5', cityB: '#CDF4FF', stars: false, moon: false },
+    mats: { GRASS: ['#6A6F8A', '#AEB6C6', '#E4E8F2', '#FFFFFF'],
+            GRASS2: ['#626880', '#A4ACBE', '#DCE2EE', '#F6F8FC'],
+            GRAVEL: ['#4A4E5E', '#7E8499', '#BDC2D4', '#E4E8F2'] } },
+  { name: 'STREET NIGHT',
+    sky: { night: '#0A0518', studio: '#2A0C4A', dusk: '#7A32B0', glow: '#B04BFF',
+           mount: '#1A0E30', mount2: '#0E0620', ground: '#171922',
+           cityA: '#B04BFF', cityB: '#3DD2FF' },
+    mats: { GRASS: ['#171922', '#252834', '#323544', '#434757'],
+            GRASS2: ['#14161E', '#1E2028', '#2C2E3A', '#3A3D4C'],
+            GRAVEL: ['#262A36', '#3E4354', '#5C6176', '#828799'] } },
+];
+// Repaint the world for a venue. Idempotent: always applied from the pristine ramps.
+Wd.applyVenue = function (R, venue) {
+  const v = venue || VENUES[0];
+  E.setPalette(v.mats || null);
+  if (R && R.setSky) R.setSky(v.sky || {});
+};
+
+// Three shapes of circuit, so layouts differ in character and not only in outline.
+const SHAPES = [
+  { name: 'SPEEDWAY',  pts: [8, 11],  base: [168, 210], spread: [40, 80],  wander: [0.14, 0.30] },
+  { name: 'BALANCED',  pts: [10, 14], base: [140, 180], spread: [70, 120], wander: [0.24, 0.50] },
+  { name: 'TECHNICAL', pts: [13, 17], base: [118, 150], spread: [90, 150], wander: [0.38, 0.70] },
+];
+
 Wd.makeCircuit = function (seed) {
-  const rng = E.mulberry32(seed), N = 11, ctrl = [];
-  for (let i = 0; i < N; i++) { const ang = (i / N) * Math.PI * 2 + (rng() - 0.5) * 0.3, rad = 150 + (rng() - 0.5) * 80; ctrl.push([Math.cos(ang) * rad * 1.35, Math.sin(ang) * rad]); }
+  const rng = E.mulberry32(seed);
+  // Where this circuit is, and what shape of circuit it is. Both are drawn from the seed through
+  // their own hash, so consecutive seeds do not march through the list in step.
+  const vpick = E.mulberry32((seed ^ 0x9E3779B9) | 0), spick = E.mulberry32((seed ^ 0x85EBCA6B) | 0);
+  const venue = VENUES[Math.floor(vpick() * VENUES.length) % VENUES.length];
+  const shape = SHAPES[Math.floor(spick() * SHAPES.length) % SHAPES.length];
+  const span = (r, k) => r[0] + (r[1] - r[0]) * k;
+  // Layout character: how many corners it is built from, how stretched the loop is, and how far
+  // a corner may wander off the ring. A circuit is its seed.
+  const N = Math.round(span(shape.pts, rng()));
+  const aspect = 1.08 + rng() * 0.62;               // 1.08..1.70, long-and-thin through to square
+  const wander = span(shape.wander, rng());         // how irregular the spacing gets
+  const spread = span(shape.spread, rng());         // radius variation, so straights and hairpins
+  const base = span(shape.base, rng());
+  const phase = rng() * Math.PI * 2;
+  const ctrl = [];
+  for (let i = 0; i < N; i++) {
+    const ang = (i / N) * Math.PI * 2 + phase + (rng() - 0.5) * wander;
+    const rad = base + (rng() - 0.5) * spread;
+    ctrl.push([Math.cos(ang) * rad * aspect, Math.sin(ang) * rad]);
+  }
   const pts = [], cr = (p0, p1, p2, p3, t) => { const t2 = t * t, t3 = t2 * t; return 0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3); };
   for (let i = 0; i < N; i++) { const p0 = ctrl[(i - 1 + N) % N], p1 = ctrl[i], p2 = ctrl[(i + 1) % N], p3 = ctrl[(i + 2) % N]; const steps = Math.max(8, Math.round(Math.hypot(p2[0] - p1[0], p2[1] - p1[1]) / 3.5));
     for (let k = 0; k < steps; k++) { const t = k / steps; pts.push([cr(p0[0], p1[0], p2[0], p3[0], t), cr(p0[1], p1[1], p2[1], p3[1], t)]); } }
@@ -22,7 +107,9 @@ Wd.makeCircuit = function (seed) {
   for (let i = 0; i < n; i++) { const a = S[(i - 1 + n) % n], b = S[(i + 1) % n], p = S[i]; let tx = b.x - a.x, tz = b.z - a.z; const l = Math.hypot(tx, tz) || 1; tx /= l; tz /= l;
     p.tx = tx; p.tz = tz; p.nx = -tz; p.nz = tx; const ta = S[(i - 2 + n) % n], tb = S[(i + 2) % n];
     const h1 = Math.atan2(p.x - ta.x, p.z - ta.z), h2 = Math.atan2(tb.x - p.x, tb.z - p.z); let dh = h2 - h1; while (dh > Math.PI) dh -= 2 * Math.PI; while (dh < -Math.PI) dh += 2 * Math.PI; p.curv = dh / (4 * STEP); }
-  const sm = S.map((p, i) => { let s = 0; for (let k = -3; k <= 3; k++) s += S[(i + k + n) % n].curv; return s / 7; }); S.forEach((p, i) => p.curv = sm[i]);
+  const KER = [1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1], KR = 5, KSUM = KER.reduce((a, b) => a + b, 0);
+  const sm = S.map((p, i) => { let s = 0; for (let k = -KR; k <= KR; k++) s += S[(i + k + n) % n].curv * KER[k + KR]; return s / KSUM; });
+  S.forEach((p, i) => p.curv = sm[i]);
   let best = 0, bestLen = 0;
   for (let i = 0; i < n; i++) { let len = 0; while (len < n && Math.abs(S[(i + len) % n].curv) < 0.004) len++; if (len > bestLen) { bestLen = len; best = i; } }
   const R = []; for (let i = 0; i < n; i++) R.push(S[(best + i) % n]); R.forEach((p, i) => p.s = i * STEP);
@@ -33,6 +120,45 @@ Wd.makeCircuit = function (seed) {
   c.outside = i => { const p = c.at(i); const dl = Math.hypot(p.x + p.nx - cx, p.z + p.nz - cz), dr = Math.hypot(p.x - p.nx - cx, p.z - p.nz - cz); return dl > dr ? 1 : -1; };
   c.geomInside = i => c.at(i).curv > 0 ? 1 : -1;
   c.clearOfTrack = (x, z, margin) => { const m2 = margin * margin; for (const p of R) { const dx = p.x - x, dz = p.z - z; if (dx * dx + dz * dz < m2) return false; } return true; };
+  // ---------------------------------------------------------------------------------------
+  // How far you can step off the centreline at i, on one side, before you are standing on
+  // another part of the same circuit. A hairpin brings the track back alongside itself within
+  // thirty metres, and a barrier built at the usual twelve metres out then sits in the middle
+  // of the road further round — which is what the car was driving through.
+  // Walk the normal at i and stop short of any other stretch of track it runs into.
+  // ---------------------------------------------------------------------------------------
+  const CLEAR = ROAD_W + 2.5, ROOM_MAX = 46, NEAR = Wd.ROOM_NEAR, STEP_W = 1.5, CELL = 8;
+  // Index the centreline once so the walk below is a handful of cell lookups rather than a
+  // scan of the whole circuit at every step.
+  const grid = new Map(), gkey = (x, z) => Math.floor(x / CELL) + ',' + Math.floor(z / CELL);
+  for (let j = 0; j < n; j++) { const p = R[j], k = gkey(p.x, p.z); const a = grid.get(k); if (a) a.push(j); else grid.set(k, [j]); }
+  // Is this spot standing on a different stretch of the circuit?
+  const onTrack = (x, z, i) => {
+    const cx = Math.floor(x / CELL), cz = Math.floor(z / CELL), r = Math.ceil(CLEAR / CELL);
+    for (let a = cx - r; a <= cx + r; a++) for (let b = cz - r; b <= cz + r; b++) {
+      const arr = grid.get(a + ',' + b); if (!arr) continue;
+      for (const j of arr) { const dj = Math.abs(j - i), gap = Math.min(dj, n - dj);
+        if (gap < NEAR) continue;                       // the corner you are standing on
+        const q = R[j], dx = q.x - x, dz = q.z - z;
+        if (dx * dx + dz * dz < CLEAR * CLEAR) return true; } }
+    return false;
+  };
+  // Walk out along the normal until the road comes back at you, and stop there.
+  const roomOf = (i, side) => {
+    const p = R[i], ax = p.nx * side, az = p.nz * side;
+    let w = 0;
+    for (; w <= ROOM_MAX; w += STEP_W) if (onTrack(p.x + ax * w, p.z + az * w, i)) break;
+    return Math.max(0, w - STEP_W);
+  };
+  const roomP = new Array(n), roomN = new Array(n);
+  for (let i = 0; i < n; i++) { roomP[i] = roomOf(i, 1); roomN[i] = roomOf(i, -1); }
+  // Neighbouring segments have to agree, or a barrier ends abruptly mid-air where the room runs
+  // out. Take the tightest value over a short window so the wall tapers instead of stopping.
+  const tighten = arr => arr.map((_, i) => { let m = 1e9; for (let k = -2; k <= 2; k++) m = Math.min(m, arr[((i + k) % n + n) % n]); return m; });
+  const rp = tighten(roomP), rn = tighten(roomN);
+  c.room = (i, side) => { const k = ((i % n) + n) % n; return side > 0 ? rp[k] : rn[k]; };
+  c.venue = venue;
+  c.shape = shape.name;
   c.name = Wd.circuitName(seed);
   return c;
 };
@@ -42,15 +168,26 @@ Wd.circuitName = seed => `${NAMES[Math.abs(seed) % NAMES.length]} LAYOUT ${Strin
 E.hooks[M.CROWD] = function (mx, my, mz, a) {
   const sg = E.signs[a]; if (!sg) return M.STAND; const [u, v] = E.signUV(sg, mx, my, mz);
   const cx = Math.floor(u / 0.48), cy = Math.floor(v / 0.42), h = E.hash2(cx, cy);
-  if (v > 0.1 && h > 0.2) { const wave = Math.sin(E.time * 2.2 + cx * 0.35) > 0.85 ? 0.35 : 0, hh = E.hash2(cx + 7, cy + 3) + wave;
+  if (v > 0.1 && h > (1 - Wd.crowdFill)) { const wave = Math.sin(E.time * 2.2 + cx * 0.35) > 0.85 ? 0.35 : 0, hh = E.hash2(cx + 7, cy + 3) + wave;
     return hh < 0.2 ? M.BODY : hh < 0.34 ? M.STRIPE : hh < 0.44 ? M.GOLD : hh < 0.56 ? M.CYAN : hh < 0.86 ? M.NAVY : M.PURPLE; }
   return M.STAND;
 };
 // build(circuit, opts) -> { mesh, lightpools, tvcams, circuit }
 Wd.build = function (c, opts = {}) {
   const cp = c.pts, cn = c.n, at = c.at, pos = c.pos, outside = c.outside, geomInside = c.geomInside, clearOfTrack = c.clearOfTrack;
-  const maxInside = i => 0.85 / Math.max(Math.abs(at(i).curv), 1e-4), safeOff = (i, side, w) => (side === geomInside(i)) ? Math.min(w, maxInside(i)) : w;
+  // 0 is a bare circuit on a quiet evening; 1 is a full house under lights. The broadcast
+  // raises it as the harness levels up, so the season visibly grows around the car.
+  const detail = Math.max(0, Math.min(1, opts.detail === undefined ? 1 : opts.detail));
+  const STAND_ROWS = 4 + Math.round(detail * 5);          // 4..9 rows of seats
+  const STAND_CAP = 1 + Math.round(detail * 3);           // 1..4 grandstands
+  const LIGHTS = 5 + Math.round(detail * 9);              // 5..14 floodlight towers
+  Wd.crowdFill = 0.32 + detail * 0.52;
+  const maxInside = i => 0.85 / Math.max(Math.abs(at(i).curv), 1e-4);
+  const safeOff = (i, side, w) => Math.min(
+    (side === geomInside(i)) ? Math.min(w, maxInside(i)) : w,
+    c.room ? c.room(i, side) : w);
   const LIGHTPOOLS = [], TVCAMS = [], signs = E.signs, tris = () => E.current();
+  let PIT = null;   // where the pit lane is, so a car can actually be driven down it
   E.begin(); E.setGroup(0); E.setAux(0);
   let minx = 1e9, maxx = -1e9, minz = 1e9, maxz = -1e9;
   for (const p of cp) { minx = Math.min(minx, p.x); maxx = Math.max(maxx, p.x); minz = Math.min(minz, p.z); maxz = Math.max(maxz, p.z); }
@@ -82,13 +219,15 @@ Wd.build = function (c, opts = {}) {
   const straights = []; let i = 0;
   while (i < cn) { if (Math.abs(at(i).curv) < 0.004) { let j = i; while (j < cn && Math.abs(at(j).curv) < 0.004) j++; straights.push([i, j - i]); i = j; } else i++; }
   straights.sort((a, b) => b[1] - a[1]);
-  const clearRun = (i0, len, side, wmax) => { for (let q = i0; q <= i0 + len; q += 2) { const p = pos(q, side * wmax); if (!clearOfTrack(p[0], p[2], ROAD_W + 3)) return false; } return true; };
+  const clearRun = (i0, len, side, wmax) => { for (let q = i0; q <= i0 + len; q += 2) {
+    if (c.room && c.room(q, side) < wmax) return false;
+    const p = pos(q, side * wmax); if (!clearOfTrack(p[0], p[2], ROAD_W + 3)) return false; } return true; };
   const segQuad = (k, side, w0, w1, y0, y1, m) => { const A = pos(k, side * w0, y0), B = pos(k + 1, side * w0, y0), Cq = pos(k + 1, side * w1, y1), Dq = pos(k, side * w1, y1); if (side > 0) Q(A, Dq, Cq, B, m); else Q(A, B, Cq, Dq, m); };
   const segWall = (k, side, w, y0, y1, m) => { const A = pos(k, side * w, y0), B = pos(k + 1, side * w, y0), Cq = pos(k + 1, side * w, y1), Dq = pos(k, side * w, y1); if (side > 0) Q(A, B, Cq, Dq, m); else Q(A, Dq, Cq, B, m); };
   const segSign = (k, side, w, y0, y1, text, u0, cell, fg, bg) => { const t = at(k), A = pos(k, side * w, y0); E.setAux(signs.length); signs.push({ text, o: A, r: [t.tx, 0, t.tz], u: [0, 1, 0], cell, fg, bg, u0 }); segWall(k, side, w, y0, y1, M.SIGN); E.setAux(0); };
   const teamName = opts.teamName || 'SCRUTINEER';
   const placeStand = (i0, len, side) => {
-    const rows = 7;
+    const rows = STAND_ROWS;
     for (let k = i0; k < i0 + len; k++) {
       const t = at(k);
       for (let r = 0; r < rows; r++) { const w0 = ROAD_W + 15 + r * 1.6, y0 = 0.3 + r * 1.15;
@@ -104,20 +243,58 @@ Wd.build = function (c, opts = {}) {
     }
   };
   let standsPlaced = 0;
-  for (const [s0, sl] of straights) { if (standsPlaced >= 2 || sl < 10) continue; const i0 = s0 + 2, len = sl - 4, side = outside(s0 + Math.floor(sl / 2)); if (clearRun(i0, len, side, ROAD_W + 36)) { placeStand(i0, len, side); standsPlaced++; } }
+  for (const [s0, sl] of straights) { if (standsPlaced >= STAND_CAP || sl < 10) continue; const i0 = s0 + 2, len = sl - 4, side = outside(s0 + Math.floor(sl / 2)); if (clearRun(i0, len, side, ROAD_W + 36)) { placeStand(i0, len, side); standsPlaced++; } }
   if (straights.length) {
     const [s0, sl] = straights[0]; const i0 = s0 + 3, len = sl - 6; let side = -outside(s0 + Math.floor(sl / 2));
-    if (!clearRun(i0, len, side, ROAD_W + 15)) side = -side;
-    if (clearRun(i0, len, side, ROAD_W + 15)) {
-      const wf = ROAD_W + 4.6, wb = ROAD_W + 13.6, hgt = 5.2;
+    if (!clearRun(i0, len, side, ROAD_W + 17)) side = -side;
+    if (clearRun(i0, len, side, ROAD_W + 17)) {
+      const wf = ROAD_W + 7.0, wb = ROAD_W + 16.0, hgt = 5.2;   // lane 2.3..7.0 = 4.7 m wide
+      // The lane itself: between the armco and the front of the building, with the box
+      // halfway along it.
+      const BOX = i0 + Math.floor(len / 2);
+      PIT = { i0, len, side, lane: side * (ROAD_W + 4.6), box: BOX,
+              entry: i0 - 6, exit: i0 + len + 6,
+              // A broadcast pit camera: across the lane from the box, slightly back and low,
+              // so the stop is seen three-quarters on rather than straight down the lane.
+              cam: pos(BOX - 3, side * (ROAD_W + 0.4), 1.9) };
       for (let k = i0; k < i0 + len; k++) {
+        // The lane is a surface you drive on, not the grass that happened to be there. Lay it
+        // between the wall and the garage fronts, with a painted edge.
+        segQuad(k, side, ROAD_W + 2.3, wf - 0.2, 0.03, 0.03, M.ASPHALT);
+        segQuad(k, side, ROAD_W + 2.3, ROAD_W + 2.55, 0.045, 0.045, M.KERB_W);
+        // one bay per two segments, so the lane reads as a row of garages
+        if ((k - i0) % 2 === 0) { const q = pos(k, side * (wf - 0.3));
+          box(q[0], 0.9, q[2], 0.12, 1.8, 0.12, M.STEEL); }
         segWall(k, side, wf, 0, hgt, M.BODY); segQuad(k, side, wf, wb, hgt, hgt, M.STEEL);
         const A = pos(k, side * wb, 0), B = pos(k + 1, side * wb, 0), Cq = pos(k + 1, side * wb, hgt), Dq = pos(k, side * wb, hgt); if (side > 0) Q(A, Dq, Cq, B, M.BODY); else Q(A, B, Cq, Dq, M.BODY);
         segWall(k, side, wf - 0.05, hgt - 0.5, hgt, M.NAVY); segWall(k, side, wf - 0.06, 3.1, 4.0, M.CYAN);
         if ((k - i0) % 2 === 0) { segWall(k, side, wf - 0.08, 0.1, 2.9, M.STEEL); segWall(k, side, wf - 0.1, 2.95, 3.05, M.GOLD); }
         if ((k - i0) % 2 === 1) { const p = pos(k, side * (wf - 0.12)); box(p[0], 1.5, p[2], 0.16, 2.9, 0.16, M.CARBON); }
         if (k > i0 + 1 && k < i0 + len - 2) segSign(k, side, wf - 0.14, 4.1, 4.9, 'PIT LANE · PARC FERME · SCRUTINEERING BAY · PIT LANE · PARC FERME', (k - i0 - 2) * 4, 0.3, M.CYAN, M.NAVY);
-        segWall(k, side, ROAD_W + 2.4, 0, 1.0, M.ARMCO);
+        // Leave the ends open: that is the pit entry and the pit exit, and without them the
+        // car would have to drive through the barrier to be serviced.
+        if (k > i0 + 2 && k < i0 + len - 3) segWall(k, side, ROAD_W + 2.4, 0, 1.0, M.ARMCO);
+      }
+      // The box itself: a marked stall, the bay it belongs to, and a crew waiting in it.
+      for (let k = BOX - 1; k <= BOX + 1; k++) segQuad(k, side, ROAD_W + 2.6, wf - 0.3, 0.05, 0.05, M.GOLD);
+      segQuad(BOX, side, ROAD_W + 2.6, ROAD_W + 2.9, 0.07, 0.07, M.NAVY);
+      segSign(BOX - 2, side, wf - 0.16, 1.2, 2.0, `${teamName} \u00B7 PIT BOX`, 0, 0.3, M.NAVY, M.GOLD);
+      {
+        // A pit crew, waiting where a pit crew waits: either side of the stall, plus one with
+        // the board out in front of it.
+        const crew = (q, m) => { box(q[0], 0.42, q[2], 0.34, 0.84, 0.34, m);
+          box(q[0], 1.02, q[2], 0.42, 0.36, 0.42, M.BODY);
+          box(q[0], 1.32, q[2], 0.3, 0.26, 0.3, m); };
+        // Clear of the car, which sits on the lane centre at ROAD_W + 3.5 and is about a
+        // metre wide over the wheels.
+        for (const [d, w, m] of [[-1, 3.35, M.GOLD], [1, 3.35, M.GOLD],
+                                 [-1, 5.85, M.CYAN], [1, 5.85, M.CYAN], [0, 6.3, M.STRIPE]]) {
+          const q = pos(BOX + d, side * (ROAD_W + w));
+          if (clearOfTrack(q[0], q[2], ROAD_W - 1.2)) crew(q, m);
+        }
+        const lolli = pos(BOX + 2, side * (ROAD_W + 4.5));
+        box(lolli[0], 1.3, lolli[2], 0.1, 2.6, 0.1, M.CARBON);
+        box(lolli[0], 2.5, lolli[2], 0.9, 0.5, 0.12, M.STRIPE);
       }
       const mid = pos(i0 + Math.floor(len / 2), side * (wf + 4.5)); box(mid[0], hgt + 0.8, mid[2], 3, 1.6, 8, M.STEEL); box(mid[0], hgt + 2.2, mid[2], 0.3, 2.6, 0.3, M.STEEL);
     }
@@ -133,7 +310,7 @@ Wd.build = function (c, opts = {}) {
     const s0 = pos(0, ROAD_W, 0.015), s1 = pos(0, -ROAD_W, 0.015), s2 = pos(-1, -ROAD_W, 0.015), s3 = pos(-1, ROAD_W, 0.015);
     for (let k = 0; k < 6; k++) { const f = k / 6, g = (k + 1) / 6, A = [s0[0] + (s1[0] - s0[0]) * f, 0.015, s0[2] + (s1[2] - s0[2]) * f], B = [s0[0] + (s1[0] - s0[0]) * g, 0.015, s0[2] + (s1[2] - s0[2]) * g], Cc = [s3[0] + (s2[0] - s3[0]) * g, 0.015, s3[2] + (s2[2] - s3[2]) * g], D = [s3[0] + (s2[0] - s3[0]) * f, 0.015, s3[2] + (s2[2] - s3[2]) * f]; Q(A, D, Cc, B, (k & 1) ? M.KERB_W : M.CARBON); }
   }
-  for (let k = 0; k < cn; k += Math.round(cn / 9)) { const side = outside(k), p = pos(k, side * (ROAD_W + 26)); if (!clearOfTrack(p[0], p[2], ROAD_W + 6)) continue;
+  for (let k = 0; k < cn; k += Math.max(4, Math.round(cn / LIGHTS))) { const side = outside(k), p = pos(k, side * (ROAD_W + 26)); if (!clearOfTrack(p[0], p[2], ROAD_W + 6)) continue;
     box(p[0], 14, p[2], 0.9, 28, 0.9, M.STEEL); box(p[0], 28.6, p[2], 4.5, 1.4, 1.2, M.STEEL); for (let j = -1; j <= 1; j++) box(p[0] + j * 1.4, 28.0, p[2] - side * 0.8, 1.0, 0.8, 0.3, M.LAMP);
     const q = pos(k, side * (ROAD_W + 2)); LIGHTPOOLS.push([q[0], q[2], 26]); }
   for (let k = 0; k < cn; k++) { const nxt = at(k + 25);
@@ -175,6 +352,6 @@ Wd.build = function (c, opts = {}) {
       n++; if (sees(tc.x, tc.z, q[0], q[2])) ok++; }
     tc.clear = ok / n;
   }
-  return { mesh: E.end(), lightpools: LIGHTPOOLS, tvcams: TVCAMS, circuit: c };
+  return { mesh: E.end(), lightpools: LIGHTPOOLS, tvcams: TVCAMS, circuit: c, pit: PIT };
 };
 })(window.SCR = window.SCR || {});

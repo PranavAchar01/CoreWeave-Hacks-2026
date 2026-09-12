@@ -5223,6 +5223,15 @@ const RAMP = {
 };
 const MAT_NAMES = E.MAT_NAMES = Object.keys(RAMP), RAMPS = E.RAMPS = MAT_NAMES.map(k => RAMP[k].map(hex));
 const M = E.M = {}; MAT_NAMES.forEach((k, i) => M[k] = i);
+// The world stores material indices, not colours, so repainting a ramp repaints everything drawn
+// in it. That is how one circuit is a desert and the next is a night race. Always applied from a
+// pristine copy, so calling it twice is the same as calling it once.
+const BASE_RAMPS = RAMPS.map(r => r.map(c2 => c2));
+E.setPalette = function (over) {
+  for (let i = 0; i < RAMPS.length; i++) RAMPS[i] = BASE_RAMPS[i];
+  if (!over) return;
+  for (const k in over) { const i = M[k]; if (i !== undefined) RAMPS[i] = over[k].map(hex); }
+};
 E.SHADOW_MAT = 250; E.LIGHT_MAT = 251;
 const GROUND_MATS = E.GROUND_MATS = new Set([M.ASPHALT, M.RUBBER, M.GRASS, M.GRASS2, M.GRAVEL, M.KERB_R, M.KERB_W, M.CONCRETE]);
 // emissive materials ignore lighting; metallic ones get extra ambient
@@ -5403,9 +5412,24 @@ E.createRenderer = function (canvas, W, H, SCALE) {
     const c = typeof color === 'string' ? hex(color) : color;
     for (let i = 0; i < W * H; i++) { const o = i * 4; px[o] = c[0]; px[o + 1] = c[1]; px[o + 2] = c[2]; px[o + 3] = 255; depth[i] = Infinity; matBuf[i] = -1; }
   };
-  const NIGHT = hex('#06081A'), STUDIO = hex('#121A4A'), DUSK = hex('#2A3A8A'), INK = hex('#000000'), MOUNT = hex('#121A4A'), MOUNT2 = hex('#0B1030'), GLOW = hex('#7A32B0'), GOLDc = hex('#F4C542'), CYANc = hex('#3DD2FF'), WHITEc = hex('#FFFFFF'), GROUNDc = hex('#0B2A17'), CAPc = hex('#C8CBD8');
+  const INK = hex('#000000');
+  // The sky is a palette rather than a set of constants, so a circuit can be at dusk in the
+  // desert, under snow, or at night under floodlights without a second sky routine.
+  const SKY_DEFAULT = { night: '#06081A', studio: '#121A4A', dusk: '#2A3A8A', mount: '#121A4A',
+    mount2: '#0B1030', glow: '#7A32B0', cityA: '#F4C542', cityB: '#3DD2FF', star: '#FFFFFF',
+    starDim: '#C8CBD8', ground: '#0B2A17', stars: true, moon: true };
+  let SKY = null;
+  R.setSky = function (o) {
+    const s2 = Object.assign({}, SKY_DEFAULT, o || {});
+    SKY = { NIGHT: hex(s2.night), STUDIO: hex(s2.studio), DUSK: hex(s2.dusk), MOUNT: hex(s2.mount),
+      MOUNT2: hex(s2.mount2), GLOW: hex(s2.glow), GOLDc: hex(s2.cityA), CYANc: hex(s2.cityB),
+      WHITEc: hex(s2.star), CAPc: hex(s2.starDim), GROUNDc: hex(s2.ground),
+      stars: s2.stars !== false, moon: s2.moon !== false };
+  };
+  R.setSky();
   const colDir = new Float32Array(W), colM1 = new Float32Array(W), colM2 = new Float32Array(W), colCity = new Uint8Array(W);
-  R.sky = function () {   // night sky with dusk glow, mountains, city lights, moon, stars; sets depth to infinity
+  R.sky = function () {   // sky with glow band, mountains, lights, optional moon and stars
+    const { NIGHT, STUDIO, DUSK, MOUNT, MOUNT2, GLOW, GOLDc, CYANc, WHITEc, CAPc, GROUNDc } = SKY;
     const hf = E.norm([VM.f[0], 0, VM.f[2]]); toView(cam.pos[0] + hf[0] * 5000, cam.pos[1], cam.pos[2] + hf[2] * 5000, cv);
     const horizon = H / 2 - cv[1] * FOCAL / cv[2], baseAz = Math.atan2(VM.f[0], VM.f[2]);
     for (let x = 0; x < W; x++) { const az = baseAz + Math.atan((x - W / 2) / FOCAL); colDir[x] = az;
@@ -5420,8 +5444,8 @@ E.createRenderer = function (canvas, W, H, SCALE) {
         else { c = t < bayer(x, y) ? STUDIO : NIGHT; if (tt > 0 && tt * 0.85 > bayer(x + 3, y)) c = DUSK; if (tt > 0.55 && (tt - 0.55) * 0.9 > bayer(x + 5, y + 2)) c = GLOW;
           let dAz = colDir[x] - moonAz; while (dAz > Math.PI) dAz -= 2 * Math.PI; while (dAz < -Math.PI) dAz += 2 * Math.PI;
           const mx = dAz * FOCAL, my = dyh - moonEl, rr = mx * mx + my * my;
-          if (rr < 121) c = (rr < 100 || bayer(x, y) < 0.5) ? (E.hash2(Math.floor(mx / 3), Math.floor(my / 3)) < 0.18 ? CAPc : WHITEc) : STUDIO;
-          else if (dyh > 44 && E.hash2(Math.floor(colDir[x] * 400), y) > 0.995) c = E.hash2(x, y) > 0.5 ? WHITEc : CAPc; }
+          if (SKY.moon && rr < 121) c = (rr < 100 || bayer(x, y) < 0.5) ? (E.hash2(Math.floor(mx / 3), Math.floor(my / 3)) < 0.18 ? CAPc : WHITEc) : STUDIO;
+          else if (SKY.stars && dyh > 44 && E.hash2(Math.floor(colDir[x] * 400), y) > 0.995) c = E.hash2(x, y) > 0.5 ? WHITEc : CAPc; }
         px[o] = c[0]; px[o + 1] = c[1]; px[o + 2] = c[2]; px[o + 3] = 255;
       }
     }
@@ -5778,7 +5802,7 @@ E.hooks[M.LIVERY] = function (mx, my, mz, aux) {
   return t > E.bayer(Math.floor(mz / 0.028) * 3, Math.floor((mx * 0.8 + my) / 0.028) * 3) ? dark : light;
 };
 // ---------- state + transform ----------
-C.newState = () => ({ x: 0, y: 0, z: 0, yaw: 0, roll: 0, pitch: 0, spin: 0, steer: 0, speed: 0, s: 0, lap: 1, lapStart: 0, best: null, last: null, sector: 0, drsAngle: 0, drsOn: false, lapsDone: 0, braking: false, fanSpin: 0, sectorTimes: [], lapTimes: [] });
+C.newState = () => ({ x: 0, y: 0, z: 0, yaw: 0, roll: 0, pitch: 0, spin: 0, steer: 0, speed: 0, s: 0, lap: 1, lapStart: 0, best: null, last: null, sector: 0, drsAngle: 0, drsOn: false, lapsDone: 0, off: 0, offPrev: 0, lift: 0, braking: false, fanSpin: 0, sectorTimes: [], lapTimes: [] });
 // a parked car for the garage / parc fermé / finale: static pose at a position and heading
 C.displayState = (x = 0, z = 0, yaw = 0) => ({ ...C.newState(), x, z, yaw });
 // returns xform(x,y,z,group,out) for a car state. opts: lift (raise the body on jacks), wheelDrop (wheels rest on the floor
@@ -5819,9 +5843,94 @@ C.makeXform = function (c, opts = {}) {
 const E = SCR.engine, M = E.M, Wd = SCR.world = {};
 const { box, Q, T } = E;
 const ROAD_W = Wd.ROAD_W = 6;
+// How full the grandstands are drawn, 0..1. build() sets it from opts.detail, so a circuit
+// early in the season is a half-empty Thursday and a late one is a full house.
+Wd.crowdFill = 0.8;
+// How much of the circuit either side of a point counts as "the corner you are standing on"
+// when working out how much room there is beside the track. Lower is stricter.
+Wd.ROOM_NEAR = 4;
+// ---------------------------------------------------------------------------------------
+// Venues. A circuit is somewhere, and where it is decides the sky, the ground and the light.
+// Each one repaints the material ramps the world is drawn in, so the same geometry reads as a
+// desert at dusk, a parkland afternoon or a street race at night.
+// ---------------------------------------------------------------------------------------
+const VENUES = Wd.VENUES = [
+  { name: 'NIGHT', sky: {} },      // the original: floodlit, mountains, a moon and stars
+  { name: 'DESERT DUSK',
+    sky: { night: '#2A1838', studio: '#6A3450', dusk: '#C85A2A', glow: '#FF8C3A',
+           mount: '#4A2C48', mount2: '#2A1832', ground: '#6E5F44',
+           cityA: '#FFD27A', cityB: '#FFA318', stars: false, moon: false },
+    mats: { GRASS: ['#4A4030', '#6E5F44', '#8C7B58', '#B09C72'],
+            GRASS2: ['#443A2C', '#665840', '#857452', '#A8946C'],
+            GRAVEL: ['#6E5F44', '#8C7B58', '#B09C72', '#D8C79A'] } },
+  { name: 'PARKLAND',
+    sky: { night: '#4E86C8', studio: '#9CC5F0', dusk: '#D6E8FB', glow: '#FFFFFF',
+           mount: '#3A5A7A', mount2: '#2A4058', ground: '#1F6B3C',
+           cityA: '#E8EBF5', cityB: '#C8CBD8', stars: false, moon: false },
+    mats: { GRASS: ['#123F24', '#1F6B3C', '#2E8A4E', '#5CB878'],
+            GRASS2: ['#0F3A20', '#1A5C33', '#27784A', '#4FA468'] } },
+  { name: 'AUTUMN',
+    sky: { night: '#3A3050', studio: '#8A7288', dusk: '#D08A4A', glow: '#F0B070',
+           mount: '#4A3A52', mount2: '#2E2438', ground: '#6B3A26',
+           cityA: '#FFD27A', cityB: '#E8EBF5', stars: false, moon: false },
+    mats: { GRASS: ['#3A1E14', '#6B3A26', '#96612F', '#BE8248'],
+            GRASS2: ['#33200E', '#5E3A08', '#A86E10', '#D89A30'],
+            GRAVEL: ['#4A3020', '#6B4420', '#96612F', '#BE8248'] } },
+  { name: 'COASTAL SUNSET',
+    sky: { night: '#14235A', studio: '#3A4CA8', dusk: '#E0567A', glow: '#FFA318',
+           mount: '#222E6A', mount2: '#131A40', ground: '#123F24',
+           cityA: '#FFA318', cityB: '#3DD2FF', stars: false, moon: false } },
+  { name: 'WINTER',
+    sky: { night: '#6F87A4', studio: '#AEBDD2', dusk: '#E4E8F2', glow: '#FFFFFF',
+           mount: '#8A8FA6', mount2: '#6A6F8A', ground: '#AEB6C6',
+           cityA: '#E8EBF5', cityB: '#CDF4FF', stars: false, moon: false },
+    mats: { GRASS: ['#6A6F8A', '#AEB6C6', '#E4E8F2', '#FFFFFF'],
+            GRASS2: ['#626880', '#A4ACBE', '#DCE2EE', '#F6F8FC'],
+            GRAVEL: ['#4A4E5E', '#7E8499', '#BDC2D4', '#E4E8F2'] } },
+  { name: 'STREET NIGHT',
+    sky: { night: '#0A0518', studio: '#2A0C4A', dusk: '#7A32B0', glow: '#B04BFF',
+           mount: '#1A0E30', mount2: '#0E0620', ground: '#171922',
+           cityA: '#B04BFF', cityB: '#3DD2FF' },
+    mats: { GRASS: ['#171922', '#252834', '#323544', '#434757'],
+            GRASS2: ['#14161E', '#1E2028', '#2C2E3A', '#3A3D4C'],
+            GRAVEL: ['#262A36', '#3E4354', '#5C6176', '#828799'] } },
+];
+// Repaint the world for a venue. Idempotent: always applied from the pristine ramps.
+Wd.applyVenue = function (R, venue) {
+  const v = venue || VENUES[0];
+  E.setPalette(v.mats || null);
+  if (R && R.setSky) R.setSky(v.sky || {});
+};
+
+// Three shapes of circuit, so layouts differ in character and not only in outline.
+const SHAPES = [
+  { name: 'SPEEDWAY',  pts: [8, 11],  base: [168, 210], spread: [40, 80],  wander: [0.14, 0.30] },
+  { name: 'BALANCED',  pts: [10, 14], base: [140, 180], spread: [70, 120], wander: [0.24, 0.50] },
+  { name: 'TECHNICAL', pts: [13, 17], base: [118, 150], spread: [90, 150], wander: [0.38, 0.70] },
+];
+
 Wd.makeCircuit = function (seed) {
-  const rng = E.mulberry32(seed), N = 11, ctrl = [];
-  for (let i = 0; i < N; i++) { const ang = (i / N) * Math.PI * 2 + (rng() - 0.5) * 0.3, rad = 150 + (rng() - 0.5) * 80; ctrl.push([Math.cos(ang) * rad * 1.35, Math.sin(ang) * rad]); }
+  const rng = E.mulberry32(seed);
+  // Where this circuit is, and what shape of circuit it is. Both are drawn from the seed through
+  // their own hash, so consecutive seeds do not march through the list in step.
+  const vpick = E.mulberry32((seed ^ 0x9E3779B9) | 0), spick = E.mulberry32((seed ^ 0x85EBCA6B) | 0);
+  const venue = VENUES[Math.floor(vpick() * VENUES.length) % VENUES.length];
+  const shape = SHAPES[Math.floor(spick() * SHAPES.length) % SHAPES.length];
+  const span = (r, k) => r[0] + (r[1] - r[0]) * k;
+  // Layout character: how many corners it is built from, how stretched the loop is, and how far
+  // a corner may wander off the ring. A circuit is its seed.
+  const N = Math.round(span(shape.pts, rng()));
+  const aspect = 1.08 + rng() * 0.62;               // 1.08..1.70, long-and-thin through to square
+  const wander = span(shape.wander, rng());         // how irregular the spacing gets
+  const spread = span(shape.spread, rng());         // radius variation, so straights and hairpins
+  const base = span(shape.base, rng());
+  const phase = rng() * Math.PI * 2;
+  const ctrl = [];
+  for (let i = 0; i < N; i++) {
+    const ang = (i / N) * Math.PI * 2 + phase + (rng() - 0.5) * wander;
+    const rad = base + (rng() - 0.5) * spread;
+    ctrl.push([Math.cos(ang) * rad * aspect, Math.sin(ang) * rad]);
+  }
   const pts = [], cr = (p0, p1, p2, p3, t) => { const t2 = t * t, t3 = t2 * t; return 0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3); };
   for (let i = 0; i < N; i++) { const p0 = ctrl[(i - 1 + N) % N], p1 = ctrl[i], p2 = ctrl[(i + 1) % N], p3 = ctrl[(i + 2) % N]; const steps = Math.max(8, Math.round(Math.hypot(p2[0] - p1[0], p2[1] - p1[1]) / 3.5));
     for (let k = 0; k < steps; k++) { const t = k / steps; pts.push([cr(p0[0], p1[0], p2[0], p3[0], t), cr(p0[1], p1[1], p2[1], p3[1], t)]); } }
@@ -5835,7 +5944,9 @@ Wd.makeCircuit = function (seed) {
   for (let i = 0; i < n; i++) { const a = S[(i - 1 + n) % n], b = S[(i + 1) % n], p = S[i]; let tx = b.x - a.x, tz = b.z - a.z; const l = Math.hypot(tx, tz) || 1; tx /= l; tz /= l;
     p.tx = tx; p.tz = tz; p.nx = -tz; p.nz = tx; const ta = S[(i - 2 + n) % n], tb = S[(i + 2) % n];
     const h1 = Math.atan2(p.x - ta.x, p.z - ta.z), h2 = Math.atan2(tb.x - p.x, tb.z - p.z); let dh = h2 - h1; while (dh > Math.PI) dh -= 2 * Math.PI; while (dh < -Math.PI) dh += 2 * Math.PI; p.curv = dh / (4 * STEP); }
-  const sm = S.map((p, i) => { let s = 0; for (let k = -3; k <= 3; k++) s += S[(i + k + n) % n].curv; return s / 7; }); S.forEach((p, i) => p.curv = sm[i]);
+  const KER = [1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1], KR = 5, KSUM = KER.reduce((a, b) => a + b, 0);
+  const sm = S.map((p, i) => { let s = 0; for (let k = -KR; k <= KR; k++) s += S[(i + k + n) % n].curv * KER[k + KR]; return s / KSUM; });
+  S.forEach((p, i) => p.curv = sm[i]);
   let best = 0, bestLen = 0;
   for (let i = 0; i < n; i++) { let len = 0; while (len < n && Math.abs(S[(i + len) % n].curv) < 0.004) len++; if (len > bestLen) { bestLen = len; best = i; } }
   const R = []; for (let i = 0; i < n; i++) R.push(S[(best + i) % n]); R.forEach((p, i) => p.s = i * STEP);
@@ -5846,6 +5957,45 @@ Wd.makeCircuit = function (seed) {
   c.outside = i => { const p = c.at(i); const dl = Math.hypot(p.x + p.nx - cx, p.z + p.nz - cz), dr = Math.hypot(p.x - p.nx - cx, p.z - p.nz - cz); return dl > dr ? 1 : -1; };
   c.geomInside = i => c.at(i).curv > 0 ? 1 : -1;
   c.clearOfTrack = (x, z, margin) => { const m2 = margin * margin; for (const p of R) { const dx = p.x - x, dz = p.z - z; if (dx * dx + dz * dz < m2) return false; } return true; };
+  // ---------------------------------------------------------------------------------------
+  // How far you can step off the centreline at i, on one side, before you are standing on
+  // another part of the same circuit. A hairpin brings the track back alongside itself within
+  // thirty metres, and a barrier built at the usual twelve metres out then sits in the middle
+  // of the road further round — which is what the car was driving through.
+  // Walk the normal at i and stop short of any other stretch of track it runs into.
+  // ---------------------------------------------------------------------------------------
+  const CLEAR = ROAD_W + 2.5, ROOM_MAX = 46, NEAR = Wd.ROOM_NEAR, STEP_W = 1.5, CELL = 8;
+  // Index the centreline once so the walk below is a handful of cell lookups rather than a
+  // scan of the whole circuit at every step.
+  const grid = new Map(), gkey = (x, z) => Math.floor(x / CELL) + ',' + Math.floor(z / CELL);
+  for (let j = 0; j < n; j++) { const p = R[j], k = gkey(p.x, p.z); const a = grid.get(k); if (a) a.push(j); else grid.set(k, [j]); }
+  // Is this spot standing on a different stretch of the circuit?
+  const onTrack = (x, z, i) => {
+    const cx = Math.floor(x / CELL), cz = Math.floor(z / CELL), r = Math.ceil(CLEAR / CELL);
+    for (let a = cx - r; a <= cx + r; a++) for (let b = cz - r; b <= cz + r; b++) {
+      const arr = grid.get(a + ',' + b); if (!arr) continue;
+      for (const j of arr) { const dj = Math.abs(j - i), gap = Math.min(dj, n - dj);
+        if (gap < NEAR) continue;                       // the corner you are standing on
+        const q = R[j], dx = q.x - x, dz = q.z - z;
+        if (dx * dx + dz * dz < CLEAR * CLEAR) return true; } }
+    return false;
+  };
+  // Walk out along the normal until the road comes back at you, and stop there.
+  const roomOf = (i, side) => {
+    const p = R[i], ax = p.nx * side, az = p.nz * side;
+    let w = 0;
+    for (; w <= ROOM_MAX; w += STEP_W) if (onTrack(p.x + ax * w, p.z + az * w, i)) break;
+    return Math.max(0, w - STEP_W);
+  };
+  const roomP = new Array(n), roomN = new Array(n);
+  for (let i = 0; i < n; i++) { roomP[i] = roomOf(i, 1); roomN[i] = roomOf(i, -1); }
+  // Neighbouring segments have to agree, or a barrier ends abruptly mid-air where the room runs
+  // out. Take the tightest value over a short window so the wall tapers instead of stopping.
+  const tighten = arr => arr.map((_, i) => { let m = 1e9; for (let k = -2; k <= 2; k++) m = Math.min(m, arr[((i + k) % n + n) % n]); return m; });
+  const rp = tighten(roomP), rn = tighten(roomN);
+  c.room = (i, side) => { const k = ((i % n) + n) % n; return side > 0 ? rp[k] : rn[k]; };
+  c.venue = venue;
+  c.shape = shape.name;
   c.name = Wd.circuitName(seed);
   return c;
 };
@@ -5855,15 +6005,26 @@ Wd.circuitName = seed => `${NAMES[Math.abs(seed) % NAMES.length]} LAYOUT ${Strin
 E.hooks[M.CROWD] = function (mx, my, mz, a) {
   const sg = E.signs[a]; if (!sg) return M.STAND; const [u, v] = E.signUV(sg, mx, my, mz);
   const cx = Math.floor(u / 0.48), cy = Math.floor(v / 0.42), h = E.hash2(cx, cy);
-  if (v > 0.1 && h > 0.2) { const wave = Math.sin(E.time * 2.2 + cx * 0.35) > 0.85 ? 0.35 : 0, hh = E.hash2(cx + 7, cy + 3) + wave;
+  if (v > 0.1 && h > (1 - Wd.crowdFill)) { const wave = Math.sin(E.time * 2.2 + cx * 0.35) > 0.85 ? 0.35 : 0, hh = E.hash2(cx + 7, cy + 3) + wave;
     return hh < 0.2 ? M.BODY : hh < 0.34 ? M.STRIPE : hh < 0.44 ? M.GOLD : hh < 0.56 ? M.CYAN : hh < 0.86 ? M.NAVY : M.PURPLE; }
   return M.STAND;
 };
 // build(circuit, opts) -> { mesh, lightpools, tvcams, circuit }
 Wd.build = function (c, opts = {}) {
   const cp = c.pts, cn = c.n, at = c.at, pos = c.pos, outside = c.outside, geomInside = c.geomInside, clearOfTrack = c.clearOfTrack;
-  const maxInside = i => 0.85 / Math.max(Math.abs(at(i).curv), 1e-4), safeOff = (i, side, w) => (side === geomInside(i)) ? Math.min(w, maxInside(i)) : w;
+  // 0 is a bare circuit on a quiet evening; 1 is a full house under lights. The broadcast
+  // raises it as the harness levels up, so the season visibly grows around the car.
+  const detail = Math.max(0, Math.min(1, opts.detail === undefined ? 1 : opts.detail));
+  const STAND_ROWS = 4 + Math.round(detail * 5);          // 4..9 rows of seats
+  const STAND_CAP = 1 + Math.round(detail * 3);           // 1..4 grandstands
+  const LIGHTS = 5 + Math.round(detail * 9);              // 5..14 floodlight towers
+  Wd.crowdFill = 0.32 + detail * 0.52;
+  const maxInside = i => 0.85 / Math.max(Math.abs(at(i).curv), 1e-4);
+  const safeOff = (i, side, w) => Math.min(
+    (side === geomInside(i)) ? Math.min(w, maxInside(i)) : w,
+    c.room ? c.room(i, side) : w);
   const LIGHTPOOLS = [], TVCAMS = [], signs = E.signs, tris = () => E.current();
+  let PIT = null;   // where the pit lane is, so a car can actually be driven down it
   E.begin(); E.setGroup(0); E.setAux(0);
   let minx = 1e9, maxx = -1e9, minz = 1e9, maxz = -1e9;
   for (const p of cp) { minx = Math.min(minx, p.x); maxx = Math.max(maxx, p.x); minz = Math.min(minz, p.z); maxz = Math.max(maxz, p.z); }
@@ -5895,13 +6056,15 @@ Wd.build = function (c, opts = {}) {
   const straights = []; let i = 0;
   while (i < cn) { if (Math.abs(at(i).curv) < 0.004) { let j = i; while (j < cn && Math.abs(at(j).curv) < 0.004) j++; straights.push([i, j - i]); i = j; } else i++; }
   straights.sort((a, b) => b[1] - a[1]);
-  const clearRun = (i0, len, side, wmax) => { for (let q = i0; q <= i0 + len; q += 2) { const p = pos(q, side * wmax); if (!clearOfTrack(p[0], p[2], ROAD_W + 3)) return false; } return true; };
+  const clearRun = (i0, len, side, wmax) => { for (let q = i0; q <= i0 + len; q += 2) {
+    if (c.room && c.room(q, side) < wmax) return false;
+    const p = pos(q, side * wmax); if (!clearOfTrack(p[0], p[2], ROAD_W + 3)) return false; } return true; };
   const segQuad = (k, side, w0, w1, y0, y1, m) => { const A = pos(k, side * w0, y0), B = pos(k + 1, side * w0, y0), Cq = pos(k + 1, side * w1, y1), Dq = pos(k, side * w1, y1); if (side > 0) Q(A, Dq, Cq, B, m); else Q(A, B, Cq, Dq, m); };
   const segWall = (k, side, w, y0, y1, m) => { const A = pos(k, side * w, y0), B = pos(k + 1, side * w, y0), Cq = pos(k + 1, side * w, y1), Dq = pos(k, side * w, y1); if (side > 0) Q(A, B, Cq, Dq, m); else Q(A, Dq, Cq, B, m); };
   const segSign = (k, side, w, y0, y1, text, u0, cell, fg, bg) => { const t = at(k), A = pos(k, side * w, y0); E.setAux(signs.length); signs.push({ text, o: A, r: [t.tx, 0, t.tz], u: [0, 1, 0], cell, fg, bg, u0 }); segWall(k, side, w, y0, y1, M.SIGN); E.setAux(0); };
   const teamName = opts.teamName || 'SCRUTINEER';
   const placeStand = (i0, len, side) => {
-    const rows = 7;
+    const rows = STAND_ROWS;
     for (let k = i0; k < i0 + len; k++) {
       const t = at(k);
       for (let r = 0; r < rows; r++) { const w0 = ROAD_W + 15 + r * 1.6, y0 = 0.3 + r * 1.15;
@@ -5917,20 +6080,58 @@ Wd.build = function (c, opts = {}) {
     }
   };
   let standsPlaced = 0;
-  for (const [s0, sl] of straights) { if (standsPlaced >= 2 || sl < 10) continue; const i0 = s0 + 2, len = sl - 4, side = outside(s0 + Math.floor(sl / 2)); if (clearRun(i0, len, side, ROAD_W + 36)) { placeStand(i0, len, side); standsPlaced++; } }
+  for (const [s0, sl] of straights) { if (standsPlaced >= STAND_CAP || sl < 10) continue; const i0 = s0 + 2, len = sl - 4, side = outside(s0 + Math.floor(sl / 2)); if (clearRun(i0, len, side, ROAD_W + 36)) { placeStand(i0, len, side); standsPlaced++; } }
   if (straights.length) {
     const [s0, sl] = straights[0]; const i0 = s0 + 3, len = sl - 6; let side = -outside(s0 + Math.floor(sl / 2));
-    if (!clearRun(i0, len, side, ROAD_W + 15)) side = -side;
-    if (clearRun(i0, len, side, ROAD_W + 15)) {
-      const wf = ROAD_W + 4.6, wb = ROAD_W + 13.6, hgt = 5.2;
+    if (!clearRun(i0, len, side, ROAD_W + 17)) side = -side;
+    if (clearRun(i0, len, side, ROAD_W + 17)) {
+      const wf = ROAD_W + 7.0, wb = ROAD_W + 16.0, hgt = 5.2;   // lane 2.3..7.0 = 4.7 m wide
+      // The lane itself: between the armco and the front of the building, with the box
+      // halfway along it.
+      const BOX = i0 + Math.floor(len / 2);
+      PIT = { i0, len, side, lane: side * (ROAD_W + 4.6), box: BOX,
+              entry: i0 - 6, exit: i0 + len + 6,
+              // A broadcast pit camera: across the lane from the box, slightly back and low,
+              // so the stop is seen three-quarters on rather than straight down the lane.
+              cam: pos(BOX - 3, side * (ROAD_W + 0.4), 1.9) };
       for (let k = i0; k < i0 + len; k++) {
+        // The lane is a surface you drive on, not the grass that happened to be there. Lay it
+        // between the wall and the garage fronts, with a painted edge.
+        segQuad(k, side, ROAD_W + 2.3, wf - 0.2, 0.03, 0.03, M.ASPHALT);
+        segQuad(k, side, ROAD_W + 2.3, ROAD_W + 2.55, 0.045, 0.045, M.KERB_W);
+        // one bay per two segments, so the lane reads as a row of garages
+        if ((k - i0) % 2 === 0) { const q = pos(k, side * (wf - 0.3));
+          box(q[0], 0.9, q[2], 0.12, 1.8, 0.12, M.STEEL); }
         segWall(k, side, wf, 0, hgt, M.BODY); segQuad(k, side, wf, wb, hgt, hgt, M.STEEL);
         const A = pos(k, side * wb, 0), B = pos(k + 1, side * wb, 0), Cq = pos(k + 1, side * wb, hgt), Dq = pos(k, side * wb, hgt); if (side > 0) Q(A, Dq, Cq, B, M.BODY); else Q(A, B, Cq, Dq, M.BODY);
         segWall(k, side, wf - 0.05, hgt - 0.5, hgt, M.NAVY); segWall(k, side, wf - 0.06, 3.1, 4.0, M.CYAN);
         if ((k - i0) % 2 === 0) { segWall(k, side, wf - 0.08, 0.1, 2.9, M.STEEL); segWall(k, side, wf - 0.1, 2.95, 3.05, M.GOLD); }
         if ((k - i0) % 2 === 1) { const p = pos(k, side * (wf - 0.12)); box(p[0], 1.5, p[2], 0.16, 2.9, 0.16, M.CARBON); }
         if (k > i0 + 1 && k < i0 + len - 2) segSign(k, side, wf - 0.14, 4.1, 4.9, 'PIT LANE · PARC FERME · SCRUTINEERING BAY · PIT LANE · PARC FERME', (k - i0 - 2) * 4, 0.3, M.CYAN, M.NAVY);
-        segWall(k, side, ROAD_W + 2.4, 0, 1.0, M.ARMCO);
+        // Leave the ends open: that is the pit entry and the pit exit, and without them the
+        // car would have to drive through the barrier to be serviced.
+        if (k > i0 + 2 && k < i0 + len - 3) segWall(k, side, ROAD_W + 2.4, 0, 1.0, M.ARMCO);
+      }
+      // The box itself: a marked stall, the bay it belongs to, and a crew waiting in it.
+      for (let k = BOX - 1; k <= BOX + 1; k++) segQuad(k, side, ROAD_W + 2.6, wf - 0.3, 0.05, 0.05, M.GOLD);
+      segQuad(BOX, side, ROAD_W + 2.6, ROAD_W + 2.9, 0.07, 0.07, M.NAVY);
+      segSign(BOX - 2, side, wf - 0.16, 1.2, 2.0, `${teamName} \u00B7 PIT BOX`, 0, 0.3, M.NAVY, M.GOLD);
+      {
+        // A pit crew, waiting where a pit crew waits: either side of the stall, plus one with
+        // the board out in front of it.
+        const crew = (q, m) => { box(q[0], 0.42, q[2], 0.34, 0.84, 0.34, m);
+          box(q[0], 1.02, q[2], 0.42, 0.36, 0.42, M.BODY);
+          box(q[0], 1.32, q[2], 0.3, 0.26, 0.3, m); };
+        // Clear of the car, which sits on the lane centre at ROAD_W + 3.5 and is about a
+        // metre wide over the wheels.
+        for (const [d, w, m] of [[-1, 3.35, M.GOLD], [1, 3.35, M.GOLD],
+                                 [-1, 5.85, M.CYAN], [1, 5.85, M.CYAN], [0, 6.3, M.STRIPE]]) {
+          const q = pos(BOX + d, side * (ROAD_W + w));
+          if (clearOfTrack(q[0], q[2], ROAD_W - 1.2)) crew(q, m);
+        }
+        const lolli = pos(BOX + 2, side * (ROAD_W + 4.5));
+        box(lolli[0], 1.3, lolli[2], 0.1, 2.6, 0.1, M.CARBON);
+        box(lolli[0], 2.5, lolli[2], 0.9, 0.5, 0.12, M.STRIPE);
       }
       const mid = pos(i0 + Math.floor(len / 2), side * (wf + 4.5)); box(mid[0], hgt + 0.8, mid[2], 3, 1.6, 8, M.STEEL); box(mid[0], hgt + 2.2, mid[2], 0.3, 2.6, 0.3, M.STEEL);
     }
@@ -5946,7 +6147,7 @@ Wd.build = function (c, opts = {}) {
     const s0 = pos(0, ROAD_W, 0.015), s1 = pos(0, -ROAD_W, 0.015), s2 = pos(-1, -ROAD_W, 0.015), s3 = pos(-1, ROAD_W, 0.015);
     for (let k = 0; k < 6; k++) { const f = k / 6, g = (k + 1) / 6, A = [s0[0] + (s1[0] - s0[0]) * f, 0.015, s0[2] + (s1[2] - s0[2]) * f], B = [s0[0] + (s1[0] - s0[0]) * g, 0.015, s0[2] + (s1[2] - s0[2]) * g], Cc = [s3[0] + (s2[0] - s3[0]) * g, 0.015, s3[2] + (s2[2] - s3[2]) * g], D = [s3[0] + (s2[0] - s3[0]) * f, 0.015, s3[2] + (s2[2] - s3[2]) * f]; Q(A, D, Cc, B, (k & 1) ? M.KERB_W : M.CARBON); }
   }
-  for (let k = 0; k < cn; k += Math.round(cn / 9)) { const side = outside(k), p = pos(k, side * (ROAD_W + 26)); if (!clearOfTrack(p[0], p[2], ROAD_W + 6)) continue;
+  for (let k = 0; k < cn; k += Math.max(4, Math.round(cn / LIGHTS))) { const side = outside(k), p = pos(k, side * (ROAD_W + 26)); if (!clearOfTrack(p[0], p[2], ROAD_W + 6)) continue;
     box(p[0], 14, p[2], 0.9, 28, 0.9, M.STEEL); box(p[0], 28.6, p[2], 4.5, 1.4, 1.2, M.STEEL); for (let j = -1; j <= 1; j++) box(p[0] + j * 1.4, 28.0, p[2] - side * 0.8, 1.0, 0.8, 0.3, M.LAMP);
     const q = pos(k, side * (ROAD_W + 2)); LIGHTPOOLS.push([q[0], q[2], 26]); }
   for (let k = 0; k < cn; k++) { const nxt = at(k + 25);
@@ -5988,7 +6189,7 @@ Wd.build = function (c, opts = {}) {
       n++; if (sees(tc.x, tc.z, q[0], q[2])) ok++; }
     tc.clear = ok / n;
   }
-  return { mesh: E.end(), lightpools: LIGHTPOOLS, tvcams: TVCAMS, circuit: c };
+  return { mesh: E.end(), lightpools: LIGHTPOOLS, tvcams: TVCAMS, circuit: c, pit: PIT };
 };
 })(window.SCR = window.SCR || {});
 
@@ -6011,6 +6212,9 @@ S.physics = function (c, dd, sp, circ, dt, opts = {}) {
   const top = dd.topSpeed + (drsZone ? dd.drsBoost : 0);
   const jitter = opts.noise ? 1 + opts.noise() * 0.06 * (1 - Math.min(1, dd.consistency)) : 1;   // driver inconsistency (tyre & performance role)
   let vAllow = Math.min(top, cornerSpeed(curv, dd, wearF) * learnF * jitter);
+  // A pit lane has a limiter, and a pit box is a stop. Both are a ceiling on what the car is
+  // allowed to be doing, so they belong here rather than as a separate mode.
+  if (opts.speedCap !== undefined) vAllow = Math.min(vAllow, opts.speedCap);
   for (let d = 6; d <= 130; d += 6) { const kk = at(Math.floor((c.s + d) / STEP)).curv; const va2 = Math.min(top, cornerSpeed(kk, dd, wearF) * learnF); vAllow = Math.min(vAllow, Math.sqrt(va2 * va2 + 2 * dd.braking * d)); }
   const prev = c.speed;
   if (c.speed < vAllow) c.speed = Math.min(vAllow, c.speed + dd.accel * (1 - 0.8 * c.speed / top) * dt); else c.speed = Math.max(vAllow, c.speed - dd.braking * dt);
@@ -6021,6 +6225,15 @@ S.physics = function (c, dd, sp, circ, dt, opts = {}) {
   if (c.s >= LAP) { c.s -= LAP; c.lap++; c.lapsDone++; const tNow = (opts.timeNow ?? E.time), lt = tNow - c.lapStart; c.sectorTimes[2] = tNow - (c.sectorStart ?? c.lapStart); c.lastLapSectors = c.sectorTimes.slice(0, 3); c.lapTimes.push(lt); c.last = lt; c.best = c.best === null ? lt : Math.min(c.best, lt); c.lapStart = tNow; c.sectorStart = tNow; c.sectorTimes = []; }
   c.x = a.x + (b.x - a.x) * f; c.z = a.z + (b.z - a.z) * f; c.y = 0;
   const tx = a.tx + (b.tx - a.tx) * f, tz = a.tz + (b.tz - a.tz) * f; c.yaw = Math.atan2(tx, tz);
+  // Lateral offset from the centreline, used to put the car in the pit lane. The heading picks
+  // up a little of the rate of change so it points where it is going while it crosses.
+  if (c.off) {
+    const nx = -tz, nz = tx;
+    c.x += nx * c.off; c.z += nz * c.off;
+    const dOff = (c.off - (c.offPrev === undefined ? c.off : c.offPrev)) / Math.max(dt, 1e-3);
+    c.yaw += Math.max(-0.35, Math.min(0.35, dOff / Math.max(6, c.speed)));
+  }
+  c.offPrev = c.off || 0;
   c.steer = Math.max(-0.35, Math.min(0.35, curv * 22));
   c.roll += ((-curv * 9 * (c.speed / dd.topSpeed)) - c.roll) * Math.min(1, dt * 6);
   c.pitch += (((c.speed - prev) / Math.max(dt, 1e-3)) * -0.0012 - c.pitch) * Math.min(1, dt * 5);
@@ -6039,18 +6252,78 @@ S.fmtD = d => (d <= 0 ? '−' : '+') + Math.abs(d).toFixed(2) + 's';
 })(window.SCR = window.SCR || {});
 
 // ============================================================================
-// SCR.trackScene — cars lapping a circuit with broadcast cameras (chase, T-cam, trackside, heli, grid, auto director)
-// One instance per session; the season swaps circuits between sessions.
+// SCR.trackScene — cars lapping a circuit with broadcast cameras.
+//
+// The director is deliberately not a fixed rota. Every session rolls its own camera
+// personality and every cut rolls its own framing, so two runs of the same circuit are
+// never covered the same way — which is what a real world feed looks like.
 // ============================================================================
 (function (SCR) {
 'use strict';
 const E = SCR.engine, TS = SCR.trackScene = {};
-TS.MODES = ['AUTO', 'CHASE', 'ONBOARD', 'TV', 'HELI', 'STUDIO'];
-// create({R, world, car(state), ghost?, meshFor(state)->mesh, ghostMesh}) -> scene
+TS.MODES = ['AUTO', 'CHASE', 'ONBOARD', 'TV', 'HELI', 'APEX', 'DETAIL', 'PITLANE', 'STUDIO'];
+
+// The showcase shot. The car is the harness, so every part of it belongs to a component, and
+// this walks the camera round them one at a time while the car keeps lapping. Offsets are in
+// car-local metres: x right, y up, z forward.
+const DETAIL_PARTS = TS.DETAIL_PARTS = [
+  { part: 'frontWing', label: 'FRONT WING',  key: 'AERO',
+    look: [0, 0.28, 2.0],      cam: [1.5, 0.78, 3.5] },
+  { part: 'rearWing',  label: 'REAR WING',   key: 'AERO',
+    look: [0, 0.86, -1.9],     cam: [1.6, 1.35, -3.7] },
+  { part: 'floor',     label: 'FLOOR',       key: 'DATA',
+    look: [0, 0.16, -0.1],     cam: [2.5, 0.52, 0.5] },
+  { part: 'engine',    label: 'POWER UNIT',  key: 'POWER_UNIT',
+    look: [0, 0.68, -1.15],    cam: [1.9, 1.25, -2.5] },
+  { part: 'tyres',     label: 'TYRES',       key: 'TYRES',
+    look: [0.86, 0.36, -1.88], cam: [2.7, 0.82, -2.5] },
+  { part: 'drs',       label: 'DRS',         key: 'SIMULATOR',
+    look: [0, 0.92, -1.95],    cam: [1.2, 1.15, -3.9] },
+  { part: 'brakes',    label: 'BRAKES',      key: 'PIT_CREW',
+    look: [0.86, 0.36, 1.72],  cam: [2.6, 0.8, 2.6] },
+];
+
+// Shots the director can call, with how often it reaches for each and how long it holds.
+// APEX and TV are hard cuts; CHASE and HELI are moves, so the camera glides into them.
+const SHOTS = {
+  TV:      { w: 3.2, min: 4.0, max: 7.0, cut: true },
+  CHASE:   { w: 2.8, min: 5.0, max: 9.0, cut: false },
+  HELI:    { w: 1.7, min: 6.0, max: 10.0, cut: false },
+  ONBOARD: { w: 1.4, min: 3.5, max: 6.0, cut: true },
+  APEX:    { w: 1.6, min: 3.0, max: 5.0, cut: true },
+  DETAIL:  { w: 1.8, min: 3.4, max: 5.2, cut: true },
+};
+const SHOT_KEYS = Object.keys(SHOTS);
+
+// Frame-rate independent exponential smoothing. min(1, dt*lag) overshoots on a long frame
+// and undershoots on a short one, which is most of why the camera snapped through corners.
+const K = (lag, dt) => 1 - Math.exp(-lag * dt);
+// shortest-arc angle lerp, so a heading crossing ±π does not whip the camera round
+const angLerp = (a, b, k) => { let d = b - a; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return a + d * k; };
+
+// create({R, world, car(state), ghost?, seed?}) -> scene
 TS.create = function (o) {
-  const R = o.R, sc = { world: o.world, circ: o.world.circuit, car: o.car, ghost: o.ghost || null, ghostActive: false, mode: 'AUTO', activeTV: -1, autoPhase: 0, autoT: 0, label: 'CAM · CHASE', fx: [], orbit: 0.9, smooth: { x: 0, y: 3, z: -10, tx: 0, ty: 0, tz: 0, init: false } };
+  const R = o.R;
+  const rng = E.mulberry32((o.seed === undefined ? 1 : o.seed) | 0);
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const rand = (a, b) => lerp(a, b, rng());
+  // The session's own way of covering a race, rolled once: how close it likes to sit, how high
+  // it likes to fly, how long it holds a shot.
+  const style = { tight: rng(), high: rng(), patient: rng() };
+
+  const sc = {
+    world: o.world, circ: o.world.circuit, car: o.car, ghost: o.ghost || null, ghostActive: false,
+    mode: 'AUTO', activeTV: -1, label: 'CAM · CHASE', fx: [], orbit: 0.9, style,
+    smooth: { x: 0, y: 3, z: -10, tx: 0, ty: 0, tz: 0, fov: 40, init: false },
+    // low-passed track state: the raw values step every 4 m of circuit, and stepping is what
+    // made the corners feel rough
+    filt: { curv: 0, head: 0, init: false },
+    dir: { shot: 'CHASE', t: 0, dur: 6, prev: '', shape: {} },
+  };
   const cam = R.cam;
-  sc.setWorld = w => { sc.world = w; sc.circ = w.circuit; sc.activeTV = -1; sc.smooth.init = false; };
+  sc.setWorld = w => { sc.world = w; sc.circ = w.circuit; sc.activeTV = -1;
+    sc.smooth.init = false; sc.filt.init = false; sc.pairS = undefined; };
+
   const tvDist = k => { let d = sc.world.tvcams[k].s - sc.car.s; if (d > sc.circ.len / 2) d -= sc.circ.len; if (d < -sc.circ.len / 2) d += sc.circ.len; return d; };
   function tvPick() {
     const cams = sc.world.tvcams; if (!cams.length) return -1;
@@ -6058,35 +6331,266 @@ TS.create = function (o) {
     const usable = k => (cams[k].clear === undefined ? 1 : cams[k].clear) > 0.55;
     if (sc.activeTV >= 0 && sc.activeTV < cams.length && usable(sc.activeTV)) { const d = tvDist(sc.activeTV); if (d > -70 && d < 110) return sc.activeTV; }
     let best = -1, bd = 1e9; for (let k = 0; k < cams.length; k++) { if (!usable(k)) continue; const d = tvDist(k); if (d >= -8 && d < 110 && d < bd) { bd = d; best = k; } } if (best >= 0) return best;
-    for (let k = 0; k < cams.length; k++) { if (!usable(k)) continue; const d = tvDist(k); if (d < 0 && d > -70 && -d < bd) { bd = -d; best = k; } } return best;
+    for (let k = 0; k < cams.length; k++) { if (!usable(k)) continue; const d = tvDist(k); if (d < 0 && d > -70 && -d < bd) { bd = -d; best = k; } } if (best >= 0) return best;
+    // The cameras sit on the corners, so the gap between two of them can be longer than the
+    // approach window. Take the nearest usable one rather than silently falling back to chase,
+    // which is why trackside shots almost never appeared.
+    // Prefer a clean sightline and enough distance to be a shot rather than a close-up of a
+    // barrier; fall back to plain nearest only if nothing qualifies.
+    let bs = -1;
+    for (let k = 0; k < cams.length; k++) { if (!usable(k)) continue;
+      const d = Math.abs(tvDist(k)); if (d < 25) continue;
+      const score = (cams[k].clear === undefined ? 1 : cams[k].clear) * 200 - d * 0.35;
+      if (score > bs) { bs = score; best = k; } }
+    if (best >= 0) return best;
+    bd = 1e9;
+    for (let k = 0; k < cams.length; k++) { if (!usable(k)) continue; const d = Math.abs(tvDist(k)); if (d < bd) { bd = d; best = k; } }
+    return best;
   }
+
+  // Every cut re-rolls the framing inside the shot's own range, nudged by the session's style.
+  function frameShot(shot) {
+    const s = {};
+    if (shot === 'CHASE') {
+      s.dist = rand(7.0, 11.5) - style.tight * 2.2;
+      s.height = rand(2.5, 4.4) + style.high * 0.9;
+      s.swing = rand(18, 34);            // how far the camera leans out of a corner
+      s.ahead = rand(3.6, 6.4);
+      s.fov = rand(39, 47);
+      s.lag = rand(5.0, 8.0);
+    } else if (shot === 'HELI') {
+      s.height = rand(24, 40) + style.high * 12;
+      s.back = rand(15, 30);
+      s.side = rand(8, 22) * (rng() < 0.5 ? -1 : 1);
+      s.fov = rand(33, 42);
+      s.lag = rand(2.2, 3.6);
+    } else if (shot === 'ONBOARD') {
+      s.height = rand(1.18, 1.46);
+      s.fov = rand(58, 72);
+      s.lag = rand(24, 44);
+    } else if (shot === 'DETAIL') {
+      // Walk the parts in order rather than at random, so watching for a while shows you the
+      // whole car instead of the front wing four times.
+      sc.detailAt = (sc.detailAt === undefined ? Math.floor(rng() * DETAIL_PARTS.length) : sc.detailAt + 1);
+      s.spec = DETAIL_PARTS[sc.detailAt % DETAIL_PARTS.length];
+      s.side = rng() < 0.5 ? -1 : 1;       // either flank
+      s.fov = rand(34, 46);
+      s.lag = 55;                          // effectively bolted to the car
+    } else if (shot === 'APEX') {
+      // low and long, planted on the inside of a corner the car has not reached yet
+      s.ahead = Math.round(rand(9, 26));
+      s.height = rand(0.6, 1.7);
+      s.fov = rand(17, 33);
+      s.lag = rand(10, 18);
+      s.side = 0;                        // resolved against the circuit when the shot is taken
+      s.anchor = null;
+    }
+    return s;
+  }
+
+  function callShot(force) {
+    const d = sc.dir, prev = d.shot;
+    let shot = force;
+    if (!shot) {
+      let total = 0; const w = {};
+      for (const k of SHOT_KEYS) { w[k] = k === prev ? 0 : SHOTS[k].w; total += w[k]; }
+      let r = rng() * total;
+      shot = SHOT_KEYS[SHOT_KEYS.length - 1];
+      for (const k of SHOT_KEYS) { r -= w[k]; if (r <= 0) { shot = k; break; } }
+    }
+    // PITLANE (and STUDIO) are not shots the director calls for itself; they are held for as
+    // long as whatever asked for them needs, so they are not in the weighted table.
+    const spec = SHOTS[shot] || { min: 6, max: 10, cut: true };
+    d.prev = prev; d.shot = shot; d.t = 0; d.fresh = true;
+    d.dur = lerp(spec.min, spec.max, rng()) * (0.85 + style.patient * 0.4);
+    d.shape = frameShot(shot);
+    if (spec.cut) { sc.smooth.init = false; sc.activeTV = shot === 'TV' ? -1 : sc.activeTV; }
+    if (shot === 'APEX') {
+      // pick the corner ahead, and stand on its inside
+      const i0 = Math.floor(sc.car.s / sc.circ.step);
+      let bi = i0 + d.shape.ahead, bk = 0;
+      for (let q = 4; q < 46; q++) { const kk = Math.abs(sc.circ.at(i0 + q).curv); if (kk > bk) { bk = kk; bi = i0 + q; } }
+      const side = sc.circ.geomInside(bi);
+      // Stand well back from the racing line. At three metres off it a car at sixty metres a
+      // second sweeps past at nearly four hundred degrees a second, which is not a shot, it is
+      // a smear. Twenty to forty metres out keeps the pan readable. Clamped by however much
+      // room there is beside the track, so the camera never ends up inside a grandstand.
+      const RW = SCR.world.ROAD_W;
+      const room = sc.circ.room ? sc.circ.room(bi, side) : 40;
+      const want = RW + 14 + rng() * 20;
+      const off = Math.max(RW + 6, Math.min(want, room - 2));
+      const p = sc.circ.pos(bi, side * off, d.shape.height);
+      d.shape.anchor = p;
+      d.shape.minD = 1e9;
+    }
+  }
+  callShot('CHASE');
+
   sc.updateCamera = function (dt) {
-    const car = sc.car, circ = sc.circ; let mode = sc.mode;
-    if (sc.mode === 'AUTO') { sc.autoT += dt; const seq = ['TV', 'CHASE', 'TV', 'ONBOARD', 'HELI', 'CHASE']; if (sc.autoT > 7) { sc.autoT = 0; sc.autoPhase = (sc.autoPhase + 1) % seq.length; } mode = seq[sc.autoPhase]; }
-    const i = Math.floor(car.s / circ.step), a = circ.at(i), tx = a.tx, tz = a.tz, nx = a.nx, nz = a.nz;
+    const car = sc.car, circ = sc.circ, d = sc.dir;
+    let mode = sc.mode;
+    if (sc.mode === 'AUTO') {
+      d.t += dt;
+      if (d.t > d.dur) callShot();
+      mode = d.shot;
+    } else if (sc.mode !== 'STUDIO' && d.shot !== sc.mode) {
+      callShot(sc.mode);
+    }
+    const shape = d.shape || {};
+
+    // How far behind the ghost is, and therefore how much room the shot needs. Taken raw this
+    // was the worst jerk in the whole director: the moment the gap crossed the cut-off, or the
+    // ghost was put back on the line, it fell from ninety metres to nothing in a single frame
+    // and threw the camera the length of a straight. Capped so the pullback stays a shot, and
+    // low-passed so it eases in and out.
+    let pairRaw = 0;
+    if (sc.ghostActive && sc.ghost) {
+      let gd = car.s - sc.ghost.s;
+      if (gd > circ.len / 2) gd -= circ.len; if (gd < -circ.len / 2) gd += circ.len;
+      if (gd > 0 && gd < 130) pairRaw = Math.min(gd, 45);
+    }
+    sc.pairS = sc.pairS === undefined ? pairRaw : sc.pairS + (pairRaw - sc.pairS) * K(1.2, dt);
+    const pair = sc.pairS;
+    sc.pair = pair;
+
+    const i = Math.floor(car.s / circ.step), a = circ.at(i);
+    // Low-pass the track's own tangent and curvature before anything is framed against them.
+    const f = sc.filt, head = Math.atan2(a.tx, a.tz);
+    if (!f.init) { f.init = true; f.curv = a.curv; f.head = head; }
+    f.curv += (a.curv - f.curv) * K(3.2, dt);
+    f.head = angLerp(f.head, head, K(4.5, dt));
+    const tx = Math.sin(f.head), tz = Math.cos(f.head), nx = -tz, nz = tx;
+
     let px_, py_, pz_, tx_, ty_, tz_, fov = 40, lag = 6;
-    if (mode === 'TV') { const k = tvPick(); if (k < 0) mode = 'CHASE'; else sc.activeTV = k; }
-    if (mode === 'CHASE') { px_ = car.x - tx * 8.4 - nx * a.curv * 26; py_ = 3.2; pz_ = car.z - tz * 8.4 - nz * a.curv * 26; tx_ = car.x + tx * 4.5; ty_ = 0.75; tz_ = car.z + tz * 4.5; fov = 42; lag = 7; }
-    else if (mode === 'STUDIO') { const ang = E.time * 0.5 + sc.orbit, rr = 5.4; px_ = car.x + Math.sin(ang) * rr; py_ = 1.75; pz_ = car.z + Math.cos(ang) * rr; tx_ = car.x; ty_ = 0.45; tz_ = car.z; fov = 34; lag = 60; }
-    else if (mode === 'ONBOARD') { px_ = car.x - tx * 0.15; py_ = 1.3; pz_ = car.z - tz * 0.15; tx_ = car.x + tx * 40; ty_ = 0.6; tz_ = car.z + tz * 40; fov = 66; lag = 40; }
-    else if (mode === 'HELI') { const side = circ.outside(i); px_ = car.x - tx * 22 - nx * side * 16; py_ = 34; pz_ = car.z - tz * 22 - nz * side * 16; tx_ = car.x + tx * 8; ty_ = 0; tz_ = car.z + tz * 8; fov = 38; lag = 3; }
-    else { const c = sc.world.tvcams[sc.activeTV]; px_ = c.x; py_ = c.y; pz_ = c.z; tx_ = car.x; ty_ = 0.6; tz_ = car.z; const d = Math.hypot(c.x - car.x, c.z - car.z); fov = Math.max(9, Math.min(46, 620 / Math.max(12, d))); lag = 14; }
-    const sm = sc.smooth, snap = mode === 'TV' || mode === 'ONBOARD' || mode === 'STUDIO';
-    if (!sm.init || snap) { sm.x = px_; sm.y = py_; sm.z = pz_; sm.init = true; }
-    const k2 = Math.min(1, dt * lag); sm.x += (px_ - sm.x) * k2; sm.y += (py_ - sm.y) * k2; sm.z += (pz_ - sm.z) * k2;
-    sm.tx += (tx_ - sm.tx) * Math.min(1, dt * lag * 2); sm.ty += (ty_ - sm.ty) * Math.min(1, dt * lag * 2); sm.tz += (tz_ - sm.tz) * Math.min(1, dt * lag * 2);
-    if (snap) { sm.tx = tx_; sm.ty = ty_; sm.tz = tz_; }
-    cam.pos = [sm.x, sm.y, sm.z]; cam.target = [sm.tx, sm.ty, sm.tz]; cam.fov = fov;
-    sc.label = mode === 'STUDIO' ? 'CAM · GRID' : mode === 'TV' ? `CAM ${sc.activeTV + 1} · TRACKSIDE` : mode === 'CHASE' ? 'CAM · CHASE' : mode === 'ONBOARD' ? 'CAM · T-CAM' : 'CAM · HELI';
+    if (mode === 'TV') {
+      if (sc.activeTV < 0 || sc.activeTV >= sc.world.tvcams.length) {
+        const k = tvPick(); if (k < 0) mode = 'CHASE'; else sc.activeTV = k;
+      } else {
+        // Hold the camera that was cut to for the length of the shot. Re-picking part way
+        // through slid the view between two cameras tens of metres apart, which reads as a
+        // smear rather than a cut. If this one has lost the car, end the shot and let the
+        // director cut properly on the next frame.
+        const gap = tvDist(sc.activeTV);
+        if (gap < -110 || gap > 220) d.t = d.dur;
+      }
+    }
+
+    if (mode === 'CHASE') {
+      // Back off and lift by however far the ghost is adrift, and aim between the two, so the
+      // separation is the subject of the shot rather than something happening off camera.
+      const dist = (shape.dist || 8.4) + pair * 0.9, sw = (shape.swing || 26) * f.curv;
+      px_ = car.x - tx * dist - nx * sw; py_ = (shape.height || 3.2) + pair * 0.16; pz_ = car.z - tz * dist - nz * sw;
+      // Aim between the two cars, but never behind the one you are following: a target behind
+      // the camera's own subject shortens the look vector and makes every corner whip.
+      const aim = Math.max(1.5, (shape.ahead || 4.5) - pair * 0.35);
+      tx_ = car.x + tx * aim; ty_ = 0.75; tz_ = car.z + tz * aim;
+      fov = shape.fov || 42; lag = shape.lag || 7;
+    } else if (mode === 'STUDIO') {
+      const ang = E.time * 0.5 + sc.orbit, rr = 5.4;
+      px_ = car.x + Math.sin(ang) * rr; py_ = 1.75; pz_ = car.z + Math.cos(ang) * rr;
+      tx_ = car.x; ty_ = 0.45; tz_ = car.z; fov = 34; lag = 60;
+    } else if (mode === 'ONBOARD') {
+      px_ = car.x - tx * 0.15; py_ = shape.height || 1.3; pz_ = car.z - tz * 0.15;
+      tx_ = car.x + tx * 40; ty_ = 0.6; tz_ = car.z + tz * 40;
+      fov = shape.fov || 66; lag = shape.lag || 40;
+    } else if (mode === 'HELI') {
+      const side = circ.outside(i), back = (shape.back || 22) + pair * 0.6, off = (shape.side || 16);
+      px_ = car.x - tx * back - nx * side * off; py_ = (shape.height || 34) + pair * 0.25; pz_ = car.z - tz * back - nz * side * off;
+      const aim = 8 - pair * 0.45;
+      tx_ = car.x + tx * aim; ty_ = 0; tz_ = car.z + tz * aim;
+      fov = shape.fov || 38; lag = shape.lag || 3;
+    } else if (mode === 'DETAIL') {
+      // Car-local to world. The car's yaw gives forward; right is that turned ninety degrees.
+      const sp = shape.spec || DETAIL_PARTS[0], sgn = shape.side || 1;
+      const fx2 = Math.sin(car.yaw), fz = Math.cos(car.yaw), rx = fz, rz2 = -fx2;
+      const at = (o, k) => [car.x + o[2] * fx2 + o[0] * k * rx, o[1], car.z + o[2] * fz + o[0] * k * rz2];
+      const lookP = at(sp.look, sgn), camP = at(sp.cam, sgn);
+      px_ = camP[0]; py_ = camP[1]; pz_ = camP[2];
+      tx_ = lookP[0]; ty_ = lookP[1]; tz_ = lookP[2];
+      fov = shape.fov || 40; lag = shape.lag || 55;
+      sc.detail = sp;
+    } else if (mode === 'PITLANE') {
+      // The pit camera is a fixed position on the wall, the way it is at a circuit: it does not
+      // follow the car, it watches the box and lets the car arrive in shot.
+      const pc = sc.world.pit && sc.world.pit.cam;
+      if (pc) {
+        px_ = pc[0]; py_ = pc[1]; pz_ = pc[2];
+        tx_ = car.x; ty_ = 0.6; tz_ = car.z;
+        const dd = Math.hypot(pc[0] - car.x, pc[2] - car.z);
+        fov = Math.max(14, Math.min(44, 330 / Math.max(8, dd)));
+        lag = 9;
+      } else { mode = 'CHASE'; px_ = car.x - tx * 8.4; py_ = 3.2; pz_ = car.z - tz * 8.4; tx_ = car.x; ty_ = 0.75; tz_ = car.z; }
+    } else if (mode === 'APEX') {
+      const p = shape.anchor;
+      if (!p) { mode = 'CHASE'; px_ = car.x - tx * 8.4; py_ = 3.2; pz_ = car.z - tz * 8.4; tx_ = car.x; ty_ = 0.75; tz_ = car.z; }
+      else {
+        px_ = p[0]; py_ = p[1]; pz_ = p[2];
+        tx_ = car.x; ty_ = 0.55; tz_ = car.z;
+        const dd = Math.hypot(p[0] - car.x, p[2] - car.z);
+        // hold the car the same size in frame as it comes to you, the way a long lens does
+        fov = Math.max(16, Math.min(shape.fov || 26, 760 / Math.max(16, dd)));
+        lag = shape.lag || 14;
+        // Hold while the car is coming; cut away only once it has been and gone, never on the
+        // approach — the approach is the shot.
+        shape.minD = Math.min(shape.minD === undefined ? 1e9 : shape.minD, dd);
+        if (dd > 55 && dd > shape.minD + 30) d.t = d.dur;
+      }
+    } else {
+      const c = sc.world.tvcams[sc.activeTV];
+      px_ = c.x; py_ = c.y; pz_ = c.z; tx_ = car.x; ty_ = 0.6; tz_ = car.z;
+      const dd = Math.hypot(c.x - car.x, c.z - car.z);
+      fov = Math.max(9, Math.min(46, 620 / Math.max(12, dd))); lag = 14;
+    }
+
+    const sm = sc.smooth;
+    // CHASE and HELI are moves rather than cuts, so the camera glides into them. That only
+    // reads as a move over a short distance: gliding seventy metres from a trackside anchor to
+    // behind the car covers it in half a second and looks like a lurch, not an edit. Past
+    // twenty-five metres, take it as a cut.
+    if (d.fresh) {
+      d.fresh = false;
+      if (sm.init && Math.hypot(px_ - sm.x, py_ - sm.y, pz_ - sm.z) > 25) sm.init = false;
+    }
+    if (!sm.init) { sm.x = px_; sm.y = py_; sm.z = pz_; sm.tx = tx_; sm.ty = ty_; sm.tz = tz_; sm.fov = fov; sm.init = true; }
+    const kp = K(lag, dt), kt = K(lag * 1.8, dt);
+    sm.x += (px_ - sm.x) * kp; sm.y += (py_ - sm.y) * kp; sm.z += (pz_ - sm.z) * kp;
+    sm.tx += (tx_ - sm.tx) * kt; sm.ty += (ty_ - sm.ty) * kt; sm.tz += (tz_ - sm.tz) * kt;
+    // The zoom is smoothed too — a long lens tracking a car towards you changes focal length
+    // every frame, and stepping it is as visible as stepping the position.
+    sm.fov += (fov - sm.fov) * K(6, dt);
+    cam.pos = [sm.x, sm.y, sm.z]; cam.target = [sm.tx, sm.ty, sm.tz]; cam.fov = sm.fov;
+    sc.label = mode === 'STUDIO' ? 'CAM · GRID' : mode === 'TV' ? `CAM ${sc.activeTV + 1} · TRACKSIDE`
+      : mode === 'CHASE' ? 'CAM · CHASE' : mode === 'ONBOARD' ? 'CAM · T-CAM'
+      : mode === 'APEX' ? 'CAM · APEX'
+      : mode === 'DETAIL' ? 'CAM · DETAIL'
+      : mode === 'PITLANE' ? 'CAM · PIT LANE' : 'CAM · HELI';
+    sc.shot = mode;
+    if (mode !== 'DETAIL') sc.detail = null;
   };
+
   // render: draws sky, world, pools, shadow, ghost, car, sparks, outline. meshes: {car, ghost}
   sc.render = function (meshes) {
     R.begin(); R.sky(); R.drawStatic(sc.world.mesh); R.drawLightPools(sc.world.lightpools);
-    const xf = SCR.car.makeXform(sc.car); R.drawDynamic(meshes.car, xf, 'shadow', 0);
+    // The car carries its own jack height, so a car up in the pit box is the body on the jacks
+    // with the wheels still on the floor rather than the whole car floating.
+    const lift = sc.car.lift || 0;
+    const xf = SCR.car.makeXform(sc.car, lift ? { lift, wheelDrop: lift } : undefined);
+    R.drawDynamic(meshes.car, xf, 'shadow', 0);
     if (sc.ghostActive && sc.ghost && meshes.ghost) R.drawDynamic(meshes.ghost, SCR.car.makeXform(sc.ghost), 'ghost', 0);
     R.drawDynamic(meshes.car, xf, 'solid', 0); SCR.sim.drawSparks(R, sc.fx); R.outline();
   };
-  sc.setMode = m => { if (TS.MODES.includes(m)) { sc.mode = m; sc.autoT = 0; } };
+  // Called when the two cars are put back on the line together: cut to the shot that shows one
+  // pulling away from the other.
+  sc.duel = () => {
+    if (sc.mode !== 'AUTO') return;
+    // If a shot that already frames both cars is running, hold it rather than re-calling it:
+    // re-calling re-rolls the framing, which moves the camera mid-shot without a cut and reads
+    // as a lurch rather than an edit.
+    if (sc.dir.shot === 'CHASE' || sc.dir.shot === 'HELI') { sc.dir.t = 0; return; }
+    callShot(rng() < 0.6 ? 'CHASE' : 'HELI');
+  };
+  sc.setMode = m => { if (TS.MODES.includes(m)) { sc.mode = m; if (m !== 'AUTO' && m !== 'STUDIO') callShot(m); else sc.dir.t = 0; } };
+  sc.cut = () => callShot();
   return sc;
 };
 })(window.SCR = window.SCR || {});
