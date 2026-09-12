@@ -713,7 +713,53 @@ const PHASE_TAG = {
   RESULT:   ['RESULT', ''],
   INTRO:    ['STANDING BY', ''],
 };
-const hud = { built: false, n: -1, cells: [], last: {} };
+// ---------------------------------------------------------------------------------------
+// Sectors. Not a grouping invented for the picture: the loop read its own ledger as a
+// component x family matrix and found the families separate into two populations, one
+// limited by RETRIEVAL and one by VERIFICATION. Those are S1 and S2. S3 is what fell
+// outside the partition. loop/state/sides.json is where the split comes from.
+// ---------------------------------------------------------------------------------------
+const SECTORS = [
+  { name: 'FORMS & TABLES', families: ['checkout', 'invoices', 'signup', 'stepper'] },
+  { name: 'COMPONENTS', families: ['dialog', 'gallery', 'pricing', 'dashboard', 'search', 'settings', 'tabs'] },
+  { name: 'SITE CHROME', families: [] },        // anything the partition did not cover
+];
+const SECTOR_OF = (() => {
+  const m = {};
+  SECTORS.forEach((s, i) => s.families.forEach(f => { m[f] = i; }));
+  return f => (m[f] === undefined ? 2 : m[f]);
+})();
+
+function sectorOfTask(r, k) {
+  const p = pageFor(r, k);
+  return SECTOR_OF(p && p.family);
+}
+
+// clean / total per sector for one run, optionally only as far as the run has got
+function sectorStats(r, upTo) {
+  const out = SECTORS.map(() => ({ n: 0, clean: 0 }));
+  const tasks = (r && r.tasks) || [];
+  for (let k = 0; k < tasks.length; k++) {
+    const si = sectorOfTask(r, k);
+    out[si].n++;
+    if ((upTo === undefined || k < upTo) && tasks[k].solved > 0) out[si].clean++;
+  }
+  return out;
+}
+
+// F1's own colours: purple is the best that sector has ever been, green is better than where
+// it started, yellow is no better.
+function sectorTone(si, runIdx, stats) {
+  const first = sectorStats(st.rounds[0])[si];
+  let best = -1;
+  for (let i = 0; i < runIdx; i++) best = Math.max(best, sectorStats(st.rounds[i])[si].clean);
+  const now = stats[si].clean;
+  if (now > best && now > first.clean) return 'purple';
+  if (now > first.clean) return 'green';
+  return now ? 'yellow' : 'none';
+}
+
+const hud = { built: false, n: -1, cells: [], last: {}, fastSig: '' };
 
 // Only write to the DOM when the text actually changed: this runs every frame.
 function put(id, txt, cls) {
@@ -764,7 +810,9 @@ function showTip(k) {
   const revealed = st.phase !== 'RUN' || k < st.shown;
   const p = pageFor(r, k), ok = t.solved > 0;
   tip.textContent = '';
-  const head = el('div', 't-head', `LAP ${k + 1} \u00B7 ${(t.title || t.id).toUpperCase()}`);
+  const si = sectorOfTask(r, k);
+  const head = el('div', 't-head', `LAP ${k + 1} \u00B7 S${si + 1} ${SECTORS[si].name}`
+    + ` \u00B7 ${(t.title || t.id).toUpperCase()}`);
   tip.append(head);
   if (!revealed) {
     tip.append(el('div', 't-rule', 'not built yet this run'));
@@ -786,6 +834,41 @@ function showTip(k) {
   tip.style.top = Math.max(6, box.top - stage.top - tip.offsetHeight - 8) + 'px';
 }
 function hideTip() { const tip = $('rhTip'); if (tip) tip.hidden = true; }
+
+function sectors(r, tasks) {
+  const host = $('rhSectors'); if (!host) return;
+  if (!r || !tasks.length) { host.hidden = true; return; }
+  host.hidden = false;
+  const upTo = st.phase === 'RUN' ? st.shown : undefined;
+  const stats = sectorStats(r, upTo);
+  const sig = `${st.i}|${stats.map(x => x.clean + '/' + x.n).join(',')}|${st.phase === 'RUN' ? 'r' : 's'}`;
+  if (host.dataset.sig === sig) return;
+  host.dataset.sig = sig;
+  host.textContent = '';
+  SECTORS.forEach((sec, i) => {
+    // A sector only earns a colour once the run has been through all of it.
+    const done = st.phase !== 'RUN' || st.shown >= tasks.length;
+    const tone = done ? sectorTone(i, st.i, stats) : 'none';
+    const n = el('div', 'rh-sec ' + tone);
+    n.innerHTML = `<b>S${i + 1}</b><span>${esc(sec.name)}</span>`
+      + `<i>${stats[i].clean}/${stats[i].n}</i><u></u>`;
+    host.append(n);
+  });
+}
+
+// The purple flag, and only on a genuine season best.
+function fastestLap(r) {
+  const host = $('rhFastest'); if (!host) return;
+  // Run 1 is trivially the best there has been, and flashing the flag for it would cheapen
+  // every time it is raised afterwards.
+  const show = r && st.i > 0 && st.phase !== 'RUN' && r.official_s !== undefined
+    && st.rounds.slice(0, st.i).every(x => x.official_s > r.official_s);
+  const sig = show ? `${st.i}` : '';
+  if (hud.fastSig === sig) return;
+  hud.fastSig = sig;
+  host.hidden = !show;
+  if (show) put('rhFastestVal', `${fx(r.official_s)} \u00B7 SEASON BEST`);
+}
 
 // The caption under the strip: the interface in progress, and what happened to it.
 function caption(r, tasks) {
@@ -936,13 +1019,16 @@ function paintHud() {
     put('rhGap', (gap.s >= 0 ? '+' : '\u2212') + fx(Math.abs(gap.s)) + 's', gap.s < -0.02 ? 'behind' : '');
   }
 
+  sectors(r, tasks);
+  fastestLap(r);
   sinceRunOne();
   caption(r, tasks);
   stripFor(tasks, r);
   for (let k = 0; k < hud.cells.length; k++) {
     const t = tasks[k];
     const revealed = st.phase === 'RUN' ? k < st.shown : true;
-    const want = 'rh-cell' + (revealed ? (t.solved > 0 ? ' ok' : ' no') : '')
+    const want = 'rh-cell s' + sectorOfTask(r, k)
+      + (revealed ? (t.solved > 0 ? ' ok' : ' no') : '')
       + (st.phase === 'RUN' && k === st.shown - 1 ? ' now' : '');
     if (hud.cells[k].className !== want) hud.cells[k].className = want;
   }

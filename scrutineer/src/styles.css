@@ -381,7 +381,40 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .rh-tip .t-file{font-family:"VT323","Courier New",monospace;font-size:14px;line-height:14px;
   color:var(--mid);text-transform:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-@media (max-width:900px){.rh-tr{width:172px}.rh-br{display:none}.rh-since{display:none}}
+/* Sector board. Three rows, the way a timing screen carries S1/S2/S3. */
+.rh-sectors{position:absolute;left:14px;bottom:118px;display:flex;flex-direction:column;gap:2px;
+  background:rgba(6,8,26,.86);padding:6px 8px;border-left:3px solid var(--studio)}
+.rh-sec{display:grid;grid-template-columns:14px 96px 42px 26px;gap:6px;align-items:center;
+  font-size:6px;letter-spacing:.3px;color:var(--mid)}
+.rh-sec>b{color:var(--caption)}
+.rh-sec>span{color:var(--caption);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rh-sec>i{font-style:normal;font-family:"VT323","Courier New",monospace;font-size:15px;
+  line-height:13px;color:var(--white);font-variant-numeric:tabular-nums;text-align:right}
+.rh-sec>u{text-decoration:none;height:9px;background:var(--mid);display:block}
+.rh-sec.purple>u{background:var(--purple)} .rh-sec.purple>b{color:var(--purple)}
+.rh-sec.green>u{background:var(--green)}  .rh-sec.green>b{color:var(--green)}
+.rh-sec.yellow>u{background:var(--amber)} .rh-sec.yellow>b{color:var(--amber)}
+.rh-sec.none>u{background:var(--studio)}
+
+/* which sector a lap belongs to, on the cell itself */
+.rh-cell{border-top:2px solid transparent}
+.rh-cell.s0{border-top-color:rgba(61,210,255,.55)}
+.rh-cell.s1{border-top-color:rgba(176,75,255,.55)}
+.rh-cell.s2{border-top-color:rgba(255,163,24,.55)}
+
+/* The purple flag. Only ever raised on a genuine season best. */
+.rh-fastest{position:absolute;left:50%;top:52px;transform:translateX(-50%);z-index:5;
+  display:flex;align-items:baseline;gap:10px;background:var(--purple);color:var(--white);
+  padding:8px 14px;font-size:9px;letter-spacing:1px;
+  animation:fastin .35s ease-out}
+.rh-fastest i{font-style:normal;font-family:"VT323","Courier New",monospace;font-size:20px;
+  line-height:14px;font-variant-numeric:tabular-nums}
+@keyframes fastin{from{opacity:0;transform:translateX(-50%) translateY(-8px)}
+  to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@media (prefers-reduced-motion:reduce){.rh-fastest{animation:none}}
+
+@media (max-width:900px){.rh-tr{width:172px}.rh-br{display:none}.rh-since{display:none}
+  .rh-sectors{display:none}}
 @media (max-height:560px){.rh-lapbar,.rh-bl{display:none}}
 
 
