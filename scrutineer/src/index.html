@@ -47,6 +47,13 @@
             <div class="rh-fastest" id="rhFastest" hidden>
               <b>FASTEST LAP</b><i id="rhFastestVal"></i>
             </div>
+            <!-- The showcase shot naming the part it is looking at, and which component owns
+                 it. The car is the harness, so every part of it answers to one. -->
+            <div class="rh-detail" id="rhDetail" hidden>
+              <span class="rd-cam">CAM &middot; DETAIL</span>
+              <span class="rd-main"><b id="rdPart"></b><em id="rdOwner"></em></span>
+              <span class="rd-does" id="rdDoes"></span>
+            </div>
           </div>
 
           <div class="rh-tr">
@@ -61,6 +68,8 @@
               <div class="rh-row rh-gap" id="rhGapRow" hidden><span>VS RUN 1</span><b id="rhGap"></b></div>
             </div>
             <div class="rh-phase" id="rhPhase">BUILDING</div>
+            <!-- Ten components, one bar each. Quiet until one of them is upgraded. -->
+            <div class="rh-rail" id="rhRail"></div>
           </div>
 
           <div class="rh-bl">
@@ -80,6 +89,11 @@
             <div class="rh-pit" id="rhPit" hidden>
               <div class="pit-head"><b id="pitState">BOX BOX</b><i id="pitClock"></i></div>
               <div class="pit-what" id="pitWhat"></div>
+              <!-- The part going on, while it goes on. -->
+              <div class="pit-fit" id="pitFit" hidden>
+                <div class="pf-row"><span id="pfPart"></span><b id="pfFrom"></b><em>&rarr;</em><b class="to" id="pfTo"></b></div>
+                <div class="pf-bar"><i id="pfBar"></i></div>
+              </div>
             </div>
             <!-- The only thing that ever interrupts the race: the loop kept a change, and the
                  garage is where you can go and look at it. Nothing moves until you press it. -->
@@ -104,6 +118,15 @@
           <div class="ghost-tag" id="ghostTag" hidden>
             <span class="gt-pin"></span>
             <span class="gt-text"><b>RUN 1</b><i>the harness before</i></span>
+          </div>
+
+          <!-- The sting when a change is kept. -->
+          <div class="rh-wipe" id="rhWipe" hidden>
+            <div class="wipe-bar">
+              <span class="wipe-tag">CHANGE KEPT</span>
+              <b id="wipeName"></b><i id="wipeLv"></i>
+              <span class="wipe-what" id="wipeWhat"></span>
+            </div>
           </div>
 
           <div class="rh-tip" id="rhTip" hidden></div>

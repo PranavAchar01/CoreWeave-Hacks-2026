@@ -788,10 +788,13 @@ function pitStep(dt) {
     car.lift = 0.11 * up;
     // The part goes on halfway through the stop, so the car that leaves is the new one.
     if (pit.t > BOX_HOLD * 0.5 && pit.pending) {
+      const done = pit.pending;
       st.levels = levelsAt(st.i + 1);
-      paintRig(pit.pending.role);
+      paintRig(done.role);
       track.refit();
-      pit.fitted = pit.pending; pit.pending = null;
+      pit.fitted = done; pit.pending = null;
+      paintRail(done.role);
+      showSting(done.role, st.levels[done.role] || 1, done.summary);
     }
     if (pit.t >= BOX_HOLD) { pit.state = 'exit'; pit.t = 0; car.lift = 0; }
     return 0;
@@ -1131,6 +1134,111 @@ function project(x, y, z) {
            y: (proj.box.h - H * scale) / 2 + sy * scale, z: vz };
 }
 
+// What each visible part of the car is actually made of, in harness terms. The mapping is
+// harnessSpec() read backwards, so the caption can only ever say what the car is really built
+// from.
+const PART_IS = {
+  frontWing: lv => `${lv.AERO > 1 ? lv.AERO + ' elements' : 'a single element'} \u2014 how much context it assembles`,
+  rearWing: lv => `set for ${lv.AERO > 2 ? 'downforce' : 'low drag'} \u2014 the same retrieval budget, seen from behind`,
+  floor: lv => `${lv.DATA > 1 ? 'sealed' : 'flat'} \u2014 what it checks before it submits`,
+  engine: lv => `${lv.POWER_UNIT > 1 ? 'a tuned checkpoint' : 'the base model'} \u2014 the model doing the work`,
+  tyres: lv => `${lv.TYRES > 2 ? 'soft' : lv.TYRES > 1 ? 'medium' : 'hard'} \u2014 how boldly it decodes`,
+  drs: lv => (lv.SIMULATOR > 1 ? 'open on the straights \u2014 the practice set it mined for itself'
+    : '<i>not fitted \u2014 it has not earned a curriculum yet</i>'),
+  brakes: lv => `${lv.PIT_CREW > 1 ? 'uprated' : 'standard'} \u2014 how a change is installed and smoke-tested`,
+};
+
+// Ten bars, one per component, height by level. A status readout that happens to celebrate.
+// The flare has to outlive the frame that raised it, or the next repaint takes it straight
+// back off again.
+const rail = { built: false, sig: '', bump: '', until: 0 };
+function paintRail(bumped) {
+  const host = $('rhRail'); if (!host) return;
+  if (bumped) { rail.bump = bumped; rail.until = E.time + 1.8; }
+  if (rail.bump && E.time > rail.until) rail.bump = '';
+  bumped = rail.bump;
+  if (!rail.built) {
+    rail.built = true;
+    for (const p of ALL) {
+      const b = el('i'); b.dataset.k = p.key;
+      b.style.setProperty('--hue', `var(--${HUE[p.key] || 'cyan'})`);
+      b.title = p.name;
+      host.append(b);
+    }
+  }
+  // Scale against the highest level any component could reach this season, not against the
+  // current leader: otherwise promoting one component visibly shrinks all the others, which
+  // reads as them getting worse when nothing happened to them at all.
+  const ceiling = Math.max(2, 1 + st.rounds.filter(x => x.promoted).length);
+  const max = ceiling;
+  const sig = ALL.map(p => st.levels[p.key] || 1).join(',') + '|' + (bumped || '');
+  if (rail.sig === sig) return;
+  rail.sig = sig;
+  for (const b of host.children) {
+    const lv = st.levels[b.dataset.k] || 1;
+    b.style.height = (22 + 78 * (lv - 1) / (max - 1 || 1)).toFixed(0) + '%';
+    b.classList.toggle('up', b.dataset.k === bumped);
+  }
+}
+
+// The part going on, while it goes on: what changed on the car, and the clock running down.
+const SPEC_LABEL = { frontWing: 'front wing', rearWing: 'rear wing', floor: 'floor',
+  engine: 'power unit', tyres: 'tyres', drs: 'DRS', fin: 'fin', brakes: 'brakes',
+  gearbox: 'gearbox', ballast: 'ballast', sidepods: 'sidepods' };
+function fitPanel() {
+  const host = $('pitFit'); if (!host) return;
+  const on = pit.state === 'stopped' || pit.state === 'exit';
+  host.hidden = !on;
+  if (!on) { host.dataset.sig = ''; return; }
+  const before = harnessSpec(levelsAt(st.i)), after = harnessSpec(levelsAt(st.i + 1));
+  const k = Object.keys(after).find(key => String(after[key]) !== String(before[key]));
+  const sig = `${st.i}|${k}`;
+  if (host.dataset.sig !== sig) {
+    host.dataset.sig = sig;
+    put('pfPart', k ? (SPEC_LABEL[k] || k).toUpperCase() : 'SETUP');
+    put('pfFrom', k ? String(before[k]) : '\u2014');
+    put('pfTo', k ? String(after[k]) : '\u2014');
+  }
+  const bar = $('pfBar');
+  if (bar) bar.style.width = Math.round(100 * Math.min(1, pit.clock / BOX_HOLD)) + '%';
+}
+
+// The sting. Raised once, at the moment the part is actually fitted.
+const sting = { timer: 0 };
+function showSting(role, level, summary) {
+  const n = $('rhWipe'); if (!n) return;
+  const p = BY_KEY[role] || { name: role || '' };
+  put('wipeName', p.name);
+  put('wipeLv', `L${level}`);
+  const w = $('wipeWhat');
+  if (w) w.textContent = summary || '';
+  n.hidden = false;
+  n.classList.remove('on');
+  void n.offsetWidth;                     // restart the animation rather than reuse the old one
+  n.classList.add('on');
+  clearTimeout(sting.timer);
+  sting.timer = setTimeout(() => { n.classList.remove('on'); n.hidden = true; }, 2700);
+}
+
+// The showcase caption: the part in shot, and the component it belongs to.
+function detailCaption() {
+  const n = $('rhDetail'); if (!n) return;
+  const sp = track.scene && track.scene.detail;
+  const on = sp && st.view === 'track' && !st.garage && $('rhFastest').hidden;
+  if (!on) { if (!n.hidden) n.hidden = true; n.dataset.sig = ''; return; }
+  const owner = BY_KEY[sp.key] || { name: sp.key, does: '' };
+  const lv = st.levels[sp.key] || 1;
+  const sig = `${sp.part}|${lv}`;
+  n.hidden = false;
+  if (n.dataset.sig === sig) return;
+  n.dataset.sig = sig;
+  put('rdPart', sp.label);
+  put('rdOwner', `${owner.name} \u00B7 L${lv}`);
+  const d = $('rdDoes');
+  const html = (PART_IS[sp.part] || (() => owner.does))(st.levels);
+  if (d && d.dataset.h !== html) { d.innerHTML = html; d.dataset.h = html; }
+}
+
 // The ghost is the same agent one season earlier, not a rival. Say so, on the car.
 function ghostTag() {
   const n = $('ghostTag'); if (!n) return;
@@ -1302,8 +1410,11 @@ function paintHud() {
     put('rhGap', (gap.s >= 0 ? '+' : '\u2212') + fx(Math.abs(gap.s)) + 's', gap.s < -0.02 ? 'behind' : '');
   }
 
+  detailCaption();
   ghostTag();
   paintPit();
+  fitPanel();
+  paintRail();
   standings(r);
   sectors(r, tasks);
   fastestLap(r);

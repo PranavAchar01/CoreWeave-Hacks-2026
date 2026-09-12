@@ -412,6 +412,57 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .rh-pit.done{border-color:var(--green)}
 .rh-pit.done .pit-head{color:var(--green)}
 
+/* The component rail: ten bars under the tower, one per component, height by level. Quiet by
+   design — it is a status readout, not a light show — but the one that just went up flares. */
+.rh-rail{display:flex;gap:2px;align-items:flex-end;height:16px;
+  background:rgba(6,8,26,.86);padding:3px 4px}
+.rh-rail i{flex:1;min-width:0;display:block;background:var(--hue,var(--mid));opacity:.45;
+  height:22%;transition:height .5s ease-out,opacity .5s ease-out}
+.rh-rail i.up{opacity:1;animation:railup 1.6s ease-out}
+@keyframes railup{0%{box-shadow:0 0 0 0 currentColor;filter:brightness(2.2)}
+  100%{box-shadow:0 0 0 5px transparent;filter:brightness(1)}}
+@media (prefers-reduced-motion:reduce){.rh-rail i{transition:none}.rh-rail i.up{animation:none}}
+
+/* The part going on, in the box, while it goes on. */
+.pit-fit{margin-top:6px;border-top:1px solid var(--studio);padding-top:6px}
+.pit-fit .pf-row{display:flex;align-items:baseline;gap:7px;font-size:7px;color:var(--mid)}
+.pit-fit .pf-row b{font-family:"VT323","Courier New",monospace;font-size:19px;line-height:13px;
+  color:var(--caption);font-variant-numeric:tabular-nums}
+.pit-fit .pf-row b.to{color:var(--green)}
+.pit-fit .pf-row em{font-style:normal;color:var(--mid)}
+.pit-fit .pf-bar{margin-top:5px;height:5px;background:var(--night)}
+.pit-fit .pf-bar i{display:block;height:100%;width:0;background:var(--cyan)}
+
+/* The sting. A bar sweeps the picture once when a change is kept, then leaves. */
+.rh-wipe{position:absolute;left:0;right:0;top:34%;z-index:7;pointer-events:none;overflow:hidden}
+.rh-wipe .wipe-bar{display:flex;align-items:baseline;gap:12px;padding:12px 20px;
+  background:linear-gradient(90deg,var(--green) 0 6px,rgba(6,8,26,.96) 6px);
+  border-top:1px solid rgba(47,217,104,.5);border-bottom:1px solid rgba(47,217,104,.5);
+  transform:translateX(-102%);white-space:nowrap;overflow:hidden}
+.rh-wipe.on .wipe-bar{animation:wipein 2.6s cubic-bezier(.16,.84,.3,1) forwards}
+@keyframes wipein{
+  0%{transform:translateX(-102%)} 18%{transform:translateX(0)}
+  78%{transform:translateX(0)} 100%{transform:translateX(102%)}}
+.rh-wipe .wipe-tag{font-size:7px;color:var(--green);letter-spacing:1px}
+.rh-wipe b{font-size:13px;color:var(--white);letter-spacing:1px}
+.rh-wipe i{font-style:normal;font-family:"VT323","Courier New",monospace;font-size:24px;
+  line-height:15px;color:var(--gold)}
+.rh-wipe .wipe-what{font-family:"VT323","Courier New",monospace;font-size:18px;line-height:14px;
+  color:var(--caption);text-transform:none;overflow:hidden;text-overflow:ellipsis}
+@media (prefers-reduced-motion:reduce){.rh-wipe .wipe-bar{transform:none}
+  .rh-wipe.on .wipe-bar{animation:none}}
+
+/* The showcase caption: which part is in shot, and whose part it is. */
+.rh-detail{display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:rgba(6,8,26,.88);border-top:2px solid var(--gold);padding:7px 12px;text-align:center}
+.rh-detail .rd-cam{font-size:6px;color:var(--mid);letter-spacing:.6px}
+.rh-detail .rd-main{display:flex;align-items:baseline;gap:8px}
+.rh-detail .rd-main b{font-size:9px;color:var(--white);letter-spacing:.6px}
+.rh-detail .rd-main em{font-style:normal;font-size:7px;color:var(--gold);letter-spacing:.4px}
+.rh-detail .rd-does{font-family:"VT323","Courier New",monospace;font-size:15px;line-height:14px;
+  color:var(--caption);text-transform:none}
+.rh-detail .rd-does i{font-style:normal;color:var(--mid)}
+
 /* The ghost's label, projected onto the car it belongs to. Dimmed and dithered-looking, the
    way the car itself is, so it reads as the same object. */
 .ghost-tag{position:absolute;z-index:4;display:flex;flex-direction:column;align-items:center;

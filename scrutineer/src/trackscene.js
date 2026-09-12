@@ -8,7 +8,27 @@
 (function (SCR) {
 'use strict';
 const E = SCR.engine, TS = SCR.trackScene = {};
-TS.MODES = ['AUTO', 'CHASE', 'ONBOARD', 'TV', 'HELI', 'APEX', 'PITLANE', 'STUDIO'];
+TS.MODES = ['AUTO', 'CHASE', 'ONBOARD', 'TV', 'HELI', 'APEX', 'DETAIL', 'PITLANE', 'STUDIO'];
+
+// The showcase shot. The car is the harness, so every part of it belongs to a component, and
+// this walks the camera round them one at a time while the car keeps lapping. Offsets are in
+// car-local metres: x right, y up, z forward.
+const DETAIL_PARTS = TS.DETAIL_PARTS = [
+  { part: 'frontWing', label: 'FRONT WING',  key: 'AERO',
+    look: [0, 0.28, 2.0],      cam: [1.5, 0.78, 3.5] },
+  { part: 'rearWing',  label: 'REAR WING',   key: 'AERO',
+    look: [0, 0.86, -1.9],     cam: [1.6, 1.35, -3.7] },
+  { part: 'floor',     label: 'FLOOR',       key: 'DATA',
+    look: [0, 0.16, -0.1],     cam: [2.5, 0.52, 0.5] },
+  { part: 'engine',    label: 'POWER UNIT',  key: 'POWER_UNIT',
+    look: [0, 0.68, -1.15],    cam: [1.9, 1.25, -2.5] },
+  { part: 'tyres',     label: 'TYRES',       key: 'TYRES',
+    look: [0.86, 0.36, -1.88], cam: [2.7, 0.82, -2.5] },
+  { part: 'drs',       label: 'DRS',         key: 'SIMULATOR',
+    look: [0, 0.92, -1.95],    cam: [1.2, 1.15, -3.9] },
+  { part: 'brakes',    label: 'BRAKES',      key: 'PIT_CREW',
+    look: [0.86, 0.36, 1.72],  cam: [2.6, 0.8, 2.6] },
+];
 
 // Shots the director can call, with how often it reaches for each and how long it holds.
 // APEX and TV are hard cuts; CHASE and HELI are moves, so the camera glides into them.
@@ -18,6 +38,7 @@ const SHOTS = {
   HELI:    { w: 1.7, min: 6.0, max: 10.0, cut: false },
   ONBOARD: { w: 1.4, min: 3.5, max: 6.0, cut: true },
   APEX:    { w: 1.6, min: 3.0, max: 5.0, cut: true },
+  DETAIL:  { w: 1.8, min: 3.4, max: 5.2, cut: true },
 };
 const SHOT_KEYS = Object.keys(SHOTS);
 
@@ -94,6 +115,14 @@ TS.create = function (o) {
       s.height = rand(1.18, 1.46);
       s.fov = rand(58, 72);
       s.lag = rand(24, 44);
+    } else if (shot === 'DETAIL') {
+      // Walk the parts in order rather than at random, so watching for a while shows you the
+      // whole car instead of the front wing four times.
+      sc.detailAt = (sc.detailAt === undefined ? Math.floor(rng() * DETAIL_PARTS.length) : sc.detailAt + 1);
+      s.spec = DETAIL_PARTS[sc.detailAt % DETAIL_PARTS.length];
+      s.side = rng() < 0.5 ? -1 : 1;       // either flank
+      s.fov = rand(34, 46);
+      s.lag = 55;                          // effectively bolted to the car
     } else if (shot === 'APEX') {
       // low and long, planted on the inside of a corner the car has not reached yet
       s.ahead = Math.round(rand(9, 26));
@@ -217,6 +246,16 @@ TS.create = function (o) {
       const aim = 8 - pair * 0.45;
       tx_ = car.x + tx * aim; ty_ = 0; tz_ = car.z + tz * aim;
       fov = shape.fov || 38; lag = shape.lag || 3;
+    } else if (mode === 'DETAIL') {
+      // Car-local to world. The car's yaw gives forward; right is that turned ninety degrees.
+      const sp = shape.spec || DETAIL_PARTS[0], sgn = shape.side || 1;
+      const fx2 = Math.sin(car.yaw), fz = Math.cos(car.yaw), rx = fz, rz2 = -fx2;
+      const at = (o, k) => [car.x + o[2] * fx2 + o[0] * k * rx, o[1], car.z + o[2] * fz + o[0] * k * rz2];
+      const lookP = at(sp.look, sgn), camP = at(sp.cam, sgn);
+      px_ = camP[0]; py_ = camP[1]; pz_ = camP[2];
+      tx_ = lookP[0]; ty_ = lookP[1]; tz_ = lookP[2];
+      fov = shape.fov || 40; lag = shape.lag || 55;
+      sc.detail = sp;
     } else if (mode === 'PITLANE') {
       // The pit camera is a fixed position on the wall, the way it is at a circuit: it does not
       // follow the car, it watches the box and lets the car arrive in shot.
@@ -270,8 +309,10 @@ TS.create = function (o) {
     sc.label = mode === 'STUDIO' ? 'CAM · GRID' : mode === 'TV' ? `CAM ${sc.activeTV + 1} · TRACKSIDE`
       : mode === 'CHASE' ? 'CAM · CHASE' : mode === 'ONBOARD' ? 'CAM · T-CAM'
       : mode === 'APEX' ? 'CAM · APEX'
+      : mode === 'DETAIL' ? 'CAM · DETAIL'
       : mode === 'PITLANE' ? 'CAM · PIT LANE' : 'CAM · HELI';
     sc.shot = mode;
+    if (mode !== 'DETAIL') sc.detail = null;
   };
 
   // render: draws sky, world, pools, shadow, ghost, car, sparks, outline. meshes: {car, ghost}
