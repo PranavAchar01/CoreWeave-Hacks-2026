@@ -849,7 +849,12 @@ S.physics = function (c, dd, sp, circ, dt, opts = {}) {
     c.yaw += Math.max(-0.35, Math.min(0.35, dOff / Math.max(6, c.speed)));
   }
   c.offPrev = c.off || 0;
-  c.steer = Math.max(-0.35, Math.min(0.35, curv * 22));
+  // Steering was geared so high it pinned against its own limit for a quarter of some laps, so
+  // the wheels sat at full lock through anything quick. Geometry says steer ~ wheelbase/radius;
+  // this is still exaggerated for readability, but it no longer saturates on an ordinary corner.
+  // Low-passed as well, so the wheels turn into a corner rather than snapping to it.
+  const steerTarget = Math.max(-0.4, Math.min(0.4, curv * 12));
+  c.steer += (steerTarget - c.steer) * Math.min(1, dt * 9);
   c.roll += ((-curv * 9 * (c.speed / dd.topSpeed)) - c.roll) * Math.min(1, dt * 6);
   c.pitch += (((c.speed - prev) / Math.max(dt, 1e-3)) * -0.0012 - c.pitch) * Math.min(1, dt * 5);
   c.spin += c.speed / SCR.car.R_R * dt; c.fanSpin += c.speed * 0.6 * dt; c.sector = Math.min(2, secNow);
