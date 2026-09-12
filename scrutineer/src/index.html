@@ -1,5 +1,5 @@
-<!-- Scrutineer. One view, one button, and the agent's own work underneath it. -->
-<div class="app" id="app">
+<!-- Scrutineer. The race runs continuously; the garage is somewhere you choose to go. -->
+<div class="app race" id="app">
   <header class="top">
     <div class="mark">SCRUTINEER</div>
     <div class="tag">an agent that builds web interfaces, and rebuilds its own harness</div>
@@ -8,6 +8,8 @@
       <button class="view-tab dash-tab" id="tabDash" role="tab">TELEMETRY</button>
     </div>
     <div class="top-right">
+      <button class="ghost-btn top-ghost" id="regsBtn">how this works</button>
+      <button class="ghost-btn top-ghost" id="tryBtn">run it yourself</button>
       <span class="runcount" id="runCount"></span>
       <button class="hold" id="holdBtn" title="the loop runs on its own; this only pauses it">
         <span class="dot"></span>RUNNING</button>
@@ -21,16 +23,22 @@
         <div class="hud" id="hud"></div>
         <div class="cards" id="cards"></div>
         <div class="overlay" id="overlay" hidden></div>
+        <!-- The only thing that ever interrupts the race: the loop kept a change, and the
+             garage is where you can go and look at it. Nothing moves until you press it. -->
+        <div class="garage-call" id="garageCall" hidden>
+          <span class="gc-eyebrow" id="gcEyebrow">UPGRADE FITTED</span>
+          <span class="gc-what" id="gcWhat"></span>
+          <button class="gc-go" id="gcGo">OPEN THE GARAGE</button>
+        </div>
+        <button class="track-back" id="trackBack" hidden>&larr; BACK TO THE TRACK</button>
       </div>
-      <p class="say" id="say">Six components decide how this agent works. Press <b>RUN THE AGENT</b>.</p>
+      <p class="say" id="say">Six components decide how this agent works.</p>
       <div class="meters" id="meters"></div>
     </section>
 
     <aside class="rig" aria-label="The harness">
       <div class="rig-head"><span>THE HARNESS</span><span class="rig-sub" id="rigSub">six components</span></div>
       <div class="rig-list" id="rig"></div>
-      <button class="ghost-btn" id="regsBtn">how this works</button>
-      <button class="ghost-btn" id="tryBtn">run it yourself &middot; your own key</button>
     </aside>
   </main>
 

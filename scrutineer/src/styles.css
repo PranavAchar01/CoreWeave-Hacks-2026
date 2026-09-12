@@ -231,6 +231,41 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   background:transparent;color:var(--mid);border:1px solid var(--studio);padding:8px;cursor:pointer}
 .ghost-btn:hover{color:var(--white);border-color:var(--mid)}
 
+/* =========================================================================
+   RACE MODE — the default. The race is the whole picture: no harness rail, no
+   narration line, no meters, no work panel. The agent is always running, and
+   the only thing that ever appears over the track is the call to the garage
+   when the loop has actually kept a change. TELEMETRY still carries every
+   number, so nothing here is the only copy of anything.
+   ========================================================================= */
+.app.race{grid-template-rows:52px minmax(0,1fr) 0;max-width:none;max-height:none;height:100vh}
+.app.race .body{grid-template-columns:minmax(0,1fr);gap:0;padding:0}
+.app.race .rig,.app.race .say,.app.race .meters,.app.race .work{display:none}
+.app.race .view{gap:0}
+.app.race .view .stage-box{flex:1;aspect-ratio:auto;width:100%;max-width:none;height:100%;
+  margin:0;border:0;border-top:2px solid var(--studio)}
+.top-ghost{margin-top:0;padding:6px 9px;font-size:6px}
+
+/* The garage call. It sits on the track and waits; the loop does not stop for it. */
+.garage-call{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);z-index:4;
+  display:flex;align-items:center;gap:12px;max-width:calc(100% - 32px);
+  background:rgba(6,8,26,.92);border:2px solid var(--gold);padding:9px 12px}
+.gc-eyebrow{font-family:"Press Start 2P","Courier New",monospace;font-size:7px;color:var(--gold);
+  letter-spacing:.5px;white-space:nowrap}
+.gc-what{font-family:"VT323","Courier New",monospace;font-size:19px;line-height:19px;
+  color:var(--caption);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gc-go{font-family:"Press Start 2P","Courier New",monospace;font-size:8px;padding:9px 13px;
+  background:var(--gold);color:var(--ink);border:0;cursor:pointer;letter-spacing:.5px;
+  white-space:nowrap;animation:runpulse 1.6s ease-in-out infinite}
+.gc-go:hover{background:#FFD75E}
+@media (prefers-reduced-motion:reduce){.gc-go{animation:none}}
+.track-back{position:absolute;left:12px;top:12px;z-index:4;
+  font-family:"Press Start 2P","Courier New",monospace;font-size:7px;padding:8px 11px;
+  background:rgba(6,8,26,.92);color:var(--caption);border:1px solid var(--mid);cursor:pointer}
+.track-back:hover{color:var(--white);border-color:var(--gold)}
+@media (max-width:720px){.garage-call{flex-wrap:wrap;justify-content:center}.gc-what{display:none}}
+
+
 .work{border-top:2px solid var(--studio);padding:9px 16px 12px;min-height:0;overflow:auto}
 .work-head{font-family:"Press Start 2P","Courier New",monospace;font-size:8px;color:var(--gold);
   margin-bottom:7px;display:flex;gap:10px;align-items:baseline}

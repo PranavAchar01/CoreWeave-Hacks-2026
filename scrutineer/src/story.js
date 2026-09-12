@@ -79,6 +79,9 @@ const fx = (n, d = 2) => (n === null || n === undefined || isNaN(n)) ? '—' : N
 const st = S.state = {
   rounds: [], i: -1, phase: 'INTRO', t: 0, dur: 0, levels: {}, shown: 0,
   playing: false, best: null, first: null, solvedNow: 0, seenTasks: [], bundle: null,
+  // The race is the default and it never stops. `garage` is a place you choose to go, and
+  // `pending` is the change waiting there for you — the loop carries on racing either way.
+  view: 'track', garage: false, pending: null,
 };
 
 function levelsAt(n) {
@@ -326,6 +329,7 @@ S.init = function (app) {
   buildRig();
   if (SCR.dash) SCR.dash.build();
   wire();
+  paintMode();
   enterIntro();
   detectLive().then(ok => {
     if (ok) enterLiveIntro();
@@ -379,6 +383,7 @@ function paintRig(bumped) {
 function focusPart(key) {
   const g = SCR.scenes.garage;
   for (const n of document.querySelectorAll('.part')) n.classList.toggle('sel', n.dataset.part === key);
+  if (!st.garage) { st.garage = true; paintMode(); }
   if (A.sceneName !== 'garage') showGarage();
   if (g) { const ui = (BY_KEY[key] || {}).ui; g.select(ui); g.setCamera('STATION_' + ui); }
   const p = BY_KEY[key];
@@ -530,8 +535,10 @@ function teamFor() {
   return team;
 }
 
+// The garage is only ever entered on purpose. Every phase that used to cut to it now just
+// asks, and the ask is silently dropped while the race is on screen.
 function showGarage(role, close) {
-  const g = SCR.scenes.garage; if (!g) return;
+  const g = SCR.scenes.garage; if (!g || !st.garage) return;
   if (A.sceneName !== 'garage') A.setScene('garage', { spec: harnessSpec(), era: 0 });
   g.setTeam(teamFor(), harnessSpec());
   const ui = role ? (BY_KEY[role] || {}).ui : null;
@@ -539,6 +546,62 @@ function showGarage(role, close) {
   // Wide, with the blamed station lit, while the loop is deciding: the question is which of the
   // ten it was. In close only when something actually changes there.
   g.setCamera(close && ui ? 'STATION_' + ui : 'OVERVIEW');
+}
+
+// ---------------------------------------------------------------------------------------
+// race mode vs garage mode
+//
+// Race mode is the whole screen: the car, and nothing else. The harness rail, the narration
+// line, the meters and the work panel all belong to the garage, because that is where you go
+// to read about a change. TELEMETRY carries every number in either mode.
+// ---------------------------------------------------------------------------------------
+function paintMode() {
+  const app = $('app');
+  if (app) app.classList.toggle('race', st.view === 'track' && !st.garage);
+  const back = $('trackBack'); if (back) back.hidden = !(st.view === 'track' && st.garage);
+  if (st.garage) { const call = $('garageCall'); if (call) call.hidden = true; }
+}
+
+// Raised only when the loop actually kept a change. It waits; it does not interrupt.
+function callToGarage(r) {
+  st.pending = r;
+  const call = $('garageCall'); if (!call || st.garage) return;
+  const p = BY_KEY[r.role] || { name: r.role || '', does: '' };
+  const eye = $('gcEyebrow'), what = $('gcWhat');
+  if (eye) eye.textContent = `${p.name} \u2192 L${st.levels[r.role] || 1}`;
+  if (what) what.textContent = r.diff_summary || p.does || 'a revision to the harness';
+  call.hidden = false;
+}
+
+function openGarage() {
+  const r = st.pending;
+  st.garage = true;
+  paintMode();
+  showGarage(r && r.role, !!r);
+  if (r) {
+    const g = SCR.scenes.garage, ui = (BY_KEY[r.role] || {}).ui;
+    if (g && g.playUpgrade && ui) {
+      g.playUpgrade(ui, { name: (r.part || 'REVISION'), blurb: r.diff_summary || '',
+        tier: Math.min(3, (st.levels[r.role] || 1) - 1) });
+    }
+    const p = BY_KEY[r.role] || { name: r.role || '' };
+    say(`<b>${esc(p.name)}</b> is now level <span class="num">${st.levels[r.role] || 1}</span>. `
+      + `<span class="num">${esc(r.diff_summary || 'a revision')}</span> — written by the agent `
+      + 'against its own files, and kept because it cleared all ten checks.');
+  }
+  paintRig(r && r.role);
+}
+
+function closeGarage() {
+  st.garage = false; st.pending = null;
+  paintMode();
+  enterTrack();
+}
+
+// The race itself, resumed rather than restarted: the car keeps whatever lap it was on.
+function enterTrack() {
+  if (A.sceneName !== 'run') A.setScene('run');
+  else if (track.refit) track.refit();
 }
 
 const track = { name: 'run' };
@@ -564,6 +627,15 @@ track.update = function (dt) {
   track.scene.updateCamera(dt);
 };
 track.render = function () { track.scene.render({ car: track.mesh }); };
+// A kept change reaches the car without stopping it: new bodywork, same lap, same corner.
+track.refit = function () {
+  if (!track.scene) return;
+  const spec = harnessSpec();
+  if (JSON.stringify(spec) === JSON.stringify(track.spec)) return;
+  track.spec = spec;
+  track.dd = SCR.car.derive(spec);
+  track.mesh = SCR.car.build(spec, 0);
+};
 SCR.scenes.run = track;
 
 // ---------------------------------------------------------------------------------------
@@ -571,7 +643,7 @@ SCR.scenes.run = track;
 // ---------------------------------------------------------------------------------------
 function enterIntro() {
   st.phase = 'INTRO'; st.playing = false;
-  showGarage();
+  if (st.garage) showGarage(); else enterTrack();
   const first = st.rounds[0], last = st.rounds[st.rounds.length - 1];
   const kept = st.rounds.filter(r => r.promoted).length;
   const t0 = (first && (first.tasks || []).filter(t => t.solved > 0).length) || 0;
@@ -584,7 +656,7 @@ function enterIntro() {
     : `It ran ${st.rounds.length} times and kept <b>${kept}</b> of the changes it wrote.`;
   say('An agent that builds web interfaces, drawn as a garage. Six components decide how it '
     + 'works — and it rewrites them itself. '
-    + promise + ' Press <b>RUN THE AGENT</b>.');
+    + promise + ' It is running now; the garage opens when it keeps one.');
   meters([
     { label: 'RUNS COMPLETED', value: '0' },
     { label: 'INTERFACES CLEAN', value: '—' },
@@ -602,8 +674,8 @@ function enterIntro() {
     const b = el('div');
     b.innerHTML = '<p style="margin:0;font-family:\'VT323\',monospace;font-size:17px;line-height:19px;'
       + 'color:var(--caption)">Nothing here is a mock-up. Every score, change and refusal on this '
-      + 'page came from that loop actually running against a real model. Press the button to step '
-      + `through it, one run at a time — ${st.rounds.length} of them.</p>`;
+      + 'page came from that loop actually running against a real model — '
+      + `${st.rounds.length} runs of it.</p>`;
     box.append(a, b); host.append(box);
   }
   button('RUN THE AGENT', st.rounds.length > 0);
@@ -612,9 +684,9 @@ function enterIntro() {
 
 function enterLiveIntro() {
   const rc = $('runCount'); if (rc) rc.textContent = 'LIVE · ON THIS MACHINE';
-  say('This is the loop running on your own machine. Press <b>RUN THE AGENT</b> and it will '
-    + 'actually build interfaces — writing each one, opening it in a browser, and auditing it — '
-    + 'then work out which of its own components caused the failures and try to fix one. '
+  say('This is the loop running on your own machine. It is '
+    + 'actually building interfaces — writing each one, opening it in a browser, and auditing it — '
+    + 'then working out which of its own components caused the failures and trying to fix one. '
     + 'It takes a few minutes, because it is really doing it.');
   const host = work('LIVE', 'nothing here is a recording');
   if (host) {
@@ -632,8 +704,11 @@ function startRun() {
   if (st.playing) return;
   st.i++;
   if (st.i >= st.rounds.length) {
-    // round the cycle again from the beginning, the way a loop does
-    st.i = -1; st.levels = levelsAt(0); enterIntro(); scheduleNext(2200); return;
+    // Round the cycle again from the beginning, the way a loop does — without ever leaving
+    // the track, because the point of this view is that the agent is always running.
+    st.i = 0; st.levels = levelsAt(0);
+    const call = $('garageCall'); if (call) call.hidden = true;
+    st.pending = null;
   }
   st.levels = levelsAt(st.i);
   st.playing = true;
@@ -651,7 +726,7 @@ function phase(name) {
 
   if (name === 'RUN') {
     st.seenTasks = []; st.solvedNow = 0;
-    A.setScene('run');
+    if (!st.garage) enterTrack();
     const n = (r.tasks || []).length || 20;
     st.dur = Math.max(7, Math.min(15, n * 0.55));
     button('RUNNING…', false);
@@ -751,13 +826,8 @@ function phase(name) {
     if (r.promoted) {
       st.levels = levelsAt(st.i + 1);
       paintRig(r.role);
-      showGarage(r.role, true);
-      // the station rebuilds itself with the new equipment, in shot
-      const g = SCR.scenes.garage, ui = (BY_KEY[r.role] || {}).ui;
-      if (g && g.playUpgrade && ui) {
-        g.playUpgrade(ui, { name: (r.part || 'REVISION'), blurb: r.diff_summary || '',
-          tier: Math.min(3, (st.levels[r.role] || 1) - 1) });
-      }
+      if (!st.garage) enterTrack();      // the new bodywork goes on without breaking the lap
+      callToGarage(r);
       const next = st.rounds[st.i + 1];
       say(`Approved. <b>${esc(p.name)}</b> is now level <span class="num">${st.levels[r.role]}</span>`
         + (next ? `, and the next run scored <span class="num">${fx(next.official_s)}</span> — `
@@ -1088,7 +1158,7 @@ function showView(which) {
   const dash = $('dash');
   if (dash) {
     dash.hidden = which !== 'dash';
-    if (which === 'dash') { if (SCR.dash) SCR.dash.show(); st.view = which; paintTabs(which); return; }
+    if (which === 'dash') { if (SCR.dash) SCR.dash.show(); st.view = which; paintTabs(which); paintMode(); return; }
     if (SCR.dash) SCR.dash.hide();
   }
   for (const [k, id] of Object.entries(VIEWS)) {
@@ -1099,6 +1169,7 @@ function showView(which) {
   // the work panel belongs to the run itself; the other two views carry their own detail, and
   // leaving it up under them just prints the same curve or the same table twice on one screen.
   const wk = $('work'); if (wk) wk.hidden = which !== 'track';
+  paintMode();
 }
 
 
@@ -1110,6 +1181,10 @@ function wire() {
   for (const [id, which] of tabs) {
     const t = $(id); if (t) t.addEventListener('click', () => showView(which));
   }
+  const go = $('gcGo');
+  if (go) go.addEventListener('click', openGarage);
+  const back = $('trackBack');
+  if (back) back.addEventListener('click', closeGarage);
   const rb = $('regsBtn');
   if (rb) rb.addEventListener('click', () => { if (SCR.ui && SCR.ui.toggleRegs) SCR.ui.toggleRegs(); });
   const tb = $('tryBtn');
@@ -1119,6 +1194,8 @@ function wire() {
     if (ev.key === ' ') { ev.preventDefault(); setHold(!auto.paused); }
     if (ev.key === '1') showView('track');
     if (ev.key === '2') showView('dash');
+    if (ev.key === 'g' || ev.key === 'G') { if (st.garage) closeGarage(); else openGarage(); }
+    if (ev.key === 'Escape' && st.garage) closeGarage();
   });
 }
 
@@ -1137,5 +1214,6 @@ S.seekTo = function (runIndex, phaseName) {
 };
 
 S.diag = () => ({ story: { phase: st.phase, run: st.i + 1, of: st.rounds.length,
-  playing: st.playing, levels: st.levels, shown: st.shown } });
+  playing: st.playing, levels: st.levels, shown: st.shown, scene: A && A.sceneName,
+  garage: st.garage, pending: !!st.pending } });
 })(window.SCR = window.SCR || {});
