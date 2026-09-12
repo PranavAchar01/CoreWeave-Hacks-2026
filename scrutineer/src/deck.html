@@ -1,0 +1,234 @@
+<!-- The deck: the script, one beat per slide. Every caption is the script's own words, verbatim. -->
+<div class="deck" id="deck">
+<div class="stage" id="stage">
+
+<!-- 01 -->
+<section class="slide" data-kick="THE CAR IS THE AGENT">
+  <div class="s-body"><div class="s1">
+    <div class="stagecar"><canvas class="px" id="car1" width="496" height="279"></canvas>
+      <div class="tagrun"><b id="car1run">RUN 10</b><span id="car1say">the harness after ten runs</span></div></div>
+    <div class="col">
+      <h1 class="big">THE CAR<br><em>IS</em> THE<br>AGENT</h1>
+      <p class="lead">An agent that rebuilds its own harness. Ten components decide how it works; it rewrites them itself, one per run.</p>
+      <div class="rail" id="rail1"></div>
+      <div class="rail-l"><span>wings · retrieval</span><span>floor · verification</span><span>compound · sampling</span></div>
+    </div>
+  </div></div>
+  <aside class="say" hidden>Scrutineer is an agent that <em>rebuilds its own harness</em>, and we draw that harness as a <em>race car</em> so you can watch it change.</aside>
+</section>
+
+<!-- 02 -->
+<section class="slide" data-kick="WHERE IT STARTS · AUTORESEARCH">
+  <div class="s-body"><div class="s2">
+    <div class="ring">
+      <svg class="loop" viewBox="0 0 860 640"><path d="M430 80 L760 80 L760 560 L100 560 L100 80 L430 80" fill="none" stroke="#F4C542" stroke-width="8" stroke-dasharray="24 14"/>
+        <path d="M740 60 L780 80 L740 100 Z M120 540 L80 560 L120 580 Z" fill="#F4C542"/></svg>
+      <div class="node" style="left:0;top:0"><span data-icon="file" data-c="cyan"></span><div><div class="h3 cyan">EDIT</div><p>one file: train.py</p></div></div>
+      <div class="node" style="right:0;top:0"><span data-icon="clock" data-c="gold"></span><div><div class="h3 gold">TRAIN</div><p>a fixed 5 minutes</p></div></div>
+      <div class="node" style="right:0;bottom:0"><span data-icon="chart" data-c="green"></span><div><div class="h3 green">CHECK</div><p>one metric: val_bpb</p></div></div>
+      <div class="node" style="left:0;bottom:0"><span data-icon="fork" data-c="red"></span><div><div class="h3 red">KEEP / DISCARD</div><p>then go again</p></div></div>
+      <div style="position:absolute;left:260px;top:230px;width:340px;text-align:center"><div class="h2">ONE GPU<br>ONE FILE<br><span class="gold">ONE METRIC</span></div></div>
+    </div>
+    <div class="col">
+      <div class="row" style="align-items:center;gap:26px"><span data-icon="moon" data-c="gold"></span><h2 class="h2">~100 EXPERIMENTS<br><span class="gold">WHILE YOU SLEEP</span></h2></div>
+      <div class="nightaxis"><span class="lbl">12 AN HOUR · 8 HOURS</span><span class="cap">one square per experiment</span></div>
+      <div class="nightgrid" id="night"></div>
+      <p class="cap">Each a five-minute run, kept or thrown away. Dim squares are illustrative discards.</p>
+      <div class="cite"><b>SOURCE</b><strong>ANDREJ KARPATHY · AUTORESEARCH</strong><span>github.com/karpathy/autoresearch · March 2026</span></div>
+    </div>
+  </div></div>
+  <aside class="say" hidden>It starts from the same idea as <em>Andrej Karpathy's autoresearch</em>: there, an agent edits one training file, trains for a fixed five minutes, checks a single metric and keeps or discards the change, about a hundred experiments a night.</aside>
+</section>
+
+<!-- 03 -->
+<section class="slide" data-kick="SAME LOOP · NEW TARGET">
+  <div class="s-body"><div class="s3">
+    <div class="target">
+      <div class="lbl">AUTORESEARCH TUNES</div>
+      <div class="file"><span data-icon="chip" data-c="cyan"></span><div><div class="h3">A MODEL</div><p class="cap">weights, architecture, optimizer — all in train.py</p></div></div>
+      <div class="mini-loop"><span class="chip">EDIT</span><span class="chip">TRAIN</span><span class="chip">CHECK</span><span class="chip">KEEP</span></div>
+      <p class="cap">The thing being improved is the network.</p>
+    </div>
+    <div class="mid-arrow"><div class="arrow">▶</div><div class="lbl" style="text-align:center">SAME<br>LOOP</div><div class="arrow">▶</div></div>
+    <div class="target new">
+      <div class="lbl gold">SCRUTINEER REBUILDS</div>
+      <div class="file"><span data-icon="car" data-c="gold"></span><div><div class="h3 gold">THE AGENT'S OWN HARNESS</div><p class="cap">the scaffolding around the model, in ten parts</p></div></div>
+      <div class="harness" id="harness3"></div>
+      <p class="cap">The thing being improved is <span class="gold">the agent itself</span>.</p>
+    </div>
+  </div></div>
+  <aside class="say" hidden>We point that loop at the <em>agent's own scaffolding</em> instead of a model.</aside>
+</section>
+
+<!-- 04 -->
+<section class="slide" data-kick="STEP 1 · IT BUILDS">
+  <div class="s-body"><div class="s4wrap">
+    <div class="s4top"><div class="row" style="align-items:baseline;gap:22px"><span class="lbl">EVERY RUN</span><span class="h2 gold">20 PAGES</span><span class="cap">run 4, as the agent built them</span></div>
+      <div class="key"><i></i><span class="cap" id="wins-key">failed its audit or timing</span></div></div>
+    <div class="s4" id="wins"></div></div></div>
+  <aside class="say" hidden>Every run, the agent builds <em>twenty real web interfaces</em> from written briefs.</aside>
+</section>
+
+<!-- 05 -->
+<section class="slide" data-kick="STEP 2 · AUDITED, THEN TIMED TWICE">
+  <div class="s-body"><div class="s5">
+    <div class="page">
+      <div class="bar"><i></i><i></i><i></i><b>SITE HEADER · RUN 4</b></div>
+      <div id="pagewf" style="position:relative;height:516px"></div>
+      <div class="scan"></div>
+      <div class="flag"><b>AXE-CORE · SERIOUS</b><span>html-has-lang</span></div>
+    </div>
+    <div class="col" style="gap:34px">
+      <div class="row" style="align-items:center;gap:22px"><span data-icon="scan" data-c="cyan"></span><div><div class="h3 cyan">EVERY PAGE, AUDITED</div><p class="cap">opened in a real browser and checked by axe-core</p></div></div>
+      <div class="timer"><span data-icon="eye" data-c="cyan"></span><div><div class="h3">PRACTICE SPLIT</div><p class="cap">the agent can see it</p></div><div class="t">76.96<em> s</em></div></div>
+      <div class="timer sealed"><span data-icon="lock" data-c="gold"></span><div><div class="h3 gold">SEALED HELD-OUT</div><p class="cap">it never sees it</p></div><div class="t">77.74<em> s</em></div></div>
+      <p class="cap mid">Run 4 of the recorded demo season.</p>
+    </div>
+  </div></div>
+  <aside class="say" hidden>Each page is <em>audited for accessibility with axe-core</em> and timed twice: once on a practice split the agent can see, and once on a <em>sealed held-out split</em> it never sees.</aside>
+</section>
+
+<!-- 06 -->
+<section class="slide" data-kick="WHY THE SEAL MATTERS">
+  <div class="s-body"><div class="s6">
+    <div class="peek" id="peek"></div>
+    <div class="col">
+      <h2 class="h2">CHECK THE SAME TEST<br>ENOUGH TIMES AND YOU<br><span class="red">LEARN THE TEST</span></h2>
+      <div class="cites">
+        <div class="cite"><b>ICML 2015</b><strong>BLUM &amp; HARDT<br>THE LADDER</strong><span>a leaderboard that resists overfitting to the holdout</span></div>
+        <div class="cite"><b>SCIENCE 2015</b><strong>DWORK ET AL.<br>REUSABLE HOLDOUT</strong><span>reusing a holdout safely under adaptive analysis</span></div>
+      </div>
+      <div class="gatecard"><span data-icon="ladder" data-c="black"></span><div><b>OUR GATE: LADDER</b><br><span>a gain on the sealed split must clear the split's own noise</span></div></div>
+    </div>
+  </div></div>
+  <aside class="say" hidden>That seal matters because an agent that keeps checking against the same test <em>starts to learn the test</em>. That is exactly the problem <em>Blum and Hardt's Ladder</em> and <em>Dwork and colleagues' reusable holdout</em> were built to solve, and one of our gates is a Ladder.</aside>
+</section>
+
+<!-- 07 -->
+<section class="slide" data-kick="STEP 3 · IT FINDS THE CAUSE">
+  <div class="s-body"><div class="s7">
+    <div class="col">
+      <div class="one"><div class="lbl">AUTORESEARCH</div><div class="n">val_bpb</div><p class="cap" style="text-align:center">one number for the whole run</p></div>
+      <div class="cite"><b>2024</b><strong>TEXTGRAD</strong><span>feedback sent back to each part of a compound AI system</span></div>
+    </div>
+    <div class="trace" id="trace">
+      <svg id="traceLines"></svg>
+      <div class="fails" id="fails"></div>
+      <div class="comps" id="comps"></div>
+    </div>
+  </div></div>
+  <aside class="say" hidden>Autoresearch judges a whole run by <em>one number</em>. Scrutineer instead traces every failing page back to <em>the one component that caused it</em>, much as TextGrad sends feedback back to individual parts of a compound AI system.</aside>
+</section>
+
+<!-- 08 -->
+<section class="slide" data-kick="THE TEN COMPONENTS">
+  <div class="s-body"><div class="s8" id="comps8"></div></div>
+  <aside class="say" hidden>There are <em>ten components</em>: retrieval, the model, sampling, verification, curriculum, the proposer, budget, audit, memory and deploy.</aside>
+</section>
+
+<!-- 09 -->
+<section class="slide" data-kick="TWO OF THEM, AND WHERE THEY COME FROM">
+  <div class="s-body"><div class="s9">
+    <div class="duo">
+      <div class="row" style="align-items:center;gap:22px"><span data-icon="deck" data-c="cyan"></span><div><div class="h2 cyan">CURRICULUM</div><p class="cap">picks the practice tasks</p></div></div>
+      <div class="cards" id="cards9"></div>
+      <div class="cite"><b>NEURIPS 2023</b><strong>VOYAGER · AUTOMATIC CURRICULUM</strong><span>an agent that chooses its own next task</span></div>
+    </div>
+    <div class="duo">
+      <div class="row" style="align-items:center;gap:22px"><span data-icon="book" data-c="gold"></span><div><div class="h2 gold">MEMORY</div><p class="cap">records findings for next time</p></div></div>
+      <div class="notebook" id="note9"></div>
+      <div class="cite"><b>NEURIPS 2023</b><strong>REFLEXION · REFLECTIONS IN MEMORY</strong><span>an agent that writes down what went wrong</span></div>
+    </div>
+  </div></div>
+  <aside class="say" hidden><em>Curriculum</em> picks practice tasks, like Voyager's automatic curriculum, and <em>memory</em> records findings for next time, the way Reflexion keeps its reflections.</aside>
+</section>
+
+<!-- 10 -->
+<section class="slide" data-kick="STEP 4 · IT PICKS ONE, AND IT REWRITES ITSELF">
+  <div class="s-body"><div class="s10">
+    <div>
+      <div class="formula"><span data-icon="coin" data-c="gold"></span><span>EXPECTED GAIN</span><span class="over">÷</span><span>COST</span></div>
+      <div class="bars" id="bars10"></div>
+      <p class="cap mid" style="margin-top:18px">Ranking shown as a shape, not measured values.</p>
+    </div>
+    <div class="term">
+      <div class="bar"><i></i><i></i><i></i><span style="margin-left:14px">RETRIEVAL · WRITES A CHANGE TO ITSELF</span></div>
+      <pre></pre>
+    </div>
+  </div></div>
+  <aside class="say" hidden>The loop picks the component with the <em>best expected gain per dollar</em>, and that component <em>writes a change to itself</em>.</aside>
+</section>
+
+<!-- 11 -->
+<section class="slide" data-kick="THE SAME MOVE · DARWIN GÖDEL MACHINE">
+  <div class="s-body"><div class="s11">
+    <div class="tree"><svg id="tree11" viewBox="0 0 892 592" width="100%" height="100%"></svg></div>
+    <div class="col" style="gap:34px">
+      <h2 class="h2">AN AGENT THAT<br><span class="gold">REWROTE ITS OWN CODE</span></h2>
+      <div class="bench">
+        <div class="b"><span>SWE-BENCH<br>BEFORE</span><div class="track"><i style="width:20%"></i></div><b>20%</b></div>
+        <div class="b"><span class="gold">SWE-BENCH<br>AFTER</span><div class="track"><i class="after" style="width:50%"></i></div><b class="gold">50%</b></div>
+        <div class="b"><span>POLYGLOT</span><div class="track"><i style="width:14.2%"></i><i class="after" style="width:30.7%;opacity:.55"></i></div><b style="font-size:36px">14→31%</b></div>
+      </div>
+      <div class="cite"><b>SAKANA AI · 2025</b><strong>ZHANG, HU, LU, LANGE &amp; CLUNE<br>DARWIN GÖDEL MACHINE</strong><span>keeps an archive of the agents it grows, and samples from it</span></div>
+    </div>
+  </div></div>
+  <aside class="say" hidden>Sakana AI's <em>Darwin Gödel Machine</em> made the same move when it rewrote its own code and raised its SWE-bench score from <em>20 to 50 percent</em>.</aside>
+</section>
+
+<!-- 12 -->
+<section class="slide" data-kick="STEP 5 · THE GATES">
+  <div class="s-body"><div class="s12">
+    <div class="gantry" id="gantry"></div>
+    <div class="legend12">
+      <span class="chip gold">NAMED IN THIS SCRIPT</span>
+      <span class="cap">Run 4: nine cleared, the splits-agree check did not — <span class="red">refused, the two splits disagreed</span>.</span>
+    </div>
+  </div></div>
+  <aside class="say" hidden>The change then has to <em>clear a set of gates</em>, including size, novelty, evidence, regression, a check that both splits agree, and cost.</aside>
+</section>
+
+<!-- 13 -->
+<section class="slide" data-kick="STEP 6 · KEPT, AND WRITTEN DOWN">
+  <div class="s-body"><div class="s13">
+    <div class="chain" id="chain"></div>
+    <div class="cites">
+      <div class="cite"><b>AUTORESEARCH</b><strong>THE EXPERIMENT LOG</strong><span>what it tried, and what it kept</span></div>
+      <div class="cite"><b>DARWIN GÖDEL MACHINE</b><strong>THE ARCHIVE OF AGENTS</strong><span>every variant it grew, kept to build on</span></div>
+      <div class="panel"><div class="h3 gold">SCRUTINEER · A SIGNED LEDGER</div><p class="cap" style="margin-top:10px">Each row carries the hash of the row before it and an Ed25519 signature. Nothing else in the loop can append.</p></div>
+    </div>
+  </div></div>
+  <aside class="say" hidden>It is kept <em>only if every gate passes</em>, and every kept change is written to a <em>signed ledger</em>, our version of autoresearch's experiment log and the Darwin Gödel Machine's archive of agents.</aside>
+</section>
+
+<!-- 14 -->
+<section class="slide" data-kick="THE CAR IS THE HARNESS">
+  <div class="s-body"><div class="s14">
+    <div class="callcar" id="callcar"><canvas class="px" id="car14" width="576" height="324"></canvas><svg id="calls14"></svg></div>
+    <div class="beforeafter">
+      <div class="shot"><canvas class="px" id="carA" width="286" height="161"></canvas><div class="tagrun">START · LEVEL 1</div></div>
+      <div class="arrow"><i></i>KEPT CHANGES<i></i></div>
+      <div class="shot"><canvas class="px" id="carB" width="286" height="161"></canvas><div class="tagrun">AFTER 10 RUNS</div></div>
+    </div>
+  </div></div>
+  <aside class="say" hidden>On the car, <em>wings are retrieval</em>, the <em>floor is verification</em> and <em>tyre compound is sampling</em>, so a kept change visibly rebuilds the car.</aside>
+</section>
+
+<!-- 15 -->
+<section class="slide" data-kick="THE LAP IS THE RUN">
+  <div class="s-body"><div class="s15">
+    <div class="map"><svg id="map15" viewBox="0 0 892 632"></svg></div>
+    <div class="col" style="gap:34px">
+      <h2 class="big" style="font-size:54px;line-height:72px">THE LAP<br>IS <em>THE RUN</em></h2>
+      <div class="pitcard"><canvas class="px" id="car15" width="274" height="171"></canvas>
+        <div class="strip"><i></i><span>REPLAY RUN 4 · LAP 25/40</span></div><div class="prog"><i></i></div></div>
+      <p class="cap">Across the line when the run is decided. Pop the card out and it floats over every app.</p>
+    </div>
+  </div></div>
+  <aside class="say" hidden>Where the car sits <em>on the lap</em> shows <em>how far the current run has got</em>.</aside>
+</section>
+
+<div class="progress" id="progress"></div>
+</div>
+<div class="hud" id="hud"><button type="button" id="prev">◀ PREV</button><span id="count"></span><button type="button" id="next">NEXT ▶</button><button type="button" id="auto">AUTOPLAY</button></div>
+</div>

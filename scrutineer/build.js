@@ -287,6 +287,42 @@ ${safe(loopJs + appJs)}
   console.log(`build: site/public/telemetry.html ${(doc.length / 1024).toFixed(0)} KB`);
 }
 
+// ---------------------------------------------------------------------------------------
+// The deck: the pitch script, one beat per slide, at /deck. Same palette and typefaces as the
+// front door; the car and circuit are drawn by the same engine, from the same recorded season.
+// ---------------------------------------------------------------------------------------
+{
+  const DECK_ORDER = ['engine.js', 'car.js', 'world.js', 'deck.js'];
+  const deckJs = DECK_ORDER.map(f => fs.readFileSync(path.join(src, f), 'utf8')).join('\n');
+  const safe = s => s.replace(/<\/script/gi, '<\\/script').replace(/<!--/g, '<\\!--');
+  const doc = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scrutineer — the pitch</title>
+<meta name="theme-color" content="#06081A">
+${FAVICON}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<style>
+${fs.readFileSync(path.join(src, 'deck.css'), 'utf8')}
+</style>
+</head>
+<body>
+${fs.readFileSync(path.join(src, 'deck.html'), 'utf8')}
+<script>
+${safe(loopJs + deckJs)}
+</script>
+</body>
+</html>`;
+  fs.writeFileSync(path.join(siteDir, 'deck.html'), doc);
+  const t5 = path.join(root, '.build-check-deck.js'); fs.writeFileSync(t5, deckJs);
+  const r5 = cp.spawnSync(process.execPath, ['--check', t5], { encoding: 'utf8' });
+  fs.unlinkSync(t5);
+  if (r5.status !== 0) { console.error(r5.stderr); process.exit(1); }
+  console.log(`build: site/public/deck.html ${(doc.length / 1024).toFixed(0)} KB`);
+}
+
 // syntax check
 const tmp = path.join(root, '.build-check.js'); fs.writeFileSync(tmp, js);
 const r = cp.spawnSync(process.execPath, ['--check', tmp], { encoding: 'utf8' }); fs.unlinkSync(tmp);

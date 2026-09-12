@@ -54,6 +54,10 @@
     {
       "source": "/telemetry",
       "destination": "/telemetry.html"
+    },
+    {
+      "source": "/deck",
+      "destination": "/deck.html"
     }
   ]
 }
