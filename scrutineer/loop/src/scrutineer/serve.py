@@ -131,7 +131,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._file(STATE / "pages" / path[len("/pages/"):])
         if path in ("/", "/index.html"):
             return self._file(SITE / "index.html")
-        if path in ("/pit", "/telemetry"):                  # the hosted site rewrites these; so do we
+        if path in ("/watch", "/pit", "/telemetry"):        # the hosted site rewrites these; so do we
             return self._file(SITE / (path.lstrip("/") + ".html"))
         return self._file(SITE / path.lstrip("/"))
 
@@ -207,7 +207,7 @@ def serve(port: int = 7777, open_browser: bool = True) -> None:
     print(f"\n  Scrutineer is running at {url}")
     print(f"  The pit board — the car on a card that stays on top — is at {url}pit")
     print(f"  The telemetry — the season as 3D charts — is at {url}telemetry")
-    print("  Press RUN THE AGENT in the page. Your key stays on this machine.\n")
+    print(f"  The broadcast, where you press RUN THE AGENT, is at {url}watch. Your key stays on this machine.\n")
     if open_browser:
         threading.Timer(0.6, lambda: webbrowser.open(url)).start()
     try:

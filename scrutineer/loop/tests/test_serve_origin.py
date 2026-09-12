@@ -91,7 +91,7 @@ def test_every_surface_has_a_route(server):
     """The hosted site rewrites these paths; the watch server has to answer the same ones, or a link
     that works on the web is a 404 on the machine running the loop."""
     url, _ = server
-    for path, marker in (("/", b'id="app"'), ("/telemetry", b'id="chart"'), ("/pit", b'class="desk"')):
+    for path, marker in (("/", b'class="ld"'), ("/watch", b'id="app"'), ("/telemetry", b'id="chart"'), ("/pit", b'class="desk"')):
         with urllib.request.urlopen(url + path, timeout=5) as r:
             assert r.status == 200, path
             assert marker in r.read(), path
