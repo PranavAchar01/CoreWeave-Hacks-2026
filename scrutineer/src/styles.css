@@ -265,6 +265,83 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .track-back:hover{color:var(--white);border-color:var(--gold)}
 @media (max-width:720px){.garage-call{flex-wrap:wrap;justify-content:center}.gc-what{display:none}}
 
+/* =========================================================================
+   THE WORLD FEED — the broadcast furniture that sits on the race itself.
+   Corner-anchored the way a live F1 feed is: session and circuit top-left,
+   the timing tower top-right, the car's own instruments bottom-left, and the
+   lap strip across the bottom. Hidden entirely outside race mode.
+   ========================================================================= */
+.rhud{position:absolute;inset:0;pointer-events:none;z-index:3;
+  font-family:"Press Start 2P","Courier New",monospace;font-size:7px;text-transform:uppercase}
+.app:not(.race) .rhud{display:none}
+
+.rh-tl{position:absolute;left:14px;top:14px;display:flex;align-items:center;gap:8px}
+.rh-live{background:var(--red);color:var(--white);padding:5px 7px;letter-spacing:.5px}
+.rh-live.held{background:var(--mid)}
+.rh-circuit{background:rgba(6,8,26,.86);color:var(--caption);padding:5px 8px;letter-spacing:.5px}
+
+.rh-tr{position:absolute;right:14px;top:14px;width:214px;display:flex;flex-direction:column;gap:3px}
+.rh-tower{background:rgba(6,8,26,.9);border-left:3px solid var(--gold)}
+.rh-t-head{display:flex;justify-content:space-between;align-items:baseline;gap:6px;
+  padding:6px 8px;border-bottom:1px solid var(--studio);color:var(--white)}
+.rh-t-head i{font-style:normal;font-size:6px;color:var(--gold)}
+.rh-row{display:grid;grid-template-columns:62px minmax(0,1fr) auto;align-items:baseline;gap:6px;
+  padding:4px 8px;border-bottom:1px solid rgba(18,26,74,.7)}
+.rh-row>span{font-size:6px;color:var(--mid);letter-spacing:.3px}
+.rh-row>b{font-family:"VT323","Courier New",monospace;font-size:19px;line-height:15px;
+  color:var(--white);font-variant-numeric:tabular-nums;text-align:right;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rh-row>i{font-style:normal;font-family:"VT323","Courier New",monospace;font-size:16px;
+  line-height:15px;color:var(--mid);font-variant-numeric:tabular-nums}
+.rh-row.rh-lap>b{font-size:23px;line-height:17px;color:var(--gold)}
+.rh-row.rh-hero{background:rgba(18,26,74,.55)}
+.rh-row.rh-hero>b{font-size:23px;line-height:17px;color:var(--gold)}
+.rh-row.rh-hero>i.good{color:var(--green)}.rh-row.rh-hero>i.bad{color:var(--red)}
+.rh-row.clean>b{color:var(--green)}
+.rh-row>b.blame{color:var(--amber);font-size:15px}
+.rh-phase{align-self:flex-end;background:var(--gold);color:var(--ink);padding:6px 9px;
+  letter-spacing:.5px}
+.rh-phase.build{background:var(--cyan)}.rh-phase.blame{background:var(--amber)}
+.rh-phase.change{background:var(--purple);color:var(--white)}
+.rh-phase.gates{background:var(--white);color:var(--ink)}
+.rh-phase.kept{background:var(--green);color:var(--ink)}
+.rh-phase.dropped{background:var(--red);color:var(--white)}
+
+.rh-bl{position:absolute;left:14px;bottom:44px;display:flex;flex-direction:column;gap:4px;
+  align-items:flex-start}
+.rh-speed{display:flex;align-items:baseline;gap:5px;background:rgba(6,8,26,.86);padding:4px 8px}
+.rh-speed b{font-family:"VT323","Courier New",monospace;font-size:34px;line-height:24px;
+  color:var(--white);font-variant-numeric:tabular-nums}
+.rh-speed em{font-style:normal;font-size:6px;color:var(--mid)}
+.rh-bar{width:132px;height:6px;background:rgba(6,8,26,.86)}
+.rh-bar i{display:block;height:100%;width:0;background:var(--cyan)}
+.rh-drive{display:flex;gap:4px}
+.rh-gear{background:var(--studio);color:var(--white);padding:5px 9px;min-width:20px;text-align:center}
+.rh-drs{background:var(--studio);color:var(--mid);padding:5px 7px}
+.rh-drs.on{background:var(--green);color:var(--ink)}
+
+.rh-br{position:absolute;right:14px;bottom:44px;display:flex;flex-direction:column;gap:2px;
+  background:rgba(6,8,26,.9);padding:6px 8px;border-left:3px solid var(--white);max-width:250px}
+.rh-br .g{display:grid;grid-template-columns:11px minmax(0,1fr);gap:6px;align-items:baseline;
+  font-family:"VT323","Courier New",monospace;font-size:15px;line-height:15px;
+  color:var(--mid);text-transform:none}
+.rh-br .g i{font-style:normal;font-family:"Press Start 2P","Courier New",monospace;font-size:7px}
+.rh-br .g.ok{color:var(--caption)}.rh-br .g.ok i{color:var(--green)}
+.rh-br .g.no{color:var(--white)}.rh-br .g.no i{color:var(--red)}
+.rh-br .g span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* One cell per interface. This is what a lap is on this circuit. */
+.rh-strip{position:absolute;left:14px;right:14px;bottom:14px;display:flex;gap:2px;
+  align-items:stretch;height:18px}
+.rh-cell{flex:1;min-width:0;background:rgba(18,26,74,.6);border-bottom:3px solid var(--mid)}
+.rh-cell.ok{background:rgba(47,217,104,.22);border-bottom-color:var(--green)}
+.rh-cell.no{background:rgba(227,30,45,.22);border-bottom-color:var(--red)}
+.rh-cell.now{outline:2px solid var(--gold);outline-offset:-2px}
+
+@media (max-width:900px){.rh-tr{width:172px}.rh-br{display:none}}
+@media (max-height:560px){.rh-strip,.rh-bl{display:none}}
+
+
 
 .work{border-top:2px solid var(--studio);padding:9px 16px 12px;min-height:0;overflow:auto}
 .work-head{font-family:"Press Start 2P","Courier New",monospace;font-size:8px;color:var(--gold);

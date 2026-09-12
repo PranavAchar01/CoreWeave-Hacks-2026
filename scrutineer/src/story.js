@@ -604,26 +604,33 @@ function enterTrack() {
   else if (track.refit) track.refit();
 }
 
+// Two runs of this page should not be the same race. Unless a seed was asked for on the URL —
+// screenshots and the diagnostic harness need that — every session gets its own salt, so the
+// circuits it draws and the way the director covers them are new each time.
+let SALT = null;
+function salt() {
+  if (SALT === null) SALT = (A.params && A.params.seed) ? 0 : (Math.random() * 0x7FFFFFFF) | 0;
+  return SALT;
+}
+const trackSeed = () => (A.seed + st.i * 7 + salt()) | 0;
+
 const track = { name: 'run' };
 track.enter = function () {
-  const circ = SCR.world.makeCircuit(A.seed + st.i * 7), world = SCR.world.build(circ);
+  const seed = trackSeed();
+  const circ = SCR.world.makeCircuit(seed), world = SCR.world.build(circ);
   track.spec = harnessSpec();
   track.dd = SCR.car.derive(track.spec);
   track.mesh = SCR.car.build(track.spec, 0);
   track.car = SCR.car.newState();
   SCR.sim.physics(track.car, track.dd, track.spec, circ, 0, {});
-  track.scene = SCR.trackScene.create({ R, world, car: track.car });
-  track.scene.setMode('CHASE');   // always frames the car; TV cuts in once it is moving
-  track.camT = 0;
+  // The director carries its own seed, so the same circuit is covered differently each session.
+  track.scene = SCR.trackScene.create({ R, world, car: track.car, seed: (seed ^ 0x5F3759D) | 0 });
+  track.scene.setMode('AUTO');
+  track.circuitName = circ.name;
 };
 track.update = function (dt) {
   SCR.sim.physics(track.car, track.dd, track.spec, track.scene.circ, dt, { fx: track.scene.fx });
   SCR.sim.stepSparks(track.scene.fx, dt);
-  track.camT += dt;
-  if (track.camT > 5.0) { track.camT = 0;
-    const modes = ['CHASE', 'TV', 'HELI', 'ONBOARD', 'CHASE'];
-    track.cut = ((track.cut || 0) + 1) % modes.length;
-    track.scene.setMode(modes[track.cut]); }
   track.scene.updateCamera(dt);
 };
 track.render = function () { track.scene.render({ car: track.mesh }); };
@@ -637,6 +644,133 @@ track.refit = function () {
   track.mesh = SCR.car.build(spec, 0);
 };
 SCR.scenes.run = track;
+
+// ---------------------------------------------------------------------------------------
+// The world feed: the broadcast furniture over the race. Everything in the timing tower comes
+// out of the loop's own bundle. The only invented readings are the car's speed and gear, and
+// those are the car — not a measurement of the agent.
+// ---------------------------------------------------------------------------------------
+const PHASE_TAG = {
+  RUN:      ['BUILDING', 'build'],
+  SCORE:    ['SCORING', ''],
+  DIAGNOSE: ['FINDING THE CAUSE', 'blame'],
+  SELECT:   ['SELECTING', 'blame'],
+  CHANGE:   ['WRITING A CHANGE', 'change'],
+  GATES:    ['CHECKING', 'gates'],
+  RESULT:   ['RESULT', ''],
+  INTRO:    ['STANDING BY', ''],
+};
+const hud = { built: false, n: -1, cells: [], last: {} };
+
+// Only write to the DOM when the text actually changed: this runs every frame.
+function put(id, txt, cls) {
+  const el_ = $(id); if (!el_) return;
+  if (hud.last[id] !== txt) { el_.textContent = txt; hud.last[id] = txt; }
+  if (cls !== undefined && el_.className !== cls) el_.className = cls;
+}
+
+function stripFor(tasks) {
+  const host = $('rhStrip'); if (!host) return;
+  if (hud.n !== tasks.length) {
+    host.textContent = ''; hud.cells = [];
+    for (let k = 0; k < tasks.length; k++) { const n = el('div', 'rh-cell'); host.append(n); hud.cells.push(n); }
+    hud.n = tasks.length;
+  }
+}
+
+function gatesPanel(r) {
+  const host = $('rhGates'); if (!host) return;
+  const gates = (r && r.gates) || [];
+  const show = gates.length && (st.phase === 'GATES' || st.phase === 'RESULT');
+  host.hidden = !show;
+  if (!show) { host.dataset.sig = ''; return; }
+  const shown = st.phase === 'GATES' ? Math.min(gates.length, st.shown) : gates.length;
+  const sig = `${st.i}:${shown}`;
+  if (host.dataset.sig === sig) return;
+  host.dataset.sig = sig;
+  host.textContent = '';
+  for (let k = 0; k < shown; k++) {
+    const g = gates[k], n = el('div', 'g ' + (g.ok ? 'ok' : 'no'));
+    n.innerHTML = `<i>${g.ok ? '\u2713' : '\u2717'}</i><span>${esc(GATE_SAYS[g.gate] || g.gate)}</span>`;
+    host.append(n);
+  }
+}
+
+function paintHud() {
+  if (st.view !== 'track' || st.garage) return;
+  const r = st.rounds[st.i] || null, tasks = (r && r.tasks) || [];
+
+  put('rhCircuit', track.circuitName || 'SEALED CIRCUIT');
+  const live_ = $('rhLive');
+  if (live_) live_.className = 'rh-live' + (auto.paused ? ' held' : '');
+  put('rhRun', st.rounds.length ? `RUN ${Math.max(1, st.i + 1)} / ${st.rounds.length}` : 'STANDING BY');
+
+  // A lap is one interface: built, opened in a browser, audited.
+  const done = st.phase === 'RUN' ? st.shown : (r ? tasks.length : 0);
+  put('rhLap', tasks.length ? `${done} / ${tasks.length}` : '\u2014');
+  const cur = st.phase === 'RUN' ? tasks[Math.max(0, st.shown - 1)] : null;
+  put('rhTask', cur ? (cur.title || cur.id) : (r ? 'RUN COMPLETE' : '\u2014'));
+
+  const clean = st.phase === 'RUN' ? st.solvedNow
+    : (r ? tasks.reduce((a, t) => a + (t.solved > 0 ? 1 : 0), 0) : 0);
+  put('rhClean', tasks.length ? `${clean} / ${tasks.length}` : '\u2014');
+  const cleanRow = $('rhClean'); if (cleanRow && cleanRow.parentElement)
+    cleanRow.parentElement.className = 'rh-row' + (clean ? ' clean' : '');
+
+  // The score only exists once the run has been scored; showing this run's number while it is
+  // still building would be printing an answer before it was measured.
+  const scored = r && st.phase !== 'RUN';
+  const shownScore = scored ? r.official_s : (st.i > 0 ? st.rounds[st.i - 1].official_s : null);
+  put('rhScore', shownScore === null || shownScore === undefined ? '\u2014' : fx(shownScore));
+  const ref = st.i > 0 ? st.rounds[st.i - 1].official_s : null;
+  let dTxt = '', dCls = '';
+  if (scored && ref !== null) {
+    const d = ref - r.official_s;
+    dTxt = (d >= 0 ? '\u2212' : '+') + fx(Math.abs(d));
+    dCls = d > 0.005 ? 'good' : d < -0.005 ? 'bad' : '';
+  } else if (!scored && ref !== null) dTxt = 'last run';
+  put('rhDelta', dTxt, dCls);
+
+  const lv = Object.values(st.levels).reduce((a, b) => a + b, 0);
+  const kept = st.rounds.slice(0, Math.max(0, st.i)).filter(x => x.promoted).length
+    + ((r && r.promoted && (st.phase === 'RESULT')) ? 1 : 0);
+  put('rhHarness', `L${lv} \u00B7 ${kept} kept`);
+
+  const blameRow = $('rhBlameRow');
+  const showBlameRow = r && r.role && ['DIAGNOSE', 'SELECT', 'CHANGE', 'GATES', 'RESULT'].includes(st.phase);
+  if (blameRow) blameRow.hidden = !showBlameRow;
+  if (showBlameRow) put('rhBlame', (BY_KEY[r.role] || { name: r.role }).name, 'blame');
+
+  let [tag, cls] = PHASE_TAG[st.phase] || ['RUNNING', ''];
+  if (st.phase === 'RESULT' && r) { if (r.promoted) { tag = 'CHANGE KEPT'; cls = 'kept'; }
+    else if (r.rule_fired === 'no_upgrade') { tag = 'NOTHING TO CHANGE'; cls = ''; }
+    else { tag = 'CHANGE DROPPED'; cls = 'dropped'; } }
+  put('rhPhase', tag, 'rh-phase' + (cls ? ' ' + cls : ''));
+
+  // The car's own instruments.
+  const car = track.car, dd = track.dd;
+  if (car && dd) {
+    const kmh = Math.round(car.speed * 3.6);
+    put('rhSpeed', String(kmh));
+    const bar = $('rhSpeedBar');
+    if (bar) bar.style.width = Math.round(100 * Math.min(1, car.speed / (dd.topSpeed + 8))) + '%';
+    const gears = dd.gears || 6;
+    const g = car.speed < 4 ? 'N'
+      : String(Math.max(1, Math.min(gears, Math.ceil(car.speed / (dd.topSpeed / gears)))));
+    put('rhGear', g);
+    put('rhDrs', 'DRS', 'rh-drs' + (car.drsOn ? ' on' : ''));
+  }
+
+  stripFor(tasks);
+  for (let k = 0; k < hud.cells.length; k++) {
+    const t = tasks[k];
+    const revealed = st.phase === 'RUN' ? k < st.shown : true;
+    const want = 'rh-cell' + (revealed ? (t.solved > 0 ? ' ok' : ' no') : '')
+      + (st.phase === 'RUN' && k === st.shown - 1 ? ' now' : '');
+    if (hud.cells[k].className !== want) hud.cells[k].className = want;
+  }
+  gatesPanel(r);
+}
 
 // ---------------------------------------------------------------------------------------
 // phases
@@ -1086,6 +1220,7 @@ function showOutcome(r) {
 // per-frame: reveal tasks and gates in time with the run
 // ---------------------------------------------------------------------------------------
 S.frame = function (dt) {
+  paintHud();
   paintTags(st.phase === 'DIAGNOSE' || st.phase === 'CHANGE' || st.phase === 'GATES'
     || st.phase === 'RESULT' ? (st.rounds[st.i] || {}).role : null);
   if (tween.to !== null && tween.t < tween.dur) { tween.t += dt; paintTween(); }

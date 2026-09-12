@@ -7,8 +7,21 @@ const E = SCR.engine, M = E.M, Wd = SCR.world = {};
 const { box, Q, T } = E;
 const ROAD_W = Wd.ROAD_W = 6;
 Wd.makeCircuit = function (seed) {
-  const rng = E.mulberry32(seed), N = 11, ctrl = [];
-  for (let i = 0; i < N; i++) { const ang = (i / N) * Math.PI * 2 + (rng() - 0.5) * 0.3, rad = 150 + (rng() - 0.5) * 80; ctrl.push([Math.cos(ang) * rad * 1.35, Math.sin(ang) * rad]); }
+  const rng = E.mulberry32(seed);
+  // Layout character, drawn from the seed: how many corners it is built from, how stretched the
+  // loop is, and how far a corner may wander off the ring. A circuit is its seed.
+  const N = 9 + Math.floor(rng() * 6);              // 9..14 control points
+  const aspect = 1.08 + rng() * 0.62;               // 1.08..1.70, long-and-thin through to square
+  const wander = 0.24 + rng() * 0.34;               // how irregular the spacing gets
+  const spread = 60 + rng() * 70;                   // radius variation, so straights and hairpins
+  const base = 138 + rng() * 46;
+  const phase = rng() * Math.PI * 2;
+  const ctrl = [];
+  for (let i = 0; i < N; i++) {
+    const ang = (i / N) * Math.PI * 2 + phase + (rng() - 0.5) * wander;
+    const rad = base + (rng() - 0.5) * spread;
+    ctrl.push([Math.cos(ang) * rad * aspect, Math.sin(ang) * rad]);
+  }
   const pts = [], cr = (p0, p1, p2, p3, t) => { const t2 = t * t, t3 = t2 * t; return 0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3); };
   for (let i = 0; i < N; i++) { const p0 = ctrl[(i - 1 + N) % N], p1 = ctrl[i], p2 = ctrl[(i + 1) % N], p3 = ctrl[(i + 2) % N]; const steps = Math.max(8, Math.round(Math.hypot(p2[0] - p1[0], p2[1] - p1[1]) / 3.5));
     for (let k = 0; k < steps; k++) { const t = k / steps; pts.push([cr(p0[0], p1[0], p2[0], p3[0], t), cr(p0[1], p1[1], p2[1], p3[1], t)]); } }
@@ -22,7 +35,9 @@ Wd.makeCircuit = function (seed) {
   for (let i = 0; i < n; i++) { const a = S[(i - 1 + n) % n], b = S[(i + 1) % n], p = S[i]; let tx = b.x - a.x, tz = b.z - a.z; const l = Math.hypot(tx, tz) || 1; tx /= l; tz /= l;
     p.tx = tx; p.tz = tz; p.nx = -tz; p.nz = tx; const ta = S[(i - 2 + n) % n], tb = S[(i + 2) % n];
     const h1 = Math.atan2(p.x - ta.x, p.z - ta.z), h2 = Math.atan2(tb.x - p.x, tb.z - p.z); let dh = h2 - h1; while (dh > Math.PI) dh -= 2 * Math.PI; while (dh < -Math.PI) dh += 2 * Math.PI; p.curv = dh / (4 * STEP); }
-  const sm = S.map((p, i) => { let s = 0; for (let k = -3; k <= 3; k++) s += S[(i + k + n) % n].curv; return s / 7; }); S.forEach((p, i) => p.curv = sm[i]);
+  const KER = [1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1], KR = 5, KSUM = KER.reduce((a, b) => a + b, 0);
+  const sm = S.map((p, i) => { let s = 0; for (let k = -KR; k <= KR; k++) s += S[(i + k + n) % n].curv * KER[k + KR]; return s / KSUM; });
+  S.forEach((p, i) => p.curv = sm[i]);
   let best = 0, bestLen = 0;
   for (let i = 0; i < n; i++) { let len = 0; while (len < n && Math.abs(S[(i + len) % n].curv) < 0.004) len++; if (len > bestLen) { bestLen = len; best = i; } }
   const R = []; for (let i = 0; i < n; i++) R.push(S[(best + i) % n]); R.forEach((p, i) => p.s = i * STEP);

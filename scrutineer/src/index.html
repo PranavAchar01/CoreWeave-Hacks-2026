@@ -23,6 +23,39 @@
         <div class="hud" id="hud"></div>
         <div class="cards" id="cards"></div>
         <div class="overlay" id="overlay" hidden></div>
+
+        <!-- The world feed. Every value in it is read from the loop's own bundle; the only
+             invented numbers are the car's speed and gear, which are the car, not a result. -->
+        <div class="rhud" id="raceHud">
+          <div class="rh-tl">
+            <span class="rh-live" id="rhLive">LIVE</span>
+            <span class="rh-circuit" id="rhCircuit"></span>
+          </div>
+
+          <div class="rh-tr">
+            <div class="rh-tower">
+              <div class="rh-t-head"><b>SCRUTINEER</b><i id="rhRun">RUN 1 / 10</i></div>
+              <div class="rh-row rh-lap"><span>LAP</span><b id="rhLap">0 / 20</b></div>
+              <div class="rh-row"><span>BUILDING</span><b id="rhTask">&mdash;</b></div>
+              <div class="rh-row"><span>CLEAN</span><b id="rhClean">0</b></div>
+              <div class="rh-row rh-hero"><span>HELD-OUT</span><b id="rhScore">&mdash;</b><i id="rhDelta"></i></div>
+              <div class="rh-row"><span>HARNESS</span><b id="rhHarness">L10</b></div>
+              <div class="rh-row" id="rhBlameRow" hidden><span>BLAMED</span><b id="rhBlame"></b></div>
+            </div>
+            <div class="rh-phase" id="rhPhase">BUILDING</div>
+          </div>
+
+          <div class="rh-bl">
+            <div class="rh-speed"><b id="rhSpeed">0</b><em>KM/H</em></div>
+            <div class="rh-bar"><i id="rhSpeedBar"></i></div>
+            <div class="rh-drive"><span class="rh-gear" id="rhGear">N</span><span class="rh-drs" id="rhDrs">DRS</span></div>
+          </div>
+
+          <div class="rh-br" id="rhGates" hidden></div>
+
+          <!-- Laps, as the thing a lap actually is here: one interface, built and audited. -->
+          <div class="rh-strip" id="rhStrip"></div>
+        </div>
         <!-- The only thing that ever interrupts the race: the loop kept a change, and the
              garage is where you can go and look at it. Nothing moves until you press it. -->
         <div class="garage-call" id="garageCall" hidden>
