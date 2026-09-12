@@ -23,11 +23,6 @@ const JOB = { AERO: 'context assembly', POWER_UNIT: 'inference', TYRES: 'decode 
   SIMULATOR: 'task selection', ENGINEER: 'patch synthesis', STRATEGIST: 'stop policy', SCRUTINEER: 'tamper check',
   HISTORIAN: 'trace compaction', PIT_CREW: 'install and smoke' };
 // what each one decides, in the regulations' words
-const DOES = { AERO: 'which reference material reaches the model', POWER_UNIT: 'the checkpoint it runs on',
-  TYRES: 'temperature, and how many candidates are drawn', DATA: 'render the page and run axe on it before submitting',
-  SIMULATOR: 'a practice set mined from what it keeps failing', ENGINEER: 'its own instructions for writing changes',
-  STRATEGIST: 'when to keep refining and when to submit', SCRUTINEER: 'what counts as an illegal change',
-  HISTORIAN: 'how findings are recorded for next time', PIT_CREW: 'how a change is applied and tested' };
 const PART = { AERO: 'wings', DATA: 'floor', TYRES: 'tyre compound', POWER_UNIT: 'power unit', SIMULATOR: 'DRS',
   STRATEGIST: 'gearbox', PIT_CREW: 'brakes', ENGINEER: 'livery', SCRUTINEER: 'livery', HISTORIAN: 'livery' };
 const HUE = { AERO: 'cyan', POWER_UNIT: 'red', TYRES: 'amber', DATA: 'green', SIMULATOR: 'cyan',
@@ -35,24 +30,16 @@ const HUE = { AERO: 'cyan', POWER_UNIT: 'red', TYRES: 'amber', DATA: 'green', SI
 const GATE = { diff_size: 'SIZE', comparable_ab: 'FAIR A/B', novelty: 'NOVELTY', evidence: 'EVIDENCE', seesaw: 'SPLITS AGREE',
   correlation: 'CORRELATION', regression: 'REGRESSION', cost_cap: 'COST', scrutineering: 'SCRUTINEER', rl_entropy: 'RL ENTROPY', ladder: 'LADDER' };
 const NAMED = new Set(['diff_size', 'novelty', 'evidence', 'regression', 'seesaw', 'cost_cap']);
-// the partners whose parts the car runs on: one per slide in the band, all ten on the wall
+// the partners whose parts each slide runs on (the band), and all ten on the closing wall
 const PARTNER = {
-  coreweave: { name: 'COREWEAVE HACKS', hue: 'cyan', line: 'Built at CoreWeave Hacks: Agent Loops. A whole weekend about the loop.' },
-  wandb: { name: 'WEIGHTS & BIASES', hue: 'gold', line: 'Model, traces, runs and registry: the whole loop lives on W&B.' },
-  rl: { name: 'W&B SERVERLESS RL', hue: 'gold', line: 'When the model is the part to change: a real LoRA job, one command away.' },
-  inference: { name: 'W&B INFERENCE', hue: 'gold', line: 'The agent builds on W&B Inference. Open models, OpenAI-compatible, nothing to host.' },
-  evals: { name: 'W&B WEAVE · EVALS', hue: 'gold', line: 'Both timings land in the Weave Evals tab: the scores the gates actually read.' },
-  sandboxes: { name: 'W&B SANDBOXES', hue: 'amber', line: 'A seal needs isolation. Sandboxes keep the agent’s own code out of process.' },
-  weave: { name: 'W&B WEAVE', hue: 'gold', line: 'Build, audit, replay, blame, gate: every step traced. That is how blame lands.' },
-  runs: { name: 'W&B RUNS', hue: 'gold', line: 'One W&B run per component, so credit is a curve you can open.' },
-  marimo: { name: 'MARIMO', hue: 'green', line: 'Memory writes a marimo notebook every generation. Executable, not a summary.' },
-  typesafe: { name: 'TYPESAFE SYSTEM1', hue: 'purple', line: 'The credit router speaks in typed decisions. No free-text guesswork.' },
-  registry: { name: 'W&B REGISTRY', hue: 'gold', line: 'Our archive of agents: every harness version registered in W&B Registry.' },
-  gate: { name: 'MARIMO', hue: 'green', line: 'The last gate is a marimo notebook that must reproduce the promotion.' },
-  aria: { name: 'ARIA', hue: 'cyan', line: 'Every generation, kept or refused, reported to the ARIA board.' },
-  alias: { name: 'W&B REGISTRY', hue: 'gold', line: 'Registered with an alias: the car that raced is the car that was promoted.' },
-  cwwb: { name: 'W&B · A COREWEAVE COMPANY', hue: 'cyan', line: 'From Inference to Weave, the stack under the car. Part of CoreWeave since 2025.' },
-  thanks: { name: 'OUR PIT WALL', hue: 'gold', line: 'None of this laps without them. Thank you.' },
+  1: { chips: [['COREWEAVE HACKS', 'cyan'], ['WEIGHTS & BIASES', 'gold']], line: 'Built at CoreWeave Hacks, running on W&B from model to registry.' },
+  2: { chips: [['W&B SERVERLESS RL', 'gold'], ['W&B INFERENCE', 'gold']], line: 'Every page built on W&B Inference; a real LoRA job one command away.' },
+  3: { chips: [['W&B WEAVE EVALS', 'gold'], ['W&B SANDBOXES', 'amber']], line: 'Both timings land in Weave Evals; Sandboxes keep the agent’s code isolated.' },
+  4: { chips: [['W&B WEAVE', 'gold'], ['W&B RUNS', 'gold'], ['MARIMO', 'green']], line: 'Every step traced, a run per component, memory as a marimo notebook.' },
+  5: { chips: [['TYPESAFE SYSTEM1', 'purple'], ['W&B REGISTRY', 'gold']], line: 'Typed decisions for the credit router; every harness version registered.' },
+  6: { chips: [['MARIMO', 'green'], ['ARIA', 'cyan']], line: 'A marimo notebook must reproduce each promotion; ARIA sees every generation.' },
+  7: { chips: [['W&B REGISTRY', 'gold'], ['W&B · A COREWEAVE COMPANY', 'cyan']], line: 'What raced is what was promoted. W&B: part of CoreWeave since 2025.' },
+  8: { chips: [['OUR PIT WALL', 'gold']], line: 'None of this laps without them. Thank you.' },
 };
 const WALL = [
   { name: 'COREWEAVE', role: 'TITLE HOST', hue: 'cyan', says: 'The hackathon this loop was built for, and the home of W&B since 2025.' },
@@ -130,8 +117,9 @@ function build() {
     s.prepend(top);
     const pt = PARTNER[s.dataset.partner];
     if (pt) {
-      const band = document.createElement('footer'); band.className = 's-partner'; band.style.setProperty('--h', `var(--${pt.hue})`);
-      band.innerHTML = `<span class="lbl">PIT PARTNER</span><b>${esc(pt.name)}</b><p>${esc(pt.line)}</p>`;
+      const band = document.createElement('footer'); band.className = 's-partner';
+      band.innerHTML = `<span class="lbl">PIT ${pt.chips.length > 1 ? 'PARTNERS' : 'PARTNER'}</span>`
+        + pt.chips.map(([n, h]) => `<b style="--h:var(--${h})">${esc(n)}</b>`).join('') + `<p>${esc(pt.line)}</p>`;
       s.append(band);
     }
   });
@@ -139,9 +127,7 @@ function build() {
   if (wall) wall.innerHTML = WALL.map(w => `<div class="partner" style="--h:var(--${w.hue})"><span class="lbl">${esc(w.role)}</span><b>${esc(w.name)}</b><p>${esc(w.says)}</p></div>`).join('');
   document.querySelectorAll('[data-icon]').forEach(n => { n.outerHTML = icon(n.dataset.icon, n.dataset.c || 'gold', +(n.dataset.s || 72)); });
 
-  // 01
-  $('rail1').innerHTML = C.ROLE_KEYS.map(k => `<i style="--h:var(--${HUE[k]});height:${24 + 76 * ((levelsAfter(R.length)[k] || 1) - 1) / 2}%"></i>`).join('');
-  // 02: a night of experiments, twelve an hour for eight hours
+  // 01: a night of experiments, about twelve an hour for eight hours
   $('night').innerHTML = Array.from({ length: 96 }, () => '<i></i>').join('');
   // 03
   $('harness3').innerHTML = ORDER.map(k => `<span style="--h:var(--${HUE[k]})">${NAME[k]}</span>`).join('');
@@ -149,26 +135,26 @@ function build() {
   const run4 = R[3] || R[0] || { pages: [] };
   $('wins').innerHTML = run4.pages.slice(0, 20).map(p => `<div class="win${p.passed ? '' : ' fail'}"><div class="bar"><i></i><i></i><i></i><b>${esc(p.title)}</b></div><div class="wf">${wire(p.family)}</div></div>`).join('');
   const nf = run4.pages.slice(0, 20).filter(p => !p.passed).length;
-  $('wins-key').textContent = `${nf} of 20 failed their audit or timing`;
+  $('wins-key').textContent = `${nf} of 20 failed audit or timing`;
   $('pagewf').innerHTML = wire('header', 3.2);
   // 06
   $('peek').innerHTML = peekChart();
   // 07: run 4's failing pages, and where the blame went
   const fails = run4.pages.filter(p => !p.passed), blamed = run4.standings || {}, top = Object.entries(blamed).sort((a, b) => b[1].n - a[1].n)[0];
-  $('fails').innerHTML = fails.slice(0, 9).map(p => `<div><span>${esc(p.title)}</span><span>${esc(((p.rules || [])[0] || {}).id || '')}</span></div>`).join('')
-    + `<div style="border-left-color:var(--mid);background:#04060F"><span class="mid">…and ${Math.max(0, fails.length - 9)} more</span><span></span></div>`;
+  $('fails').innerHTML = fails.slice(0, 5).map(p => `<div><span>${esc(p.title)}</span><span>${esc(((p.rules || [])[0] || {}).id || '')}</span></div>`).join('')
+    + `<div style="border-left-color:var(--mid);background:#04060F"><span class="mid">…and ${Math.max(0, fails.length - 5)} more</span><span></span></div>`;
   $('comps').innerHTML = ['AERO', 'DATA', 'TYRES', 'POWER_UNIT'].map(k => {
     const n = blamed[k] && blamed[k].n;
     return `<div class="${top && top[0] === k ? 'hot' : ''}" data-k="${k}"><span>${NAME[k]}</span>${n ? `<em>${n}</em>` : '<em class="mid">·</em>'}</div>`;
   }).join('') + `<p class="cap" style="margin:6px 0 0">${top ? `${top[1].n} of ${fails.length} failing pages traced to <span class="gold">${NAME[top[0]]}</span>. Blame counts only when correcting that one component flips the page.` : ''}</p>`;
-  // 08
-  $('comps8').innerHTML = ORDER.map(k => `<div class="comp" style="--h:var(--${HUE[k]})">${icon(compIcon(k), HUE[k], 48)}<div class="h3">${NAME[k]}</div><div class="job">${JOB[k]}</div><p>${esc(DOES[k])}</p><div class="part">on the car: ${PART[k]}</div></div>`).join('');
-  // 09: practice picked from what failed; notes from what each run changed
+  // the ten components, curriculum and memory lit
+  $('comps8').innerHTML = ORDER.map(k => `<div class="ctile${k === 'SIMULATOR' || k === 'HISTORIAN' ? ' lit' : ''}" style="--h:var(--${HUE[k]})">${icon(compIcon(k), HUE[k], 40)}<b>${NAME[k]}</b><span>${JOB[k]}</span><em>car: ${PART[k]}</em></div>`).join('');
+  // curriculum: practice mined from what kept failing; memory: the latest kept finding
   const fam = {}; R.slice(0, 4).forEach(r => r.pages.filter(p => !p.passed).forEach(p => { fam[p.family] = fam[p.family] || { t: p.title.replace(/ \(\d\)$/, ''), n: 0 }; fam[p.family].n++; }));
-  $('cards9').innerHTML = Object.values(fam).sort((a, b) => b.n - a.n).slice(0, 4).map((f, i) =>
-    `<div style="transform:rotate(${[-3, 2, -1.5, 3][i]}deg) translateY(${[0, 14, -8, 10][i]}px)"><b>FAILED ${f.n}×</b>${esc(f.t)}</div>`).join('');
-  $('note9').innerHTML = R.filter(r => r.diff_summary).slice(0, 5).map(r => `<div><b>RUN ${r.generation + 1}</b>${r.promoted ? '<em class="green">KEPT</em>' : '<em class="red">REFUSED</em>'}<span>${esc(r.diff_summary)}</span></div>`).join('');
-  // 10
+  $('cur4').textContent = 'practice mined from what kept failing: ' + Object.values(fam).sort((a, b) => b.n - a.n).slice(0, 2).map(f => `${f.t} ${f.n}×`).join(', ');
+  const noted = R.filter(r => r.diff_summary && r.promoted).slice(-1)[0];
+  $('mem4').textContent = 'a marimo notebook each generation' + (noted ? ` · run ${noted.generation + 1}: ${noted.diff_summary}` : '');
+  // 05
   $('bars10').innerHTML = [['AERO', 92], ['TYRES', 61], ['DATA', 48], ['SIMULATOR', 30], ['POWER_UNIT', 18]].map(([k, w]) =>
     `<div class="${k === 'AERO' ? 'pick' : ''}"><span>${NAME[k]}</span><i style="width:${w}%"></i><em>${k === 'AERO' ? 'PICKED' : ''}</em></div>`).join('');
   const aero = R.map((r, i) => ({ r, i })).filter(x => x.r.role === 'AERO' && x.r.diff_summary);
@@ -268,7 +254,6 @@ function cars() {
   const main = renderCar($('car14'), end, { orbit: 2.25, dist: 5.2, h: 1.9, fov: 32, target: [0, 0.35, 0] });
   renderCar($('carA'), start, { orbit: 2.25, dist: 5.4, h: 1.7, fov: 30 });
   renderCar($('carB'), end, { orbit: 2.25, dist: 5.4, h: 1.7, fov: 30 });
-  LIVE.push(renderCar($('car15'), end, { orbit: 3.4, dist: 6, h: 2.2, fov: 34, spin: true }));
   // three callouts, pinned to where those parts really are on the drawn car
   const k = 2, host = $('calls14'), anchors = [
     { k: 'AERO', t: 'WINGS = RETRIEVAL', s: 'more of the right references', p: [0, 0.3, 2.1], box: [30, 36] },
@@ -288,7 +273,7 @@ function cars() {
   host.setAttribute('viewBox', '0 0 1152 648'); host.innerHTML = lines;
 }
 
-// ---------- the trace lines on slide 7, once the layout is known ----------
+// ---------- the trace lines on slide 4, once the layout is known ----------
 function traceLines() {
   const host = $('trace'), svg = $('traceLines'), hb = host.getBoundingClientRect(), sc = hb.width / host.offsetWidth || 1;
   const hot = host.querySelector('.comps .hot'); if (!hot) return;
@@ -312,7 +297,7 @@ function show(i) {
   $('count').textContent = `${at + 1} / ${all.length}`;
   $('progress').style.width = `${((at + 1) / all.length) * 100}%`;
   if (!EXPORT) history.replaceState(null, '', `${location.pathname}?slide=${at + 1}`);
-  if (at === 6) requestAnimationFrame(traceLines);
+  if (at === 3) requestAnimationFrame(traceLines);
 }
 function fit() {
   if (EXPORT) return;
@@ -347,7 +332,6 @@ function boot() {
   const tick = ts => {
     const dt = last ? Math.min(0.05, (ts - last) / 1000) : 0; last = ts; E.time += dt;
     if (at === 0) LIVE[0].draw((LIVE[0].view.orbit += dt * 0.35));
-    if (at === 14) LIVE[1].draw((LIVE[1].view.orbit += dt * 0.25));
     requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);

@@ -67,179 +67,173 @@ canvas.px{display:block;image-rendering:pixelated;image-rendering:crisp-edges}
 @keyframes blink{50%{opacity:.25}}
 .export .blink{animation:none}
 
-/* ---------- 01 the car is the agent ---------- */
-.s1{display:grid;grid-template-columns:1000px 1fr;gap:70px;align-items:center;width:100%}
-.s1 .stagecar{position:relative;border:4px solid var(--studio);background:#04060F;box-shadow:12px 12px 0 #000}
-.s1 .stagecar canvas{width:992px;height:558px}
-.s1 .tagrun{position:absolute;left:18px;bottom:18px;display:flex;gap:16px;align-items:baseline;background:rgba(6,8,26,.88);padding:12px 16px}
-.s1 .tagrun b{font:14px var(--px);color:var(--gold)}.s1 .tagrun span{font:30px/24px var(--vt);color:var(--caption)}
-.rail{display:flex;gap:6px;height:44px;align-items:flex-end;margin:34px 0 14px}
-.rail i{flex:1;height:100%;background:var(--h)}
-.rail-l{display:flex;gap:28px;font:24px var(--vt);color:var(--mid)}
+/* ---------- 01 the car is the agent · where it starts ---------- */
+.m1{display:flex;flex-direction:column;gap:46px;width:100%}
+.m1-top{display:grid;grid-template-columns:888px 1fr;gap:70px;align-items:center}
+.stagecar{position:relative;border:4px solid var(--studio);background:#04060F;box-shadow:12px 12px 0 #000}
+.stagecar canvas{width:880px;height:496px}
+.stagecar .tagrun{position:absolute;left:18px;bottom:18px;display:flex;gap:16px;align-items:baseline;background:rgba(6,8,26,.88);padding:12px 16px}
+.stagecar .tagrun b{font:14px var(--px);color:var(--gold)}.stagecar .tagrun span{font:30px/24px var(--vt);color:var(--caption)}
+.m1-title .big{font-size:62px;line-height:80px}
+.m1-title .hackbadge{margin-bottom:6px}
+.m1-bot{display:flex;flex-direction:column;gap:18px}
+.m1-head{display:flex;align-items:baseline;gap:22px}
+.flow{display:grid;grid-template-columns:1fr 34px 1fr 34px 1fr 34px 1fr 34px 1fr;gap:12px;align-items:center}
+.flow .node{height:128px;padding:18px 20px;background:var(--studio);border:4px solid #000;box-shadow:8px 8px 0 #000;display:flex;gap:16px;align-items:center}
+.flow .node .h3{font-size:14px}
+.flow .node p{margin:6px 0 0;font:28px/28px var(--vt);color:var(--caption)}
+.flow .step{height:0;border-top:12px solid transparent;border-bottom:12px solid transparent;border-left:20px solid var(--gold);justify-self:center}
+.flow .night{border-color:var(--gold)}
+.nightgrid{display:grid;grid-template-columns:repeat(16,9px);grid-auto-rows:9px;gap:4px;margin-top:10px}
+.nightgrid i{background:var(--cyan);box-shadow:2px 2px 0 #000}
 
-/* ---------- 02 autoresearch ---------- */
-.s2{display:grid;grid-template-columns:900px 1fr;gap:80px;width:100%;align-items:center}
-.s2 .col{gap:12px}
-.ring{position:relative;width:860px;height:640px}
-.ring .node{position:absolute;width:330px;padding:22px 24px;background:var(--studio);border:4px solid #000;box-shadow:8px 8px 0 #000;display:flex;gap:20px;align-items:center}
-.ring .node .h3{font-size:17px}
-.ring .node p{margin:6px 0 0;font:30px/30px var(--vt);color:var(--caption)}
-.ring svg.loop{position:absolute;inset:0}
-.nightgrid{display:grid;grid-template-columns:repeat(12,28px);grid-auto-rows:28px;gap:7px;margin:14px 0 18px}
-.nightaxis{display:flex;gap:18px;align-items:baseline;margin-top:14px}
-.nightgrid i{background:var(--cyan);opacity:.85;box-shadow:3px 3px 0 #000}
-.nightgrid i:nth-child(7n){opacity:.35}
-
-/* ---------- 03 same loop, new target ---------- */
-.s3{display:grid;grid-template-columns:1fr 160px 1fr;gap:30px;width:100%;align-items:stretch}
-.target{display:flex;flex-direction:column;gap:28px;padding:40px;background:var(--studio);box-shadow:10px 10px 0 #000}
+/* ---------- 02 same loop, new target · it builds ---------- */
+.m2{display:grid;grid-template-columns:640px 1fr;gap:64px;width:100%;align-items:center}
+.m2-left{gap:0}
+.target{display:flex;flex-direction:column;gap:18px;padding:26px 28px;background:var(--studio);box-shadow:10px 10px 0 #000}
 .target.new{outline:6px solid var(--gold);outline-offset:-6px}
-.target .file{display:flex;align-items:center;gap:22px;padding:24px;background:#04060F;border:3px solid #000}
-.target .file .h3{font-size:20px}
-.mini-loop{display:flex;gap:12px;flex-wrap:wrap}
-.harness{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
-.harness span{font:13px/20px var(--px);padding:14px 8px;text-align:center;background:#04060F;border-bottom:6px solid var(--h);color:var(--white)}
-.s3 .mid-arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px}
-
-/* ---------- 04 twenty interfaces ---------- */
-.s4wrap{width:100%;display:flex;flex-direction:column;gap:26px}
+.target .file{display:flex;align-items:center;gap:20px;padding:18px 20px;background:#04060F;border:3px solid #000}
+.target .file .h3{font-size:17px}
+.target .file .cap{font-size:28px;line-height:30px}
+.m2-arrow{display:flex;align-items:center;justify-content:center;gap:18px;height:74px}
+.m2-arrow i{width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:18px solid var(--gold)}
+.harness{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.harness span{font:13px/20px var(--px);padding:11px 10px;text-align:center;background:#04060F;border-bottom:6px solid var(--h);color:var(--white)}
+.m2-right{gap:22px;min-width:0}
+.m2-right .s4top{white-space:nowrap}
+.m2-right .s4top .h2{font-size:28px}
 .s4top{display:flex;align-items:center;justify-content:space-between}
 .s4top .key{display:flex;align-items:center;gap:14px}
 .s4top .key i{width:34px;height:22px;background:#E9ECF4;border:3px solid #000;box-shadow:5px 5px 0 var(--red)}
-.s4{display:grid;grid-template-columns:repeat(5,1fr);gap:22px;width:100%}
-.win{background:#E9ECF4;border:4px solid #000;box-shadow:6px 6px 0 #000;height:134px;display:flex;flex-direction:column}
-.win .bar{display:flex;align-items:center;gap:6px;height:26px;padding:0 8px;background:var(--studio)}
-.win .bar i{width:8px;height:8px;background:var(--mid)}.win .bar i:first-child{background:var(--red)}
-.win .bar b{margin-left:8px;font:9px var(--px);color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s4{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px;width:100%}
+.win{background:#E9ECF4;border:4px solid #000;box-shadow:6px 6px 0 #000;height:128px;display:flex;flex-direction:column;min-width:0}
+.win .bar{display:flex;align-items:center;gap:6px;height:24px;padding:0 8px;background:var(--studio)}
+.win .bar i{flex:none;width:8px;height:8px;background:var(--mid)}.win .bar i:first-child{background:var(--red)}
+.win .bar b{margin-left:6px;font:8px var(--px);color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .win .wf{flex:1;position:relative;padding:10px;overflow:hidden}
 .win.fail{box-shadow:6px 6px 0 var(--red)}
 
-/* ---------- 05 audited and timed twice ---------- */
-.s5{display:grid;grid-template-columns:820px 1fr;gap:70px;width:100%;align-items:center}
-.page{position:relative;height:560px;background:#E9ECF4;border:5px solid #000;box-shadow:12px 12px 0 #000;overflow:hidden}
-.page .bar{height:44px;background:var(--studio);display:flex;align-items:center;gap:10px;padding:0 16px}
+/* ---------- 03 audited and timed twice · the seal ---------- */
+.m3{display:grid;grid-template-columns:780px 1fr;grid-template-rows:390px 1fr;gap:36px 64px;width:100%;height:100%;padding:8px 0 16px}
+.page{position:relative;background:#E9ECF4;border:5px solid #000;box-shadow:12px 12px 0 #000;overflow:hidden}
+.page .bar{height:40px;background:var(--studio);display:flex;align-items:center;gap:10px;padding:0 16px}
 .page .bar i{width:12px;height:12px;background:var(--mid)}.page .bar i:first-child{background:var(--red)}
 .page .bar b{margin-left:12px;font:14px var(--px);color:#fff}
-.scan{position:absolute;left:0;right:0;height:90px;top:210px;background:linear-gradient(transparent,rgba(61,210,255,.35),transparent);border-top:3px solid var(--cyan);border-bottom:3px solid var(--cyan);animation:scan 3s steps(18) infinite}
-@keyframes scan{0%{top:50px}100%{top:470px}}
+.scan{position:absolute;left:0;right:0;height:80px;top:170px;background:linear-gradient(transparent,rgba(61,210,255,.35),transparent);border-top:3px solid var(--cyan);border-bottom:3px solid var(--cyan);animation:scan 3s steps(14) infinite}
+@keyframes scan{0%{top:46px}100%{top:300px}}
 .export .scan{animation:none}
-.flag{position:absolute;right:26px;top:66px;background:var(--red);color:#fff;padding:14px 18px;box-shadow:6px 6px 0 #000}
-.flag b{display:block;font:14px var(--px);margin-bottom:6px}.flag span{font:28px var(--vt)}
-.timer{display:grid;grid-template-columns:120px 1fr auto;gap:28px;align-items:center;padding:30px 34px;background:var(--studio);box-shadow:10px 10px 0 #000}
-.timer .t{font:78px/70px var(--vt);color:var(--white)}.timer .t em{font-style:normal;font-size:40px;color:var(--mid)}
+.flag{position:absolute;right:22px;top:58px;background:var(--red);color:#fff;padding:12px 16px;box-shadow:6px 6px 0 #000}
+.flag b{display:block;font:13px var(--px);margin-bottom:6px}.flag span{font:28px var(--vt)}
+.m3-times{gap:20px;justify-content:center}
+.timer{display:grid;grid-template-columns:70px 1fr auto;gap:24px;align-items:center;padding:18px 28px;background:var(--studio);box-shadow:10px 10px 0 #000}
+.timer .t{font:66px/60px var(--vt);color:var(--white)}.timer .t em{font-style:normal;font-size:36px;color:var(--mid)}
 .timer.sealed{border:5px solid var(--gold)}
+.peek{position:relative;padding:24px;background:#04060F;border:4px solid var(--studio)}
+.m3-seal{gap:20px;justify-content:center}
+.m3-seal .h2{font-size:24px;line-height:38px}
+.m3-seal .cites{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.m3-seal .cite{padding:16px 20px}
+.m3-seal .cite span{font-size:26px;line-height:28px}
+.gatecard{display:flex;gap:24px;align-items:center;padding:18px 26px;background:var(--gold);color:#000;box-shadow:10px 10px 0 #000}
+.gatecard b{font:18px var(--px)}.gatecard span{font:30px/30px var(--vt)}
 
-/* ---------- 06 the seal ---------- */
-.s6{display:grid;grid-template-columns:760px 1fr;gap:80px;width:100%;align-items:center}
-.peek{position:relative;height:540px;padding:30px;background:#04060F;border:4px solid var(--studio)}
-.s6 .cites{display:grid;grid-template-columns:1fr 1fr;gap:26px}
-.gatecard{display:flex;gap:28px;align-items:center;padding:28px 32px;background:var(--gold);color:#000;box-shadow:10px 10px 0 #000;margin-top:34px}
-.gatecard b{font:20px var(--px)}.gatecard span{font:34px/34px var(--vt)}
-
-/* ---------- 07 blame ---------- */
-.s7{display:grid;grid-template-columns:430px 1fr;gap:70px;width:100%;align-items:center}
-.one{display:flex;flex-direction:column;align-items:center;gap:24px;padding:40px 30px;background:#04060F;border:4px dashed var(--mid)}
-.one .n{font:120px/100px var(--vt);color:var(--mid)}
-.trace{position:relative;height:640px}
-.trace .fails{position:absolute;left:0;top:0;display:flex;flex-direction:column;gap:12px;width:560px}
-.trace .fails div{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--studio);border-left:6px solid var(--red);font:28px/28px var(--vt)}
+/* ---------- 04 blame · ten components · curriculum and memory ---------- */
+.m4{display:flex;flex-direction:column;gap:22px;width:100%}
+.m4-top{display:grid;grid-template-columns:360px 1fr;gap:56px;align-items:start}
+.m4-one{gap:20px}
+.one{display:flex;flex-direction:column;align-items:center;gap:14px;padding:24px 20px;background:#04060F;border:4px dashed var(--mid)}
+.one .n{font:92px/80px var(--vt);color:var(--mid)}
+.m4-one .cite{padding:16px 20px}.m4-one .cite span{font-size:26px;line-height:28px}
+.trace{position:relative;height:400px}
+.trace .fails{position:absolute;left:0;top:0;display:flex;flex-direction:column;gap:10px;width:600px}
+.trace .fails div{display:flex;justify-content:space-between;gap:12px;padding:10px 16px;background:var(--studio);border-left:6px solid var(--red);font:27px/36px var(--vt)}
 .trace .fails div span:last-child{color:var(--red);font-size:24px}
-.trace .comps{position:absolute;right:0;top:20px;display:flex;flex-direction:column;gap:18px;width:360px}
-.trace .comps div{padding:16px 20px;background:#04060F;border:4px solid var(--studio);font:16px var(--px);display:flex;justify-content:space-between;align-items:center}
+.trace .comps{position:absolute;right:0;top:0;display:flex;flex-direction:column;gap:12px;width:380px}
+.trace .comps div{padding:12px 18px;background:#04060F;border:4px solid var(--studio);font:15px var(--px);display:flex;justify-content:space-between;align-items:center}
 .trace .comps div.hot{border-color:var(--gold);background:var(--studio);box-shadow:0 0 0 4px #000,8px 8px 0 var(--gold)}
-.trace .comps div em{font-style:normal;font:34px var(--vt);color:var(--gold)}
+.trace .comps div em{font-style:normal;font:32px/28px var(--vt);color:var(--gold)}
+.trace .comps .cap{font-size:27px;line-height:30px}
 .trace svg{position:absolute;inset:0;pointer-events:none}
+.ctiles{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:12px}
+.ctile{display:flex;flex-direction:column;gap:6px;padding:14px 12px 12px;background:var(--studio);border-top:8px solid var(--h);box-shadow:6px 6px 0 #000;min-width:0}
+.ctile .pxi{margin-bottom:4px}
+.ctile b{font:11px/16px var(--px);font-weight:400;color:var(--white)}
+.ctile span{font:22px/22px var(--vt);color:var(--h)}
+.ctile em{font:21px/22px var(--vt);font-style:normal;color:var(--mid)}
+.ctile.lit{outline:4px solid var(--h);outline-offset:4px}
+.m4-cites{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:26px}
+.m4-cites .cite{padding:16px 22px;min-width:0}
+.m4-cites .cite span{font-size:26px;line-height:27px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.cite.cyanrule{border-top-color:var(--cyan)}.cite.cyanrule b{color:var(--cyan)}
+.cite.goldrule{border-top-color:var(--gold)}.cite.goldrule b{color:var(--gold)}
 
-/* ---------- 08 ten components ---------- */
-.s8{display:grid;grid-template-columns:repeat(5,1fr);gap:24px;width:100%}
-.comp{position:relative;padding:28px 24px 26px;background:var(--studio);box-shadow:8px 8px 0 #000;border-top:10px solid var(--h);min-height:300px;display:flex;flex-direction:column;gap:14px}
-.comp .h3{font-size:17px;line-height:26px}
-.comp p{margin:0;font:28px/28px var(--vt);color:var(--caption)}
-.comp .job{font:14px var(--px);color:var(--h);letter-spacing:1px;text-transform:uppercase}
-.comp .part{margin-top:auto;font:24px var(--vt);color:var(--mid)}
-
-/* ---------- 09 curriculum and memory ---------- */
-.s9{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:60px;width:100%}
-.duo{display:flex;flex-direction:column;gap:26px;padding:40px;background:var(--studio);box-shadow:10px 10px 0 #000}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;height:280px;align-items:center}
-.cards div{height:200px;background:#E9ECF4;border:4px solid #000;box-shadow:6px 6px 0 #000;padding:14px;color:#000;font:26px/26px var(--vt)}
-.cards div b{display:block;font:11px var(--px);margin-bottom:10px;color:var(--red);white-space:nowrap}
-.notebook{height:280px;background:#04060F;border:4px solid #000;padding:14px 26px;display:flex;flex-direction:column;background-image:repeating-linear-gradient(180deg,transparent 0 43px,var(--studio) 43px 46px);background-position:0 14px}
-.notebook div{display:flex;align-items:baseline;gap:14px;height:46px;font:30px/46px var(--vt);color:var(--caption);white-space:nowrap;min-width:0}
-.notebook div b{font:13px var(--px);color:var(--gold);flex:none}.notebook div em{font:13px var(--px);font-style:normal;flex:none;width:92px}
-.notebook div span{overflow:hidden;text-overflow:ellipsis;min-width:0;font-size:27px}
-
-/* ---------- 10 gain per dollar ---------- */
-.s10{display:grid;grid-template-columns:780px 1fr;gap:70px;width:100%;align-items:center}
-.formula{display:flex;align-items:center;gap:24px;padding:26px 30px;background:#000;border:4px solid var(--gold);margin-bottom:30px}
-.formula span{font:22px var(--px)}.formula .over{font:40px var(--px);color:var(--gold)}
-.bars{display:flex;flex-direction:column;gap:16px}
-.bars div{display:grid;grid-template-columns:230px 1fr 110px;gap:18px;align-items:center;font:14px var(--px)}
+/* ---------- 05 gain per dollar · darwin gödel machine ---------- */
+.m5{display:grid;grid-template-columns:800px 1fr;gap:64px;width:100%;align-items:center}
+.m5-left{gap:18px}
+.formula{display:flex;align-items:center;gap:22px;padding:18px 26px;background:#000;border:4px solid var(--gold)}
+.formula span{font:20px var(--px)}.formula .over{font:36px var(--px);color:var(--gold)}
+.bars{display:flex;flex-direction:column;gap:12px}
+.bars div{display:grid;grid-template-columns:210px 1fr 100px;gap:18px;align-items:center;font:14px var(--px)}
 .bars div em{font-style:normal;font-size:13px}
-.bars div i{height:30px;background:var(--mid);box-shadow:4px 4px 0 #000}
+.bars div i{height:26px;background:var(--mid);box-shadow:4px 4px 0 #000}
 .bars div.pick i{background:var(--gold)}.bars div.pick{color:var(--gold)}
 .term{background:#000;border:4px solid var(--studio);box-shadow:12px 12px 0 #000}
-.term .bar{display:flex;align-items:center;gap:12px;height:48px;padding:0 18px;background:var(--studio);font:14px var(--px)}
+.term .bar{display:flex;align-items:center;gap:12px;height:44px;padding:0 18px;background:var(--studio);font:13px var(--px)}
 .term .bar i{width:12px;height:12px;background:var(--mid)}.term .bar i:first-child{background:var(--red)}
-.term pre{margin:0;padding:26px 30px;font:34px/40px var(--vt);color:var(--caption);white-space:pre-wrap}
+.term pre{margin:0;padding:18px 26px;font:29px/34px var(--vt);color:var(--caption);white-space:pre-wrap}
 .term pre .add{color:var(--green)}.term pre .del{color:var(--red)}.term pre .c{color:var(--mid)}.term pre .g{color:var(--gold)}
-
-/* ---------- 11 darwin gödel machine ---------- */
-.s11{display:grid;grid-template-columns:900px 1fr;gap:70px;width:100%;align-items:center}
-.tree{position:relative;height:600px;background:#04060F;border:4px solid var(--studio)}
-.bench{display:flex;flex-direction:column;gap:30px}
-.bench .b{display:grid;grid-template-columns:200px 1fr 130px;gap:22px;align-items:center}
-.bench .b span{font:14px/24px var(--px);color:var(--caption)}
-.bench .b .track{height:44px;background:#04060F;border:3px solid var(--studio);position:relative}
+.m5-right{gap:22px}
+.m5-right .h2{font-size:22px;line-height:36px}
+.tree{position:relative;height:420px;background:#04060F;border:4px solid var(--studio)}
+.m5-row{display:grid;grid-template-columns:1fr 330px;gap:28px;align-items:center}
+.m5-row .cite{padding:16px 20px}.m5-row .cite strong{font-size:15px;line-height:24px}.m5-row .cite span{font-size:26px;line-height:28px}
+.bench{display:flex;flex-direction:column;gap:18px}
+.bench .b{display:grid;grid-template-columns:130px 1fr 96px;gap:16px;align-items:center}
+.bench .b span{font:12px/20px var(--px);color:var(--caption)}
+.bench .b .track{height:36px;background:#04060F;border:3px solid var(--studio);position:relative}
 .bench .b .track i{position:absolute;left:0;top:0;bottom:0;background:var(--mid)}
 .bench .b .track i.after{background:var(--gold)}
-.bench .b b{font:48px var(--vt);font-weight:400;text-align:right}
+.bench .b b{font:42px var(--vt);font-weight:400;text-align:right}
 
-/* ---------- 12 gates ---------- */
-.s12{display:flex;flex-direction:column;gap:40px;width:100%}
-.gantry{display:grid;grid-template-columns:repeat(11,1fr);gap:16px;padding:34px 34px 30px;background:#04060F;border:4px solid var(--studio);box-shadow:12px 12px 0 #000;position:relative}
+/* ---------- 06 gates · the ledger ---------- */
+.m6{display:flex;flex-direction:column;gap:28px;width:100%;padding-top:24px}
+.gantry{display:grid;grid-template-columns:repeat(11,1fr);gap:16px;padding:26px 30px 22px;background:#04060F;border:4px solid var(--studio);box-shadow:12px 12px 0 #000;position:relative}
 .gantry::before{content:"";position:absolute;left:-4px;right:-4px;top:-26px;height:22px;background:repeating-linear-gradient(90deg,var(--studio) 0 40px,#000 40px 44px)}
-.light{display:flex;flex-direction:column;align-items:center;gap:16px}
-.light i{width:100%;aspect-ratio:1;border-radius:0;background:var(--green);box-shadow:inset -8px -8px 0 rgba(0,0,0,.35),0 0 0 4px #000}
+.light{display:flex;flex-direction:column;align-items:center;gap:12px}
+.light i{width:100%;height:84px;background:var(--green);box-shadow:inset -8px -8px 0 rgba(0,0,0,.35),0 0 0 4px #000}
 .light i.off{background:#1A1F33}
 .light i.bad{background:var(--red)}
-.light span{font:12px/18px var(--px);text-align:center;color:var(--caption);min-height:36px}
+.light span{font:11px/17px var(--px);text-align:center;color:var(--caption);min-height:34px}
 .light.named span{color:var(--gold)}
-.light.named{outline:4px solid var(--gold);outline-offset:8px}
-.legend12{display:flex;gap:36px;align-items:center}
-
-/* ---------- 13 kept, and written down ---------- */
-.s13{display:flex;flex-direction:column;gap:40px;width:100%}
+.light.named{outline:4px solid var(--gold);outline-offset:7px}
+.legend12{display:flex;gap:30px;align-items:center}
 .chain{display:flex;align-items:center;gap:0}
-.block{flex:1;min-width:0;padding:24px;background:var(--studio);border:4px solid #000;box-shadow:8px 8px 0 #000;display:flex;flex-direction:column;gap:10px}
-.block .h3{font-size:15px;color:var(--gold)}
-.block .kv{font:26px/28px var(--vt);color:var(--caption)}.block .kv b{font:12px var(--px);color:var(--mid);display:block;margin-bottom:2px}
-.link{flex:none;width:44px;height:14px;background:repeating-linear-gradient(90deg,var(--gold) 0 10px,transparent 10px 16px)}
-.s13 .cites{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:30px}
+.block{flex:1;min-width:0;padding:18px 22px;background:var(--studio);border:4px solid #000;box-shadow:8px 8px 0 #000;display:flex;flex-direction:column;gap:6px}
+.block .h3{font-size:14px;color:var(--gold)}
+.block .kv{font:25px/26px var(--vt);color:var(--caption)}.block .kv b{font:11px var(--px);color:var(--mid);display:block;margin-bottom:2px}
+.link{flex:none;width:40px;height:14px;background:repeating-linear-gradient(90deg,var(--gold) 0 10px,transparent 10px 16px)}
+.m6 .cites{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:28px}
+.m6 .cite,.m6 .panel{padding:18px 22px}
 
-/* ---------- 14 the car ---------- */
-.s14{display:grid;grid-template-columns:1160px 1fr;gap:60px;width:100%;align-items:center}
-.callcar{position:relative;border:4px solid var(--studio);background:#04060F;box-shadow:12px 12px 0 #000}
-.callcar canvas{width:1152px;height:648px}
+/* ---------- 07 the car is the harness · the lap is the run ---------- */
+.m7{display:grid;grid-template-columns:922px 1fr;gap:60px;width:100%;align-items:center}
+.m7-left{gap:22px}
+.callwrap{width:922px;height:518px}
+.callcar{position:relative;width:1152px;height:648px;transform:scale(.8);transform-origin:0 0;border:4px solid var(--studio);background:#04060F;box-shadow:12px 12px 0 #000}
+.callcar canvas{width:1144px;height:640px}
 .callcar svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .callout{position:absolute;padding:12px 16px;background:#000;border:4px solid var(--h);box-shadow:6px 6px 0 #000}
-.callout b{display:block;font:14px var(--px);color:var(--h)}.callout span{font:28px/28px var(--vt);color:var(--white)}
-.beforeafter{display:flex;flex-direction:column;gap:22px}
+.callout b{display:block;font:15px var(--px);color:var(--h)}.callout span{font:30px/30px var(--vt);color:var(--white)}
+.beforeafter{display:grid;grid-template-columns:1fr 110px 1fr;gap:14px;align-items:center}
 .beforeafter .shot{position:relative;border:4px solid var(--studio);background:#04060F}
 .beforeafter canvas{display:block;width:100%;height:auto;aspect-ratio:286/161}
-.beforeafter .arrow{display:flex;align-items:center;justify-content:center;gap:22px;font-size:30px}
-.beforeafter .arrow i{width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:18px solid var(--gold)}
-.beforeafter .shot .tagrun{position:absolute;left:12px;top:12px;background:rgba(6,8,26,.9);padding:10px 12px;font:13px var(--px);color:var(--gold)}
-
-/* ---------- 15 the lap is the run ---------- */
-.s15{display:grid;grid-template-columns:900px 1fr;gap:70px;width:100%;align-items:center}
-.map{position:relative;height:640px;background:#04060F;border:4px solid var(--studio);box-shadow:12px 12px 0 #000}
+.beforeafter .arrow{display:flex;flex-direction:column;align-items:center;gap:10px;font-size:16px}
+.beforeafter .arrow i{width:0;height:0;border-top:14px solid transparent;border-bottom:14px solid transparent;border-left:20px solid var(--gold)}
+.beforeafter .shot .tagrun{position:absolute;left:10px;top:10px;background:rgba(6,8,26,.9);padding:8px 10px;font:12px var(--px);color:var(--gold)}
+.m7-right{gap:24px}
+.m7-right .big{font-size:52px;line-height:70px}
+.map{position:relative;height:500px;background:#04060F;border:4px solid var(--studio);box-shadow:12px 12px 0 #000}
 .map svg{position:absolute;inset:0;width:100%;height:100%}
-.pitcard{width:560px;border:6px solid var(--gold);background:var(--night);box-shadow:10px 10px 0 #000}
-.pitcard canvas{width:548px;height:342px}
-.pitcard .strip{display:flex;align-items:center;gap:16px;height:60px;padding:0 18px;background:#000;font:17px var(--px)}
-.pitcard .strip i{width:16px;height:16px;background:var(--cyan)}
-.pitcard .prog{height:8px;background:var(--studio)}.pitcard .prog i{display:block;height:100%;width:62%;background:var(--gold)}
 
 /* ---------- controls (hidden in exports) ---------- */
 .hud{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:8px;align-items:center;z-index:5;opacity:.0;transition:opacity .2s}
@@ -252,11 +246,10 @@ canvas.px{display:block;image-rendering:pixelated;image-rendering:crisp-edges}
 @media (prefers-reduced-motion:reduce){.blink,.scan{animation:none}.slide{transition:none}}
 
 /* ---------- partners ---------- */
-.s-partner{display:flex;align-items:center;gap:22px;border-top:3px solid var(--studio);min-width:0}
-.s-partner b{flex:none;font:16px var(--px);letter-spacing:1px;color:var(--h);background:#000;padding:12px 16px 12px 14px;border-left:8px solid var(--h);box-shadow:5px 5px 0 rgba(0,0,0,.6)}
-.s-partner p{margin:0;flex:1;min-width:0;font:31px/34px var(--vt);color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.s-partner .s-event{flex:none;font:11px var(--px);letter-spacing:1px;color:var(--mid)}
-.hackbadge{display:inline-flex;white-space:nowrap;align-items:center;gap:14px;align-self:flex-start;margin-bottom:26px;padding:12px 18px 12px 12px;background:#000;border:3px solid var(--cyan);box-shadow:6px 6px 0 rgba(61,210,255,.25)}
+.s-partner{display:flex;align-items:center;gap:18px;border-top:3px solid var(--studio);min-width:0}
+.s-partner b{flex:none;font:14px var(--px);letter-spacing:1px;color:var(--h);background:#000;padding:12px 16px 12px 14px;border-left:8px solid var(--h);box-shadow:5px 5px 0 rgba(0,0,0,.6)}
+.s-partner p{margin:0 0 0 6px;flex:1;min-width:0;font:30px/34px var(--vt);color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hackbadge{display:inline-flex;white-space:nowrap;align-items:center;gap:14px;align-self:flex-start;margin-bottom:20px;padding:12px 18px 12px 12px;background:#000;border:3px solid var(--cyan);box-shadow:6px 6px 0 rgba(61,210,255,.25)}
 .hackbadge i{width:26px;height:26px;background:conic-gradient(var(--cyan) 0 25%,#000 0 50%,var(--cyan) 0 75%,#000 0);background-size:13px 13px}
 .hackbadge span{font:11px var(--px);letter-spacing:1px;color:var(--mid)}.hackbadge b{font:15px var(--px);letter-spacing:1px;color:var(--cyan)}
 .s16{display:flex;flex-direction:column;gap:34px;width:100%}
@@ -270,200 +263,158 @@ canvas.px{display:block;image-rendering:pixelated;image-rendering:crisp-edges}
 </style>
 </head>
 <body>
-<!-- The deck: the script, one beat per slide. Every caption is the script's own words, verbatim. -->
+<!-- The deck: eight slides, the script's sixteen paragraphs in order. The script is spoken, not shown;
+     each slide keeps its paragraphs as hidden text, which paces the autoplay. -->
 <div class="deck" id="deck">
 <div class="stage" id="stage">
 
-<!-- 01 -->
-<section class="slide" data-partner="coreweave" data-kick="THE CAR IS THE AGENT">
-  <div class="s-body"><div class="s1">
-    <div class="stagecar"><canvas class="px" id="car1" width="496" height="279"></canvas>
-      <div class="tagrun"><b id="car1run">RUN 10</b><span id="car1say">the harness after ten runs</span></div></div>
-    <div class="col">
-      <div class="hackbadge"><i></i><span>BUILT AT</span><b>COREWEAVE HACKS</b><span>AGENT LOOPS · 2026</span></div>
-      <h1 class="big">THE CAR<br><em>IS</em> THE<br>AGENT</h1>
-      <p class="lead">An agent that rebuilds its own harness. Ten components decide how it works; it rewrites them itself, one per run.</p>
-      <div class="rail" id="rail1"></div>
-      <div class="rail-l"><span>wings · retrieval</span><span>floor · verification</span><span>compound · sampling</span></div>
+<!-- 01 · paragraphs 1–2 -->
+<section class="slide" data-partner="1" data-kick="THE CAR IS THE AGENT · WHERE IT STARTS">
+  <div class="s-body"><div class="m1">
+    <div class="m1-top">
+      <div class="stagecar"><canvas class="px" id="car1" width="440" height="248"></canvas>
+        <div class="tagrun"><b id="car1run">RUN 10</b><span>the harness after ten runs</span></div></div>
+      <div class="col m1-title">
+        <div class="hackbadge"><i></i><span>BUILT AT</span><b>COREWEAVE HACKS</b><span>AGENT LOOPS · 2026</span></div>
+        <h1 class="big">THE CAR<br><em>IS</em> THE<br>AGENT</h1>
+        <p class="lead">An agent that rebuilds its own harness, drawn as a race car so you can watch it change.</p>
+      </div>
+    </div>
+    <div class="m1-bot">
+      <div class="m1-head"><span class="lbl">WHERE IT STARTS</span><span class="h3 gold">ANDREJ KARPATHY'S AUTORESEARCH</span><span class="cap mid">github.com/karpathy/autoresearch · March 2026</span></div>
+      <div class="flow">
+        <div class="node"><span data-icon="file" data-c="cyan" data-s="56"></span><div><div class="h3 cyan">EDIT</div><p>one file: train.py</p></div></div>
+        <i class="step"></i>
+        <div class="node"><span data-icon="clock" data-c="gold" data-s="56"></span><div><div class="h3 gold">TRAIN</div><p>a fixed 5 minutes</p></div></div>
+        <i class="step"></i>
+        <div class="node"><span data-icon="chart" data-c="green" data-s="56"></span><div><div class="h3 green">CHECK</div><p>one metric: val_bpb</p></div></div>
+        <i class="step"></i>
+        <div class="node"><span data-icon="fork" data-c="red" data-s="56"></span><div><div class="h3 red">KEEP OR DISCARD</div><p>then go again</p></div></div>
+        <i class="step"></i>
+        <div class="node night"><div><div class="h3 gold">~100 A NIGHT</div><div class="nightgrid" id="night"></div></div></div>
+      </div>
     </div>
   </div></div>
-  <aside class="say" hidden>Scrutineer is an agent that <em>rebuilds its own harness</em>, and we draw that harness as a <em>race car</em> so you can watch it change.</aside>
+  <aside class="say" hidden>Scrutineer is an agent that rebuilds its own harness, and we draw that harness as a race car so you can watch it change. We built it here at CoreWeave Hacks: Agent Loops, a whole weekend about the loop.
+It starts from the same idea as Andrej Karpathy's autoresearch: there, an agent edits one training file, trains for a fixed five minutes, checks a single metric and keeps or discards the change, about a hundred experiments a night. Our version runs on Weights &amp; Biases: the model, the traces, the runs and the registry.</aside>
 </section>
 
-<!-- 02 -->
-<section class="slide" data-partner="wandb" data-kick="WHERE IT STARTS · AUTORESEARCH">
-  <div class="s-body"><div class="s2">
-    <div class="ring">
-      <svg class="loop" viewBox="0 0 860 640"><path d="M430 80 L760 80 L760 560 L100 560 L100 80 L430 80" fill="none" stroke="#F4C542" stroke-width="8" stroke-dasharray="24 14"/>
-        <path d="M740 60 L780 80 L740 100 Z M120 540 L80 560 L120 580 Z" fill="#F4C542"/></svg>
-      <div class="node" style="left:0;top:0"><span data-icon="file" data-c="cyan"></span><div><div class="h3 cyan">EDIT</div><p>one file: train.py</p></div></div>
-      <div class="node" style="right:0;top:0"><span data-icon="clock" data-c="gold"></span><div><div class="h3 gold">TRAIN</div><p>a fixed 5 minutes</p></div></div>
-      <div class="node" style="right:0;bottom:0"><span data-icon="chart" data-c="green"></span><div><div class="h3 green">CHECK</div><p>one metric: val_bpb</p></div></div>
-      <div class="node" style="left:0;bottom:0"><span data-icon="fork" data-c="red"></span><div><div class="h3 red">KEEP / DISCARD</div><p>then go again</p></div></div>
-      <div style="position:absolute;left:260px;top:230px;width:340px;text-align:center"><div class="h2">ONE GPU<br>ONE FILE<br><span class="gold">ONE METRIC</span></div></div>
+<!-- 02 · paragraphs 3–4 -->
+<section class="slide" data-partner="2" data-kick="SAME LOOP, NEW TARGET · STEP 1: IT BUILDS">
+  <div class="s-body"><div class="m2">
+    <div class="col m2-left">
+      <div class="target">
+        <div class="lbl">AUTORESEARCH TUNES</div>
+        <div class="file"><span data-icon="chip" data-c="cyan" data-s="56"></span><div><div class="h3">A MODEL</div><p class="cap">weights, architecture, optimizer, all in train.py</p></div></div>
+      </div>
+      <div class="m2-arrow"><i></i><span class="lbl gold">SAME LOOP, NEW TARGET</span><i></i></div>
+      <div class="target new">
+        <div class="lbl gold">SCRUTINEER REBUILDS</div>
+        <div class="file"><span data-icon="car" data-c="gold" data-s="56"></span><div><div class="h3 gold">THE AGENT'S OWN HARNESS</div><p class="cap">the scaffolding around the model, in ten parts</p></div></div>
+        <div class="harness" id="harness3"></div>
+      </div>
     </div>
-    <div class="col">
-      <div class="row" style="align-items:center;gap:26px"><span data-icon="moon" data-c="gold"></span><h2 class="h2">~100 EXPERIMENTS<br><span class="gold">WHILE YOU SLEEP</span></h2></div>
-      <div class="nightaxis"><span class="lbl">12 AN HOUR · 8 HOURS</span><span class="cap">one square per experiment</span></div>
-      <div class="nightgrid" id="night"></div>
-      <p class="cap">Each a five-minute run, kept or thrown away. Dim squares are illustrative discards.</p>
-      <div class="cite"><b>SOURCE</b><strong>ANDREJ KARPATHY · AUTORESEARCH</strong><span>github.com/karpathy/autoresearch · March 2026</span></div>
-    </div>
-  </div></div>
-  <aside class="say" hidden>It starts from the same idea as <em>Andrej Karpathy's autoresearch</em>: there, an agent edits one training file, trains for a fixed five minutes, checks a single metric and keeps or discards the change, about a hundred experiments a night.</aside>
-</section>
-
-<!-- 03 -->
-<section class="slide" data-partner="rl" data-kick="SAME LOOP · NEW TARGET">
-  <div class="s-body"><div class="s3">
-    <div class="target">
-      <div class="lbl">AUTORESEARCH TUNES</div>
-      <div class="file"><span data-icon="chip" data-c="cyan"></span><div><div class="h3">A MODEL</div><p class="cap">weights, architecture, optimizer — all in train.py</p></div></div>
-      <div class="mini-loop"><span class="chip">EDIT</span><span class="chip">TRAIN</span><span class="chip">CHECK</span><span class="chip">KEEP</span></div>
-      <p class="cap">The thing being improved is the network.</p>
-    </div>
-    <div class="mid-arrow"><div class="arrow">▶</div><div class="lbl" style="text-align:center">SAME<br>LOOP</div><div class="arrow">▶</div></div>
-    <div class="target new">
-      <div class="lbl gold">SCRUTINEER REBUILDS</div>
-      <div class="file"><span data-icon="car" data-c="gold"></span><div><div class="h3 gold">THE AGENT'S OWN HARNESS</div><p class="cap">the scaffolding around the model, in ten parts</p></div></div>
-      <div class="harness" id="harness3"></div>
-      <p class="cap">The thing being improved is <span class="gold">the agent itself</span>.</p>
+    <div class="col m2-right">
+      <div class="s4top"><div class="row" style="align-items:baseline;gap:20px"><span class="lbl">EVERY RUN</span><span class="h2 gold">20 PAGES</span></div>
+        <div class="key"><i></i><span class="cap" id="wins-key">failed their audit or timing</span></div></div>
+      <div class="s4" id="wins"></div>
+      <p class="cap mid">Run 4, as the agent built them from written briefs.</p>
     </div>
   </div></div>
-  <aside class="say" hidden>We point that loop at the <em>agent's own scaffolding</em> instead of a model.</aside>
+  <aside class="say" hidden>We point that loop at the agent's own scaffolding instead of a model. When the model itself is the part worth changing, W&amp;B Serverless RL is one command away: it registers a real LoRA job and collects rollouts through the trainer's own client.
+Every run, the agent builds twenty real web interfaces from written briefs. It builds them on W&amp;B Inference: open models, OpenAI-compatible, nothing to host.</aside>
 </section>
 
-<!-- 04 -->
-<section class="slide" data-partner="inference" data-kick="STEP 1 · IT BUILDS">
-  <div class="s-body"><div class="s4wrap">
-    <div class="s4top"><div class="row" style="align-items:baseline;gap:22px"><span class="lbl">EVERY RUN</span><span class="h2 gold">20 PAGES</span><span class="cap">run 4, as the agent built them</span></div>
-      <div class="key"><i></i><span class="cap" id="wins-key">failed its audit or timing</span></div></div>
-    <div class="s4" id="wins"></div></div></div>
-  <aside class="say" hidden>Every run, the agent builds <em>twenty real web interfaces</em> from written briefs.</aside>
-</section>
-
-<!-- 05 -->
-<section class="slide" data-partner="evals" data-kick="STEP 2 · AUDITED, THEN TIMED TWICE">
-  <div class="s-body"><div class="s5">
+<!-- 03 · paragraphs 5–6 -->
+<section class="slide" data-partner="3" data-kick="STEP 2: AUDITED, TIMED TWICE · WHY THE SEAL MATTERS">
+  <div class="s-body"><div class="m3">
     <div class="page">
       <div class="bar"><i></i><i></i><i></i><b>SITE HEADER · RUN 4</b></div>
-      <div id="pagewf" style="position:relative;height:516px"></div>
+      <div id="pagewf" style="position:relative;height:340px"></div>
       <div class="scan"></div>
       <div class="flag"><b>AXE-CORE · SERIOUS</b><span>html-has-lang</span></div>
     </div>
-    <div class="col" style="gap:34px">
-      <div class="row" style="align-items:center;gap:22px"><span data-icon="scan" data-c="cyan"></span><div><div class="h3 cyan">EVERY PAGE, AUDITED</div><p class="cap">opened in a real browser and checked by axe-core</p></div></div>
-      <div class="timer"><span data-icon="eye" data-c="cyan"></span><div><div class="h3">PRACTICE SPLIT</div><p class="cap">the agent can see it</p></div><div class="t">76.96<em> s</em></div></div>
-      <div class="timer sealed"><span data-icon="lock" data-c="gold"></span><div><div class="h3 gold">SEALED HELD-OUT</div><p class="cap">it never sees it</p></div><div class="t">77.74<em> s</em></div></div>
-      <p class="cap mid">Run 4 of the recorded demo season.</p>
+    <div class="col m3-times">
+      <div class="row" style="align-items:center;gap:22px"><span data-icon="scan" data-c="cyan" data-s="56"></span><div><div class="h3 cyan">EVERY PAGE, AUDITED</div><p class="cap">opened in a real browser, checked by axe-core, then timed twice</p></div></div>
+      <div class="timer"><span data-icon="eye" data-c="cyan" data-s="56"></span><div><div class="h3">PRACTICE SPLIT</div><p class="cap">the agent can see it</p></div><div class="t">76.96<em> s</em></div></div>
+      <div class="timer sealed"><span data-icon="lock" data-c="gold" data-s="56"></span><div><div class="h3 gold">SEALED HELD-OUT</div><p class="cap">it never sees it · run 4</p></div><div class="t">77.74<em> s</em></div></div>
     </div>
-  </div></div>
-  <aside class="say" hidden>Each page is <em>audited for accessibility with axe-core</em> and timed twice: once on a practice split the agent can see, and once on a <em>sealed held-out split</em> it never sees.</aside>
-</section>
-
-<!-- 06 -->
-<section class="slide" data-partner="sandboxes" data-kick="WHY THE SEAL MATTERS">
-  <div class="s-body"><div class="s6">
     <div class="peek" id="peek"></div>
-    <div class="col">
-      <h2 class="h2">CHECK THE SAME TEST<br>ENOUGH TIMES AND YOU<br><span class="red">LEARN THE TEST</span></h2>
+    <div class="col m3-seal">
+      <h2 class="h2">CHECK THE SAME TEST ENOUGH<br>AND YOU <span class="red">LEARN THE TEST</span></h2>
       <div class="cites">
         <div class="cite"><b>ICML 2015</b><strong>BLUM &amp; HARDT<br>THE LADDER</strong><span>a leaderboard that resists overfitting to the holdout</span></div>
         <div class="cite"><b>SCIENCE 2015</b><strong>DWORK ET AL.<br>REUSABLE HOLDOUT</strong><span>reusing a holdout safely under adaptive analysis</span></div>
       </div>
-      <div class="gatecard"><span data-icon="ladder" data-c="black"></span><div><b>OUR GATE: LADDER</b><br><span>a gain on the sealed split must clear the split's own noise</span></div></div>
+      <div class="gatecard"><span data-icon="ladder" data-c="black" data-s="56"></span><div><b>OUR GATE: LADDER</b><br><span>a gain on the sealed split must clear the split's own noise</span></div></div>
     </div>
   </div></div>
-  <aside class="say" hidden>That seal matters because an agent that keeps checking against the same test <em>starts to learn the test</em>. That is exactly the problem <em>Blum and Hardt's Ladder</em> and <em>Dwork and colleagues' reusable holdout</em> were built to solve, and one of our gates is a Ladder.</aside>
+  <aside class="say" hidden>Each page is audited for accessibility with axe-core and timed twice: once on a practice split the agent can see, and once on a sealed held-out split it never sees. Both timings land in the Weave Evals tab, which is where our gates read them.
+That seal matters because an agent that keeps checking against the same test starts to learn the test. That is exactly the problem Blum and Hardt's Ladder and Dwork and colleagues' reusable holdout were built to solve, and one of our gates is a Ladder. A seal needs isolation, and W&amp;B Sandboxes are built for exactly that: the agent's own code, kept out of process.</aside>
 </section>
 
-<!-- 07 -->
-<section class="slide" data-partner="weave" data-kick="STEP 3 · IT FINDS THE CAUSE">
-  <div class="s-body"><div class="s7">
-    <div class="col">
-      <div class="one"><div class="lbl">AUTORESEARCH</div><div class="n">val_bpb</div><p class="cap" style="text-align:center">one number for the whole run</p></div>
-      <div class="cite"><b>2024</b><strong>TEXTGRAD</strong><span>feedback sent back to each part of a compound AI system</span></div>
-    </div>
-    <div class="trace" id="trace">
-      <svg id="traceLines"></svg>
-      <div class="fails" id="fails"></div>
-      <div class="comps" id="comps"></div>
-    </div>
-  </div></div>
-  <aside class="say" hidden>Autoresearch judges a whole run by <em>one number</em>. Scrutineer instead traces every failing page back to <em>the one component that caused it</em>, much as TextGrad sends feedback back to individual parts of a compound AI system.</aside>
-</section>
-
-<!-- 08 -->
-<section class="slide" data-partner="runs" data-kick="THE TEN COMPONENTS">
-  <div class="s-body"><div class="s8" id="comps8"></div></div>
-  <aside class="say" hidden>There are <em>ten components</em>: retrieval, the model, sampling, verification, curriculum, the proposer, budget, audit, memory and deploy.</aside>
-</section>
-
-<!-- 09 -->
-<section class="slide" data-partner="marimo" data-kick="TWO OF THEM, AND WHERE THEY COME FROM">
-  <div class="s-body"><div class="s9">
-    <div class="duo">
-      <div class="row" style="align-items:center;gap:22px"><span data-icon="deck" data-c="cyan"></span><div><div class="h2 cyan">CURRICULUM</div><p class="cap">picks the practice tasks</p></div></div>
-      <div class="cards" id="cards9"></div>
-      <div class="cite"><b>NEURIPS 2023</b><strong>VOYAGER · AUTOMATIC CURRICULUM</strong><span>an agent that chooses its own next task</span></div>
-    </div>
-    <div class="duo">
-      <div class="row" style="align-items:center;gap:22px"><span data-icon="book" data-c="gold"></span><div><div class="h2 gold">MEMORY</div><p class="cap">records findings for next time</p></div></div>
-      <div class="notebook" id="note9"></div>
-      <div class="cite"><b>NEURIPS 2023</b><strong>REFLEXION · REFLECTIONS IN MEMORY</strong><span>an agent that writes down what went wrong</span></div>
-    </div>
-  </div></div>
-  <aside class="say" hidden><em>Curriculum</em> picks practice tasks, like Voyager's automatic curriculum, and <em>memory</em> records findings for next time, the way Reflexion keeps its reflections.</aside>
-</section>
-
-<!-- 10 -->
-<section class="slide" data-partner="typesafe" data-kick="STEP 4 · IT PICKS ONE, AND IT REWRITES ITSELF">
-  <div class="s-body"><div class="s10">
-    <div>
-      <div class="formula"><span data-icon="coin" data-c="gold"></span><span>EXPECTED GAIN</span><span class="over">÷</span><span>COST</span></div>
-      <div class="bars" id="bars10"></div>
-      <p class="cap mid" style="margin-top:18px">Ranking shown as a shape, not measured values.</p>
-    </div>
-    <div class="term">
-      <div class="bar"><i></i><i></i><i></i><span style="margin-left:14px">RETRIEVAL · WRITES A CHANGE TO ITSELF</span></div>
-      <pre></pre>
-    </div>
-  </div></div>
-  <aside class="say" hidden>The loop picks the component with the <em>best expected gain per dollar</em>, and that component <em>writes a change to itself</em>.</aside>
-</section>
-
-<!-- 11 -->
-<section class="slide" data-partner="registry" data-kick="THE SAME MOVE · DARWIN GÖDEL MACHINE">
-  <div class="s-body"><div class="s11">
-    <div class="tree"><svg id="tree11" viewBox="0 0 892 592" width="100%" height="100%"></svg></div>
-    <div class="col" style="gap:34px">
-      <h2 class="h2">AN AGENT THAT<br><span class="gold">REWROTE ITS OWN CODE</span></h2>
-      <div class="bench">
-        <div class="b"><span>SWE-BENCH<br>BEFORE</span><div class="track"><i style="width:20%"></i></div><b>20%</b></div>
-        <div class="b"><span class="gold">SWE-BENCH<br>AFTER</span><div class="track"><i class="after" style="width:50%"></i></div><b class="gold">50%</b></div>
-        <div class="b"><span>POLYGLOT</span><div class="track"><i style="width:14.2%"></i><i class="after" style="width:30.7%;opacity:.55"></i></div><b style="font-size:36px">14→31%</b></div>
+<!-- 04 · paragraphs 7–9 -->
+<section class="slide" data-partner="4" data-kick="STEP 3: IT FINDS THE CAUSE · THE TEN COMPONENTS">
+  <div class="s-body"><div class="m4">
+    <div class="m4-top">
+      <div class="col m4-one">
+        <div class="one"><div class="lbl">AUTORESEARCH</div><div class="n">val_bpb</div><p class="cap">one number for the whole run</p></div>
+        <div class="cite"><b>2024</b><strong>TEXTGRAD</strong><span>feedback sent back to each part of a compound AI system</span></div>
       </div>
-      <div class="cite"><b>SAKANA AI · 2025</b><strong>ZHANG, HU, LU, LANGE &amp; CLUNE<br>DARWIN GÖDEL MACHINE</strong><span>keeps an archive of the agents it grows, and samples from it</span></div>
+      <div class="trace" id="trace">
+        <svg id="traceLines"></svg>
+        <div class="fails" id="fails"></div>
+        <div class="comps" id="comps"></div>
+      </div>
+    </div>
+    <div class="ctiles" id="comps8"></div>
+    <div class="m4-cites">
+      <div class="cite cyanrule"><b>CURRICULUM · LIKE VOYAGER, NEURIPS 2023</b><strong>PICKS THE PRACTICE TASKS</strong><span id="cur4"></span></div>
+      <div class="cite goldrule"><b>MEMORY · LIKE REFLEXION, NEURIPS 2023</b><strong>RECORDS FINDINGS FOR NEXT TIME</strong><span id="mem4"></span></div>
     </div>
   </div></div>
-  <aside class="say" hidden>Sakana AI's <em>Darwin Gödel Machine</em> made the same move when it rewrote its own code and raised its SWE-bench score from <em>20 to 50 percent</em>.</aside>
+  <aside class="say" hidden>Autoresearch judges a whole run by one number. Scrutineer instead traces every failing page back to the one component that caused it, much as TextGrad sends feedback back to individual parts of a compound AI system. That only works because W&amp;B Weave traces every step: build, audit, replay, blame and gate.
+There are ten components: retrieval, the model, sampling, verification, curriculum, the proposer, budget, audit, memory and deploy. Each one gets its own W&amp;B run, so the credit it earns is a curve you can open, not a number buried in a log.
+Curriculum picks practice tasks, like Voyager's automatic curriculum, and memory records findings for next time, the way Reflexion keeps its reflections. Every generation, memory writes its debrief as a marimo notebook: something you can run, not just read.</aside>
 </section>
 
-<!-- 12 -->
-<section class="slide" data-partner="gate" data-kick="STEP 5 · THE GATES">
-  <div class="s-body"><div class="s12">
+<!-- 05 · paragraphs 10–11 -->
+<section class="slide" data-partner="5" data-kick="STEP 4: IT REWRITES ITSELF · THE SAME MOVE">
+  <div class="s-body"><div class="m5">
+    <div class="col m5-left">
+      <div class="formula"><span data-icon="coin" data-c="gold" data-s="56"></span><span>EXPECTED GAIN</span><span class="over">÷</span><span>COST</span></div>
+      <div class="bars" id="bars10"></div>
+      <p class="cap mid">Ranking shown as a shape, not measured values.</p>
+      <div class="term">
+        <div class="bar"><i></i><i></i><i></i><span style="margin-left:14px">RETRIEVAL · WRITES A CHANGE TO ITSELF</span></div>
+        <pre></pre>
+      </div>
+    </div>
+    <div class="col m5-right">
+      <h2 class="h2">DARWIN GÖDEL MACHINE: AN AGENT<br>THAT <span class="gold">REWROTE ITS OWN CODE</span></h2>
+      <div class="tree"><svg id="tree11" viewBox="0 0 892 592" width="100%" height="100%"></svg></div>
+      <div class="m5-row">
+        <div class="bench">
+          <div class="b"><span>SWE-BENCH<br>BEFORE</span><div class="track"><i style="width:20%"></i></div><b>20%</b></div>
+          <div class="b"><span class="gold">SWE-BENCH<br>AFTER</span><div class="track"><i class="after" style="width:50%"></i></div><b class="gold">50%</b></div>
+          <div class="b"><span>POLYGLOT</span><div class="track"><i style="width:14.2%"></i><i class="after" style="width:30.7%;opacity:.55"></i></div><b style="font-size:32px">14→31%</b></div>
+        </div>
+        <div class="cite"><b>SAKANA AI · 2025</b><strong>ZHANG, HU, LU,<br>LANGE &amp; CLUNE</strong><span>keeps an archive of the agents it grows</span></div>
+      </div>
+    </div>
+  </div></div>
+  <aside class="say" hidden>The loop picks the component with the best expected gain per dollar, and that component writes a change to itself. The credit router makes that call as typed decisions through TypeSafe System1, so there is no free-text guesswork.
+Sakana AI's Darwin Gödel Machine made the same move when it rewrote its own code and raised its SWE-bench score from 20 to 50 percent. Our archive of agents lives in W&amp;B Registry, where every harness version is registered.</aside>
+</section>
+
+<!-- 06 · paragraphs 12–13 -->
+<section class="slide" data-partner="6" data-kick="STEP 5: THE GATES · STEP 6: KEPT, AND WRITTEN DOWN">
+  <div class="s-body"><div class="m6">
     <div class="gantry" id="gantry"></div>
     <div class="legend12">
       <span class="chip gold">NAMED IN THIS SCRIPT</span>
-      <span class="cap">Run 4: nine cleared, the splits-agree check did not — <span class="red">refused, the two splits disagreed</span>.</span>
+      <span class="cap">Run 4: nine cleared, the splits-agree check did not, so it was <span class="red">refused</span>.</span>
     </div>
-  </div></div>
-  <aside class="say" hidden>The change then has to <em>clear a set of gates</em>, including size, novelty, evidence, regression, a check that both splits agree, and cost.</aside>
-</section>
-
-<!-- 13 -->
-<section class="slide" data-partner="aria" data-kick="STEP 6 · KEPT, AND WRITTEN DOWN">
-  <div class="s-body"><div class="s13">
     <div class="chain" id="chain"></div>
     <div class="cites">
       <div class="cite"><b>AUTORESEARCH</b><strong>THE EXPERIMENT LOG</strong><span>what it tried, and what it kept</span></div>
@@ -471,42 +422,39 @@ canvas.px{display:block;image-rendering:pixelated;image-rendering:crisp-edges}
       <div class="panel"><div class="h3 gold">SCRUTINEER · A SIGNED LEDGER</div><p class="cap" style="margin-top:10px">Each row carries the hash of the row before it and an Ed25519 signature. Nothing else in the loop can append.</p></div>
     </div>
   </div></div>
-  <aside class="say" hidden>It is kept <em>only if every gate passes</em>, and every kept change is written to a <em>signed ledger</em>, our version of autoresearch's experiment log and the Darwin Gödel Machine's archive of agents.</aside>
+  <aside class="say" hidden>The change then has to clear a set of gates, including size, novelty, evidence, regression, a check that both splits agree, and cost. The last gate is a marimo notebook that has to reproduce the promotion decision; if it can't, the change is refused.
+It is kept only if every gate passes, and every kept change is written to a signed ledger, our version of autoresearch's experiment log and the Darwin Gödel Machine's archive of agents. Every generation, kept or refused, is also reported to the ARIA board.</aside>
 </section>
 
-<!-- 14 -->
-<section class="slide" data-partner="alias" data-kick="THE CAR IS THE HARNESS">
-  <div class="s-body"><div class="s14">
-    <div class="callcar" id="callcar"><canvas class="px" id="car14" width="576" height="324"></canvas><svg id="calls14"></svg></div>
-    <div class="beforeafter">
-      <div class="shot"><canvas class="px" id="carA" width="286" height="161"></canvas><div class="tagrun">START · LEVEL 1</div></div>
-      <div class="arrow"><i></i>KEPT CHANGES<i></i></div>
-      <div class="shot"><canvas class="px" id="carB" width="286" height="161"></canvas><div class="tagrun">AFTER 10 RUNS</div></div>
+<!-- 07 · paragraphs 14–15 -->
+<section class="slide" data-partner="7" data-kick="THE CAR IS THE HARNESS · THE LAP IS THE RUN">
+  <div class="s-body"><div class="m7">
+    <div class="col m7-left">
+      <div class="callwrap"><div class="callcar" id="callcar"><canvas class="px" id="car14" width="576" height="324"></canvas><svg id="calls14"></svg></div></div>
+      <div class="beforeafter">
+        <div class="shot"><canvas class="px" id="carA" width="286" height="161"></canvas><div class="tagrun">START · LEVEL 1</div></div>
+        <div class="arrow"><span>KEPT</span><i></i></div>
+        <div class="shot"><canvas class="px" id="carB" width="286" height="161"></canvas><div class="tagrun">AFTER 10 RUNS</div></div>
+      </div>
     </div>
-  </div></div>
-  <aside class="say" hidden>On the car, <em>wings are retrieval</em>, the <em>floor is verification</em> and <em>tyre compound is sampling</em>, so a kept change visibly rebuilds the car.</aside>
-</section>
-
-<!-- 15 -->
-<section class="slide" data-partner="cwwb" data-kick="THE LAP IS THE RUN">
-  <div class="s-body"><div class="s15">
-    <div class="map"><svg id="map15" viewBox="0 0 892 632"></svg></div>
-    <div class="col" style="gap:34px">
-      <h2 class="big" style="font-size:54px;line-height:72px">THE LAP<br>IS <em>THE RUN</em></h2>
-      <div class="pitcard"><canvas class="px" id="car15" width="274" height="171"></canvas>
-        <div class="strip"><i></i><span>REPLAY RUN 4 · LAP 25/40</span></div><div class="prog"><i></i></div></div>
+    <div class="col m7-right">
+      <h2 class="big">THE LAP<br>IS <em>THE RUN</em></h2>
+      <div class="map"><svg id="map15" viewBox="0 0 892 632"></svg></div>
       <p class="cap">Across the line when the run is decided. Pop the card out and it floats over every app.</p>
     </div>
   </div></div>
-  <aside class="say" hidden>Where the car sits <em>on the lap</em> shows <em>how far the current run has got</em>.</aside>
+  <aside class="say" hidden>On the car, wings are retrieval, the floor is verification and tyre compound is sampling, so a kept change visibly rebuilds the car. Each version is registered in W&amp;B Registry under an alias, so the car that raced is the car that was promoted.
+Where the car sits on the lap shows how far the current run has got. From Inference to Weave, that's the Weights &amp; Biases stack under the car, and W&amp;B has been part of CoreWeave since 2025.</aside>
 </section>
-<section class="slide" data-partner="thanks" data-kick="THE PIT WALL · OUR PARTNERS">
+
+<!-- 08 · paragraph 16 -->
+<section class="slide" data-partner="8" data-kick="THE PIT WALL · OUR PARTNERS">
   <div class="s-body"><div class="s16">
     <div class="s16-head"><h2 class="big" style="font-size:54px;line-height:72px">THE CAR RUNS<br>ON <em>THEIR PARTS</em></h2>
       <p class="lead">Ten partners, ten jobs on the pit wall. Every one of them is wired into the loop and reported by <code>scrutineer doctor</code>.</p></div>
     <div class="wall" id="wall16"></div>
   </div></div>
-  <aside class="say" hidden>None of this laps without our partners: CoreWeave, Weights and Biases, ARIA, TypeSafe and marimo.</aside>
+  <aside class="say" hidden>None of this laps without our pit wall. CoreWeave hosted the weekend. Weights &amp; Biases gave the car its engine with Inference, its telemetry with Weave, its timing with Runs, its homologation with Registry, its wind tunnel with Serverless RL and its parc fermé with Sandboxes. ARIA is race control, TypeSafe System1 is the team radio, and marimo is the debrief room. Thank you.</aside>
 </section>
 
 <div class="progress" id="progress"></div>
@@ -6756,11 +6704,6 @@ const JOB = { AERO: 'context assembly', POWER_UNIT: 'inference', TYRES: 'decode 
   SIMULATOR: 'task selection', ENGINEER: 'patch synthesis', STRATEGIST: 'stop policy', SCRUTINEER: 'tamper check',
   HISTORIAN: 'trace compaction', PIT_CREW: 'install and smoke' };
 // what each one decides, in the regulations' words
-const DOES = { AERO: 'which reference material reaches the model', POWER_UNIT: 'the checkpoint it runs on',
-  TYRES: 'temperature, and how many candidates are drawn', DATA: 'render the page and run axe on it before submitting',
-  SIMULATOR: 'a practice set mined from what it keeps failing', ENGINEER: 'its own instructions for writing changes',
-  STRATEGIST: 'when to keep refining and when to submit', SCRUTINEER: 'what counts as an illegal change',
-  HISTORIAN: 'how findings are recorded for next time', PIT_CREW: 'how a change is applied and tested' };
 const PART = { AERO: 'wings', DATA: 'floor', TYRES: 'tyre compound', POWER_UNIT: 'power unit', SIMULATOR: 'DRS',
   STRATEGIST: 'gearbox', PIT_CREW: 'brakes', ENGINEER: 'livery', SCRUTINEER: 'livery', HISTORIAN: 'livery' };
 const HUE = { AERO: 'cyan', POWER_UNIT: 'red', TYRES: 'amber', DATA: 'green', SIMULATOR: 'cyan',
@@ -6768,24 +6711,16 @@ const HUE = { AERO: 'cyan', POWER_UNIT: 'red', TYRES: 'amber', DATA: 'green', SI
 const GATE = { diff_size: 'SIZE', comparable_ab: 'FAIR A/B', novelty: 'NOVELTY', evidence: 'EVIDENCE', seesaw: 'SPLITS AGREE',
   correlation: 'CORRELATION', regression: 'REGRESSION', cost_cap: 'COST', scrutineering: 'SCRUTINEER', rl_entropy: 'RL ENTROPY', ladder: 'LADDER' };
 const NAMED = new Set(['diff_size', 'novelty', 'evidence', 'regression', 'seesaw', 'cost_cap']);
-// the partners whose parts the car runs on: one per slide in the band, all ten on the wall
+// the partners whose parts each slide runs on (the band), and all ten on the closing wall
 const PARTNER = {
-  coreweave: { name: 'COREWEAVE HACKS', hue: 'cyan', line: 'Built at CoreWeave Hacks: Agent Loops. A whole weekend about the loop.' },
-  wandb: { name: 'WEIGHTS & BIASES', hue: 'gold', line: 'Model, traces, runs and registry: the whole loop lives on W&B.' },
-  rl: { name: 'W&B SERVERLESS RL', hue: 'gold', line: 'When the model is the part to change: a real LoRA job, one command away.' },
-  inference: { name: 'W&B INFERENCE', hue: 'gold', line: 'The agent builds on W&B Inference. Open models, OpenAI-compatible, nothing to host.' },
-  evals: { name: 'W&B WEAVE · EVALS', hue: 'gold', line: 'Both timings land in the Weave Evals tab: the scores the gates actually read.' },
-  sandboxes: { name: 'W&B SANDBOXES', hue: 'amber', line: 'A seal needs isolation. Sandboxes keep the agent’s own code out of process.' },
-  weave: { name: 'W&B WEAVE', hue: 'gold', line: 'Build, audit, replay, blame, gate: every step traced. That is how blame lands.' },
-  runs: { name: 'W&B RUNS', hue: 'gold', line: 'One W&B run per component, so credit is a curve you can open.' },
-  marimo: { name: 'MARIMO', hue: 'green', line: 'Memory writes a marimo notebook every generation. Executable, not a summary.' },
-  typesafe: { name: 'TYPESAFE SYSTEM1', hue: 'purple', line: 'The credit router speaks in typed decisions. No free-text guesswork.' },
-  registry: { name: 'W&B REGISTRY', hue: 'gold', line: 'Our archive of agents: every harness version registered in W&B Registry.' },
-  gate: { name: 'MARIMO', hue: 'green', line: 'The last gate is a marimo notebook that must reproduce the promotion.' },
-  aria: { name: 'ARIA', hue: 'cyan', line: 'Every generation, kept or refused, reported to the ARIA board.' },
-  alias: { name: 'W&B REGISTRY', hue: 'gold', line: 'Registered with an alias: the car that raced is the car that was promoted.' },
-  cwwb: { name: 'W&B · A COREWEAVE COMPANY', hue: 'cyan', line: 'From Inference to Weave, the stack under the car. Part of CoreWeave since 2025.' },
-  thanks: { name: 'OUR PIT WALL', hue: 'gold', line: 'None of this laps without them. Thank you.' },
+  1: { chips: [['COREWEAVE HACKS', 'cyan'], ['WEIGHTS & BIASES', 'gold']], line: 'Built at CoreWeave Hacks, running on W&B from model to registry.' },
+  2: { chips: [['W&B SERVERLESS RL', 'gold'], ['W&B INFERENCE', 'gold']], line: 'Every page built on W&B Inference; a real LoRA job one command away.' },
+  3: { chips: [['W&B WEAVE EVALS', 'gold'], ['W&B SANDBOXES', 'amber']], line: 'Both timings land in Weave Evals; Sandboxes keep the agent’s code isolated.' },
+  4: { chips: [['W&B WEAVE', 'gold'], ['W&B RUNS', 'gold'], ['MARIMO', 'green']], line: 'Every step traced, a run per component, memory as a marimo notebook.' },
+  5: { chips: [['TYPESAFE SYSTEM1', 'purple'], ['W&B REGISTRY', 'gold']], line: 'Typed decisions for the credit router; every harness version registered.' },
+  6: { chips: [['MARIMO', 'green'], ['ARIA', 'cyan']], line: 'A marimo notebook must reproduce each promotion; ARIA sees every generation.' },
+  7: { chips: [['W&B REGISTRY', 'gold'], ['W&B · A COREWEAVE COMPANY', 'cyan']], line: 'What raced is what was promoted. W&B: part of CoreWeave since 2025.' },
+  8: { chips: [['OUR PIT WALL', 'gold']], line: 'None of this laps without them. Thank you.' },
 };
 const WALL = [
   { name: 'COREWEAVE', role: 'TITLE HOST', hue: 'cyan', says: 'The hackathon this loop was built for, and the home of W&B since 2025.' },
@@ -6863,8 +6798,9 @@ function build() {
     s.prepend(top);
     const pt = PARTNER[s.dataset.partner];
     if (pt) {
-      const band = document.createElement('footer'); band.className = 's-partner'; band.style.setProperty('--h', `var(--${pt.hue})`);
-      band.innerHTML = `<span class="lbl">PIT PARTNER</span><b>${esc(pt.name)}</b><p>${esc(pt.line)}</p>`;
+      const band = document.createElement('footer'); band.className = 's-partner';
+      band.innerHTML = `<span class="lbl">PIT ${pt.chips.length > 1 ? 'PARTNERS' : 'PARTNER'}</span>`
+        + pt.chips.map(([n, h]) => `<b style="--h:var(--${h})">${esc(n)}</b>`).join('') + `<p>${esc(pt.line)}</p>`;
       s.append(band);
     }
   });
@@ -6872,9 +6808,7 @@ function build() {
   if (wall) wall.innerHTML = WALL.map(w => `<div class="partner" style="--h:var(--${w.hue})"><span class="lbl">${esc(w.role)}</span><b>${esc(w.name)}</b><p>${esc(w.says)}</p></div>`).join('');
   document.querySelectorAll('[data-icon]').forEach(n => { n.outerHTML = icon(n.dataset.icon, n.dataset.c || 'gold', +(n.dataset.s || 72)); });
 
-  // 01
-  $('rail1').innerHTML = C.ROLE_KEYS.map(k => `<i style="--h:var(--${HUE[k]});height:${24 + 76 * ((levelsAfter(R.length)[k] || 1) - 1) / 2}%"></i>`).join('');
-  // 02: a night of experiments, twelve an hour for eight hours
+  // 01: a night of experiments, about twelve an hour for eight hours
   $('night').innerHTML = Array.from({ length: 96 }, () => '<i></i>').join('');
   // 03
   $('harness3').innerHTML = ORDER.map(k => `<span style="--h:var(--${HUE[k]})">${NAME[k]}</span>`).join('');
@@ -6882,26 +6816,26 @@ function build() {
   const run4 = R[3] || R[0] || { pages: [] };
   $('wins').innerHTML = run4.pages.slice(0, 20).map(p => `<div class="win${p.passed ? '' : ' fail'}"><div class="bar"><i></i><i></i><i></i><b>${esc(p.title)}</b></div><div class="wf">${wire(p.family)}</div></div>`).join('');
   const nf = run4.pages.slice(0, 20).filter(p => !p.passed).length;
-  $('wins-key').textContent = `${nf} of 20 failed their audit or timing`;
+  $('wins-key').textContent = `${nf} of 20 failed audit or timing`;
   $('pagewf').innerHTML = wire('header', 3.2);
   // 06
   $('peek').innerHTML = peekChart();
   // 07: run 4's failing pages, and where the blame went
   const fails = run4.pages.filter(p => !p.passed), blamed = run4.standings || {}, top = Object.entries(blamed).sort((a, b) => b[1].n - a[1].n)[0];
-  $('fails').innerHTML = fails.slice(0, 9).map(p => `<div><span>${esc(p.title)}</span><span>${esc(((p.rules || [])[0] || {}).id || '')}</span></div>`).join('')
-    + `<div style="border-left-color:var(--mid);background:#04060F"><span class="mid">…and ${Math.max(0, fails.length - 9)} more</span><span></span></div>`;
+  $('fails').innerHTML = fails.slice(0, 5).map(p => `<div><span>${esc(p.title)}</span><span>${esc(((p.rules || [])[0] || {}).id || '')}</span></div>`).join('')
+    + `<div style="border-left-color:var(--mid);background:#04060F"><span class="mid">…and ${Math.max(0, fails.length - 5)} more</span><span></span></div>`;
   $('comps').innerHTML = ['AERO', 'DATA', 'TYRES', 'POWER_UNIT'].map(k => {
     const n = blamed[k] && blamed[k].n;
     return `<div class="${top && top[0] === k ? 'hot' : ''}" data-k="${k}"><span>${NAME[k]}</span>${n ? `<em>${n}</em>` : '<em class="mid">·</em>'}</div>`;
   }).join('') + `<p class="cap" style="margin:6px 0 0">${top ? `${top[1].n} of ${fails.length} failing pages traced to <span class="gold">${NAME[top[0]]}</span>. Blame counts only when correcting that one component flips the page.` : ''}</p>`;
-  // 08
-  $('comps8').innerHTML = ORDER.map(k => `<div class="comp" style="--h:var(--${HUE[k]})">${icon(compIcon(k), HUE[k], 48)}<div class="h3">${NAME[k]}</div><div class="job">${JOB[k]}</div><p>${esc(DOES[k])}</p><div class="part">on the car: ${PART[k]}</div></div>`).join('');
-  // 09: practice picked from what failed; notes from what each run changed
+  // the ten components, curriculum and memory lit
+  $('comps8').innerHTML = ORDER.map(k => `<div class="ctile${k === 'SIMULATOR' || k === 'HISTORIAN' ? ' lit' : ''}" style="--h:var(--${HUE[k]})">${icon(compIcon(k), HUE[k], 40)}<b>${NAME[k]}</b><span>${JOB[k]}</span><em>car: ${PART[k]}</em></div>`).join('');
+  // curriculum: practice mined from what kept failing; memory: the latest kept finding
   const fam = {}; R.slice(0, 4).forEach(r => r.pages.filter(p => !p.passed).forEach(p => { fam[p.family] = fam[p.family] || { t: p.title.replace(/ \(\d\)$/, ''), n: 0 }; fam[p.family].n++; }));
-  $('cards9').innerHTML = Object.values(fam).sort((a, b) => b.n - a.n).slice(0, 4).map((f, i) =>
-    `<div style="transform:rotate(${[-3, 2, -1.5, 3][i]}deg) translateY(${[0, 14, -8, 10][i]}px)"><b>FAILED ${f.n}×</b>${esc(f.t)}</div>`).join('');
-  $('note9').innerHTML = R.filter(r => r.diff_summary).slice(0, 5).map(r => `<div><b>RUN ${r.generation + 1}</b>${r.promoted ? '<em class="green">KEPT</em>' : '<em class="red">REFUSED</em>'}<span>${esc(r.diff_summary)}</span></div>`).join('');
-  // 10
+  $('cur4').textContent = 'practice mined from what kept failing: ' + Object.values(fam).sort((a, b) => b.n - a.n).slice(0, 2).map(f => `${f.t} ${f.n}×`).join(', ');
+  const noted = R.filter(r => r.diff_summary && r.promoted).slice(-1)[0];
+  $('mem4').textContent = 'a marimo notebook each generation' + (noted ? ` · run ${noted.generation + 1}: ${noted.diff_summary}` : '');
+  // 05
   $('bars10').innerHTML = [['AERO', 92], ['TYRES', 61], ['DATA', 48], ['SIMULATOR', 30], ['POWER_UNIT', 18]].map(([k, w]) =>
     `<div class="${k === 'AERO' ? 'pick' : ''}"><span>${NAME[k]}</span><i style="width:${w}%"></i><em>${k === 'AERO' ? 'PICKED' : ''}</em></div>`).join('');
   const aero = R.map((r, i) => ({ r, i })).filter(x => x.r.role === 'AERO' && x.r.diff_summary);
@@ -7001,7 +6935,6 @@ function cars() {
   const main = renderCar($('car14'), end, { orbit: 2.25, dist: 5.2, h: 1.9, fov: 32, target: [0, 0.35, 0] });
   renderCar($('carA'), start, { orbit: 2.25, dist: 5.4, h: 1.7, fov: 30 });
   renderCar($('carB'), end, { orbit: 2.25, dist: 5.4, h: 1.7, fov: 30 });
-  LIVE.push(renderCar($('car15'), end, { orbit: 3.4, dist: 6, h: 2.2, fov: 34, spin: true }));
   // three callouts, pinned to where those parts really are on the drawn car
   const k = 2, host = $('calls14'), anchors = [
     { k: 'AERO', t: 'WINGS = RETRIEVAL', s: 'more of the right references', p: [0, 0.3, 2.1], box: [30, 36] },
@@ -7021,7 +6954,7 @@ function cars() {
   host.setAttribute('viewBox', '0 0 1152 648'); host.innerHTML = lines;
 }
 
-// ---------- the trace lines on slide 7, once the layout is known ----------
+// ---------- the trace lines on slide 4, once the layout is known ----------
 function traceLines() {
   const host = $('trace'), svg = $('traceLines'), hb = host.getBoundingClientRect(), sc = hb.width / host.offsetWidth || 1;
   const hot = host.querySelector('.comps .hot'); if (!hot) return;
@@ -7045,7 +6978,7 @@ function show(i) {
   $('count').textContent = `${at + 1} / ${all.length}`;
   $('progress').style.width = `${((at + 1) / all.length) * 100}%`;
   if (!EXPORT) history.replaceState(null, '', `${location.pathname}?slide=${at + 1}`);
-  if (at === 6) requestAnimationFrame(traceLines);
+  if (at === 3) requestAnimationFrame(traceLines);
 }
 function fit() {
   if (EXPORT) return;
@@ -7080,7 +7013,6 @@ function boot() {
   const tick = ts => {
     const dt = last ? Math.min(0.05, (ts - last) / 1000) : 0; last = ts; E.time += dt;
     if (at === 0) LIVE[0].draw((LIVE[0].view.orbit += dt * 0.35));
-    if (at === 14) LIVE[1].draw((LIVE[1].view.orbit += dt * 0.25));
     requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
