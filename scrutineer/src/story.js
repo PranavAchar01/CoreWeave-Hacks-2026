@@ -713,8 +713,8 @@ function pitAbort() {
   if (pit.thenCall && pit.state !== 'off') { callToGarage(pit.thenCall); }
   pit.thenCall = null;
   pit.state = 'off'; pit.pending = null; pit.fitted = null;
-  if (track.car) track.car.off = 0;
-  if (track.scene && track.scene.mode === 'STUDIO') track.scene.setMode('AUTO');
+  if (track.car) { track.car.off = 0; track.car.lift = 0; }
+  if (track.scene && (track.scene.mode === 'PITLANE' || track.scene.mode === 'STUDIO')) track.scene.setMode('AUTO');
 }
 
 // distance from the car to a circuit index, forwards along the lap
@@ -740,6 +740,7 @@ function pitStep(dt) {
   }
 
   if (pit.state === 'enter') {
+    if (track.scene && track.scene.mode !== 'PITLANE') track.scene.setMode('PITLANE');
     // cross into the lane over the first stretch past the entry, not in one step
     const past = -aheadOf(p.entry);
     car.off = lane * Math.max(0, Math.min(1, past / BLEND));
@@ -747,8 +748,7 @@ function pitStep(dt) {
     // Brake into the box rather than arriving at it still doing eighty, so the clock measures
     // a car that is actually stationary.
     if (d < 30 || d > 200) {
-      if (car.speed < 0.8) { pit.state = 'stopped'; pit.t = 0; car.off = lane;
-        if (track.scene) track.scene.setMode('STUDIO'); }
+      if (car.speed < 0.8) { pit.state = 'stopped'; pit.t = 0; car.off = lane; }
       return 0;
     }
     return LIMITER;
@@ -757,6 +757,9 @@ function pitStep(dt) {
   if (pit.state === 'stopped') {
     car.off = lane;
     pit.t += dt; pit.clock = pit.t;
+    // On the jacks while it is worked on, and dropped on release.
+    const up = Math.min(1, pit.t / 0.35) * (pit.t > BOX_HOLD - 0.3 ? Math.max(0, (BOX_HOLD - pit.t) / 0.3) : 1);
+    car.lift = 0.11 * up;
     // The part goes on halfway through the stop, so the car that leaves is the new one.
     if (pit.t > BOX_HOLD * 0.5 && pit.pending) {
       st.levels = levelsAt(st.i + 1);
@@ -764,8 +767,7 @@ function pitStep(dt) {
       track.refit();
       pit.fitted = pit.pending; pit.pending = null;
     }
-    if (pit.t >= BOX_HOLD) { pit.state = 'exit'; pit.t = 0;
-      if (track.scene) track.scene.setMode('AUTO'); }
+    if (pit.t >= BOX_HOLD) { pit.state = 'exit'; pit.t = 0; car.lift = 0; }
     return 0;
   }
 
@@ -773,8 +775,9 @@ function pitStep(dt) {
     const d = aheadOf(p.exit);
     car.off = lane * Math.max(0, Math.min(1, d / BLEND));
     pit.t += dt;
+    if (pit.t > 1.6 && track.scene && track.scene.mode === 'PITLANE') track.scene.setMode('AUTO');
     if ((d <= 0.6 && d > -30) || pit.t > 12) {
-      car.off = 0; pit.state = 'off'; pit.fitted = null;
+      car.off = 0; car.lift = 0; pit.state = 'off'; pit.fitted = null;
       if (pit.thenCall) { callToGarage(pit.thenCall); pit.thenCall = null; }
     }
     return LIMITER;

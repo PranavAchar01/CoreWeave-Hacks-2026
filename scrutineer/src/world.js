@@ -183,9 +183,20 @@ Wd.build = function (c, opts = {}) {
       const wf = ROAD_W + 4.6, wb = ROAD_W + 13.6, hgt = 5.2;
       // The lane itself: between the armco and the front of the building, with the box
       // halfway along it.
-      PIT = { i0, len, side, lane: side * (ROAD_W + 3.5), box: i0 + Math.floor(len / 2),
-              entry: i0 - 6, exit: i0 + len + 6 };
+      const BOX = i0 + Math.floor(len / 2);
+      PIT = { i0, len, side, lane: side * (ROAD_W + 3.5), box: BOX,
+              entry: i0 - 6, exit: i0 + len + 6,
+              // A broadcast pit camera: across the lane from the box, slightly back and low,
+              // so the stop is seen three-quarters on rather than straight down the lane.
+              cam: pos(BOX - 3, side * (ROAD_W + 0.4), 1.9) };
       for (let k = i0; k < i0 + len; k++) {
+        // The lane is a surface you drive on, not the grass that happened to be there. Lay it
+        // between the wall and the garage fronts, with a painted edge.
+        segQuad(k, side, ROAD_W + 2.3, wf - 0.2, 0.03, 0.03, M.ASPHALT);
+        segQuad(k, side, ROAD_W + 2.3, ROAD_W + 2.55, 0.045, 0.045, M.KERB_W);
+        // one bay per two segments, so the lane reads as a row of garages
+        if ((k - i0) % 2 === 0) { const q = pos(k, side * (wf - 0.3));
+          box(q[0], 0.9, q[2], 0.12, 1.8, 0.12, M.STEEL); }
         segWall(k, side, wf, 0, hgt, M.BODY); segQuad(k, side, wf, wb, hgt, hgt, M.STEEL);
         const A = pos(k, side * wb, 0), B = pos(k + 1, side * wb, 0), Cq = pos(k + 1, side * wb, hgt), Dq = pos(k, side * wb, hgt); if (side > 0) Q(A, Dq, Cq, B, M.BODY); else Q(A, B, Cq, Dq, M.BODY);
         segWall(k, side, wf - 0.05, hgt - 0.5, hgt, M.NAVY); segWall(k, side, wf - 0.06, 3.1, 4.0, M.CYAN);
@@ -195,6 +206,25 @@ Wd.build = function (c, opts = {}) {
         // Leave the ends open: that is the pit entry and the pit exit, and without them the
         // car would have to drive through the barrier to be serviced.
         if (k > i0 + 2 && k < i0 + len - 3) segWall(k, side, ROAD_W + 2.4, 0, 1.0, M.ARMCO);
+      }
+      // The box itself: a marked stall, the bay it belongs to, and a crew waiting in it.
+      for (let k = BOX - 1; k <= BOX + 1; k++) segQuad(k, side, ROAD_W + 2.6, wf - 0.3, 0.05, 0.05, M.GOLD);
+      segQuad(BOX, side, ROAD_W + 2.6, ROAD_W + 2.9, 0.07, 0.07, M.NAVY);
+      segSign(BOX - 2, side, wf - 0.16, 1.2, 2.0, `${teamName} \u00B7 PIT BOX`, 0, 0.3, M.NAVY, M.GOLD);
+      {
+        // A pit crew, waiting where a pit crew waits: either side of the stall, plus one with
+        // the board out in front of it.
+        const crew = (q, m) => { box(q[0], 0.42, q[2], 0.34, 0.84, 0.34, m);
+          box(q[0], 1.02, q[2], 0.42, 0.36, 0.42, M.BODY);
+          box(q[0], 1.32, q[2], 0.3, 0.26, 0.3, m); };
+        for (const [d, w, m] of [[-1, 2.95, M.GOLD], [1, 2.95, M.GOLD],
+                                 [-1, 4.3, M.CYAN], [1, 4.3, M.CYAN], [0, 4.6, M.STRIPE]]) {
+          const q = pos(BOX + d, side * (ROAD_W + w));
+          if (clearOfTrack(q[0], q[2], ROAD_W - 1.2)) crew(q, m);
+        }
+        const lolli = pos(BOX + 2, side * (ROAD_W + 3.4));
+        box(lolli[0], 1.3, lolli[2], 0.1, 2.6, 0.1, M.CARBON);
+        box(lolli[0], 2.5, lolli[2], 0.9, 0.5, 0.12, M.STRIPE);
       }
       const mid = pos(i0 + Math.floor(len / 2), side * (wf + 4.5)); box(mid[0], hgt + 0.8, mid[2], 3, 1.6, 8, M.STEEL); box(mid[0], hgt + 2.2, mid[2], 0.3, 2.6, 0.3, M.STEEL);
     }

@@ -8,7 +8,7 @@
 (function (SCR) {
 'use strict';
 const E = SCR.engine, TS = SCR.trackScene = {};
-TS.MODES = ['AUTO', 'CHASE', 'ONBOARD', 'TV', 'HELI', 'APEX', 'STUDIO'];
+TS.MODES = ['AUTO', 'CHASE', 'ONBOARD', 'TV', 'HELI', 'APEX', 'PITLANE', 'STUDIO'];
 
 // Shots the director can call, with how often it reaches for each and how long it holds.
 // APEX and TV are hard cuts; CHASE and HELI are moves, so the camera glides into them.
@@ -115,7 +115,9 @@ TS.create = function (o) {
       shot = SHOT_KEYS[SHOT_KEYS.length - 1];
       for (const k of SHOT_KEYS) { r -= w[k]; if (r <= 0) { shot = k; break; } }
     }
-    const spec = SHOTS[shot];
+    // PITLANE (and STUDIO) are not shots the director calls for itself; they are held for as
+    // long as whatever asked for them needs, so they are not in the weighted table.
+    const spec = SHOTS[shot] || { min: 6, max: 10, cut: true };
     d.prev = prev; d.shot = shot; d.t = 0;
     d.dur = lerp(spec.min, spec.max, rng()) * (0.85 + style.patient * 0.4);
     d.shape = frameShot(shot);
@@ -187,6 +189,17 @@ TS.create = function (o) {
       const aim = 8 - pair * 0.45;
       tx_ = car.x + tx * aim; ty_ = 0; tz_ = car.z + tz * aim;
       fov = shape.fov || 38; lag = shape.lag || 3;
+    } else if (mode === 'PITLANE') {
+      // The pit camera is a fixed position on the wall, the way it is at a circuit: it does not
+      // follow the car, it watches the box and lets the car arrive in shot.
+      const pc = sc.world.pit && sc.world.pit.cam;
+      if (pc) {
+        px_ = pc[0]; py_ = pc[1]; pz_ = pc[2];
+        tx_ = car.x; ty_ = 0.6; tz_ = car.z;
+        const dd = Math.hypot(pc[0] - car.x, pc[2] - car.z);
+        fov = Math.max(14, Math.min(44, 330 / Math.max(8, dd)));
+        lag = 9;
+      } else { mode = 'CHASE'; px_ = car.x - tx * 8.4; py_ = 3.2; pz_ = car.z - tz * 8.4; tx_ = car.x; ty_ = 0.75; tz_ = car.z; }
     } else if (mode === 'APEX') {
       const p = shape.anchor;
       if (!p) { mode = 'CHASE'; px_ = car.x - tx * 8.4; py_ = 3.2; pz_ = car.z - tz * 8.4; tx_ = car.x; ty_ = 0.75; tz_ = car.z; }
@@ -220,14 +233,19 @@ TS.create = function (o) {
     cam.pos = [sm.x, sm.y, sm.z]; cam.target = [sm.tx, sm.ty, sm.tz]; cam.fov = sm.fov;
     sc.label = mode === 'STUDIO' ? 'CAM · GRID' : mode === 'TV' ? `CAM ${sc.activeTV + 1} · TRACKSIDE`
       : mode === 'CHASE' ? 'CAM · CHASE' : mode === 'ONBOARD' ? 'CAM · T-CAM'
-      : mode === 'APEX' ? 'CAM · APEX' : 'CAM · HELI';
+      : mode === 'APEX' ? 'CAM · APEX'
+      : mode === 'PITLANE' ? 'CAM · PIT LANE' : 'CAM · HELI';
     sc.shot = mode;
   };
 
   // render: draws sky, world, pools, shadow, ghost, car, sparks, outline. meshes: {car, ghost}
   sc.render = function (meshes) {
     R.begin(); R.sky(); R.drawStatic(sc.world.mesh); R.drawLightPools(sc.world.lightpools);
-    const xf = SCR.car.makeXform(sc.car); R.drawDynamic(meshes.car, xf, 'shadow', 0);
+    // The car carries its own jack height, so a car up in the pit box is the body on the jacks
+    // with the wheels still on the floor rather than the whole car floating.
+    const lift = sc.car.lift || 0;
+    const xf = SCR.car.makeXform(sc.car, lift ? { lift, wheelDrop: lift } : undefined);
+    R.drawDynamic(meshes.car, xf, 'shadow', 0);
     if (sc.ghostActive && sc.ghost && meshes.ghost) R.drawDynamic(meshes.ghost, SCR.car.makeXform(sc.ghost), 'ghost', 0);
     R.drawDynamic(meshes.car, xf, 'solid', 0); SCR.sim.drawSparks(R, sc.fx); R.outline();
   };
