@@ -70,7 +70,22 @@ ${loopJs}${js}
   // describes, so the seeded season's pages and a live season's pages live in separate
   // directories and the bundle picks which one ships.
   const pagesSrc = path.join(root, 'loop', 'state', seeded ? 'demo-pages' : 'pages');
-  if (fs.existsSync(pagesSrc)) {
+  // Only replace what is published if the source can actually account for every page the bundle
+  // links to. An interrupted `scrutineer demo` leaves a directory with one page in it, and this
+  // used to wipe two hundred real documents and copy that one in — the build reported success
+  // and the site lost the artifact it exists to show.
+  const wanted = [];
+  if (fs.existsSync(bundlePath)) {
+    const b = JSON.parse(fs.readFileSync(bundlePath, 'utf8'));
+    for (const r of (b.rounds || [])) for (const pg of (r.pages || [])) if (pg.file) wanted.push(pg.file);
+  }
+  const missing = fs.existsSync(pagesSrc)
+    ? wanted.filter(f => !fs.existsSync(path.join(pagesSrc, f))) : wanted;
+  if (fs.existsSync(pagesSrc) && missing.length) {
+    console.log(`build: NOT touching site/public/pages — ${path.basename(pagesSrc)} is missing `
+      + `${missing.length} of ${wanted.length} pages the bundle links to (e.g. ${missing[0]}). `
+      + 'Re-run the season/demo to completion first.');
+  } else if (fs.existsSync(pagesSrc)) {
     const dst = path.join(siteDir, 'pages');
     fs.rmSync(dst, { recursive: true, force: true });
     fs.cpSync(pagesSrc, dst, { recursive: true });
