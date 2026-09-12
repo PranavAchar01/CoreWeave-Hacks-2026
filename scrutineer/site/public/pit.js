@@ -44,6 +44,15 @@ const RAMP = {
 };
 const MAT_NAMES = E.MAT_NAMES = Object.keys(RAMP), RAMPS = E.RAMPS = MAT_NAMES.map(k => RAMP[k].map(hex));
 const M = E.M = {}; MAT_NAMES.forEach((k, i) => M[k] = i);
+// The world stores material indices, not colours, so repainting a ramp repaints everything drawn
+// in it. That is how one circuit is a desert and the next is a night race. Always applied from a
+// pristine copy, so calling it twice is the same as calling it once.
+const BASE_RAMPS = RAMPS.map(r => r.map(c2 => c2));
+E.setPalette = function (over) {
+  for (let i = 0; i < RAMPS.length; i++) RAMPS[i] = BASE_RAMPS[i];
+  if (!over) return;
+  for (const k in over) { const i = M[k]; if (i !== undefined) RAMPS[i] = over[k].map(hex); }
+};
 E.SHADOW_MAT = 250; E.LIGHT_MAT = 251;
 const GROUND_MATS = E.GROUND_MATS = new Set([M.ASPHALT, M.RUBBER, M.GRASS, M.GRASS2, M.GRAVEL, M.KERB_R, M.KERB_W, M.CONCRETE]);
 // emissive materials ignore lighting; metallic ones get extra ambient
@@ -224,9 +233,24 @@ E.createRenderer = function (canvas, W, H, SCALE) {
     const c = typeof color === 'string' ? hex(color) : color;
     for (let i = 0; i < W * H; i++) { const o = i * 4; px[o] = c[0]; px[o + 1] = c[1]; px[o + 2] = c[2]; px[o + 3] = 255; depth[i] = Infinity; matBuf[i] = -1; }
   };
-  const NIGHT = hex('#06081A'), STUDIO = hex('#121A4A'), DUSK = hex('#2A3A8A'), INK = hex('#000000'), MOUNT = hex('#121A4A'), MOUNT2 = hex('#0B1030'), GLOW = hex('#7A32B0'), GOLDc = hex('#F4C542'), CYANc = hex('#3DD2FF'), WHITEc = hex('#FFFFFF'), GROUNDc = hex('#0B2A17'), CAPc = hex('#C8CBD8');
+  const INK = hex('#000000');
+  // The sky is a palette rather than a set of constants, so a circuit can be at dusk in the
+  // desert, under snow, or at night under floodlights without a second sky routine.
+  const SKY_DEFAULT = { night: '#06081A', studio: '#121A4A', dusk: '#2A3A8A', mount: '#121A4A',
+    mount2: '#0B1030', glow: '#7A32B0', cityA: '#F4C542', cityB: '#3DD2FF', star: '#FFFFFF',
+    starDim: '#C8CBD8', ground: '#0B2A17', stars: true, moon: true };
+  let SKY = null;
+  R.setSky = function (o) {
+    const s2 = Object.assign({}, SKY_DEFAULT, o || {});
+    SKY = { NIGHT: hex(s2.night), STUDIO: hex(s2.studio), DUSK: hex(s2.dusk), MOUNT: hex(s2.mount),
+      MOUNT2: hex(s2.mount2), GLOW: hex(s2.glow), GOLDc: hex(s2.cityA), CYANc: hex(s2.cityB),
+      WHITEc: hex(s2.star), CAPc: hex(s2.starDim), GROUNDc: hex(s2.ground),
+      stars: s2.stars !== false, moon: s2.moon !== false };
+  };
+  R.setSky();
   const colDir = new Float32Array(W), colM1 = new Float32Array(W), colM2 = new Float32Array(W), colCity = new Uint8Array(W);
-  R.sky = function () {   // night sky with dusk glow, mountains, city lights, moon, stars; sets depth to infinity
+  R.sky = function () {   // sky with glow band, mountains, lights, optional moon and stars
+    const { NIGHT, STUDIO, DUSK, MOUNT, MOUNT2, GLOW, GOLDc, CYANc, WHITEc, CAPc, GROUNDc } = SKY;
     const hf = E.norm([VM.f[0], 0, VM.f[2]]); toView(cam.pos[0] + hf[0] * 5000, cam.pos[1], cam.pos[2] + hf[2] * 5000, cv);
     const horizon = H / 2 - cv[1] * FOCAL / cv[2], baseAz = Math.atan2(VM.f[0], VM.f[2]);
     for (let x = 0; x < W; x++) { const az = baseAz + Math.atan((x - W / 2) / FOCAL); colDir[x] = az;
@@ -241,8 +265,8 @@ E.createRenderer = function (canvas, W, H, SCALE) {
         else { c = t < bayer(x, y) ? STUDIO : NIGHT; if (tt > 0 && tt * 0.85 > bayer(x + 3, y)) c = DUSK; if (tt > 0.55 && (tt - 0.55) * 0.9 > bayer(x + 5, y + 2)) c = GLOW;
           let dAz = colDir[x] - moonAz; while (dAz > Math.PI) dAz -= 2 * Math.PI; while (dAz < -Math.PI) dAz += 2 * Math.PI;
           const mx = dAz * FOCAL, my = dyh - moonEl, rr = mx * mx + my * my;
-          if (rr < 121) c = (rr < 100 || bayer(x, y) < 0.5) ? (E.hash2(Math.floor(mx / 3), Math.floor(my / 3)) < 0.18 ? CAPc : WHITEc) : STUDIO;
-          else if (dyh > 44 && E.hash2(Math.floor(colDir[x] * 400), y) > 0.995) c = E.hash2(x, y) > 0.5 ? WHITEc : CAPc; }
+          if (SKY.moon && rr < 121) c = (rr < 100 || bayer(x, y) < 0.5) ? (E.hash2(Math.floor(mx / 3), Math.floor(my / 3)) < 0.18 ? CAPc : WHITEc) : STUDIO;
+          else if (SKY.stars && dyh > 44 && E.hash2(Math.floor(colDir[x] * 400), y) > 0.995) c = E.hash2(x, y) > 0.5 ? WHITEc : CAPc; }
         px[o] = c[0]; px[o + 1] = c[1]; px[o + 2] = c[2]; px[o + 3] = 255;
       }
     }
@@ -599,7 +623,7 @@ E.hooks[M.LIVERY] = function (mx, my, mz, aux) {
   return t > E.bayer(Math.floor(mz / 0.028) * 3, Math.floor((mx * 0.8 + my) / 0.028) * 3) ? dark : light;
 };
 // ---------- state + transform ----------
-C.newState = () => ({ x: 0, y: 0, z: 0, yaw: 0, roll: 0, pitch: 0, spin: 0, steer: 0, speed: 0, s: 0, lap: 1, lapStart: 0, best: null, last: null, sector: 0, drsAngle: 0, drsOn: false, lapsDone: 0, braking: false, fanSpin: 0, sectorTimes: [], lapTimes: [] });
+C.newState = () => ({ x: 0, y: 0, z: 0, yaw: 0, roll: 0, pitch: 0, spin: 0, steer: 0, speed: 0, s: 0, lap: 1, lapStart: 0, best: null, last: null, sector: 0, drsAngle: 0, drsOn: false, lapsDone: 0, off: 0, offPrev: 0, lift: 0, braking: false, fanSpin: 0, sectorTimes: [], lapTimes: [] });
 // a parked car for the garage / parc fermé / finale: static pose at a position and heading
 C.displayState = (x = 0, z = 0, yaw = 0) => ({ ...C.newState(), x, z, yaw });
 // returns xform(x,y,z,group,out) for a car state. opts: lift (raise the body on jacks), wheelDrop (wheels rest on the floor
@@ -651,6 +675,9 @@ S.physics = function (c, dd, sp, circ, dt, opts = {}) {
   const top = dd.topSpeed + (drsZone ? dd.drsBoost : 0);
   const jitter = opts.noise ? 1 + opts.noise() * 0.06 * (1 - Math.min(1, dd.consistency)) : 1;   // driver inconsistency (tyre & performance role)
   let vAllow = Math.min(top, cornerSpeed(curv, dd, wearF) * learnF * jitter);
+  // A pit lane has a limiter, and a pit box is a stop. Both are a ceiling on what the car is
+  // allowed to be doing, so they belong here rather than as a separate mode.
+  if (opts.speedCap !== undefined) vAllow = Math.min(vAllow, opts.speedCap);
   for (let d = 6; d <= 130; d += 6) { const kk = at(Math.floor((c.s + d) / STEP)).curv; const va2 = Math.min(top, cornerSpeed(kk, dd, wearF) * learnF); vAllow = Math.min(vAllow, Math.sqrt(va2 * va2 + 2 * dd.braking * d)); }
   const prev = c.speed;
   if (c.speed < vAllow) c.speed = Math.min(vAllow, c.speed + dd.accel * (1 - 0.8 * c.speed / top) * dt); else c.speed = Math.max(vAllow, c.speed - dd.braking * dt);
@@ -661,6 +688,15 @@ S.physics = function (c, dd, sp, circ, dt, opts = {}) {
   if (c.s >= LAP) { c.s -= LAP; c.lap++; c.lapsDone++; const tNow = (opts.timeNow ?? E.time), lt = tNow - c.lapStart; c.sectorTimes[2] = tNow - (c.sectorStart ?? c.lapStart); c.lastLapSectors = c.sectorTimes.slice(0, 3); c.lapTimes.push(lt); c.last = lt; c.best = c.best === null ? lt : Math.min(c.best, lt); c.lapStart = tNow; c.sectorStart = tNow; c.sectorTimes = []; }
   c.x = a.x + (b.x - a.x) * f; c.z = a.z + (b.z - a.z) * f; c.y = 0;
   const tx = a.tx + (b.tx - a.tx) * f, tz = a.tz + (b.tz - a.tz) * f; c.yaw = Math.atan2(tx, tz);
+  // Lateral offset from the centreline, used to put the car in the pit lane. The heading picks
+  // up a little of the rate of change so it points where it is going while it crosses.
+  if (c.off) {
+    const nx = -tz, nz = tx;
+    c.x += nx * c.off; c.z += nz * c.off;
+    const dOff = (c.off - (c.offPrev === undefined ? c.off : c.offPrev)) / Math.max(dt, 1e-3);
+    c.yaw += Math.max(-0.35, Math.min(0.35, dOff / Math.max(6, c.speed)));
+  }
+  c.offPrev = c.off || 0;
   c.steer = Math.max(-0.35, Math.min(0.35, curv * 22));
   c.roll += ((-curv * 9 * (c.speed / dd.topSpeed)) - c.roll) * Math.min(1, dt * 6);
   c.pitch += (((c.speed - prev) / Math.max(dt, 1e-3)) * -0.0012 - c.pitch) * Math.min(1, dt * 5);
