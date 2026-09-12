@@ -28,6 +28,7 @@ const WHY = { seesaw: 'the two splits disagreed', regression: 'it made the car s
   scrutineering: 'black-flagged', diff_size: 'too big a change', comparable_ab: 'the A/B was not comparable',
   novelty: 'nothing new in it', evidence: 'not enough evidence', correlation: 'the splits did not track',
   rl_entropy: 'the model collapsed', 'debrief gate': 'the debrief did not clear' };
+const unchanged = r => r.rule_fired === 'no_upgrade' || r.rule_fired === 'circuit';
 const esc = s => String(s === undefined || s === null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const el = (t, c, txt) => { const n = document.createElement(t); if (c) n.className = c; if (txt !== undefined) n.textContent = txt; return n; };
 const ease = x => x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x);
@@ -37,7 +38,7 @@ const canPip = () => 'documentPictureInPicture' in window;
 const st = {
   source: 'probing', origin: '', demo: false, linkDown: false,
   rounds: [],                          // decided generations, oldest first
-  levels: {}, run: 0, laps: 0, lap: 0, lapsRun: 0, busy: false, phase: '', error: null,
+  levels: {}, run: 0, laps: 0, lap: 0, lapsRun: 0, race: '', busy: false, phase: '', error: null,
   claimed: null, official: null, since: 0, seenSeq: 0,
   replay: { all: [], i: 0, every: 24, at: 0, elapsed: 0, beat: 0, laps: 40 },
   orbit: 0.9, whip: 0, fx: [], anim: null, card: null, cardTimer: 0,
@@ -115,12 +116,14 @@ function frame(dt) {
 // ---------- a generation landed ----------
 function landed(r, animate) {
   st.rounds.push(r);
-  st.levels = r.levels && Object.keys(r.levels).length ? r.levels : C.levelsAfter(st.rounds, st.rounds.length);
+  const own = C.levelsAfter(st.rounds, st.rounds.length), given = r.levels || {};
+  st.levels = Object.fromEntries(C.ROLE_KEYS.map(k => [k, Math.max(Number(given[k]) || 1, own[k] || 1)]));
   st.run = st.rounds.length; st.busy = false; st.lap = 0;
   if (r.promoted) rebuild(animate);
   else { rebuild(false); if (animate) { st.anim = { kind: 'refused', t: 0, len: 1.4, flash: 0, tint: 0 }; if (!reduced()) st.whip = 1.6; } }
-  if (animate) card(r.promoted ? 'kept' : r.rule_fired === 'no_upgrade' ? 'none' : 'refused',
-    r.promoted ? `<b>KEPT</b> ${esc(NAME[r.role] || r.role)} <i>L${esc((st.levels || {})[r.role] || '')}</i>`
+  if (animate) card(r.promoted ? 'kept' : unchanged(r) ? 'none' : 'refused',
+    r.promoted ? `<b>KEPT</b> ${esc(NAME[r.role] || r.role)} <i>L${level(r.role)}</i>`
+      : r.rule_fired === 'circuit' ? '<b>NO CHANGE</b> it changed the practice set instead'
       : r.rule_fired === 'no_upgrade' ? '<b>NO CHANGE</b> not enough evidence'
       : `<b>REFUSED</b> ${esc(NAME[r.role] || r.role || '')} <i>${esc(WHY[(r.failed || [])[0]] || (r.failed || [])[0] || 'thrown out')}</i>`);
   paint(true);
@@ -145,14 +148,14 @@ function goReplay() {
 // The replay keeps wall-clock time, not frame time: a tab in the background draws no frames, but
 // its rounds still fall due, and when it comes back every round that fell due lands at once —
 // silently but for the last, so the board catches up without a burst of placards.
-function replayTick(now) {
-  const rp = st.replay; if (!rp.all.length) return;
+function replayTick() {
+  const now = Date.now(), rp = st.replay; if (!rp.all.length) return;
   if (!rp.at) rp.at = now;
   const elapsed = (now - rp.at) / 1000;
   if (rp.beat) {                                          // the beat between seasons
     if (elapsed < rp.beat) return;
     rp.beat = 0; rp.at = now; rp.i = 0;
-    st.rounds = []; st.levels = C.levelsAfter([], 0); st.run = 0; rebuild(true);
+    st.rounds = []; st.levels = C.levelsAfter([], 0); st.run = 0; st.lapsRun = 0; st.lap = 0; rebuild(true);
     card('none', '<b>NEW SEASON</b> back to level one'); paint(true);
     return;
   }
@@ -177,8 +180,10 @@ async function probe(origin) {
     if (!r.ok) return null; const j = await r.json(); return j && j.live ? j : null;
   } catch (e) { return null; }
 }
+const loopback = o => { try { const u = new URL(o); return u.hostname === '127.0.0.1' || u.hostname === 'localhost' || u.hostname === '[::1]'; } catch (e) { return false; } };
 async function detect(pref) {
   const here = /^https?:/.test(location.origin) ? location.origin : '';
+  if (pref && pref !== 'replay' && pref !== here && !loopback(pref)) pref = 'replay';
   const cands = pref === 'replay' ? [] : pref ? [pref] : [here, LOCAL].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i);
   for (const o of cands) { const s = await probe(o); if (s) { goLive(o, s); return; } }
   goReplay();
@@ -200,7 +205,7 @@ function goLive(origin, s) {
 function onLive(d, fresh) {
   if (d.kind === 'phase') { st.phase = d.phase; if (d.phase === 'RUN') { st.run = d.generation + 1; st.lap = 0; st.laps = d.total || 0; st.busy = true; }
     if (d.levels && !fresh) { st.levels = d.levels; rebuild(false); } }
-  else if (d.kind === 'lap') { st.lap = d.index; st.laps = d.total; st.lapsRun++; }
+  else if (d.kind === 'lap') { if (d.race !== st.race) { st.race = d.race; st.lap = 0; } st.lap = d.index; st.laps = d.total; st.lapsRun++; }
   else if (d.kind === 'score') { st.claimed = d.claimed; st.official = d.official; }
   else if (d.kind === 'result') { landed({ generation: d.generation, promoted: !!d.promoted, role: d.role || null, part: d.part || null,
     rule_fired: d.rule || null, failed: d.failed || [], official_s: st.official, claimed_s: st.claimed, levels: d.levels }, fresh); return; }
@@ -212,6 +217,8 @@ function onLive(d, fresh) {
 // ---------- the board ----------
 function fmtT(s) { s = Math.max(0, Math.floor(s)); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), q = s % 60; return `${h ? h + ':' : ''}${h && m < 10 ? '0' : ''}${m}:${q < 10 ? '0' : ''}${q}`; }
 const kept = () => st.rounds.filter(r => r.promoted).length;
+// a level is a small counting number or it is nothing; the board renders no server's value verbatim
+const level = k => { const n = Math.floor(Number((st.levels || {})[k])); return n >= 1 && n <= 99 ? n : 1; };
 // paint(now): the strip every time; the board when it is open and something changed, or once a
 // second for the clocks. The actions row is built once so a button is never replaced under a click.
 function paint(now) {
@@ -225,7 +232,7 @@ function paint(now) {
   const dot = root.querySelector('.pit-dot'), dc = 'pit-dot ' + (st.source === 'live' ? (st.linkDown ? 'down' : st.busy ? 'busy' : 'live') : st.source === 'replay' ? 'replay' : 'probe');
   if (dot.className !== dc) { dot.className = dc; dot.title = st.source === 'live' ? `live · ${st.origin}` : st.source === 'replay' ? 'replaying the recorded season' : 'looking for a running loop'; }
   if (!st.open) return;
-  const t = performance.now(); if (!now && t - st.boardAt < 1000) return; st.boardAt = t;
+  const t = Date.now(); if (!now && t - st.boardAt < 1000) return; st.boardAt = t;
   paintBoard();
 }
 function paintBoard() {
@@ -245,20 +252,21 @@ function paintBoard() {
   b.append(el('div', 'pb-gain', score === null ? (st.source === 'live' ? 'no run scored yet' : '') : gain > 0.005 ? `−${gain.toFixed(2)} s since the start · held-out score` : 'the harness it started with · held-out score'));
   if (st.rounds.length || total) {
     const ticks = el('div', 'pb-ticks'), n = Math.max(st.rounds.length, total);
-    for (let k = 0; k < n; k++) { const r = st.rounds[k]; ticks.append(el('i', r ? (r.promoted ? 'keep' : r.rule_fired === 'no_upgrade' ? 'none' : 'drop') : 'todo')); }
+    for (let k = 0; k < n; k++) { const r = st.rounds[k]; ticks.append(el('i', r ? (r.promoted ? 'keep' : unchanged(r) ? 'none' : 'drop') : 'todo')); }
     if (st.busy && st.laps) { const p = el('i', 'now'); p.style.setProperty('--p', (st.lap / st.laps).toFixed(3)); ticks.append(p); }
     b.append(ticks);
   }
   const rig = el('div', 'pb-rig');
-  for (const k of C.ROLE_KEYS) { const lv = (st.levels || {})[k] || 1, row = el('div', 'pb-comp' + (lv > 1 ? ' up' : '') + (last && last.promoted && last.role === k ? ' now' : ''));
-    row.innerHTML = `<span>${esc(NAME[k])}</span><b>${'▮'.repeat(Math.min(6, lv))}</b><em>L${lv}</em>`; rig.append(row); }
+  for (const k of C.ROLE_KEYS) { const lv = level(k), row = el('div', 'pb-comp' + (lv > 1 ? ' up' : '') + (last && last.promoted && last.role === k ? ' now' : ''));
+    row.innerHTML = `<span>${esc(NAME[k])}</span><b>${'▮'.repeat(Math.min(6, lv))}</b><em>L${esc(lv)}</em>`; rig.append(row); }
   b.append(rig);
   if (last) { const l = el('div', 'pb-last');
-    l.innerHTML = last.promoted ? `<b class="k">KEPT</b> ${esc(NAME[last.role] || last.role)} → L${esc((st.levels || {})[last.role] || '')}${last.part ? ` <code>${esc(last.part)}</code>` : ''}${last.summary ? `<span>${esc(last.summary)}</span>` : ''}`
+    l.innerHTML = last.promoted ? `<b class="k">KEPT</b> ${esc(NAME[last.role] || last.role)} → L${level(last.role)}${last.part ? ` <code>${esc(last.part)}</code>` : ''}${last.summary ? `<span>${esc(last.summary)}</span>` : ''}`
+      : last.rule_fired === 'circuit' ? '<b class="n">NO CHANGE</b> it changed the practice set instead of a component'
       : last.rule_fired === 'no_upgrade' ? '<b class="n">NO CHANGE</b> nothing had enough evidence behind it'
       : `<b class="d">REFUSED</b> ${esc(NAME[last.role] || last.role || '')} <span>${esc(WHY[(last.failed || [])[0]] || (last.failed || [])[0] || 'its own gates threw it out')}</span>`;
     b.append(l); }
-  const up = fmtT((performance.now() - st.since) / 1000);
+  const up = fmtT((Date.now() - st.since) / 1000);
   b.append(el('div', 'pb-foot', st.error ? `stopped: ${st.error}`
     : st.source === 'live' ? (st.linkDown ? 'link down · reconnecting' : st.busy ? `running · ${st.phase || 'RUN'} · watching for ${up}` : `idle · waiting for a run · watching for ${up}`)
     : st.source === 'replay' ? (st.phase === 'END' ? 'season over · starting again' : `next run in ${Math.max(0, Math.ceil(st.replay.every - st.replay.elapsed))} s · on the board ${up}`)
@@ -268,7 +276,8 @@ function paintActions() {
   const a = st.root.querySelector('.pb-actions'); a.innerHTML = '';
   if (canPip()) { const pb = el('button', 'pb-btn', st.pip ? 'BRING IT BACK' : 'POP OUT ↗'); pb.type = 'button';
     pb.addEventListener('click', ev => { ev.stopPropagation(); if (st.pip) st.pip.close(); else P.popOut(); }); a.append(pb); }
-  const link = el('a', 'pb-link', 'THE BROADCAST ↗'); link.href = st.source === 'live' ? st.origin + '/' : 'https://scrutineer-one.vercel.app/'; link.target = '_blank'; link.rel = 'noopener'; a.append(link);
+  const link = el('a', 'pb-link', 'THE BROADCAST ↗');
+  link.href = st.source === 'live' && (st.origin === location.origin || loopback(st.origin)) ? st.origin + '/' : 'https://scrutineer-one.vercel.app/'; link.target = '_blank'; link.rel = 'noopener'; a.append(link);
 }
 
 // ---------- the card on the page: drag, hover, pop out ----------
@@ -326,7 +335,7 @@ function swapLoop(win) {
   st.win = win; st.last = 0;
   const tick = now => {
     if (!st.last) st.last = now; const dt = Math.min(0.05, (now - st.last) / 1000); st.last = now;
-    frame(dt); if (st.source === 'replay') replayTick(now); paint(false);
+    frame(dt); if (st.source === 'replay') replayTick(); paint(false);
     st.raf = win.requestAnimationFrame(tick);
   };
   st.raf = win.requestAnimationFrame(tick);
@@ -340,7 +349,7 @@ function ensureStyles() {
 P.mount = function (opts = {}) {
   if (st.root) return P;
   ensureStyles();
-  st.host = opts.host || document.body; st.since = performance.now();
+  st.host = opts.host || document.body; st.since = Date.now();
   const root = st.root = el('div', 'pit'); root.tabIndex = 0; root.setAttribute('role', 'group'); root.setAttribute('aria-label', 'Scrutineer pit board');
   root.innerHTML = '<canvas width="128" height="80" aria-label="the car, as the harness stands now"></canvas>'
     + '<div class="pit-card" aria-live="polite"></div>'

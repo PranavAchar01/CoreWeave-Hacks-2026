@@ -6,9 +6,10 @@ off disk so you can open one the moment it exists.
 
 The key never leaves the machine. There is no relay here and nothing is uploaded.
 
-The two read-only endpoints, `/api/state` and `/api/events`, answer any origin: that is how the
-hosted pit board finds a loop running on this machine and turns live. Starting a run stays
-same-origin only — a page you happened to open cannot spend your key.
+The two read-only endpoints, `/api/state` and `/api/events`, answer any origin: that is how a pit
+board on another page finds a loop running on this machine and turns live. Starting a run is
+same-origin only, and enforced rather than assumed: a cross-origin POST needs no preflight, so
+without the Origin check below any page you happened to have open could spend your key.
 """
 
 from __future__ import annotations
@@ -130,6 +131,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._file(STATE / "pages" / path[len("/pages/"):])
         if path in ("/", "/index.html"):
             return self._file(SITE / "index.html")
+        if path == "/pit":                                  # the hosted site rewrites this; so do we
+            return self._file(SITE / "pit.html")
         return self._file(SITE / path.lstrip("/"))
 
     def do_OPTIONS(self) -> None:
@@ -144,9 +147,17 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_POST(self) -> None:
+        origin = self.headers.get("Origin")
+        if origin and origin not in self._own_origins():
+            return self._json({"error": "a run may only be started from this server's own page"}, 403)
         if self.path.split("?")[0] == "/api/run":
             return self._json(RUNNER.start())
         self._json({"error": "not found"}, 404)
+
+    def _own_origins(self) -> set[str]:
+        host = self.headers.get("Host") or ""
+        port = host.rpartition(":")[2] if ":" in host else "80"
+        return {f"http://{h}:{port}" for h in ("127.0.0.1", "localhost", "[::1]")} | {f"http://{host}"}
 
     def _file(self, p: Path) -> None:
         try:

@@ -142,7 +142,7 @@ console.log(`build: site-timeline/public/index.html ${(tlDoc.length / 1024).toFi
   fs.writeFileSync(path.join(siteDir, 'pit.js'), pitJs);
   const fonts = 'https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap';
   // inlined in a <script>, so the bundle must not contain the sequence that would close it
-  const pitInline = pitJs.replace(/<\/script/gi, '<\\/script');
+  const pitInline = pitJs.replace(/<\/script/gi, '<\\/script').replace(/<!--/g, '<\\!--');
   const pitDoc = `<!doctype html>
 <html lang="en">
 <head>
