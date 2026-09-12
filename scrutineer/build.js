@@ -23,7 +23,9 @@ if (fs.existsSync(bundlePath)) {
   // the blame matrix, so the page reports what was measured rather than what was written here
   for (const [file, global] of [['partition.json', 'SCRUTINEER_PARTITION'],
                                 ['sides.json', 'SCRUTINEER_SIDES'],
-                                ['bcb_compare.json', 'SCRUTINEER_BCB']]) {
+                                ['bcb_compare.json', 'SCRUTINEER_BCB'],
+                                ['bcb_scaling.json', 'SCRUTINEER_BCB_SCALING'],
+                                ['bcb_verdict.json', 'SCRUTINEER_VERDICT']]) {
     const f = path.join(root, 'loop', 'state', file);
     if (fs.existsSync(f)) loopJs += `window.${global} = ${fs.readFileSync(f, 'utf8')};\n`;
   }

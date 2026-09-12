@@ -248,7 +248,9 @@ function gates() {
   const r = st.rounds[st.i] || {};
   const rows = st.live.gates.length ? st.live.gates : (r.gates || []);
   host.textContent = '';
-  const NAMES = ['diff_size', 'comparable_ab', 'novelty', 'evidence', 'seesaw', 'correlation',
+  // A season recorded before the ladder existed has no row for it, and the chip stays unlit rather
+  // than claiming a pass that was never judged.
+  const NAMES = ['diff_size', 'comparable_ab', 'novelty', 'evidence', 'seesaw', 'ladder', 'correlation',
                  'regression', 'cost_cap', 'scrutineering', 'rl_entropy'];
   for (const name of NAMES) {
     const g = rows.find(x => x.gate === name);
@@ -349,28 +351,38 @@ function benchCard() {
   const B = window.SCRUTINEER_BCB;
   if (!B || !B.baseline || !B.loop) return '';
   const a = B.baseline, b = B.loop;
-  const worse = b.pass_at_1 < a.pass_at_1;
+  const S = window.SCRUTINEER_BCB_SCALING, V = window.SCRUTINEER_VERDICT;
+  const R = B.resolution || null;
+  // Colour is a claim. A difference the comparison could not resolve is drawn neutral, whichever
+  // way the point estimate leans — red for an unresolved dip reads as a measured regression.
+  const tone = (r, delta) => (!r || !r.resolved) ? 'even' : delta < 0 ? 'worse' : 'better';
   const pct = v => (v * 100).toFixed(1) + '%';
   const row = (label, d, cls) =>
     `<div class="bq-row ${cls}"><span class="bq-l">${esc(label)}</span>`
     + `<span class="bq-bar"><i style="width:${(d.pass_at_1 * 100).toFixed(1)}%"></i></span>`
-    + `<b>${pct(d.pass_at_1)}</b><span class="bq-n">${d.solved}/${B.n}</span></div>`;
+    + `<b>${pct(d.pass_at_1)}</b><span class="bq-n">${d.solved}/${d.n || B.n}</span></div>`;
+  const vsScale = V && V.loop_vs_scaling;
+  const t = tone(R, B.delta_pp);
   return `
     <section class="d-card">
       <h3>OUTSIDE CHECK<em>${esc(B.benchmark)} · held-out, never raced</em></h3>
       <div class="bq">
         ${row('harness it starts with', a, 'base')}
-        ${row('harness the loop kept', b, worse ? 'worse' : 'better')}
+        ${S ? row('same harness, one more draw', S, tone(V && V.scaling_vs_baseline, (V && V.scaling_vs_baseline || {}).delta_pp)) : ''}
+        ${row('harness the loop kept', b, t)}
         <div class="bq-foot">
-          <span class="bq-delta ${worse ? 'worse' : 'better'}">${B.delta_pp >= 0 ? '+' : ''}${B.delta_pp.toFixed(1)} pts</span>
+          <span class="bq-delta ${t}">${B.delta_pp >= 0 ? '+' : ''}${B.delta_pp.toFixed(1)} pts</span>
           <span>n = ${B.n}</span>
           <span>McNemar p = ${B.p_two_sided}</span>
           <span>+${B.fixed.length} / −${B.broken.length}</span>
+          ${R && R.mde_pp != null ? `<span>detects ≥ ${R.mde_pp} pts</span>` : ''}
+          ${R && R.n_star != null ? `<span>needs n = ${R.n_star}</span>` : ''}
         </div>
-        <p class="bq-read">${worse
-          ? 'The kept change cleared every gate on the practice and sealed splits, then lost ground '
-            + 'out of sample. Not significant at this n — the point estimate favours the baseline.'
-          : 'Measured on tasks the loop never saw in a race, a replay or a gate.'}</p>
+        <p class="bq-read">${esc(V ? V.headline : (R ? R.claim : ''))}${
+          vsScale ? ' · against one more draw: ' + esc(vsScale.claim) : ''}</p>
+        ${R && !R.resolved ? `<p class="bq-read">This comparison cannot resolve a difference smaller than
+          ${R.mde_pp} points, and it observed ${Math.abs(B.delta_pp).toFixed(1)}. The honest reading is
+          <b>unresolved</b> — not a regression, not a null.</p>` : ''}
       </div>
     </section>`;
 }
@@ -416,7 +428,7 @@ D.build = function () {
     </section>
 
     <section class="d-card span2">
-      <h3>GATES<em>all ten, in order, first failure stops it</em></h3>
+      <h3>GATES<em>all eleven, in order, first failure stops it</em></h3>
       <div class="d-gates" id="dGates"></div>
     </section>
 

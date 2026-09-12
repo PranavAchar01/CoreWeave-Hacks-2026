@@ -1,38 +1,6 @@
 {
   "benchmark": "BigCodeBench-Hard",
-  "n": 76,
-  "baseline": {
-    "harness": "starting",
-    "pass_at_1": 0.3289,
-    "solved": 25,
-    "cost_usd": 0.8395
-  },
-  "loop": {
-    "harness": "champion",
-    "pass_at_1": 0.2632,
-    "solved": 20,
-    "cost_usd": 0.9098
-  },
-  "delta_pp": -6.57,
-  "fixed": [
-    "bcb0302",
-    "bcb0502",
-    "bcb0678",
-    "bcb1003"
-  ],
-  "broken": [
-    "bcb0019",
-    "bcb0211",
-    "bcb0401",
-    "bcb0760",
-    "bcb0800",
-    "bcb0879",
-    "bcb0971",
-    "bcb0999",
-    "bcb1004"
-  ],
-  "p_two_sided": 0.26685,
-  "resolution": {
+  "loop_vs_baseline": {
     "n": 76,
     "fixed": 4,
     "broken": 9,
@@ -46,5 +14,12 @@
     "n_star_method": "Connor (1987) normal approximation for paired proportions",
     "q": 0.247,
     "claim": "unresolved: -6.6 pp, p=0.267, n=76; the smallest effect this comparison detects at 80 % power is 13.5 pp"
-  }
+  },
+  "cost_usd": {
+    "baseline": 0.8395,
+    "loop": 0.9098
+  },
+  "loop_vs_scaling": null,
+  "scaling_vs_baseline": null,
+  "headline": "unresolved"
 }

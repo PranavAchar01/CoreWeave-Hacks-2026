@@ -918,10 +918,11 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .bq-row.base .bq-bar i{background:var(--d-ink);opacity:.45}
 .bq-row.worse .bq-bar i{background:var(--d-bad);opacity:.6}
 .bq-row.better .bq-bar i{background:var(--d-good);opacity:.6}
+.bq-row.even .bq-bar i{background:var(--d-mute);opacity:.55}
 .bq-row b{text-align:right;font-size:13px;color:var(--d-ink)}
 .bq-n{text-align:right;color:var(--d-mute);font-size:9.5px}
 .bq-foot{display:flex;flex-wrap:wrap;gap:12px;padding-top:7px;border-top:1px solid var(--d-hair);
   font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--d-mute)}
 .bq-delta{font-size:12px;font-weight:600}
-.bq-delta.worse{color:var(--d-bad)}.bq-delta.better{color:var(--d-good)}
+.bq-delta.worse{color:var(--d-bad)}.bq-delta.better{color:var(--d-good)}.bq-delta.even{color:var(--d-mute)}
 .bq-read{margin:6px 0 0;font-size:11.5px;line-height:1.45;color:var(--d-mute)}

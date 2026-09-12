@@ -743,6 +743,7 @@ const NAME = { AERO: 'RETRIEVAL', DATA: 'VERIFICATION', TYRES: 'SAMPLING', POWER
 const WHY = { seesaw: 'the two splits disagreed', regression: 'it made the car slower', cost_cap: 'over the cost cap',
   scrutineering: 'black-flagged', diff_size: 'too big a change', comparable_ab: 'the A/B was not comparable',
   novelty: 'nothing new in it', evidence: 'not enough evidence', correlation: 'the splits did not track',
+  ladder: "inside the sealed split's own noise",
   rl_entropy: 'the model collapsed', 'debrief gate': 'the debrief did not clear' };
 const unchanged = r => r.rule_fired === 'no_upgrade' || r.rule_fired === 'circuit';
 const esc = s => String(s === undefined || s === null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
