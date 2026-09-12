@@ -9,6 +9,7 @@ Four backends, tried in order; whichever answers is named on the REGS panel:
 
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import os
 import resource
@@ -16,6 +17,8 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
+import uuid
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -26,6 +29,13 @@ from . import Backend
 _SANDBOX_TIMEOUT_S = int(os.environ.get("SCRUTINEER_SANDBOX_TIMEOUT_S", "20"))
 _MEM_LIMIT_BYTES = 512 * 1024 * 1024
 
+
+
+def _kill_container(name: str) -> None:
+    """Stop a sandbox the client gave up on. Best effort and bounded: a daemon too wedged to answer
+    in 20 s is not something a benchmark run can fix, and hanging here would stall the lap."""
+    with contextlib.suppress(subprocess.TimeoutExpired, OSError):
+        subprocess.run(["docker", "kill", name], capture_output=True, timeout=20)
 
 @dataclass(frozen=True)
 class RunResult:
@@ -178,14 +188,30 @@ class SandboxRail:
                 # and CPU all still hold.
                 image = os.environ.get("SCRUTINEER_SANDBOX_IMAGE", "python:3.13-slim")
                 mem = os.environ.get("SCRUTINEER_SANDBOX_MEMORY", "512m")
+                # The timeout is enforced twice, because the host-side one alone does not stop
+                # anything. subprocess.run's timeout kills the `docker run` *client*; the container
+                # it started keeps running, and --rm only removes it after it exits. Each orphan
+                # holds its CPUs and memory, so the next sandboxes starve and time out too, and a
+                # benchmark run spirals: 24 live containers, some an hour old against a 180 s
+                # limit, and every grade taken under starvation. So the program is killed inside
+                # the container by `timeout`, and the container is killed by name from outside
+                # if the client still has to give up on it.
+                name = f"scrutineer-{uuid.uuid4().hex[:12]}"
+                started = time.monotonic()
                 p = subprocess.run(
-                    ["docker", "run", "--rm", "--network", "none", "--memory", mem,
+                    ["docker", "run", "--rm", "--name", name, "--network", "none", "--memory", mem,
                      "--cpus", "2", "-v", f"{d}:/w:ro", image,
-                     "python", "/w/prog.py"],
+                     "timeout", "-s", "KILL", str(int(_SANDBOX_TIMEOUT_S)), "python", "/w/prog.py"],
                     capture_output=True, text=True, timeout=_SANDBOX_TIMEOUT_S + 10,
                 )
+                # 137 is SIGKILL, which the in-container timeout sends — and so does the kernel when
+                # --memory is exceeded. Only a run that lasted to the limit is called a timeout; an
+                # early kill is reported as the failure it was.
+                if p.returncode == 137 and time.monotonic() - started >= _SANDBOX_TIMEOUT_S - 1:
+                    return RunResult(124, p.stdout, p.stderr or "timeout", "docker", timed_out=True)
                 return RunResult(p.returncode, p.stdout, p.stderr, "docker")
             except subprocess.TimeoutExpired:
+                _kill_container(name)
                 return RunResult(124, "", "timeout", "docker", timed_out=True)
 
     def _local(self, program: str) -> RunResult:
