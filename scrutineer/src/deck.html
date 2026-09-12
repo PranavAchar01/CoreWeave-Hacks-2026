@@ -30,8 +30,7 @@
       </div>
     </div>
   </div></div>
-  <aside class="say" hidden>Scrutineer is an agent that rebuilds its own harness, and we draw that harness as a race car so you can watch it change. We built it here at CoreWeave Hacks: Agent Loops, a whole weekend about the loop.
-It starts from the same idea as Andrej Karpathy's autoresearch: there, an agent edits one training file, trains for a fixed five minutes, checks a single metric and keeps or discards the change, about a hundred experiments a night. Our version runs on Weights &amp; Biases: the model, the traces, the runs and the registry.</aside>
+  <aside class="say" hidden>Scrutineer is an agent that rebuilds its own harness, and we draw that harness as a race car so you can watch it change. We built it at CoreWeave Hacks: Agent Loops. It starts from the same idea as Andrej Karpathy's autoresearch: there, an agent edits one training file, trains for a fixed five minutes, checks a single metric and keeps or discards the change, about a hundred experiments a night. Every tool in our loop sits behind an adapter that reports which backend actually served it, and scrutineer doctor prints that table.</aside>
 </section>
 
 <!-- 02 · paragraphs 3–4 -->
@@ -56,8 +55,7 @@ It starts from the same idea as Andrej Karpathy's autoresearch: there, an agent 
       <p class="cap mid">Run 4, as the agent built them from written briefs.</p>
     </div>
   </div></div>
-  <aside class="say" hidden>We point that loop at the agent's own scaffolding instead of a model. When the model itself is the part worth changing, W&amp;B Serverless RL is one command away: it registers a real LoRA job and collects rollouts through the trainer's own client.
-Every run, the agent builds twenty real web interfaces from written briefs. It builds them on W&amp;B Inference: open models, OpenAI-compatible, nothing to host.</aside>
+  <aside class="say" hidden>We point that loop at the agent's own scaffolding instead of a model. The model's weights have a separate path: scrutineer train registers a LoRA job on W&amp;B Serverless RL through ART's serverless backend. Our job registered but trained zero steps, because every rollout group got the same reward. Every run, the agent builds twenty real web interfaces from written briefs. Its model calls go through one interface whose default backend is W&amp;B Inference's OpenAI-compatible endpoint; the recorded season ran that interface on Anthropic's API.</aside>
 </section>
 
 <!-- 03 · paragraphs 5–6 -->
@@ -84,8 +82,7 @@ Every run, the agent builds twenty real web interfaces from written briefs. It b
       <div class="gatecard"><span data-icon="ladder" data-c="black" data-s="56"></span><div><b>OUR GATE: LADDER</b><br><span>a gain on the sealed split must clear the split's own noise</span></div></div>
     </div>
   </div></div>
-  <aside class="say" hidden>Each page is audited for accessibility with axe-core and timed twice: once on a practice split the agent can see, and once on a sealed held-out split it never sees. Both timings land in the Weave Evals tab, which is where our gates read them.
-That seal matters because an agent that keeps checking against the same test starts to learn the test. That is exactly the problem Blum and Hardt's Ladder and Dwork and colleagues' reusable holdout were built to solve, and one of our gates is a Ladder. A seal needs isolation, and W&amp;B Sandboxes are built for exactly that: the agent's own code, kept out of process.</aside>
+  <aside class="say" hidden>Each page is audited for accessibility with axe-core and timed twice: once on a practice split the agent can see, and once on a sealed held-out split it never sees. The evaluator logs every race to the Weave Evals tab, one row per task, with the same scores the gates read. That seal matters because an agent that keeps checking against the same test starts to learn the test. That is exactly the problem Blum and Hardt's Ladder and Dwork and colleagues' reusable holdout were built to solve, and one of our gates is a Ladder. Code the agent writes is tested in the first isolated backend that answers: CoreWeave and W&amp;B Sandboxes first, then Docker with no network. Managed sandboxes aren't enabled for our account, so ours ran in Docker.</aside>
 </section>
 
 <!-- 04 · paragraphs 7–9 -->
@@ -108,9 +105,7 @@ That seal matters because an agent that keeps checking against the same test sta
       <div class="cite goldrule"><b>MEMORY · LIKE REFLEXION, NEURIPS 2023</b><strong>RECORDS FINDINGS FOR NEXT TIME</strong><span id="mem4"></span></div>
     </div>
   </div></div>
-  <aside class="say" hidden>Autoresearch judges a whole run by one number. Scrutineer instead traces every failing page back to the one component that caused it, much as TextGrad sends feedback back to individual parts of a compound AI system. That only works because W&amp;B Weave traces every step: build, audit, replay, blame and gate.
-There are ten components: retrieval, the model, sampling, verification, curriculum, the proposer, budget, audit, memory and deploy. Each one gets its own W&amp;B run, so the credit it earns is a curve you can open, not a number buried in a log.
-Curriculum picks practice tasks, like Voyager's automatic curriculum, and memory records findings for next time, the way Reflexion keeps its reflections. Every generation, memory writes its debrief as a marimo notebook: something you can run, not just read.</aside>
+  <aside class="say" hidden>Autoresearch judges a whole run by one number. Scrutineer instead traces every failing page back to the one component that caused it, much as TextGrad sends feedback back to individual parts of a compound AI system. Every model call and feedback row goes to a local append-only store and is mirrored to W&amp;B Weave, so the build, audit, replay and blame steps can be inspected there. There are ten components: retrieval, the model, sampling, verification, curriculum, the proposer, budget, audit, memory and deploy. After a season, scrutineer runs writes one W&amp;B run per component per round, with its blame and whether its change moved the held-out score. Curriculum picks practice tasks, like Voyager's automatic curriculum, and memory records findings for next time, the way Reflexion keeps its reflections. Each generation, memory also writes its debrief as a marimo notebook.</aside>
 </section>
 
 <!-- 05 · paragraphs 10–11 -->
@@ -138,8 +133,7 @@ Curriculum picks practice tasks, like Voyager's automatic curriculum, and memory
       </div>
     </div>
   </div></div>
-  <aside class="say" hidden>The loop picks the component with the best expected gain per dollar, and that component writes a change to itself. The credit router makes that call as typed decisions through TypeSafe System1, so there is no free-text guesswork.
-Sakana AI's Darwin Gödel Machine made the same move when it rewrote its own code and raised its SWE-bench score from 20 to 50 percent. Our archive of agents lives in W&amp;B Registry, where every harness version is registered.</aside>
+  <aside class="say" hidden>The loop picks the component with the best expected gain per dollar, and that component writes a change to itself. The loop's typed decisions go through one endpoint whose first backend is TypeSafe System1; the recorded season had no TypeSafe key, so a local policy answered. Sakana AI's Darwin Gödel Machine made the same move when it rewrote its own code and raised its SWE-bench score from 20 to 50 percent. Our version of its archive is W&amp;B Registry, where every component version is linked to the version it came from.</aside>
 </section>
 
 <!-- 06 · paragraphs 12–13 -->
@@ -157,8 +151,7 @@ Sakana AI's Darwin Gödel Machine made the same move when it rewrote its own cod
       <div class="panel"><div class="h3 gold">SCRUTINEER · A SIGNED LEDGER</div><p class="cap" style="margin-top:10px">Each row carries the hash of the row before it and an Ed25519 signature. Nothing else in the loop can append.</p></div>
     </div>
   </div></div>
-  <aside class="say" hidden>The change then has to clear a set of gates, including size, novelty, evidence, regression, a check that both splits agree, and cost. The last gate is a marimo notebook that has to reproduce the promotion decision; if it can't, the change is refused.
-It is kept only if every gate passes, and every kept change is written to a signed ledger, our version of autoresearch's experiment log and the Darwin Gödel Machine's archive of agents. Every generation, kept or refused, is also reported to the ARIA board.</aside>
+  <aside class="say" hidden>The change then has to clear a set of gates, including size, novelty, evidence, regression, a check that both splits agree, and cost. It also has to pass its marimo debrief: the notebook must pass marimo check, run as a script and reproduce the promotion decision. It is kept only if every gate passes, and every kept change is written to a signed ledger, our version of autoresearch's experiment log and the Darwin Gödel Machine's archive of agents. After each attended generation, the loop asks ARIA which component's changes moved the held-out score, writes the answer into the next round's hypothesis, and records whether ARIA agrees with the ledger.</aside>
 </section>
 
 <!-- 07 · paragraphs 14–15 -->
@@ -178,18 +171,17 @@ It is kept only if every gate passes, and every kept change is written to a sign
       <p class="cap">Across the line when the run is decided. Pop the card out and it floats over every app.</p>
     </div>
   </div></div>
-  <aside class="say" hidden>On the car, wings are retrieval, the floor is verification and tyre compound is sampling, so a kept change visibly rebuilds the car. Each version is registered in W&amp;B Registry under an alias, so the car that raced is the car that was promoted.
-Where the car sits on the lap shows how far the current run has got. From Inference to Weave, that's the Weights &amp; Biases stack under the car, and W&amp;B has been part of CoreWeave since 2025.</aside>
+  <aside class="say" hidden>On the car, wings are retrieval, the floor is verification and tyre compound is sampling, so a kept change visibly rebuilds the car. When a change is kept, the champion alias in W&amp;B Registry moves to the new version, and only the auditor is allowed to move it, so the next race always uses the promoted version. Where the car sits on the lap shows how far the current run has got.</aside>
 </section>
 
 <!-- 08 · paragraph 16 -->
 <section class="slide" data-partner="8" data-kick="THE PIT WALL · OUR PARTNERS">
   <div class="s-body"><div class="s16">
-    <div class="s16-head"><h2 class="big" style="font-size:54px;line-height:72px">THE CAR RUNS<br>ON <em>THEIR PARTS</em></h2>
-      <p class="lead">Ten partners, ten jobs on the pit wall. Every one of them is wired into the loop and reported by <code>scrutineer doctor</code>.</p></div>
+    <div class="s16-head"><h2 class="big" style="font-size:54px;line-height:72px">HOW EACH TOOL<br>IS <em>WIRED IN</em></h2>
+      <p class="lead">Each one sits behind an adapter that reports which backend served it, and <code>scrutineer doctor</code> prints the table. Status is from the recorded season.</p></div>
     <div class="wall" id="wall16"></div>
   </div></div>
-  <aside class="say" hidden>None of this laps without our pit wall. CoreWeave hosted the weekend. Weights &amp; Biases gave the car its engine with Inference, its telemetry with Weave, its timing with Runs, its homologation with Registry, its wind tunnel with Serverless RL and its parc fermé with Sandboxes. ARIA is race control, TypeSafe System1 is the team radio, and marimo is the debrief room. Thank you.</aside>
+  <aside class="say" hidden>Thank you to CoreWeave for hosting, and to Weights &amp; Biases, ARIA, TypeSafe and marimo for the tools wired into the loop.</aside>
 </section>
 
 <div class="progress" id="progress"></div>

@@ -30,28 +30,29 @@ const HUE = { AERO: 'cyan', POWER_UNIT: 'red', TYRES: 'amber', DATA: 'green', SI
 const GATE = { diff_size: 'SIZE', comparable_ab: 'FAIR A/B', novelty: 'NOVELTY', evidence: 'EVIDENCE', seesaw: 'SPLITS AGREE',
   correlation: 'CORRELATION', regression: 'REGRESSION', cost_cap: 'COST', scrutineering: 'SCRUTINEER', rl_entropy: 'RL ENTROPY', ladder: 'LADDER' };
 const NAMED = new Set(['diff_size', 'novelty', 'evidence', 'regression', 'seesaw', 'cost_cap']);
-// the partners whose parts each slide runs on (the band), and all ten on the closing wall
+// the partners each slide's paragraphs describe (the band), and how all of them are wired in (the wall)
 const PARTNER = {
-  1: { chips: [['COREWEAVE HACKS', 'cyan'], ['WEIGHTS & BIASES', 'gold']], line: 'Built at CoreWeave Hacks, running on W&B from model to registry.' },
-  2: { chips: [['W&B SERVERLESS RL', 'gold'], ['W&B INFERENCE', 'gold']], line: 'Every page built on W&B Inference; a real LoRA job one command away.' },
-  3: { chips: [['W&B WEAVE EVALS', 'gold'], ['W&B SANDBOXES', 'amber']], line: 'Both timings land in Weave Evals; Sandboxes keep the agent’s code isolated.' },
-  4: { chips: [['W&B WEAVE', 'gold'], ['W&B RUNS', 'gold'], ['MARIMO', 'green']], line: 'Every step traced, a run per component, memory as a marimo notebook.' },
-  5: { chips: [['TYPESAFE SYSTEM1', 'purple'], ['W&B REGISTRY', 'gold']], line: 'Typed decisions for the credit router; every harness version registered.' },
-  6: { chips: [['MARIMO', 'green'], ['ARIA', 'cyan']], line: 'A marimo notebook must reproduce each promotion; ARIA sees every generation.' },
-  7: { chips: [['W&B REGISTRY', 'gold'], ['W&B · A COREWEAVE COMPANY', 'cyan']], line: 'What raced is what was promoted. W&B: part of CoreWeave since 2025.' },
-  8: { chips: [['OUR PIT WALL', 'gold']], line: 'None of this laps without them. Thank you.' },
+  1: { chips: [['COREWEAVE HACKS', 'cyan']], line: 'Built at CoreWeave Hacks. Every tool reports which backend actually served it.' },
+  2: { chips: [['W&B SERVERLESS RL', 'gold'], ['W&B INFERENCE', 'gold']], line: 'Inference: default model backend. Serverless RL: registered, 0 steps trained.' },
+  3: { chips: [['W&B WEAVE EVALS', 'gold'], ['W&B SANDBOXES', 'amber']], line: 'Races logged to Weave Evals. Tests ran in Docker; Sandboxes not enabled.' },
+  4: { chips: [['W&B WEAVE', 'gold'], ['W&B RUNS', 'gold'], ['MARIMO', 'green']], line: 'Calls mirrored to Weave, a W&B run per component, a marimo debrief per round.' },
+  5: { chips: [['TYPESAFE SYSTEM1', 'purple'], ['W&B REGISTRY', 'gold']], line: 'TypeSafe: first typed-decision backend. Registry: each version and its parent.' },
+  6: { chips: [['MARIMO', 'green'], ['ARIA', 'cyan']], line: 'The marimo debrief must reproduce the decision. ARIA is asked each round.' },
+  7: { chips: [['W&B REGISTRY', 'gold']], line: 'When a change is kept, the champion alias moves to the new version.' },
+  8: { chips: [['OUR PARTNERS', 'gold']], line: 'CoreWeave, Weights & Biases, ARIA, TypeSafe and marimo. Thank you.' },
 };
+// live: served in the recorded season; part: wired, but something else served or it did not complete
 const WALL = [
-  { name: 'COREWEAVE', role: 'TITLE HOST', hue: 'cyan', says: 'The hackathon this loop was built for, and the home of W&B since 2025.' },
-  { name: 'W&B INFERENCE', role: 'ENGINE SUPPLIER', hue: 'gold', says: 'The model behind the pages. Open models, OpenAI-compatible, nothing to self-host.' },
-  { name: 'W&B WEAVE', role: 'TELEMETRY', hue: 'gold', says: 'Every build, audit, replay, blame and gate traced. Nothing the car does goes unseen.' },
-  { name: 'W&B RUNS', role: 'TIMING', hue: 'gold', says: 'A run per component: credit you can open as a curve, not dig out of a log.' },
-  { name: 'W&B REGISTRY', role: 'HOMOLOGATION', hue: 'gold', says: 'Every harness version registered with an alias. What raced is what was promoted.' },
-  { name: 'W&B SERVERLESS RL', role: 'WIND TUNNEL', hue: 'gold', says: 'A real LoRA job registered from one command, rollouts through the trainer’s own client.' },
-  { name: 'W&B SANDBOXES', role: 'PARC FERME', hue: 'amber', says: 'Built for exactly what a seal needs: the agent’s own code, isolated.' },
-  { name: 'ARIA', role: 'RACE CONTROL', hue: 'cyan', says: 'The board every generation reports to, kept or refused.' },
-  { name: 'TYPESAFE SYSTEM1', role: 'TEAM RADIO', hue: 'purple', says: 'Typed decisions for the pit wall, the credit router and the gates.' },
-  { name: 'MARIMO', role: 'DEBRIEF ROOM', hue: 'green', says: 'A notebook that must reproduce every promotion. If it cannot, the change is refused.' },
+  { name: 'COREWEAVE', status: 'HOST', live: true, hue: 'cyan', says: 'Hosted CoreWeave Hacks: Agent Loops. W&B has been part of CoreWeave since 2025.' },
+  { name: 'W&B INFERENCE', status: 'DEFAULT BACKEND', live: false, hue: 'gold', says: 'OpenAI-compatible client to api.inference.wandb.ai. The recorded season ran on Anthropic.' },
+  { name: 'W&B WEAVE', status: 'LIVE', live: true, hue: 'gold', says: 'Every call and feedback row mirrored from the local store; each race logged as Evals rows.' },
+  { name: 'W&B RUNS', status: 'LIVE', live: true, hue: 'gold', says: 'One run per component per round: its blame, and whether its change moved the score.' },
+  { name: 'W&B REGISTRY', status: 'LIVE', live: true, hue: 'gold', says: 'Each version linked to its parent. Only the auditor moves the champion alias.' },
+  { name: 'W&B SERVERLESS RL', status: 'REGISTERED · 0 STEPS', live: false, hue: 'gold', says: 'scrutineer train, through ART’s serverless backend. Every rollout group had the same reward.' },
+  { name: 'W&B SANDBOXES', status: 'NOT ENABLED', live: false, hue: 'amber', says: 'Tried first for hidden tests. Not enabled for our account, so tests ran in Docker, no network.' },
+  { name: 'ARIA', status: 'CONNECTED', live: true, hue: 'cyan', says: 'Asked after each attended generation which change moved the score; seeds the next hypothesis.' },
+  { name: 'TYPESAFE SYSTEM1', status: 'LOCAL POLICY SERVED', live: false, hue: 'purple', says: 'First backend for typed decisions. No key in the recorded season, so a local policy answered.' },
+  { name: 'MARIMO', status: 'LIVE', live: true, hue: 'green', says: 'A notebook per generation that must pass marimo check, run, and reproduce the promotion.' },
 ];
 
 // ---------- pixel icons: 12×12 drawings, X = colour, o = white ----------
@@ -124,7 +125,7 @@ function build() {
     }
   });
   const wall = $('wall16');
-  if (wall) wall.innerHTML = WALL.map(w => `<div class="partner" style="--h:var(--${w.hue})"><span class="lbl">${esc(w.role)}</span><b>${esc(w.name)}</b><p>${esc(w.says)}</p></div>`).join('');
+  if (wall) wall.innerHTML = WALL.map(w => `<div class="partner" style="--h:var(--${w.hue})"><span class="lbl ${w.live ? 'green' : 'amber'}">${esc(w.status)}</span><b>${esc(w.name)}</b><p>${esc(w.says)}</p></div>`).join('');
   document.querySelectorAll('[data-icon]').forEach(n => { n.outerHTML = icon(n.dataset.icon, n.dataset.c || 'gold', +(n.dataset.s || 72)); });
 
   // 01: a night of experiments, about twelve an hour for eight hours
