@@ -145,6 +145,15 @@ TS.create = function (o) {
     }
     const shape = d.shape || {};
 
+    // How far behind the ghost is along the lap, and therefore how much room the shot needs.
+    let pair = 0;
+    if (sc.ghostActive && sc.ghost) {
+      let gd = car.s - sc.ghost.s;
+      if (gd > circ.len / 2) gd -= circ.len; if (gd < -circ.len / 2) gd += circ.len;
+      if (gd > 0 && gd < 95) pair = gd;          // close enough that both fit in one frame
+    }
+    sc.pair = pair;
+
     const i = Math.floor(car.s / circ.step), a = circ.at(i);
     // Low-pass the track's own tangent and curvature before anything is framed against them.
     const f = sc.filt, head = Math.atan2(a.tx, a.tz);
@@ -157,9 +166,12 @@ TS.create = function (o) {
     if (mode === 'TV') { const k = tvPick(); if (k < 0) mode = 'CHASE'; else sc.activeTV = k; }
 
     if (mode === 'CHASE') {
-      const dist = shape.dist || 8.4, sw = (shape.swing || 26) * f.curv;
-      px_ = car.x - tx * dist - nx * sw; py_ = shape.height || 3.2; pz_ = car.z - tz * dist - nz * sw;
-      tx_ = car.x + tx * (shape.ahead || 4.5); ty_ = 0.75; tz_ = car.z + tz * (shape.ahead || 4.5);
+      // Back off and lift by however far the ghost is adrift, and aim between the two, so the
+      // separation is the subject of the shot rather than something happening off camera.
+      const dist = (shape.dist || 8.4) + pair * 0.95, sw = (shape.swing || 26) * f.curv;
+      px_ = car.x - tx * dist - nx * sw; py_ = (shape.height || 3.2) + pair * 0.18; pz_ = car.z - tz * dist - nz * sw;
+      const aim = (shape.ahead || 4.5) - pair * 0.5;
+      tx_ = car.x + tx * aim; ty_ = 0.75; tz_ = car.z + tz * aim;
       fov = shape.fov || 42; lag = shape.lag || 7;
     } else if (mode === 'STUDIO') {
       const ang = E.time * 0.5 + sc.orbit, rr = 5.4;
@@ -170,9 +182,10 @@ TS.create = function (o) {
       tx_ = car.x + tx * 40; ty_ = 0.6; tz_ = car.z + tz * 40;
       fov = shape.fov || 66; lag = shape.lag || 40;
     } else if (mode === 'HELI') {
-      const side = circ.outside(i), back = shape.back || 22, off = (shape.side || 16);
-      px_ = car.x - tx * back - nx * side * off; py_ = shape.height || 34; pz_ = car.z - tz * back - nz * side * off;
-      tx_ = car.x + tx * 8; ty_ = 0; tz_ = car.z + tz * 8;
+      const side = circ.outside(i), back = (shape.back || 22) + pair * 0.6, off = (shape.side || 16);
+      px_ = car.x - tx * back - nx * side * off; py_ = (shape.height || 34) + pair * 0.25; pz_ = car.z - tz * back - nz * side * off;
+      const aim = 8 - pair * 0.45;
+      tx_ = car.x + tx * aim; ty_ = 0; tz_ = car.z + tz * aim;
       fov = shape.fov || 38; lag = shape.lag || 3;
     } else if (mode === 'APEX') {
       const p = shape.anchor;
@@ -218,6 +231,9 @@ TS.create = function (o) {
     if (sc.ghostActive && sc.ghost && meshes.ghost) R.drawDynamic(meshes.ghost, SCR.car.makeXform(sc.ghost), 'ghost', 0);
     R.drawDynamic(meshes.car, xf, 'solid', 0); SCR.sim.drawSparks(R, sc.fx); R.outline();
   };
+  // Called when the two cars are put back on the line together: cut to the shot that shows one
+  // pulling away from the other.
+  sc.duel = () => { if (sc.mode === 'AUTO') callShot(rng() < 0.6 ? 'CHASE' : 'HELI'); };
   sc.setMode = m => { if (TS.MODES.includes(m)) { sc.mode = m; if (m !== 'AUTO' && m !== 'STUDIO') callShot(m); else sc.dir.t = 0; } };
   sc.cut = () => callShot();
   return sc;

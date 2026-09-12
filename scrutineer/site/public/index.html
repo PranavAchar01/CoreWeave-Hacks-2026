@@ -288,7 +288,9 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   font-family:"Press Start 2P","Courier New",monospace;font-size:7px;text-transform:uppercase}
 .app:not(.race) .rhud{display:none}
 
-.rh-tl{position:absolute;left:14px;top:14px;display:flex;align-items:center;gap:8px}
+.rh-tl{position:absolute;left:14px;top:14px;display:flex;flex-direction:column;
+  align-items:flex-start;gap:5px;max-width:340px}
+.rh-tl-top{display:flex;align-items:center;gap:8px}
 .rh-live{background:var(--red);color:var(--white);padding:5px 7px;letter-spacing:.5px}
 .rh-live.held{background:var(--mid)}
 .rh-circuit{background:rgba(6,8,26,.86);color:var(--caption);padding:5px 8px;letter-spacing:.5px}
@@ -310,6 +312,7 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .rh-row.rh-hero{background:rgba(18,26,74,.55)}
 .rh-row.rh-hero>b{font-size:23px;line-height:17px;color:var(--gold)}
 .rh-row.rh-hero>i.good{color:var(--green)}.rh-row.rh-hero>i.bad{color:var(--red)}
+.rh-row.rh-gap>b{color:var(--cyan)}.rh-row.rh-gap>b.behind{color:var(--red)}
 .rh-row.clean>b{color:var(--green)}
 .rh-row>b.blame{color:var(--amber);font-size:15px}
 .rh-phase{align-self:flex-end;background:var(--gold);color:var(--ink);padding:6px 9px;
@@ -351,8 +354,48 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .rh-cell.no{background:rgba(227,30,45,.22);border-bottom-color:var(--red)}
 .rh-cell.now{outline:2px solid var(--gold);outline-offset:-2px}
 
-@media (max-width:900px){.rh-tr{width:172px}.rh-br{display:none}}
-@media (max-height:560px){.rh-strip,.rh-bl{display:none}}
+/* What is different about the agent since run 1. Quiet by design — the same weight as the
+   circuit name above it, and it only says the components that actually changed. */
+.rh-since{background:rgba(6,8,26,.72);padding:6px 8px;border-left:2px solid var(--studio);
+  display:flex;flex-direction:column;gap:3px;font-size:6px;letter-spacing:.3px;color:var(--mid)}
+.rh-since .s-it{color:var(--caption)}
+.rh-since .s-line{display:grid;grid-template-columns:52px minmax(0,1fr);gap:7px;align-items:baseline;
+  font-family:"VT323","Courier New",monospace;font-size:15px;line-height:14px;text-transform:none}
+.rh-since .s-line>span{font-family:"Press Start 2P","Courier New",monospace;font-size:6px;
+  color:var(--mid);text-transform:uppercase}
+.rh-since .s-line>b{color:var(--caption);font-weight:400;font-variant-numeric:tabular-nums;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rh-since .s-line>b em{font-style:normal;color:var(--green)}
+.rh-since .s-line>b i{font-style:normal;color:var(--mid)}
+.rh-since .s-parts>b{color:var(--caption);white-space:normal;overflow:visible;line-height:16px}
+.rh-since .s-parts>b b{color:var(--gold)}
+
+/* The lap bar: the caption reads the interface in progress, the cells answer on hover. */
+.rh-lapbar{position:absolute;left:14px;right:14px;bottom:14px;display:flex;flex-direction:column;gap:4px}
+.rh-cap{font-size:7px;letter-spacing:.4px;color:var(--mid);height:9px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rh-cap b{color:var(--caption)}
+.rh-cap .ok{color:var(--green)}
+.rh-cap .no{color:var(--red)}
+.rh-cap .why{color:var(--amber)}
+.rh-strip{position:static;display:flex;gap:2px;align-items:stretch;height:18px}
+.rh-cell{pointer-events:auto;cursor:default}
+.rh-cell:hover{filter:brightness(1.7)}
+
+.rh-tip{position:absolute;z-index:6;pointer-events:none;max-width:280px;
+  background:rgba(6,8,26,.96);border:1px solid var(--mid);padding:7px 9px;
+  display:flex;flex-direction:column;gap:4px}
+.rh-tip .t-head{font-size:7px;color:var(--white);letter-spacing:.4px}
+.rh-tip .t-verdict{font-size:7px}
+.rh-tip .t-verdict.ok{color:var(--green)}.rh-tip .t-verdict.no{color:var(--red)}
+.rh-tip .t-rule{font-family:"VT323","Courier New",monospace;font-size:15px;line-height:15px;
+  color:var(--caption);text-transform:none}
+.rh-tip .t-rule i{font-style:normal;color:var(--amber)}
+.rh-tip .t-file{font-family:"VT323","Courier New",monospace;font-size:14px;line-height:14px;
+  color:var(--mid);text-transform:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+@media (max-width:900px){.rh-tr{width:172px}.rh-br{display:none}.rh-since{display:none}}
+@media (max-height:560px){.rh-lapbar,.rh-bl{display:none}}
 
 
 
@@ -779,8 +822,13 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
              invented numbers are the car's speed and gear, which are the car, not a result. -->
         <div class="rhud" id="raceHud">
           <div class="rh-tl">
-            <span class="rh-live" id="rhLive">LIVE</span>
-            <span class="rh-circuit" id="rhCircuit"></span>
+            <div class="rh-tl-top">
+              <span class="rh-live" id="rhLive">LIVE</span>
+              <span class="rh-circuit" id="rhCircuit"></span>
+            </div>
+            <!-- The iteration, and what is actually different about the agent since run 1.
+                 Deliberately quiet: there to be read, not to be announced. -->
+            <div class="rh-since" id="rhSince" hidden></div>
           </div>
 
           <div class="rh-tr">
@@ -792,6 +840,7 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
               <div class="rh-row rh-hero"><span>HELD-OUT</span><b id="rhScore">&mdash;</b><i id="rhDelta"></i></div>
               <div class="rh-row"><span>HARNESS</span><b id="rhHarness">L10</b></div>
               <div class="rh-row" id="rhBlameRow" hidden><span>BLAMED</span><b id="rhBlame"></b></div>
+              <div class="rh-row rh-gap" id="rhGapRow" hidden><span>VS RUN 1</span><b id="rhGap"></b></div>
             </div>
             <div class="rh-phase" id="rhPhase">BUILDING</div>
           </div>
@@ -804,8 +853,13 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 
           <div class="rh-br" id="rhGates" hidden></div>
 
-          <!-- Laps, as the thing a lap actually is here: one interface, built and audited. -->
-          <div class="rh-strip" id="rhStrip"></div>
+          <!-- Laps, as the thing a lap actually is here: one interface, built and audited.
+               The caption names the one in progress; every cell answers for itself on hover. -->
+          <div class="rh-lapbar">
+            <div class="rh-cap" id="rhCap"></div>
+            <div class="rh-strip" id="rhStrip"></div>
+          </div>
+          <div class="rh-tip" id="rhTip" hidden></div>
         </div>
         <!-- The only thing that ever interrupts the race: the loop kept a change, and the
              garage is where you can go and look at it. Nothing moves until you press it. -->
@@ -6504,6 +6558,9 @@ C.makeXform = function (c, opts = {}) {
 const E = SCR.engine, M = E.M, Wd = SCR.world = {};
 const { box, Q, T } = E;
 const ROAD_W = Wd.ROAD_W = 6;
+// How full the grandstands are drawn, 0..1. build() sets it from opts.detail, so a circuit
+// early in the season is a half-empty Thursday and a late one is a full house.
+Wd.crowdFill = 0.8;
 Wd.makeCircuit = function (seed) {
   const rng = E.mulberry32(seed);
   // Layout character, drawn from the seed: how many corners it is built from, how stretched the
@@ -6555,13 +6612,20 @@ Wd.circuitName = seed => `${NAMES[Math.abs(seed) % NAMES.length]} LAYOUT ${Strin
 E.hooks[M.CROWD] = function (mx, my, mz, a) {
   const sg = E.signs[a]; if (!sg) return M.STAND; const [u, v] = E.signUV(sg, mx, my, mz);
   const cx = Math.floor(u / 0.48), cy = Math.floor(v / 0.42), h = E.hash2(cx, cy);
-  if (v > 0.1 && h > 0.2) { const wave = Math.sin(E.time * 2.2 + cx * 0.35) > 0.85 ? 0.35 : 0, hh = E.hash2(cx + 7, cy + 3) + wave;
+  if (v > 0.1 && h > (1 - Wd.crowdFill)) { const wave = Math.sin(E.time * 2.2 + cx * 0.35) > 0.85 ? 0.35 : 0, hh = E.hash2(cx + 7, cy + 3) + wave;
     return hh < 0.2 ? M.BODY : hh < 0.34 ? M.STRIPE : hh < 0.44 ? M.GOLD : hh < 0.56 ? M.CYAN : hh < 0.86 ? M.NAVY : M.PURPLE; }
   return M.STAND;
 };
 // build(circuit, opts) -> { mesh, lightpools, tvcams, circuit }
 Wd.build = function (c, opts = {}) {
   const cp = c.pts, cn = c.n, at = c.at, pos = c.pos, outside = c.outside, geomInside = c.geomInside, clearOfTrack = c.clearOfTrack;
+  // 0 is a bare circuit on a quiet evening; 1 is a full house under lights. The broadcast
+  // raises it as the harness levels up, so the season visibly grows around the car.
+  const detail = Math.max(0, Math.min(1, opts.detail === undefined ? 1 : opts.detail));
+  const STAND_ROWS = 4 + Math.round(detail * 5);          // 4..9 rows of seats
+  const STAND_CAP = 1 + Math.round(detail * 3);           // 1..4 grandstands
+  const LIGHTS = 5 + Math.round(detail * 9);              // 5..14 floodlight towers
+  Wd.crowdFill = 0.32 + detail * 0.52;
   const maxInside = i => 0.85 / Math.max(Math.abs(at(i).curv), 1e-4), safeOff = (i, side, w) => (side === geomInside(i)) ? Math.min(w, maxInside(i)) : w;
   const LIGHTPOOLS = [], TVCAMS = [], signs = E.signs, tris = () => E.current();
   E.begin(); E.setGroup(0); E.setAux(0);
@@ -6601,7 +6665,7 @@ Wd.build = function (c, opts = {}) {
   const segSign = (k, side, w, y0, y1, text, u0, cell, fg, bg) => { const t = at(k), A = pos(k, side * w, y0); E.setAux(signs.length); signs.push({ text, o: A, r: [t.tx, 0, t.tz], u: [0, 1, 0], cell, fg, bg, u0 }); segWall(k, side, w, y0, y1, M.SIGN); E.setAux(0); };
   const teamName = opts.teamName || 'SCRUTINEER';
   const placeStand = (i0, len, side) => {
-    const rows = 7;
+    const rows = STAND_ROWS;
     for (let k = i0; k < i0 + len; k++) {
       const t = at(k);
       for (let r = 0; r < rows; r++) { const w0 = ROAD_W + 15 + r * 1.6, y0 = 0.3 + r * 1.15;
@@ -6617,7 +6681,7 @@ Wd.build = function (c, opts = {}) {
     }
   };
   let standsPlaced = 0;
-  for (const [s0, sl] of straights) { if (standsPlaced >= 2 || sl < 10) continue; const i0 = s0 + 2, len = sl - 4, side = outside(s0 + Math.floor(sl / 2)); if (clearRun(i0, len, side, ROAD_W + 36)) { placeStand(i0, len, side); standsPlaced++; } }
+  for (const [s0, sl] of straights) { if (standsPlaced >= STAND_CAP || sl < 10) continue; const i0 = s0 + 2, len = sl - 4, side = outside(s0 + Math.floor(sl / 2)); if (clearRun(i0, len, side, ROAD_W + 36)) { placeStand(i0, len, side); standsPlaced++; } }
   if (straights.length) {
     const [s0, sl] = straights[0]; const i0 = s0 + 3, len = sl - 6; let side = -outside(s0 + Math.floor(sl / 2));
     if (!clearRun(i0, len, side, ROAD_W + 15)) side = -side;
@@ -6646,7 +6710,7 @@ Wd.build = function (c, opts = {}) {
     const s0 = pos(0, ROAD_W, 0.015), s1 = pos(0, -ROAD_W, 0.015), s2 = pos(-1, -ROAD_W, 0.015), s3 = pos(-1, ROAD_W, 0.015);
     for (let k = 0; k < 6; k++) { const f = k / 6, g = (k + 1) / 6, A = [s0[0] + (s1[0] - s0[0]) * f, 0.015, s0[2] + (s1[2] - s0[2]) * f], B = [s0[0] + (s1[0] - s0[0]) * g, 0.015, s0[2] + (s1[2] - s0[2]) * g], Cc = [s3[0] + (s2[0] - s3[0]) * g, 0.015, s3[2] + (s2[2] - s3[2]) * g], D = [s3[0] + (s2[0] - s3[0]) * f, 0.015, s3[2] + (s2[2] - s3[2]) * f]; Q(A, D, Cc, B, (k & 1) ? M.KERB_W : M.CARBON); }
   }
-  for (let k = 0; k < cn; k += Math.round(cn / 9)) { const side = outside(k), p = pos(k, side * (ROAD_W + 26)); if (!clearOfTrack(p[0], p[2], ROAD_W + 6)) continue;
+  for (let k = 0; k < cn; k += Math.max(4, Math.round(cn / LIGHTS))) { const side = outside(k), p = pos(k, side * (ROAD_W + 26)); if (!clearOfTrack(p[0], p[2], ROAD_W + 6)) continue;
     box(p[0], 14, p[2], 0.9, 28, 0.9, M.STEEL); box(p[0], 28.6, p[2], 4.5, 1.4, 1.2, M.STEEL); for (let j = -1; j <= 1; j++) box(p[0] + j * 1.4, 28.0, p[2] - side * 0.8, 1.0, 0.8, 0.3, M.LAMP);
     const q = pos(k, side * (ROAD_W + 2)); LIGHTPOOLS.push([q[0], q[2], 26]); }
   for (let k = 0; k < cn; k++) { const nxt = at(k + 25);
@@ -6887,6 +6951,15 @@ TS.create = function (o) {
     }
     const shape = d.shape || {};
 
+    // How far behind the ghost is along the lap, and therefore how much room the shot needs.
+    let pair = 0;
+    if (sc.ghostActive && sc.ghost) {
+      let gd = car.s - sc.ghost.s;
+      if (gd > circ.len / 2) gd -= circ.len; if (gd < -circ.len / 2) gd += circ.len;
+      if (gd > 0 && gd < 95) pair = gd;          // close enough that both fit in one frame
+    }
+    sc.pair = pair;
+
     const i = Math.floor(car.s / circ.step), a = circ.at(i);
     // Low-pass the track's own tangent and curvature before anything is framed against them.
     const f = sc.filt, head = Math.atan2(a.tx, a.tz);
@@ -6899,9 +6972,12 @@ TS.create = function (o) {
     if (mode === 'TV') { const k = tvPick(); if (k < 0) mode = 'CHASE'; else sc.activeTV = k; }
 
     if (mode === 'CHASE') {
-      const dist = shape.dist || 8.4, sw = (shape.swing || 26) * f.curv;
-      px_ = car.x - tx * dist - nx * sw; py_ = shape.height || 3.2; pz_ = car.z - tz * dist - nz * sw;
-      tx_ = car.x + tx * (shape.ahead || 4.5); ty_ = 0.75; tz_ = car.z + tz * (shape.ahead || 4.5);
+      // Back off and lift by however far the ghost is adrift, and aim between the two, so the
+      // separation is the subject of the shot rather than something happening off camera.
+      const dist = (shape.dist || 8.4) + pair * 0.95, sw = (shape.swing || 26) * f.curv;
+      px_ = car.x - tx * dist - nx * sw; py_ = (shape.height || 3.2) + pair * 0.18; pz_ = car.z - tz * dist - nz * sw;
+      const aim = (shape.ahead || 4.5) - pair * 0.5;
+      tx_ = car.x + tx * aim; ty_ = 0.75; tz_ = car.z + tz * aim;
       fov = shape.fov || 42; lag = shape.lag || 7;
     } else if (mode === 'STUDIO') {
       const ang = E.time * 0.5 + sc.orbit, rr = 5.4;
@@ -6912,9 +6988,10 @@ TS.create = function (o) {
       tx_ = car.x + tx * 40; ty_ = 0.6; tz_ = car.z + tz * 40;
       fov = shape.fov || 66; lag = shape.lag || 40;
     } else if (mode === 'HELI') {
-      const side = circ.outside(i), back = shape.back || 22, off = (shape.side || 16);
-      px_ = car.x - tx * back - nx * side * off; py_ = shape.height || 34; pz_ = car.z - tz * back - nz * side * off;
-      tx_ = car.x + tx * 8; ty_ = 0; tz_ = car.z + tz * 8;
+      const side = circ.outside(i), back = (shape.back || 22) + pair * 0.6, off = (shape.side || 16);
+      px_ = car.x - tx * back - nx * side * off; py_ = (shape.height || 34) + pair * 0.25; pz_ = car.z - tz * back - nz * side * off;
+      const aim = 8 - pair * 0.45;
+      tx_ = car.x + tx * aim; ty_ = 0; tz_ = car.z + tz * aim;
       fov = shape.fov || 38; lag = shape.lag || 3;
     } else if (mode === 'APEX') {
       const p = shape.anchor;
@@ -6960,6 +7037,9 @@ TS.create = function (o) {
     if (sc.ghostActive && sc.ghost && meshes.ghost) R.drawDynamic(meshes.ghost, SCR.car.makeXform(sc.ghost), 'ghost', 0);
     R.drawDynamic(meshes.car, xf, 'solid', 0); SCR.sim.drawSparks(R, sc.fx); R.outline();
   };
+  // Called when the two cars are put back on the line together: cut to the shot that shows one
+  // pulling away from the other.
+  sc.duel = () => { if (sc.mode === 'AUTO') callShot(rng() < 0.6 ? 'CHASE' : 'HELI'); };
   sc.setMode = m => { if (TS.MODES.includes(m)) { sc.mode = m; if (m !== 'AUTO' && m !== 'STUDIO') callShot(m); else sc.dir.t = 0; } };
   sc.cut = () => callShot();
   return sc;
@@ -9803,9 +9883,9 @@ function scheduleNext(ms) {
 // ---------------------------------------------------------------------------------------
 // scenes
 // ---------------------------------------------------------------------------------------
-function harnessSpec() {
+function harnessSpec(levels) {
   // the car is the harness: each component that levels up changes a part you can see
-  const lv = st.levels, C = SCR.car;
+  const lv = levels || st.levels, C = SCR.car;
   const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
   return {
     ...C.GEN01,
@@ -9892,10 +9972,20 @@ function closeGarage() {
   enterTrack();
 }
 
-// The race itself, resumed rather than restarted: the car keeps whatever lap it was on.
-function enterTrack() {
-  if (A.sceneName !== 'run') A.setScene('run');
-  else if (track.refit) track.refit();
+// The race, resumed rather than restarted — unless the season has moved to the next run, which
+// is a different circuit, built with however much of the improvement has landed by then.
+function enterTrack(newRound) {
+  if (A.sceneName !== 'run') { A.setScene('run'); return; }
+  if (newRound && track.seed !== trackSeed()) { A.setScene('run'); return; }
+  if (track.refit) track.refit();
+}
+
+// How much of the season's improvement has landed, 0..1. The circuit is built around this:
+// early runs race a bare track on a quiet evening, late ones a full house under lights.
+function progress() {
+  const maxKept = st.rounds.filter(r => r.promoted).length;
+  const got = Object.values(st.levels).reduce((a, b) => a + b, 0) - ALL.length;
+  return maxKept ? Math.max(0, Math.min(1, got / maxKept)) : 0;
 }
 
 // Two runs of this page should not be the same race. Unless a seed was asked for on the URL —
@@ -9911,23 +10001,65 @@ const trackSeed = () => (A.seed + st.i * 7 + salt()) | 0;
 const track = { name: 'run' };
 track.enter = function () {
   const seed = trackSeed();
-  const circ = SCR.world.makeCircuit(seed), world = SCR.world.build(circ);
+  const circ = SCR.world.makeCircuit(seed);
+  const world = SCR.world.build(circ, { detail: progress() });
+  track.seed = seed;
   track.spec = harnessSpec();
   track.dd = SCR.car.derive(track.spec);
   track.mesh = SCR.car.build(track.spec, 0);
   track.car = SCR.car.newState();
   SCR.sim.physics(track.car, track.dd, track.spec, circ, 0, {});
+  // The car the agent was on run 1, on the same circuit, from the same standing start. It is
+  // not a handicap or a target time — it is the run-1 harness put through the same physics, so
+  // the gap that opens is exactly the improvement the loop has actually kept.
+  track.ghostSpec = harnessSpec(levelsAt(0));
+  track.ghostDd = SCR.car.derive(track.ghostSpec);
+  track.ghostMesh = SCR.car.build(track.ghostSpec, 0);
+  track.ghost = SCR.car.newState();
+  SCR.sim.physics(track.ghost, track.ghostDd, track.ghostSpec, circ, 0, {});
   // The director carries its own seed, so the same circuit is covered differently each session.
-  track.scene = SCR.trackScene.create({ R, world, car: track.car, seed: (seed ^ 0x5F3759D) | 0 });
+  track.scene = SCR.trackScene.create({ R, world, car: track.car, ghost: track.ghost,
+    seed: (seed ^ 0x5F3759D) | 0 });
+  track.scene.ghostActive = ghostWorthShowing();
   track.scene.setMode('AUTO');
   track.circuitName = circ.name;
 };
 track.update = function (dt) {
-  SCR.sim.physics(track.car, track.dd, track.spec, track.scene.circ, dt, { fx: track.scene.fx });
+  const circ = track.scene.circ;
+  const lapWas = track.car.lapsDone;
+  SCR.sim.physics(track.car, track.dd, track.spec, circ, dt, { fx: track.scene.fx });
+  if (track.scene.ghostActive) {
+    SCR.sim.physics(track.ghost, track.ghostDd, track.ghostSpec, circ, dt, {});
+    // The ghost is a lap reference, not a cumulative one. Both cars start every lap together at
+    // the line, so what you watch open up is the time this harness gains over the old one in a
+    // single lap — and you get to watch it happen again every lap instead of once.
+    if (track.car.lapsDone !== lapWas) {
+      track.ghost.s = track.car.s;
+      track.ghost.lapsDone = track.car.lapsDone;
+      track.ghost.lap = track.car.lap;
+      if (track.scene.duel) track.scene.duel();
+    }
+  }
   SCR.sim.stepSparks(track.scene.fx, dt);
   track.scene.updateCamera(dt);
 };
-track.render = function () { track.scene.render({ car: track.mesh }); };
+track.render = function () { track.scene.render({ car: track.mesh, ghost: track.ghostMesh }); };
+
+// Nothing to compare against until at least one change has stuck.
+function ghostWorthShowing() {
+  return Object.values(st.levels).some(v => v > 1);
+}
+
+// How far ahead of its old self the agent is, in seconds: the distance between the two cars,
+// over the speed the old car is doing. That is what a gap is.
+function ghostGap() {
+  if (!track.scene || !track.scene.ghostActive || !track.ghost) return null;
+  const len = track.scene.circ.len;
+  let d = track.car.s - track.ghost.s;
+  if (d > len / 2) d -= len; if (d < -len / 2) d += len;
+  const v = Math.max(8, track.ghost.speed);
+  return { d, s: d / v };
+}
 // A kept change reaches the car without stopping it: new bodywork, same lap, same corner.
 track.refit = function () {
   if (!track.scene) return;
@@ -9936,6 +10068,7 @@ track.refit = function () {
   track.spec = spec;
   track.dd = SCR.car.derive(spec);
   track.mesh = SCR.car.build(spec, 0);
+  track.scene.ghostActive = ghostWorthShowing();
 };
 SCR.scenes.run = track;
 
@@ -9963,12 +10096,126 @@ function put(id, txt, cls) {
   if (cls !== undefined && el_.className !== cls) el_.className = cls;
 }
 
-function stripFor(tasks) {
+// The audit result for one interface, keyed the way the bundle keys it. tasks[] carries the
+// verdict; pages[] carries what the browser actually found.
+function pageFor(r, k) {
+  const t = (r && r.tasks) ? r.tasks[k] : null;
+  if (!t) return null;
+  const pages = (r && r.pages) || [];
+  return pages.find(p => p.id === t.id) || pages[k] || null;
+}
+
+// "color-contrast x6 serious" — the rule the page broke, in axe's own words.
+function ruleText(p) {
+  if (!p) return '';
+  const bits = (p.rules || []).map(x => `${x.id}${x.n > 1 ? ' \u00D7' + x.n : ''}`);
+  for (const m of (p.missing || [])) bits.push(`missing: ${m}`);
+  return bits.join(' \u00B7 ');
+}
+
+function stripFor(tasks, r) {
   const host = $('rhStrip'); if (!host) return;
   if (hud.n !== tasks.length) {
     host.textContent = ''; hud.cells = [];
-    for (let k = 0; k < tasks.length; k++) { const n = el('div', 'rh-cell'); host.append(n); hud.cells.push(n); }
+    for (let k = 0; k < tasks.length; k++) {
+      const n = el('div', 'rh-cell');
+      n.dataset.k = String(k);
+      n.addEventListener('mouseenter', () => showTip(k));
+      n.addEventListener('mouseleave', hideTip);
+      host.append(n); hud.cells.push(n);
+    }
     hud.n = tasks.length;
+  }
+  void r;
+}
+
+// Any cell answers for itself: which brief it was, whether it passed, and what the browser
+// found if it did not.
+function showTip(k) {
+  const tip = $('rhTip'), cell = hud.cells[k]; if (!tip || !cell) return;
+  const r = st.rounds[st.i]; if (!r) return;
+  const t = (r.tasks || [])[k]; if (!t) return;
+  const revealed = st.phase !== 'RUN' || k < st.shown;
+  const p = pageFor(r, k), ok = t.solved > 0;
+  tip.textContent = '';
+  const head = el('div', 't-head', `LAP ${k + 1} \u00B7 ${(t.title || t.id).toUpperCase()}`);
+  tip.append(head);
+  if (!revealed) {
+    tip.append(el('div', 't-rule', 'not built yet this run'));
+  } else {
+    tip.append(el('div', 't-verdict ' + (ok ? 'ok' : 'no'),
+      ok ? '\u2713 CLEAN \u00B7 NO VIOLATIONS' : '\u2717 FAILED'
+        + (p && p.weighted ? ` \u00B7 ${p.weighted} WEIGHTED` : '')));
+    const why = ruleText(p);
+    if (why) { const n = el('div', 't-rule'); n.innerHTML = `<i>${esc(why)}</i>`; tip.append(n); }
+    if (p && p.file) tip.append(el('div', 't-file', `pages/${p.file}`));
+  }
+  tip.hidden = false;
+  // pin it above the cell, kept inside the picture
+  const box = cell.getBoundingClientRect(), stage = $('viewTrack').getBoundingClientRect();
+  const w = tip.offsetWidth || 200;
+  let left = box.left - stage.left + box.width / 2 - w / 2;
+  left = Math.max(6, Math.min(stage.width - w - 6, left));
+  tip.style.left = left + 'px';
+  tip.style.top = Math.max(6, box.top - stage.top - tip.offsetHeight - 8) + 'px';
+}
+function hideTip() { const tip = $('rhTip'); if (tip) tip.hidden = true; }
+
+// The caption under the strip: the interface in progress, and what happened to it.
+function caption(r, tasks) {
+  const n = $('rhCap'); if (!n) return;
+  let html = '';
+  if (r && tasks.length) {
+    if (st.phase === 'RUN' && st.shown > 0) {
+      const k = st.shown - 1, t = tasks[k], p = pageFor(r, k), ok = t.solved > 0;
+      const why = ok ? '' : ruleText(p);
+      html = `LAP ${k + 1} \u00B7 <b>${esc((t.title || t.id).toUpperCase())}</b> \u00B7 `
+        + (ok ? '<span class="ok">CLEAN</span>'
+              : `<span class="no">FAILED</span>${why ? ` \u00B7 <span class="why">${esc(why)}</span>` : ''}`);
+    } else if (st.phase !== 'RUN') {
+      const clean = tasks.reduce((a, t) => a + (t.solved > 0 ? 1 : 0), 0);
+      html = `RUN ${st.i + 1} COMPLETE \u00B7 <b>${clean} OF ${tasks.length}</b> CLEAN `
+        + '\u00B7 HOVER A LAP FOR WHAT THE BROWSER FOUND';
+    } else {
+      html = 'STANDING BY';
+    }
+  }
+  if (hud.cap !== html) { n.innerHTML = html; hud.cap = html; }
+}
+
+// What is actually different about the agent since run 1. Quiet, and only ever the components
+// that really moved.
+function sinceRunOne() {
+  const host = $('rhSince'); if (!host) return;
+  const first = st.rounds[0], r = st.rounds[st.i];
+  const moved = ALL.filter(p => (st.levels[p.key] || 1) > 1);
+  if (st.i < 1 || !first || !moved.length) { host.hidden = true; host.dataset.sig = ''; return; }
+  const scored = r && st.phase !== 'RUN';
+  const nowClean = scored ? (r.tasks || []).reduce((a, t) => a + (t.solved > 0 ? 1 : 0), 0)
+    : (st.phase === 'RUN' ? st.solvedNow : null);
+  const firstClean = (first.tasks || []).reduce((a, t) => a + (t.solved > 0 ? 1 : 0), 0);
+  const total = (first.tasks || []).length;
+  const sig = `${st.i}|${st.phase === 'RUN' ? 'r' : 's'}|${nowClean}|${moved.map(p => p.key + st.levels[p.key]).join(',')}`;
+  if (host.dataset.sig === sig) return;
+  host.dataset.sig = sig;
+  host.hidden = false;
+  host.textContent = '';
+  host.append(el('div', 's-it', `ITERATION ${st.i + 1} OF ${st.rounds.length}`));
+  const parts = moved.map(p => `<b>${esc(p.name)}</b> L1\u2192L${st.levels[p.key]}`).join('  ');
+  const a = el('div', 's-line s-parts');
+  a.innerHTML = `<span>changed</span><b>${parts}</b>`;
+  host.append(a);
+  if (nowClean !== null) {
+    const b = el('div', 's-line');
+    b.innerHTML = `<span>clean</span><b><i>${firstClean}</i> \u2192 <em>${nowClean}</em> of ${total}</b>`;
+    host.append(b);
+  }
+  if (scored) {
+    const d = first.official_s - r.official_s;
+    const cc = el('div', 's-line');
+    cc.innerHTML = `<span>held-out</span><b><i>${fx(first.official_s)}</i> \u2192 `
+      + `<em>${fx(r.official_s)}</em> (${d >= 0 ? '\u2212' : '+'}${fx(Math.abs(d))})</b>`;
+    host.append(cc);
   }
 }
 
@@ -10055,7 +10302,17 @@ function paintHud() {
     put('rhDrs', 'DRS', 'rh-drs' + (car.drsOn ? ' on' : ''));
   }
 
-  stripFor(tasks);
+  // How far ahead of the run-1 harness the car is, right now, on this circuit.
+  const gapRow = $('rhGapRow'), gap = ghostGap();
+  const gapReady = gap && Math.abs(gap.d) > 4;
+  if (gapRow) gapRow.hidden = !gapReady;
+  if (gapReady) {
+    put('rhGap', (gap.s >= 0 ? '+' : '\u2212') + fx(Math.abs(gap.s)) + 's', gap.s < -0.02 ? 'behind' : '');
+  }
+
+  sinceRunOne();
+  caption(r, tasks);
+  stripFor(tasks, r);
   for (let k = 0; k < hud.cells.length; k++) {
     const t = tasks[k];
     const revealed = st.phase === 'RUN' ? k < st.shown : true;
@@ -10154,7 +10411,7 @@ function phase(name) {
 
   if (name === 'RUN') {
     st.seenTasks = []; st.solvedNow = 0;
-    if (!st.garage) enterTrack();
+    if (!st.garage) enterTrack(true);
     const n = (r.tasks || []).length || 20;
     st.dur = Math.max(7, Math.min(15, n * 0.55));
     button('RUNNING…', false);

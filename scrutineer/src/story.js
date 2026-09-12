@@ -509,9 +509,9 @@ function scheduleNext(ms) {
 // ---------------------------------------------------------------------------------------
 // scenes
 // ---------------------------------------------------------------------------------------
-function harnessSpec() {
+function harnessSpec(levels) {
   // the car is the harness: each component that levels up changes a part you can see
-  const lv = st.levels, C = SCR.car;
+  const lv = levels || st.levels, C = SCR.car;
   const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
   return {
     ...C.GEN01,
@@ -598,10 +598,20 @@ function closeGarage() {
   enterTrack();
 }
 
-// The race itself, resumed rather than restarted: the car keeps whatever lap it was on.
-function enterTrack() {
-  if (A.sceneName !== 'run') A.setScene('run');
-  else if (track.refit) track.refit();
+// The race, resumed rather than restarted — unless the season has moved to the next run, which
+// is a different circuit, built with however much of the improvement has landed by then.
+function enterTrack(newRound) {
+  if (A.sceneName !== 'run') { A.setScene('run'); return; }
+  if (newRound && track.seed !== trackSeed()) { A.setScene('run'); return; }
+  if (track.refit) track.refit();
+}
+
+// How much of the season's improvement has landed, 0..1. The circuit is built around this:
+// early runs race a bare track on a quiet evening, late ones a full house under lights.
+function progress() {
+  const maxKept = st.rounds.filter(r => r.promoted).length;
+  const got = Object.values(st.levels).reduce((a, b) => a + b, 0) - ALL.length;
+  return maxKept ? Math.max(0, Math.min(1, got / maxKept)) : 0;
 }
 
 // Two runs of this page should not be the same race. Unless a seed was asked for on the URL —
@@ -617,23 +627,65 @@ const trackSeed = () => (A.seed + st.i * 7 + salt()) | 0;
 const track = { name: 'run' };
 track.enter = function () {
   const seed = trackSeed();
-  const circ = SCR.world.makeCircuit(seed), world = SCR.world.build(circ);
+  const circ = SCR.world.makeCircuit(seed);
+  const world = SCR.world.build(circ, { detail: progress() });
+  track.seed = seed;
   track.spec = harnessSpec();
   track.dd = SCR.car.derive(track.spec);
   track.mesh = SCR.car.build(track.spec, 0);
   track.car = SCR.car.newState();
   SCR.sim.physics(track.car, track.dd, track.spec, circ, 0, {});
+  // The car the agent was on run 1, on the same circuit, from the same standing start. It is
+  // not a handicap or a target time — it is the run-1 harness put through the same physics, so
+  // the gap that opens is exactly the improvement the loop has actually kept.
+  track.ghostSpec = harnessSpec(levelsAt(0));
+  track.ghostDd = SCR.car.derive(track.ghostSpec);
+  track.ghostMesh = SCR.car.build(track.ghostSpec, 0);
+  track.ghost = SCR.car.newState();
+  SCR.sim.physics(track.ghost, track.ghostDd, track.ghostSpec, circ, 0, {});
   // The director carries its own seed, so the same circuit is covered differently each session.
-  track.scene = SCR.trackScene.create({ R, world, car: track.car, seed: (seed ^ 0x5F3759D) | 0 });
+  track.scene = SCR.trackScene.create({ R, world, car: track.car, ghost: track.ghost,
+    seed: (seed ^ 0x5F3759D) | 0 });
+  track.scene.ghostActive = ghostWorthShowing();
   track.scene.setMode('AUTO');
   track.circuitName = circ.name;
 };
 track.update = function (dt) {
-  SCR.sim.physics(track.car, track.dd, track.spec, track.scene.circ, dt, { fx: track.scene.fx });
+  const circ = track.scene.circ;
+  const lapWas = track.car.lapsDone;
+  SCR.sim.physics(track.car, track.dd, track.spec, circ, dt, { fx: track.scene.fx });
+  if (track.scene.ghostActive) {
+    SCR.sim.physics(track.ghost, track.ghostDd, track.ghostSpec, circ, dt, {});
+    // The ghost is a lap reference, not a cumulative one. Both cars start every lap together at
+    // the line, so what you watch open up is the time this harness gains over the old one in a
+    // single lap — and you get to watch it happen again every lap instead of once.
+    if (track.car.lapsDone !== lapWas) {
+      track.ghost.s = track.car.s;
+      track.ghost.lapsDone = track.car.lapsDone;
+      track.ghost.lap = track.car.lap;
+      if (track.scene.duel) track.scene.duel();
+    }
+  }
   SCR.sim.stepSparks(track.scene.fx, dt);
   track.scene.updateCamera(dt);
 };
-track.render = function () { track.scene.render({ car: track.mesh }); };
+track.render = function () { track.scene.render({ car: track.mesh, ghost: track.ghostMesh }); };
+
+// Nothing to compare against until at least one change has stuck.
+function ghostWorthShowing() {
+  return Object.values(st.levels).some(v => v > 1);
+}
+
+// How far ahead of its old self the agent is, in seconds: the distance between the two cars,
+// over the speed the old car is doing. That is what a gap is.
+function ghostGap() {
+  if (!track.scene || !track.scene.ghostActive || !track.ghost) return null;
+  const len = track.scene.circ.len;
+  let d = track.car.s - track.ghost.s;
+  if (d > len / 2) d -= len; if (d < -len / 2) d += len;
+  const v = Math.max(8, track.ghost.speed);
+  return { d, s: d / v };
+}
 // A kept change reaches the car without stopping it: new bodywork, same lap, same corner.
 track.refit = function () {
   if (!track.scene) return;
@@ -642,6 +694,7 @@ track.refit = function () {
   track.spec = spec;
   track.dd = SCR.car.derive(spec);
   track.mesh = SCR.car.build(spec, 0);
+  track.scene.ghostActive = ghostWorthShowing();
 };
 SCR.scenes.run = track;
 
@@ -669,12 +722,126 @@ function put(id, txt, cls) {
   if (cls !== undefined && el_.className !== cls) el_.className = cls;
 }
 
-function stripFor(tasks) {
+// The audit result for one interface, keyed the way the bundle keys it. tasks[] carries the
+// verdict; pages[] carries what the browser actually found.
+function pageFor(r, k) {
+  const t = (r && r.tasks) ? r.tasks[k] : null;
+  if (!t) return null;
+  const pages = (r && r.pages) || [];
+  return pages.find(p => p.id === t.id) || pages[k] || null;
+}
+
+// "color-contrast x6 serious" — the rule the page broke, in axe's own words.
+function ruleText(p) {
+  if (!p) return '';
+  const bits = (p.rules || []).map(x => `${x.id}${x.n > 1 ? ' \u00D7' + x.n : ''}`);
+  for (const m of (p.missing || [])) bits.push(`missing: ${m}`);
+  return bits.join(' \u00B7 ');
+}
+
+function stripFor(tasks, r) {
   const host = $('rhStrip'); if (!host) return;
   if (hud.n !== tasks.length) {
     host.textContent = ''; hud.cells = [];
-    for (let k = 0; k < tasks.length; k++) { const n = el('div', 'rh-cell'); host.append(n); hud.cells.push(n); }
+    for (let k = 0; k < tasks.length; k++) {
+      const n = el('div', 'rh-cell');
+      n.dataset.k = String(k);
+      n.addEventListener('mouseenter', () => showTip(k));
+      n.addEventListener('mouseleave', hideTip);
+      host.append(n); hud.cells.push(n);
+    }
     hud.n = tasks.length;
+  }
+  void r;
+}
+
+// Any cell answers for itself: which brief it was, whether it passed, and what the browser
+// found if it did not.
+function showTip(k) {
+  const tip = $('rhTip'), cell = hud.cells[k]; if (!tip || !cell) return;
+  const r = st.rounds[st.i]; if (!r) return;
+  const t = (r.tasks || [])[k]; if (!t) return;
+  const revealed = st.phase !== 'RUN' || k < st.shown;
+  const p = pageFor(r, k), ok = t.solved > 0;
+  tip.textContent = '';
+  const head = el('div', 't-head', `LAP ${k + 1} \u00B7 ${(t.title || t.id).toUpperCase()}`);
+  tip.append(head);
+  if (!revealed) {
+    tip.append(el('div', 't-rule', 'not built yet this run'));
+  } else {
+    tip.append(el('div', 't-verdict ' + (ok ? 'ok' : 'no'),
+      ok ? '\u2713 CLEAN \u00B7 NO VIOLATIONS' : '\u2717 FAILED'
+        + (p && p.weighted ? ` \u00B7 ${p.weighted} WEIGHTED` : '')));
+    const why = ruleText(p);
+    if (why) { const n = el('div', 't-rule'); n.innerHTML = `<i>${esc(why)}</i>`; tip.append(n); }
+    if (p && p.file) tip.append(el('div', 't-file', `pages/${p.file}`));
+  }
+  tip.hidden = false;
+  // pin it above the cell, kept inside the picture
+  const box = cell.getBoundingClientRect(), stage = $('viewTrack').getBoundingClientRect();
+  const w = tip.offsetWidth || 200;
+  let left = box.left - stage.left + box.width / 2 - w / 2;
+  left = Math.max(6, Math.min(stage.width - w - 6, left));
+  tip.style.left = left + 'px';
+  tip.style.top = Math.max(6, box.top - stage.top - tip.offsetHeight - 8) + 'px';
+}
+function hideTip() { const tip = $('rhTip'); if (tip) tip.hidden = true; }
+
+// The caption under the strip: the interface in progress, and what happened to it.
+function caption(r, tasks) {
+  const n = $('rhCap'); if (!n) return;
+  let html = '';
+  if (r && tasks.length) {
+    if (st.phase === 'RUN' && st.shown > 0) {
+      const k = st.shown - 1, t = tasks[k], p = pageFor(r, k), ok = t.solved > 0;
+      const why = ok ? '' : ruleText(p);
+      html = `LAP ${k + 1} \u00B7 <b>${esc((t.title || t.id).toUpperCase())}</b> \u00B7 `
+        + (ok ? '<span class="ok">CLEAN</span>'
+              : `<span class="no">FAILED</span>${why ? ` \u00B7 <span class="why">${esc(why)}</span>` : ''}`);
+    } else if (st.phase !== 'RUN') {
+      const clean = tasks.reduce((a, t) => a + (t.solved > 0 ? 1 : 0), 0);
+      html = `RUN ${st.i + 1} COMPLETE \u00B7 <b>${clean} OF ${tasks.length}</b> CLEAN `
+        + '\u00B7 HOVER A LAP FOR WHAT THE BROWSER FOUND';
+    } else {
+      html = 'STANDING BY';
+    }
+  }
+  if (hud.cap !== html) { n.innerHTML = html; hud.cap = html; }
+}
+
+// What is actually different about the agent since run 1. Quiet, and only ever the components
+// that really moved.
+function sinceRunOne() {
+  const host = $('rhSince'); if (!host) return;
+  const first = st.rounds[0], r = st.rounds[st.i];
+  const moved = ALL.filter(p => (st.levels[p.key] || 1) > 1);
+  if (st.i < 1 || !first || !moved.length) { host.hidden = true; host.dataset.sig = ''; return; }
+  const scored = r && st.phase !== 'RUN';
+  const nowClean = scored ? (r.tasks || []).reduce((a, t) => a + (t.solved > 0 ? 1 : 0), 0)
+    : (st.phase === 'RUN' ? st.solvedNow : null);
+  const firstClean = (first.tasks || []).reduce((a, t) => a + (t.solved > 0 ? 1 : 0), 0);
+  const total = (first.tasks || []).length;
+  const sig = `${st.i}|${st.phase === 'RUN' ? 'r' : 's'}|${nowClean}|${moved.map(p => p.key + st.levels[p.key]).join(',')}`;
+  if (host.dataset.sig === sig) return;
+  host.dataset.sig = sig;
+  host.hidden = false;
+  host.textContent = '';
+  host.append(el('div', 's-it', `ITERATION ${st.i + 1} OF ${st.rounds.length}`));
+  const parts = moved.map(p => `<b>${esc(p.name)}</b> L1\u2192L${st.levels[p.key]}`).join('  ');
+  const a = el('div', 's-line s-parts');
+  a.innerHTML = `<span>changed</span><b>${parts}</b>`;
+  host.append(a);
+  if (nowClean !== null) {
+    const b = el('div', 's-line');
+    b.innerHTML = `<span>clean</span><b><i>${firstClean}</i> \u2192 <em>${nowClean}</em> of ${total}</b>`;
+    host.append(b);
+  }
+  if (scored) {
+    const d = first.official_s - r.official_s;
+    const cc = el('div', 's-line');
+    cc.innerHTML = `<span>held-out</span><b><i>${fx(first.official_s)}</i> \u2192 `
+      + `<em>${fx(r.official_s)}</em> (${d >= 0 ? '\u2212' : '+'}${fx(Math.abs(d))})</b>`;
+    host.append(cc);
   }
 }
 
@@ -761,7 +928,17 @@ function paintHud() {
     put('rhDrs', 'DRS', 'rh-drs' + (car.drsOn ? ' on' : ''));
   }
 
-  stripFor(tasks);
+  // How far ahead of the run-1 harness the car is, right now, on this circuit.
+  const gapRow = $('rhGapRow'), gap = ghostGap();
+  const gapReady = gap && Math.abs(gap.d) > 4;
+  if (gapRow) gapRow.hidden = !gapReady;
+  if (gapReady) {
+    put('rhGap', (gap.s >= 0 ? '+' : '\u2212') + fx(Math.abs(gap.s)) + 's', gap.s < -0.02 ? 'behind' : '');
+  }
+
+  sinceRunOne();
+  caption(r, tasks);
+  stripFor(tasks, r);
   for (let k = 0; k < hud.cells.length; k++) {
     const t = tasks[k];
     const revealed = st.phase === 'RUN' ? k < st.shown : true;
@@ -860,7 +1037,7 @@ function phase(name) {
 
   if (name === 'RUN') {
     st.seenTasks = []; st.solvedNow = 0;
-    if (!st.garage) enterTrack();
+    if (!st.garage) enterTrack(true);
     const n = (r.tasks || []).length || 20;
     st.dur = Math.max(7, Math.min(15, n * 0.55));
     button('RUNNING…', false);

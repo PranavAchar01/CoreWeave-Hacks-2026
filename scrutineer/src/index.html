@@ -28,8 +28,13 @@
              invented numbers are the car's speed and gear, which are the car, not a result. -->
         <div class="rhud" id="raceHud">
           <div class="rh-tl">
-            <span class="rh-live" id="rhLive">LIVE</span>
-            <span class="rh-circuit" id="rhCircuit"></span>
+            <div class="rh-tl-top">
+              <span class="rh-live" id="rhLive">LIVE</span>
+              <span class="rh-circuit" id="rhCircuit"></span>
+            </div>
+            <!-- The iteration, and what is actually different about the agent since run 1.
+                 Deliberately quiet: there to be read, not to be announced. -->
+            <div class="rh-since" id="rhSince" hidden></div>
           </div>
 
           <div class="rh-tr">
@@ -41,6 +46,7 @@
               <div class="rh-row rh-hero"><span>HELD-OUT</span><b id="rhScore">&mdash;</b><i id="rhDelta"></i></div>
               <div class="rh-row"><span>HARNESS</span><b id="rhHarness">L10</b></div>
               <div class="rh-row" id="rhBlameRow" hidden><span>BLAMED</span><b id="rhBlame"></b></div>
+              <div class="rh-row rh-gap" id="rhGapRow" hidden><span>VS RUN 1</span><b id="rhGap"></b></div>
             </div>
             <div class="rh-phase" id="rhPhase">BUILDING</div>
           </div>
@@ -53,8 +59,13 @@
 
           <div class="rh-br" id="rhGates" hidden></div>
 
-          <!-- Laps, as the thing a lap actually is here: one interface, built and audited. -->
-          <div class="rh-strip" id="rhStrip"></div>
+          <!-- Laps, as the thing a lap actually is here: one interface, built and audited.
+               The caption names the one in progress; every cell answers for itself on hover. -->
+          <div class="rh-lapbar">
+            <div class="rh-cap" id="rhCap"></div>
+            <div class="rh-strip" id="rhStrip"></div>
+          </div>
+          <div class="rh-tip" id="rhTip" hidden></div>
         </div>
         <!-- The only thing that ever interrupts the race: the loop kept a change, and the
              garage is where you can go and look at it. Nothing moves until you press it. -->

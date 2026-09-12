@@ -6,6 +6,9 @@
 const E = SCR.engine, M = E.M, Wd = SCR.world = {};
 const { box, Q, T } = E;
 const ROAD_W = Wd.ROAD_W = 6;
+// How full the grandstands are drawn, 0..1. build() sets it from opts.detail, so a circuit
+// early in the season is a half-empty Thursday and a late one is a full house.
+Wd.crowdFill = 0.8;
 Wd.makeCircuit = function (seed) {
   const rng = E.mulberry32(seed);
   // Layout character, drawn from the seed: how many corners it is built from, how stretched the
@@ -57,13 +60,20 @@ Wd.circuitName = seed => `${NAMES[Math.abs(seed) % NAMES.length]} LAYOUT ${Strin
 E.hooks[M.CROWD] = function (mx, my, mz, a) {
   const sg = E.signs[a]; if (!sg) return M.STAND; const [u, v] = E.signUV(sg, mx, my, mz);
   const cx = Math.floor(u / 0.48), cy = Math.floor(v / 0.42), h = E.hash2(cx, cy);
-  if (v > 0.1 && h > 0.2) { const wave = Math.sin(E.time * 2.2 + cx * 0.35) > 0.85 ? 0.35 : 0, hh = E.hash2(cx + 7, cy + 3) + wave;
+  if (v > 0.1 && h > (1 - Wd.crowdFill)) { const wave = Math.sin(E.time * 2.2 + cx * 0.35) > 0.85 ? 0.35 : 0, hh = E.hash2(cx + 7, cy + 3) + wave;
     return hh < 0.2 ? M.BODY : hh < 0.34 ? M.STRIPE : hh < 0.44 ? M.GOLD : hh < 0.56 ? M.CYAN : hh < 0.86 ? M.NAVY : M.PURPLE; }
   return M.STAND;
 };
 // build(circuit, opts) -> { mesh, lightpools, tvcams, circuit }
 Wd.build = function (c, opts = {}) {
   const cp = c.pts, cn = c.n, at = c.at, pos = c.pos, outside = c.outside, geomInside = c.geomInside, clearOfTrack = c.clearOfTrack;
+  // 0 is a bare circuit on a quiet evening; 1 is a full house under lights. The broadcast
+  // raises it as the harness levels up, so the season visibly grows around the car.
+  const detail = Math.max(0, Math.min(1, opts.detail === undefined ? 1 : opts.detail));
+  const STAND_ROWS = 4 + Math.round(detail * 5);          // 4..9 rows of seats
+  const STAND_CAP = 1 + Math.round(detail * 3);           // 1..4 grandstands
+  const LIGHTS = 5 + Math.round(detail * 9);              // 5..14 floodlight towers
+  Wd.crowdFill = 0.32 + detail * 0.52;
   const maxInside = i => 0.85 / Math.max(Math.abs(at(i).curv), 1e-4), safeOff = (i, side, w) => (side === geomInside(i)) ? Math.min(w, maxInside(i)) : w;
   const LIGHTPOOLS = [], TVCAMS = [], signs = E.signs, tris = () => E.current();
   E.begin(); E.setGroup(0); E.setAux(0);
@@ -103,7 +113,7 @@ Wd.build = function (c, opts = {}) {
   const segSign = (k, side, w, y0, y1, text, u0, cell, fg, bg) => { const t = at(k), A = pos(k, side * w, y0); E.setAux(signs.length); signs.push({ text, o: A, r: [t.tx, 0, t.tz], u: [0, 1, 0], cell, fg, bg, u0 }); segWall(k, side, w, y0, y1, M.SIGN); E.setAux(0); };
   const teamName = opts.teamName || 'SCRUTINEER';
   const placeStand = (i0, len, side) => {
-    const rows = 7;
+    const rows = STAND_ROWS;
     for (let k = i0; k < i0 + len; k++) {
       const t = at(k);
       for (let r = 0; r < rows; r++) { const w0 = ROAD_W + 15 + r * 1.6, y0 = 0.3 + r * 1.15;
@@ -119,7 +129,7 @@ Wd.build = function (c, opts = {}) {
     }
   };
   let standsPlaced = 0;
-  for (const [s0, sl] of straights) { if (standsPlaced >= 2 || sl < 10) continue; const i0 = s0 + 2, len = sl - 4, side = outside(s0 + Math.floor(sl / 2)); if (clearRun(i0, len, side, ROAD_W + 36)) { placeStand(i0, len, side); standsPlaced++; } }
+  for (const [s0, sl] of straights) { if (standsPlaced >= STAND_CAP || sl < 10) continue; const i0 = s0 + 2, len = sl - 4, side = outside(s0 + Math.floor(sl / 2)); if (clearRun(i0, len, side, ROAD_W + 36)) { placeStand(i0, len, side); standsPlaced++; } }
   if (straights.length) {
     const [s0, sl] = straights[0]; const i0 = s0 + 3, len = sl - 6; let side = -outside(s0 + Math.floor(sl / 2));
     if (!clearRun(i0, len, side, ROAD_W + 15)) side = -side;
@@ -148,7 +158,7 @@ Wd.build = function (c, opts = {}) {
     const s0 = pos(0, ROAD_W, 0.015), s1 = pos(0, -ROAD_W, 0.015), s2 = pos(-1, -ROAD_W, 0.015), s3 = pos(-1, ROAD_W, 0.015);
     for (let k = 0; k < 6; k++) { const f = k / 6, g = (k + 1) / 6, A = [s0[0] + (s1[0] - s0[0]) * f, 0.015, s0[2] + (s1[2] - s0[2]) * f], B = [s0[0] + (s1[0] - s0[0]) * g, 0.015, s0[2] + (s1[2] - s0[2]) * g], Cc = [s3[0] + (s2[0] - s3[0]) * g, 0.015, s3[2] + (s2[2] - s3[2]) * g], D = [s3[0] + (s2[0] - s3[0]) * f, 0.015, s3[2] + (s2[2] - s3[2]) * f]; Q(A, D, Cc, B, (k & 1) ? M.KERB_W : M.CARBON); }
   }
-  for (let k = 0; k < cn; k += Math.round(cn / 9)) { const side = outside(k), p = pos(k, side * (ROAD_W + 26)); if (!clearOfTrack(p[0], p[2], ROAD_W + 6)) continue;
+  for (let k = 0; k < cn; k += Math.max(4, Math.round(cn / LIGHTS))) { const side = outside(k), p = pos(k, side * (ROAD_W + 26)); if (!clearOfTrack(p[0], p[2], ROAD_W + 6)) continue;
     box(p[0], 14, p[2], 0.9, 28, 0.9, M.STEEL); box(p[0], 28.6, p[2], 4.5, 1.4, 1.2, M.STEEL); for (let j = -1; j <= 1; j++) box(p[0] + j * 1.4, 28.0, p[2] - side * 0.8, 1.0, 0.8, 0.3, M.LAMP);
     const q = pos(k, side * (ROAD_W + 2)); LIGHTPOOLS.push([q[0], q[2], 26]); }
   for (let k = 0; k < cn; k++) { const nxt = at(k + 25);
