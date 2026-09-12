@@ -246,13 +246,13 @@ Wd.build = function (c, opts = {}) {
   for (const [s0, sl] of straights) { if (standsPlaced >= STAND_CAP || sl < 10) continue; const i0 = s0 + 2, len = sl - 4, side = outside(s0 + Math.floor(sl / 2)); if (clearRun(i0, len, side, ROAD_W + 36)) { placeStand(i0, len, side); standsPlaced++; } }
   if (straights.length) {
     const [s0, sl] = straights[0]; const i0 = s0 + 3, len = sl - 6; let side = -outside(s0 + Math.floor(sl / 2));
-    if (!clearRun(i0, len, side, ROAD_W + 15)) side = -side;
-    if (clearRun(i0, len, side, ROAD_W + 15)) {
-      const wf = ROAD_W + 4.6, wb = ROAD_W + 13.6, hgt = 5.2;
+    if (!clearRun(i0, len, side, ROAD_W + 17)) side = -side;
+    if (clearRun(i0, len, side, ROAD_W + 17)) {
+      const wf = ROAD_W + 7.0, wb = ROAD_W + 16.0, hgt = 5.2;   // lane 2.3..7.0 = 4.7 m wide
       // The lane itself: between the armco and the front of the building, with the box
       // halfway along it.
       const BOX = i0 + Math.floor(len / 2);
-      PIT = { i0, len, side, lane: side * (ROAD_W + 3.5), box: BOX,
+      PIT = { i0, len, side, lane: side * (ROAD_W + 4.6), box: BOX,
               entry: i0 - 6, exit: i0 + len + 6,
               // A broadcast pit camera: across the lane from the box, slightly back and low,
               // so the stop is seen three-quarters on rather than straight down the lane.
@@ -287,12 +287,12 @@ Wd.build = function (c, opts = {}) {
           box(q[0], 1.32, q[2], 0.3, 0.26, 0.3, m); };
         // Clear of the car, which sits on the lane centre at ROAD_W + 3.5 and is about a
         // metre wide over the wheels.
-        for (const [d, w, m] of [[-1, 2.35, M.GOLD], [1, 2.35, M.GOLD],
-                                 [-1, 4.75, M.CYAN], [1, 4.75, M.CYAN], [0, 5.1, M.STRIPE]]) {
+        for (const [d, w, m] of [[-1, 3.35, M.GOLD], [1, 3.35, M.GOLD],
+                                 [-1, 5.85, M.CYAN], [1, 5.85, M.CYAN], [0, 6.3, M.STRIPE]]) {
           const q = pos(BOX + d, side * (ROAD_W + w));
           if (clearOfTrack(q[0], q[2], ROAD_W - 1.2)) crew(q, m);
         }
-        const lolli = pos(BOX + 2, side * (ROAD_W + 3.4));
+        const lolli = pos(BOX + 2, side * (ROAD_W + 4.5));
         box(lolli[0], 1.3, lolli[2], 0.1, 2.6, 0.1, M.CARBON);
         box(lolli[0], 2.5, lolli[2], 0.9, 0.5, 0.12, M.STRIPE);
       }

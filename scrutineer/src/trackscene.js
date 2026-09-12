@@ -47,7 +47,8 @@ TS.create = function (o) {
     dir: { shot: 'CHASE', t: 0, dur: 6, prev: '', shape: {} },
   };
   const cam = R.cam;
-  sc.setWorld = w => { sc.world = w; sc.circ = w.circuit; sc.activeTV = -1; sc.smooth.init = false; sc.filt.init = false; };
+  sc.setWorld = w => { sc.world = w; sc.circ = w.circuit; sc.activeTV = -1;
+    sc.smooth.init = false; sc.filt.init = false; sc.pairS = undefined; };
 
   const tvDist = k => { let d = sc.world.tvcams[k].s - sc.car.s; if (d > sc.circ.len / 2) d -= sc.circ.len; if (d < -sc.circ.len / 2) d += sc.circ.len; return d; };
   function tvPick() {
@@ -118,7 +119,7 @@ TS.create = function (o) {
     // PITLANE (and STUDIO) are not shots the director calls for itself; they are held for as
     // long as whatever asked for them needs, so they are not in the weighted table.
     const spec = SHOTS[shot] || { min: 6, max: 10, cut: true };
-    d.prev = prev; d.shot = shot; d.t = 0;
+    d.prev = prev; d.shot = shot; d.t = 0; d.fresh = true;
     d.dur = lerp(spec.min, spec.max, rng()) * (0.85 + style.patient * 0.4);
     d.shape = frameShot(shot);
     if (spec.cut) { sc.smooth.init = false; sc.activeTV = shot === 'TV' ? -1 : sc.activeTV; }
@@ -128,7 +129,15 @@ TS.create = function (o) {
       let bi = i0 + d.shape.ahead, bk = 0;
       for (let q = 4; q < 46; q++) { const kk = Math.abs(sc.circ.at(i0 + q).curv); if (kk > bk) { bk = kk; bi = i0 + q; } }
       const side = sc.circ.geomInside(bi);
-      const p = sc.circ.pos(bi, side * (SCR.world.ROAD_W + 3.4), d.shape.height);
+      // Stand well back from the racing line. At three metres off it a car at sixty metres a
+      // second sweeps past at nearly four hundred degrees a second, which is not a shot, it is
+      // a smear. Twenty to forty metres out keeps the pan readable. Clamped by however much
+      // room there is beside the track, so the camera never ends up inside a grandstand.
+      const RW = SCR.world.ROAD_W;
+      const room = sc.circ.room ? sc.circ.room(bi, side) : 40;
+      const want = RW + 14 + rng() * 20;
+      const off = Math.max(RW + 6, Math.min(want, room - 2));
+      const p = sc.circ.pos(bi, side * off, d.shape.height);
       d.shape.anchor = p;
       d.shape.minD = 1e9;
     }
@@ -147,13 +156,19 @@ TS.create = function (o) {
     }
     const shape = d.shape || {};
 
-    // How far behind the ghost is along the lap, and therefore how much room the shot needs.
-    let pair = 0;
+    // How far behind the ghost is, and therefore how much room the shot needs. Taken raw this
+    // was the worst jerk in the whole director: the moment the gap crossed the cut-off, or the
+    // ghost was put back on the line, it fell from ninety metres to nothing in a single frame
+    // and threw the camera the length of a straight. Capped so the pullback stays a shot, and
+    // low-passed so it eases in and out.
+    let pairRaw = 0;
     if (sc.ghostActive && sc.ghost) {
       let gd = car.s - sc.ghost.s;
       if (gd > circ.len / 2) gd -= circ.len; if (gd < -circ.len / 2) gd += circ.len;
-      if (gd > 0 && gd < 95) pair = gd;          // close enough that both fit in one frame
+      if (gd > 0 && gd < 130) pairRaw = Math.min(gd, 45);
     }
+    sc.pairS = sc.pairS === undefined ? pairRaw : sc.pairS + (pairRaw - sc.pairS) * K(1.2, dt);
+    const pair = sc.pairS;
     sc.pair = pair;
 
     const i = Math.floor(car.s / circ.step), a = circ.at(i);
@@ -165,14 +180,27 @@ TS.create = function (o) {
     const tx = Math.sin(f.head), tz = Math.cos(f.head), nx = -tz, nz = tx;
 
     let px_, py_, pz_, tx_, ty_, tz_, fov = 40, lag = 6;
-    if (mode === 'TV') { const k = tvPick(); if (k < 0) mode = 'CHASE'; else sc.activeTV = k; }
+    if (mode === 'TV') {
+      if (sc.activeTV < 0 || sc.activeTV >= sc.world.tvcams.length) {
+        const k = tvPick(); if (k < 0) mode = 'CHASE'; else sc.activeTV = k;
+      } else {
+        // Hold the camera that was cut to for the length of the shot. Re-picking part way
+        // through slid the view between two cameras tens of metres apart, which reads as a
+        // smear rather than a cut. If this one has lost the car, end the shot and let the
+        // director cut properly on the next frame.
+        const gap = tvDist(sc.activeTV);
+        if (gap < -110 || gap > 220) d.t = d.dur;
+      }
+    }
 
     if (mode === 'CHASE') {
       // Back off and lift by however far the ghost is adrift, and aim between the two, so the
       // separation is the subject of the shot rather than something happening off camera.
-      const dist = (shape.dist || 8.4) + pair * 0.95, sw = (shape.swing || 26) * f.curv;
-      px_ = car.x - tx * dist - nx * sw; py_ = (shape.height || 3.2) + pair * 0.18; pz_ = car.z - tz * dist - nz * sw;
-      const aim = (shape.ahead || 4.5) - pair * 0.5;
+      const dist = (shape.dist || 8.4) + pair * 0.9, sw = (shape.swing || 26) * f.curv;
+      px_ = car.x - tx * dist - nx * sw; py_ = (shape.height || 3.2) + pair * 0.16; pz_ = car.z - tz * dist - nz * sw;
+      // Aim between the two cars, but never behind the one you are following: a target behind
+      // the camera's own subject shortens the look vector and makes every corner whip.
+      const aim = Math.max(1.5, (shape.ahead || 4.5) - pair * 0.35);
       tx_ = car.x + tx * aim; ty_ = 0.75; tz_ = car.z + tz * aim;
       fov = shape.fov || 42; lag = shape.lag || 7;
     } else if (mode === 'STUDIO') {
@@ -208,7 +236,7 @@ TS.create = function (o) {
         tx_ = car.x; ty_ = 0.55; tz_ = car.z;
         const dd = Math.hypot(p[0] - car.x, p[2] - car.z);
         // hold the car the same size in frame as it comes to you, the way a long lens does
-        fov = Math.max(10, Math.min(shape.fov || 26, 520 / Math.max(10, dd)));
+        fov = Math.max(16, Math.min(shape.fov || 26, 760 / Math.max(16, dd)));
         lag = shape.lag || 14;
         // Hold while the car is coming; cut away only once it has been and gone, never on the
         // approach — the approach is the shot.
@@ -223,6 +251,14 @@ TS.create = function (o) {
     }
 
     const sm = sc.smooth;
+    // CHASE and HELI are moves rather than cuts, so the camera glides into them. That only
+    // reads as a move over a short distance: gliding seventy metres from a trackside anchor to
+    // behind the car covers it in half a second and looks like a lurch, not an edit. Past
+    // twenty-five metres, take it as a cut.
+    if (d.fresh) {
+      d.fresh = false;
+      if (sm.init && Math.hypot(px_ - sm.x, py_ - sm.y, pz_ - sm.z) > 25) sm.init = false;
+    }
     if (!sm.init) { sm.x = px_; sm.y = py_; sm.z = pz_; sm.tx = tx_; sm.ty = ty_; sm.tz = tz_; sm.fov = fov; sm.init = true; }
     const kp = K(lag, dt), kt = K(lag * 1.8, dt);
     sm.x += (px_ - sm.x) * kp; sm.y += (py_ - sm.y) * kp; sm.z += (pz_ - sm.z) * kp;
@@ -251,7 +287,14 @@ TS.create = function (o) {
   };
   // Called when the two cars are put back on the line together: cut to the shot that shows one
   // pulling away from the other.
-  sc.duel = () => { if (sc.mode === 'AUTO') callShot(rng() < 0.6 ? 'CHASE' : 'HELI'); };
+  sc.duel = () => {
+    if (sc.mode !== 'AUTO') return;
+    // If a shot that already frames both cars is running, hold it rather than re-calling it:
+    // re-calling re-rolls the framing, which moves the camera mid-shot without a cut and reads
+    // as a lurch rather than an edit.
+    if (sc.dir.shot === 'CHASE' || sc.dir.shot === 'HELI') { sc.dir.t = 0; return; }
+    callShot(rng() < 0.6 ? 'CHASE' : 'HELI');
+  };
   sc.setMode = m => { if (TS.MODES.includes(m)) { sc.mode = m; if (m !== 'AUTO' && m !== 'STUDIO') callShot(m); else sc.dir.t = 0; } };
   sc.cut = () => callShot();
   return sc;

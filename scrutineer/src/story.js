@@ -622,7 +622,10 @@ function salt() {
   if (SALT === null) SALT = (A.params && A.params.seed) ? 0 : (Math.random() * 0x7FFFFFFF) | 0;
   return SALT;
 }
-const trackSeed = () => (A.seed + st.i * 7 + salt()) | 0;
+// Clamped at run 1: before the first run starts st.i is -1, so the intro used to build a
+// circuit nobody ever races, and two seconds later the first run rebuilt a different one. The
+// track you see on load is the track run 1 is about to be raced on.
+const trackSeed = () => (A.seed + Math.max(0, st.i) * 7 + salt()) | 0;
 
 const track = { name: 'run' };
 track.enter = function () {
@@ -700,8 +703,11 @@ function ghostGap() {
 // the box and the openings in the armco are real geometry from world.build; the car is driven
 // down them under a limiter by the same physics as everywhere else, with a lateral offset.
 // ---------------------------------------------------------------------------------------
-const LIMITER = 22, BOX_HOLD = 2.4, BLEND = 34;   // m/s, seconds, metres to cross into the lane
+const LIMITER = 22, BOX_HOLD = 2.4, BLEND_MAX = 95;   // m/s, seconds, metres to cross the lane
 const PIT_DECEL = 5.5;                            // m/s^2 on the way into the box
+// Crossing in and out on a straight ramp leaves a kink at each end, because the car's sideways
+// speed jumps from nothing to full and back. Smoothstep starts and finishes at zero.
+const ease = t => { const k = Math.max(0, Math.min(1, t)); return k * k * (3 - 2 * k); };
 const pit = track.pit = { state: 'off', pending: null, t: 0, clock: 0 };
 
 function pitLane() { return track.scene && track.scene.world && track.scene.world.pit; }
@@ -736,19 +742,28 @@ function pitStep(dt) {
   const p = pitLane();
   if (!p || pit.state === 'off') return undefined;
   const car = track.car, lane = p.lane, circ = track.scene.circ;
+  // How much road there is to cross the lane in. A car cannot step ten metres sideways in forty
+  // metres of track without sliding, so the crossing is spread over as much of the run to the
+  // box (and from the box to the exit) as is available, up to a sensible maximum.
+  const inRun = Math.max(20, (p.box - p.entry) * circ.step * 0.75);
+  const outRun = Math.max(20, (p.exit - p.box) * circ.step * 0.75);
+  const blendIn = Math.min(BLEND_MAX, inRun), blendOut = Math.min(BLEND_MAX, outRun);
 
   if (pit.state === 'called') {
     // wait for the entry to come round; start crossing once it is close
     const d = aheadOf(p.entry);
-    if (d > 0 && d < BLEND) { pit.state = 'enter'; pit.t = 0; pit.clock = 0; }
-    return d > 0 && d < 120 ? Math.max(LIMITER + 10, car.speed - 6) : undefined;   // slow for the entry
+    if (d > 0 && d < 6) { pit.state = 'enter'; pit.t = 0; pit.clock = 0; }
+    // Come down to the limiter on a profile that arrives at it exactly at the entry, rather
+    // than standing on the brakes the moment the entry is within range.
+    if (d > 0 && d < 170) return Math.sqrt(LIMITER * LIMITER + 2 * PIT_DECEL * d);
+    return undefined;
   }
 
   if (pit.state === 'enter') {
     if (track.scene && track.scene.mode !== 'PITLANE') track.scene.setMode('PITLANE');
-    // cross into the lane over the first stretch past the entry, not in one step
+    // cross into the lane over the first stretch past the entry, eased at both ends
     const past = -aheadOf(p.entry);
-    car.off = lane * Math.max(0, Math.min(1, past / BLEND));
+    car.off = lane * ease(past / blendIn);
     // Brake onto the box, not merely to a halt somewhere near it. A flat zero cap thirty metres
     // out just meant the car shed speed at whatever rate it could and parked where it ran out —
     // seventeen metres short of the stall, every time. The cap follows v = sqrt(2ad) instead, so
@@ -784,14 +799,16 @@ function pitStep(dt) {
 
   if (pit.state === 'exit') {
     const d = aheadOf(p.exit);
-    car.off = lane * Math.max(0, Math.min(1, d / BLEND));
+    car.off = lane * ease(d / blendOut);
     pit.t += dt;
     if (pit.t > 1.6 && track.scene && track.scene.mode === 'PITLANE') track.scene.setMode('AUTO');
     if ((d <= 0.6 && d > -30) || pit.t > 12) {
       car.off = 0; car.lift = 0; pit.state = 'off'; pit.fitted = null;
       if (pit.thenCall) { callToGarage(pit.thenCall); pit.thenCall = null; }
     }
-    return LIMITER;
+    // Hold the limiter while any part of the car is still off the racing line, then let it go
+    // rather than dropping the cap the instant the exit line passes.
+    return Math.abs(car.off) > Math.abs(lane) * 0.06 ? LIMITER : undefined;
   }
   return undefined;
 }
@@ -1088,6 +1105,53 @@ function fastestLap(r) {
   if (show) put('rhFastestVal', `${fx(r.official_s)} \u00B7 SEASON BEST`);
 }
 
+// ---------------------------------------------------------------------------------------
+// Project a point in the world onto the picture, in stage pixels. The canvas letterboxes
+// inside its box (object-fit: contain), so the buffer has to be mapped through the contained
+// rect rather than treated as a straight percentage of the box.
+// ---------------------------------------------------------------------------------------
+const proj = { box: null, at: 0, cv: [0, 0, 0] };
+function project(x, y, z) {
+  const cam = R.cam, W = R.W, H = R.H;
+  R.toView(x, y, z, proj.cv);
+  const vz = proj.cv[2];
+  if (vz <= 0.25) return null;                      // behind the camera
+  const focal = (H / 2) / Math.tan((cam.fov * Math.PI / 180) / 2);
+  const sx = W / 2 + proj.cv[0] * focal / vz;
+  const sy = H / 2 - proj.cv[1] * focal / vz;
+  if (sx < -40 || sx > W + 40 || sy < -40 || sy > H + 40) return null;
+  const now = E.time;
+  if (!proj.box || now - proj.at > 0.5) {           // layout read, but not every frame
+    const n = $('viewTrack'); if (!n) return null;
+    const r = n.getBoundingClientRect();
+    proj.box = { w: r.width, h: r.height }; proj.at = now;
+  }
+  const scale = Math.min(proj.box.w / W, proj.box.h / H);
+  return { x: (proj.box.w - W * scale) / 2 + sx * scale,
+           y: (proj.box.h - H * scale) / 2 + sy * scale, z: vz };
+}
+
+// The ghost is the same agent one season earlier, not a rival. Say so, on the car.
+function ghostTag() {
+  const n = $('ghostTag'); if (!n) return;
+  const sc = track.scene;
+  const on = sc && sc.ghostActive && track.ghost && st.view === 'track' && !st.garage;
+  if (!on) { if (!n.hidden) n.hidden = true; return; }
+  // a little above the roll hoop, and only while it is close enough to read
+  const p = project(track.ghost.x, 1.5, track.ghost.z);
+  if (!p || p.z > 140) { if (!n.hidden) n.hidden = true; return; }
+  n.hidden = false;
+  // Keep it in the picture: the tag is centred on the car and would otherwise hang off the
+  // edge when the ghost is near the side of frame.
+  const w = n.offsetWidth || 130, h = n.offsetHeight || 30;
+  const box = proj.box || { w: 0, h: 0 };
+  const x = Math.max(w / 2 + 4, Math.min(box.w - w / 2 - 4, p.x));
+  const y = Math.max(h + 4, Math.min(box.h - 4, p.y));
+  n.style.left = x.toFixed(1) + 'px';
+  n.style.top = y.toFixed(1) + 'px';
+  n.style.opacity = p.z > 105 ? String(Math.max(0, (140 - p.z) / 35)) : '1';
+}
+
 // The caption under the strip: the interface in progress, and what happened to it.
 function caption(r, tasks) {
   const n = $('rhCap'); if (!n) return;
@@ -1238,6 +1302,7 @@ function paintHud() {
     put('rhGap', (gap.s >= 0 ? '+' : '\u2212') + fx(Math.abs(gap.s)) + 's', gap.s < -0.02 ? 'behind' : '');
   }
 
+  ghostTag();
   paintPit();
   standings(r);
   sectors(r, tasks);

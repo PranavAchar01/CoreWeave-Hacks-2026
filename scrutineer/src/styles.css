@@ -412,6 +412,17 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .rh-pit.done{border-color:var(--green)}
 .rh-pit.done .pit-head{color:var(--green)}
 
+/* The ghost's label, projected onto the car it belongs to. Dimmed and dithered-looking, the
+   way the car itself is, so it reads as the same object. */
+.ghost-tag{position:absolute;z-index:4;display:flex;flex-direction:column;align-items:center;
+  transform:translate(-50%,-100%);pointer-events:none}
+.ghost-tag .gt-text{display:flex;align-items:baseline;gap:6px;
+  background:rgba(6,8,26,.82);border:1px solid var(--cyan);padding:4px 7px;white-space:nowrap}
+.ghost-tag .gt-text b{font-size:7px;color:var(--cyan);letter-spacing:.5px}
+.ghost-tag .gt-text i{font-style:normal;font-family:"VT323","Courier New",monospace;font-size:14px;
+  line-height:12px;color:var(--caption);text-transform:none}
+.ghost-tag .gt-pin{width:1px;height:14px;background:var(--cyan);opacity:.75}
+
 /* Timing tower / championship. Left edge, under the season summary. */
 .rh-stand{width:236px;max-width:100%;background:rgba(6,8,26,.9);
   border-left:3px solid var(--gold);padding:0 0 4px}
