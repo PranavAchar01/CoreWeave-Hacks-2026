@@ -5,7 +5,7 @@ const root = __dirname, src = path.join(root, 'src');
 // The mark: a two-by-two chequer, gold on night, centred with a two-pixel margin. One
 // definition — it used to be pasted into two of the three documents and missing from the third.
 const FAVICON = `<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Crect width='16' height='16' fill='%2306081A'/%3E%3Cpath d='M2 2h6v6H2zM8 8h6v6H8z' fill='%23F4C542'/%3E%3C/svg%3E">`;
-const ORDER = ['engine.js', 'car.js', 'world.js', 'sim.js', 'trackscene.js', 'team.js', 'garage.js', 'scenes.js', 'season.js', 'ui.js', 'trial.js', 'dash.js', 'story.js', 'main.js'];
+const ORDER = ['engine.js', 'car.js', 'world.js', 'sim.js', 'trackscene.js', 'team.js', 'garage.js', 'scenes.js', 'season.js', 'ui.js', 'trial.js', 'dash.js', 'audio.js', 'story.js', 'main.js'];
 const present = ORDER.filter(f => fs.existsSync(path.join(src, f)));
 const missing = ORDER.filter(f => !present.includes(f));
 if (missing.length) console.log('build: skipping missing modules:', missing.join(', '));

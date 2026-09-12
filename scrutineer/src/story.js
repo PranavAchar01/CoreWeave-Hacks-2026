@@ -1941,7 +1941,26 @@ function showOutcome(r) {
 // ---------------------------------------------------------------------------------------
 // per-frame: reveal tasks and gates in time with the run
 // ---------------------------------------------------------------------------------------
+// What the car is doing, in the terms the synth needs. Read straight off the same state the
+// renderer draws from, so the sound cannot describe a different car than the one on screen.
+function feedAudio(dt) {
+  if (!SCR.audio || !SCR.audio.isOn()) return;
+  const on = A.sceneName === 'run' && track.car && track.dd && st.view === 'track' && !st.garage;
+  SCR.audio.update(on ? {
+    active: true,
+    speed: track.car.speed,
+    topSpeed: track.dd.topSpeed,
+    gears: track.dd.gears,
+    braking: track.car.braking,
+    drs: track.car.drsOn,
+    steer: track.car.steer,
+    pit: pit.state === 'off' ? null : pit.state,
+    lift: track.car.lift,
+  } : { active: false }, dt);
+}
+
 S.frame = function (dt) {
+  feedAudio(dt);
   paintHud();
   paintTags(st.phase === 'DIAGNOSE' || st.phase === 'CHANGE' || st.phase === 'GATES'
     || st.phase === 'RESULT' ? (st.rounds[st.i] || {}).role : null);
@@ -2034,6 +2053,23 @@ function showView(which) {
 function wire() {
   const hold = $('holdBtn');
   if (hold) hold.addEventListener('click', () => setHold(!auto.paused));
+  const snd = $('sndBtn');
+  if (snd) {
+    if (!SCR.audio || !SCR.audio.available()) snd.hidden = true;
+    else {
+      const paint = on => { snd.setAttribute('aria-pressed', on ? 'true' : 'false');
+        snd.lastChild.nodeValue = on ? 'SOUND' : 'MUTED'; };
+      paint(false);
+      snd.addEventListener('click', () => {
+        const on = SCR.audio.toggle();
+        paint(on);
+        try { localStorage.setItem('scrutineer.sound', on ? '1' : '0'); } catch (e) { /* private window */ }
+      });
+      // A stored yes is remembered, but it still cannot start the audio on its own — the
+      // browser wants a gesture on this page, so the first click is what actually begins it.
+      try { if (localStorage.getItem('scrutineer.sound') === '1') snd.classList.add('wants'); } catch (e) { /* ignore */ }
+    }
+  }
   const tabs = [['tabTrack', 'track'], ['tabDash', 'dash']];
   for (const [id, which] of tabs) {
     const t = $(id); if (t) t.addEventListener('click', () => showView(which));
@@ -2052,6 +2088,7 @@ function wire() {
     if (ev.key === '1') showView('track');
     if (ev.key === '2') showView('dash');
     if (ev.key === 'g' || ev.key === 'G') { if (st.garage) closeGarage(); else openGarage(); }
+    if (ev.key === 'm' || ev.key === 'M') { const b = $('sndBtn'); if (b) b.click(); }
     if (ev.key === 'Escape' && st.garage) closeGarage();
   });
 }
@@ -2070,7 +2107,8 @@ S.seekTo = function (runIndex, phaseName) {
   if (st.phase === 'GATES') { S.frame(st.dur * 0.92); }
 };
 
-S.diag = () => ({ story: { phase: st.phase, run: st.i + 1, of: st.rounds.length,
+S.diag = () => ({ audio: SCR.audio ? SCR.audio.diag() : null,
+  story: { phase: st.phase, run: st.i + 1, of: st.rounds.length,
   playing: st.playing, levels: st.levels, shown: st.shown, scene: A && A.sceneName,
   ghostTag: { ...ghostDbg },
   garage: st.garage, pending: !!st.pending } });
