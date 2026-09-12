@@ -14,6 +14,7 @@ Built for **CoreWeave Hacks: Agent Loops**, September 2026.
 | **The broadcast** | https://scrutineer-one.vercel.app |
 | **The timeline** | https://scrutineer-timeline.vercel.app |
 | **The pit board** | https://scrutineer-one.vercel.app/pit |
+| **The telemetry** | https://scrutineer-one.vercel.app/telemetry |
 
 The broadcast has two surfaces: `TRACK`, where a season plays out as a race, and `TELEMETRY`, a
 live instrument panel — held-out score, laps as they land, the ten gates resolving, credit per
@@ -24,8 +25,10 @@ generation, because the car *is* the harness: wings move with RETRIEVAL, the flo
 VERIFICATION, compound with SAMPLING. Switch to `GARAGE` for the same state from the other side.
 
 The pit board is the car on a card that stays on top. Pop it out and it floats above every other
-app while the loop runs behind it; each time a generation lands the car rebuilds and a placard says
-what was kept. Hover it for how far the agent has run — runs, laps, score, the ten components. It
+app while the loop runs behind it. The car laps the season's circuit: where it is on the lap is how
+far the current run has got, it crosses the line when the loop decides the run, and a kept change
+rebuilds it right there. Click or hover it for how far the agent has run — runs, laps, score, the
+ten components — and a link to the telemetry. It
 turns live when a `scrutineer watch` server answers — open `http://127.0.0.1:7777/pit` while the
 loop is running — and replays the recorded season otherwise. The hosted copy is always a replay: a
 browser will not let an `https` page reach a plain-http server on your own machine. One line embeds
@@ -34,6 +37,15 @@ it anywhere:
 ```html
 <script src="https://scrutineer-one.vercel.app/pit.js" async></script>
 ```
+
+The telemetry is the season as flat, vector instrument graphics — no 3D models, no car, no track —
+in a graphite-and-lime style of its own so it never reads as a second broadcast. Five questions, one
+chart each: how a run works (the loop as a ring, with what the selected run did at every step), is it
+getting faster (the held-out lap by run against its own measurement, with every gate), what did it
+build (an audit matrix of every page family by run, with links to open the failing pages), which part
+changed (a radial of component levels and the blame each took), and does it hold up outside
+(BigCodeBench-Hard pass-rate gauges, every held-out task, and where the difference sits against what
+the test can detect). One scrubber picks the run for all of them. Plain SVG and CSS, no libraries.
 
 ## What it measures, including where it failed
 

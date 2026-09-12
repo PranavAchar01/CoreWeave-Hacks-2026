@@ -46,6 +46,10 @@
     {
       "source": "/pit",
       "destination": "/pit.html"
+    },
+    {
+      "source": "/telemetry",
+      "destination": "/telemetry.html"
     }
   ]
 }

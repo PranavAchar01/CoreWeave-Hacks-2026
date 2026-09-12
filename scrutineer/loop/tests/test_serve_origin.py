@@ -85,3 +85,13 @@ def test_the_preflight_only_answers_for_what_may_be_read(server):
                 assert r.status == expect, path
         except urllib.error.HTTPError as e:
             assert e.code == expect, path
+
+
+def test_every_surface_has_a_route(server):
+    """The hosted site rewrites these paths; the watch server has to answer the same ones, or a link
+    that works on the web is a 404 on the machine running the loop."""
+    url, _ = server
+    for path, marker in (("/", b'id="app"'), ("/telemetry", b'id="chart"'), ("/pit", b'class="desk"')):
+        with urllib.request.urlopen(url + path, timeout=5) as r:
+            assert r.status == 200, path
+            assert marker in r.read(), path

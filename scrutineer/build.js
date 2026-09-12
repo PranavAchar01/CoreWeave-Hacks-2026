@@ -145,15 +145,19 @@ console.log(`build: site-timeline/public/index.html ${(tlDoc.length / 1024).toFi
 // load in one line. It carries only what the card needs of the recorded season.
 // ---------------------------------------------------------------------------------------
 {
-  const PIT_ORDER = ['engine.js', 'car.js', 'sim.js', 'pit.js'];
-  const pitSrc = PIT_ORDER.map(f => fs.readFileSync(path.join(src, f), 'utf8')).join('\n');
+  const PIT_ORDER = ['engine.js', 'car.js', 'sim.js', 'world.js', 'pit.js'];
+  // Every module hands itself to window.SCR. On a page with its own SCR two copies would overwrite
+  // each other's engine, so the embed builds into a private one and publishes only SCR.pit.
+  const pitSrc = `(function () {\nvar __SCR = {};\n${PIT_ORDER.map(f => fs.readFileSync(path.join(src, f), 'utf8'))
+    .join('\n').replace(/\}\)\(window\.SCR = window\.SCR \|\| \{\}\);/g, '})(__SCR);')}\n`
+    + 'var g = window.SCR = window.SCR || {}; g.pit = __SCR.pit;\n})();';
   const pitCss = fs.readFileSync(path.join(src, 'pit.css'), 'utf8');
   const pageCss = fs.readFileSync(path.join(src, 'pitpage.css'), 'utf8');
   const pitHtml = fs.readFileSync(path.join(src, 'pit.html'), 'utf8');
   let season = { demo: false, rounds: [] };
   if (fs.existsSync(bundlePath)) {
     const b = JSON.parse(fs.readFileSync(bundlePath, 'utf8'));
-    season = { demo: !!b.demo, rounds: (b.rounds || []).map(r => ({
+    season = { demo: !!b.demo, seed: b.seed, rounds: (b.rounds || []).map(r => ({
       generation: r.generation, promoted: !!r.promoted, role: r.role || null, part: r.part || null,
       official_s: r.official_s, claimed_s: r.claimed_s, rule_fired: r.rule_fired || null,
       summary: r.diff_summary || '', failed: (r.gates || []).filter(g => !g.ok).map(g => g.gate),
@@ -195,6 +199,44 @@ ${pitInline}
   fs.unlinkSync(t3);
   if (r3.status !== 0) { console.error(r3.stderr); process.exit(1); }
   console.log(`build: site/public/pit.html ${(pitDoc.length / 1024).toFixed(0)} KB, pit.js ${(pitJs.length / 1024).toFixed(0)} KB, ${season.rounds.length} rounds`);
+}
+
+// ---------------------------------------------------------------------------------------
+// The telemetry: the season as flat, vector instrument graphics, at /telemetry. Its own page and
+// its own look — no car, no track, no pixels — so it reads as the instrument report beside the
+// broadcast rather than a second broadcast. Plain SVG and CSS from the same season bundle every
+// other surface reads; nothing fetched but the fonts.
+// ---------------------------------------------------------------------------------------
+{
+  const appJs = fs.readFileSync(path.join(src, 'telemetry.js'), 'utf8');
+  const safe = s => s.replace(/<\/script/gi, '<\\/script').replace(/<!--/g, '<\\!--');
+  const doc = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scrutineer telemetry</title>
+<meta name="description" content="The season as instrument graphics: how a run works, whether it is getting faster, what it built, which part changed, and whether it holds up on a public benchmark.">
+<meta name="theme-color" content="#07090B">
+${FAVICON}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+${fs.readFileSync(path.join(src, 'telemetry.css'), 'utf8')}
+</style>
+</head>
+<body>
+${fs.readFileSync(path.join(src, 'telemetry.html'), 'utf8')}
+<script>
+${safe(loopJs + appJs)}
+</script>
+</body>
+</html>`;
+  fs.writeFileSync(path.join(siteDir, 'telemetry.html'), doc);
+  const t4 = path.join(root, '.build-check-telemetry.js'); fs.writeFileSync(t4, appJs);
+  const r4 = cp.spawnSync(process.execPath, ['--check', t4], { encoding: 'utf8' });
+  fs.unlinkSync(t4);
+  if (r4.status !== 0) { console.error(r4.stderr); process.exit(1); }
+  console.log(`build: site/public/telemetry.html ${(doc.length / 1024).toFixed(0)} KB`);
 }
 
 // syntax check

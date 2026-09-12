@@ -1,0 +1,31 @@
+<!-- Scrutineer telemetry: the season as flat, vector instrument graphics. No 3D models, no car and
+     no track — those belong to the broadcast and the pit board. Every number is read from the loop. -->
+<div class="tx-bg" aria-hidden="true"></div>
+<div class="tx" id="tx">
+  <header class="tx-top">
+    <a class="tx-mark" href="/telemetry"><span class="tx-glyph" aria-hidden="true"></span><b>SCRUTINEER</b><em>TELEMETRY</em></a>
+    <div class="tx-top-r">
+      <span class="tx-src" id="src"><i></i><b>—</b></span>
+      <a class="tx-link" href="/">Broadcast ↗</a>
+      <a class="tx-link" href="/pit">Pit board ↗</a>
+    </div>
+  </header>
+  <nav class="tx-nav" id="nav" aria-label="Charts">
+    <button class="hud" type="button" data-st="loop"><b>How does a run work?</b><em>seven steps, and what this run did at each</em></button>
+    <button class="hud" type="button" data-st="progress"><b>Is it getting faster?</b><em>the held-out lap time, run by run</em></button>
+    <button class="hud" type="button" data-st="interfaces"><b>What did it build?</b><em>every page, and what the audit found</em></button>
+    <button class="hud" type="button" data-st="components"><b>Which part changed?</b><em>ten components: levels and blame</em></button>
+    <button class="hud" type="button" data-st="benchmark"><b>Does it hold up outside?</b><em>a public benchmark it did not write</em></button>
+  </nav>
+  <main class="tx-stage hud" id="stage">
+    <div class="tx-stage-h" id="head"></div>
+    <div class="tx-plot" id="plot">
+      <svg id="chart" role="img" aria-labelledby="chartTitle" xmlns="http://www.w3.org/2000/svg"><title id="chartTitle">chart</title></svg>
+      <div class="tx-over" id="over"></div>
+    </div>
+  </main>
+  <aside class="tx-facts hud" id="facts" aria-live="polite"></aside>
+  <div class="tx-scrub hud" id="scrub"></div>
+  <p class="tx-note" id="note"></p>
+</div>
+<div class="tx-tip" id="tip" hidden></div>

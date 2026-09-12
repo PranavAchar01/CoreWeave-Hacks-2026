@@ -63,3 +63,4 @@
 .pit.inpip .pit-card{top:auto;bottom:40px}
 @keyframes pit-blink{50%{opacity:.25}}
 @media (prefers-reduced-motion:reduce){.pit-dot,.pit-card{animation:none;transition:none}}
+.pit.pit-away:not(.inpip){display:none}

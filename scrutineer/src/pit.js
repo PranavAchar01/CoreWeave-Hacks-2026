@@ -1,8 +1,9 @@
 // ============================================================================
 // SCR.pit — the pit board: the car on your desk while the loop runs behind it.
 //
-// A small card that stays on top. The car turns on its pit-box floor; each time the loop lands a
-// generation the car rebuilds in front of you, and hovering the card opens the board: how far the
+// A small card that stays on top, with a toy car lapping the season's circuit. Where the car is on
+// the lap is how far the current run has got, and it crosses the line when the loop decides the run;
+// a kept change rebuilds the car right there. Click or hover the card for the board: how far the
 // agent has run, what it kept, what it is running on. Three ways to keep it in view:
 //   · pop it out — Document Picture-in-Picture gives it a window of its own, above every app
 //   · drag it anywhere on the page it lives in; it remembers where you left it
@@ -17,7 +18,7 @@
 // ============================================================================
 (function (SCR) {
 'use strict';
-const E = SCR.engine, C = SCR.car, S = SCR.sim, M = E.M, P = SCR.pit = {};
+const E = SCR.engine, C = SCR.car, S = SCR.sim, Wd = SCR.world, M = E.M, P = SCR.pit = {};
 const W = 128, H = 80;                        // the board's own pixels; CSS doubles them, nearest neighbour
 const LOCAL = 'http://127.0.0.1:7777';
 const FONTS = 'https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap';
@@ -42,20 +43,133 @@ const st = {
   levels: {}, run: 0, laps: 0, lap: 0, lapsRun: 0, race: '', busy: false, phase: '', error: null,
   claimed: null, official: null, since: 0, seenSeq: 0,
   replay: { all: [], i: 0, every: 24, at: 0, elapsed: 0, beat: 0, laps: 40 },
-  orbit: 0.9, whip: 0, fx: [], anim: null, card: null, cardTimer: 0,
-  R: null, ground: null, spec: null, mesh: null, car: null,
+  orbit: 0, camYaw: 0, along: 0, whip: 0, fx: [], anim: null, card: null, cardTimer: 0,
+  R: null, track: null, spec: null, mesh: null, car: null,
   root: null, host: null, win: window, raf: 0, last: 0, pip: null, open: false, drag: null, boardAt: 0, stripTxt: '',
 };
 P.state = () => st;
 
-// ---------- the floor: concrete, with the box painted on it ----------
-E.hooks[M.CONCRETE] = function (mx, my, mz) {
-  const ax = Math.abs(mx), az = Math.abs(mz);
-  return ((ax > 2.1 && ax < 2.26 && az < 3.95) || (az > 3.8 && az < 3.95 && ax < 2.26)) ? M.GOLD : M.CONCRETE;
-};
-function makeGround() { E.begin(); E.setGroup(0); E.setAux(0); E.Q([-8, 0, -8], [8, 0, -8], [8, 0, 8], [-8, 0, 8], M.CONCRETE); return E.end(); }
-
-// ---------- the car, idling: turntable camera, a wink of DRS, a steering check ----------
+// ---------- the circuit: the season's own, the same one the front page drives ----------
+// Where the car is on the lap is how far the current run has got; crossing the line is the run
+// being decided. So the lap is a progress bar you can read from across the room, and the speed
+// on it is a real car's: brake for the corners, flat out on the straights, and the lap still ends
+// exactly when the run does.
+const ROAD = 6, KERB = 1.4, RUN_SHARE = 0.8;
+const PHASE_AT = { RUN: 0, SCORE: 0.82, DIAGNOSE: 0.86, SELECT: 0.9, CHANGE: 0.93, GATES: 0.96, RESULT: 0.98 };
+const wrap = (i, n) => ((i % n) + n) % n;
+function makeTrack(seed) {
+  const circ = Wd.makeCircuit(seed), pts = circ.pts, n = circ.n, step = circ.step;
+  // how hard each stretch can be taken, then accelerate out of and brake into it
+  const curvS = pts.map((_, i) => { let a = 0; for (let k = -12; k <= 12; k++) a += pts[wrap(i + k, n)].curv; return a / 25; });
+  const v = pts.map(q => Math.min(78, Math.sqrt(34 / Math.max(1e-5, Math.abs(q.curv)))));
+  for (let pass = 0; pass < 2; pass++) {
+    for (let i = 0; i < n; i++) { const j = (i + 1) % n; v[j] = Math.min(v[j], Math.sqrt(v[i] * v[i] + 2 * 11 * step)); }
+    for (let i = n - 1; i >= 0; i--) { const j = (i + 1) % n; v[i] = Math.min(v[i], Math.sqrt(v[j] * v[j] + 2 * 28 * step)); }
+  }
+  const tcum = new Float64Array(n + 1);
+  for (let i = 0; i < n; i++) tcum[i + 1] = tcum[i] + step * 2 / (v[i] + v[(i + 1) % n]);
+  const off = curvS.map(c => Math.max(-1, Math.min(1, c * 260)) * 3.1);   // the racing line: tuck in at the apex
+  // the static world: striped grass, the road, kerbs where it turns, armco where there is room
+  E.begin(); E.setGroup(0); E.setAux(0);
+  const quad = (a, b, c, d, m) => {   // ground quads wind the one way the renderer expects
+    const ux = b[0] - a[0], uz = b[2] - a[2], vx = c[0] - a[0], vz = c[2] - a[2];
+    if (uz * vx - ux * vz < 0) E.Q(a, b, c, d, m); else E.Q(d, c, b, a, m);
+  };
+  let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9;
+  for (const q of pts) { x0 = Math.min(x0, q.x); x1 = Math.max(x1, q.x); z0 = Math.min(z0, q.z); z1 = Math.max(z1, q.z); }
+  const G = 18, gx0 = Math.floor((x0 - 90) / G) * G, gz0 = Math.floor((z0 - 90) / G) * G;
+  for (let gx = gx0; gx < x1 + 90; gx += G) for (let gz = gz0; gz < z1 + 90; gz += G)
+    quad([gx, 0, gz], [gx + G, 0, gz], [gx + G, 0, gz + G], [gx, 0, gz + G], ((gx - gx0) / G + (gz - gz0) / G) % 2 ? M.GRASS : M.GRASS2);
+  const edge = (i, o) => { const q = pts[wrap(i, n)]; return [q.x + q.nx * o, 0, q.z + q.nz * o]; };
+  for (let i = 0; i < n; i++) {
+    const j = i + 1;
+    quad(edge(i, -ROAD), edge(i, ROAD), edge(j, ROAD), edge(j, -ROAD), i === 0 ? M.KERB_W : M.ASPHALT);
+    for (const sd of [-1, 1]) quad(edge(i, sd * (ROAD - 0.55)), edge(i, sd * (ROAD - 0.2)), edge(j, sd * (ROAD - 0.2)), edge(j, sd * (ROAD - 0.55)), M.KERB_W);
+    if (Math.abs(curvS[i]) > 0.0045) for (const sd of [-1, 1])
+      quad(edge(i, sd * ROAD), edge(i, sd * (ROAD + KERB)), edge(j, sd * (ROAD + KERB)), edge(j, sd * ROAD), (i >> 1) % 2 ? M.KERB_R : M.KERB_W);
+    for (const sd of [-1, 1]) {
+      const room = Math.min(circ.room(i, sd), circ.room(j, sd));
+      if (room < 10) continue;
+      const w = Math.min(room - 1, 13) * sd, a = edge(i, w), b = edge(j, w), h = 0.9;
+      E.Q(a, b, [b[0], h, b[2]], [a[0], h, a[2]], M.ARMCO); E.Q(b, a, [a[0], h, a[2]], [b[0], h, b[2]], M.ARMCO);
+    }
+  }
+  // the gantry over the line: where every run is decided
+  const q0 = pts[0], yaw0 = Math.atan2(q0.tx, q0.tz), from = E.current().length;
+  E.box(-ROAD - 1.2, 3, 0, 0.5, 6, 0.5, M.STEEL); E.box(ROAD + 1.2, 3, 0, 0.5, 6, 0.5, M.STEEL);
+  E.box(0, 5.9, 0, ROAD * 2 + 2.9, 0.9, 0.6, M.NAVY);
+  for (let k = -3; k <= 3; k++) E.box(k * 1.4, 5.9, 0.32, 0.8, 0.5, 0.05, k % 2 ? M.GOLD : M.LAMP);
+  E.rotateRange(from, yaw0, q0.x, q0.z);
+  const mesh = E.end();
+  // the minimap: the same lap, a few pixels wide, in the corner of the card
+  const MW = 30, MH = 19, sc = Math.min((MW - 2) / (x1 - x0), (MH - 2) / (z1 - z0));
+  const padX = ((MW - 2) - (x1 - x0) * sc) / 2, padY = ((MH - 2) - (z1 - z0) * sc) / 2;
+  const mini = pts.map(q => [Math.round(1 + padX + (q.x - x0) * sc), Math.round(1 + padY + (q.z - z0) * sc)]);
+  return { circ, pts, n, step, v, tcum, T: tcum[n], off, curvS, mesh, mini, MW, MH };
+}
+// lap fraction (0..1 of lap time) -> distance along the lap, through the speed profile
+function sAt(tr, frac) {
+  const tt = (((frac % 1) + 1) % 1) * tr.T, a = tr.tcum;
+  let lo = 0, hi = tr.n;
+  while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (a[mid] <= tt) lo = mid; else hi = mid; }
+  const u = (tt - a[lo]) / Math.max(1e-9, a[lo + 1] - a[lo]);
+  return (lo + u) * tr.step;
+}
+function poseAt(tr, s) {
+  const f = s / tr.step, i = Math.floor(f), u = f - i, n = tr.n, A = tr.pts[wrap(i, n)], B = tr.pts[wrap(i + 1, n)];
+  const o = tr.off[wrap(i, n)] + (tr.off[wrap(i + 1, n)] - tr.off[wrap(i, n)]) * u;
+  return { x: A.x + (B.x - A.x) * u + (A.nx + (B.nx - A.nx) * u) * o, z: A.z + (B.z - A.z) * u + (A.nz + (B.nz - A.nz) * u) * o, curv: tr.curvS[wrap(i, n)] };
+}
+// where the run is, as a fraction of the lap: the laps fill the first 80 %, the loop's own phases
+// the rest, and the line itself only when the result is in
+function runFraction() {
+  if (st.source === 'replay') return st.busy ? Math.min(0.995, st.replay.elapsed / st.replay.every) : 0;
+  if (!st.busy) return 0;
+  if (st.phase === 'RUN' || !st.phase) return st.laps ? RUN_SHARE * st.lap / st.laps : 0;
+  return PHASE_AT[st.phase] !== undefined ? PHASE_AT[st.phase] : RUN_SHARE;
+}
+function drive(dt) {
+  const tr = st.track, c = st.car;
+  const target = st.rounds.length + runFraction();
+  if (target < st.along - 0.5 || target - st.along > 1.5) st.along = target - 0.001;   // a new season, or back from a hidden tab
+  const gap = target - st.along, rate = gap > 0.25 ? 1 / 4 : 1 / 12;
+  st.along += Math.max(0, Math.min(gap, rate * dt * (1 + gap * 4)));
+  const s = sAt(tr, st.along), p = poseAt(tr, s), ahead = poseAt(tr, s + 3), behind = poseAt(tr, s - 3);
+  const speed = dt > 0 ? Math.hypot(p.x - c.x, p.z - c.z) / dt : 0;
+  c.x = p.x; c.z = p.z; c.y = 0;
+  c.yaw = Math.atan2(ahead.x - behind.x, ahead.z - behind.z);
+  c.speed = speed;
+  const k = 1 - Math.exp(-8 * dt), moving = speed > 1.5;
+  c.steer += ((moving ? Math.max(-0.34, Math.min(0.34, p.curv * 24)) : 0) - c.steer) * k;
+  c.roll += ((moving ? Math.max(-0.07, Math.min(0.07, -p.curv * speed * 0.9)) : 0) - c.roll) * k;
+  c.pitch = 0; c.spin += speed * dt / 0.33; c.fanSpin += dt * (1.5 + speed * 0.2);
+  c.drsAngle += ((moving && speed > 55 && Math.abs(p.curv) < 0.002 ? 0.75 : 0) - c.drsAngle) * k;
+  if (!moving) {   // parked on the line between runs: a wink of DRS, a steering check
+    const t = E.time % 9;
+    if (t > 6 && t < 6.9) c.drsAngle = 0.75 * Math.sin((t - 6) / 0.9 * Math.PI);
+    if (t > 2.5 && t < 4) c.steer = 0.3 * Math.sin((t - 2.5) / 1.5 * Math.PI * 2);
+  }
+}
+function camera(dt) {
+  const c = st.car, cam = st.R.cam, k = 1 - Math.exp(-3.2 * dt), calm = reduced();
+  st.whip = Math.max(0, st.whip - dt * 4.5);
+  let d = c.yaw - st.camYaw; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
+  st.camYaw += d * k;
+  st.orbit += st.whip * dt * 1.87;                                   // a kept run: the camera goes once round the car
+  if (!st.whip) { const home = Math.round(st.orbit / (2 * Math.PI)) * 2 * Math.PI; st.orbit += (home - st.orbit) * (1 - Math.exp(-1.5 * dt)); }
+  const a = st.camYaw + st.orbit + (calm ? 0.35 : 0.35 + Math.sin(E.time * 0.21) * 0.4), dist = 9.5, h = 3.6;
+  cam.pos = [c.x - Math.sin(a) * dist, h, c.z - Math.cos(a) * dist];
+  cam.target = [c.x + Math.sin(c.yaw) * 2.5, 0.3, c.z + Math.cos(c.yaw) * 2.5]; cam.fov = 42;
+}
+function minimap(R) {
+  const tr = st.track, px = R.px, w = R.W, ox = w - tr.MW - 2, oy = 2;
+  for (let y = 0; y < tr.MH; y++) for (let x = 0; x < tr.MW; x++) { const o = ((oy + y) * w + ox + x) * 4; px[o] >>= 2; px[o + 1] >>= 2; px[o + 2] >>= 1; }
+  const done = ((st.along % 1) + 1) % 1, iNow = Math.min(tr.n - 1, Math.floor(sAt(tr, done) / tr.step));
+  const put = (x, y, r, g, b) => { const o = ((oy + y) * w + ox + x) * 4; px[o] = r; px[o + 1] = g; px[o + 2] = b; };
+  tr.mini.forEach(([x, y], i) => i <= iNow && st.busy ? put(x, y, 244, 197, 66) : put(x, y, 82, 88, 114));
+  put(tr.mini[0][0], tr.mini[0][1], 255, 255, 255);
+  const [cx, cy] = tr.mini[iNow]; if ((E.time * 3 | 0) % 2 || !st.busy) put(cx, cy, 255, 255, 255); else put(cx, cy, 227, 30, 45);
+}
 function rebuild(animate) {
   st.spec = C.specForLevels(st.levels);
   const mesh = C.build(st.spec, C.eraForLevels(st.levels));
@@ -63,24 +177,12 @@ function rebuild(animate) {
   st.mesh = mesh;
   if (animate && !reduced()) st.whip = 5.5;
 }
-function camera(dt) {
-  st.whip = Math.max(0, st.whip - dt * 4.5);
-  st.orbit += dt * (0.3 + st.whip);
-  const cam = st.R.cam, r = 5.35;
-  cam.pos = [Math.sin(st.orbit) * r, 1.5, Math.cos(st.orbit) * r]; cam.target = [0, 0.4, 0]; cam.fov = 31;
-}
-function idle(dt) {
-  const c = st.car, k = E.time % 9;
-  c.spin = 0; c.roll = 0; c.pitch = 0;
-  c.drsAngle = k > 6 && k < 6.9 ? 0.75 * Math.sin((k - 6) / 0.9 * Math.PI) : 0;
-  c.steer = k > 2.5 && k < 4 ? 0.3 * Math.sin((k - 2.5) / 1.5 * Math.PI * 2) : 0;
-  c.fanSpin += dt * 1.5;
-}
 const lifted = (xf, dy) => (x, y, z, g, o) => { xf(x, y, z, g, o); o[1] += dy; };
 function burst(n) {
   for (let k = 0; k < n; k++) {
-    const h = E.hash2(k, st.fx.length + 1), h2 = E.hash2(k * 7 + 3, 11), wd = C.WHEELS[k & 3];
-    st.fx.push({ x: wd.cx * 1.1, y: 0.15, z: wd.cz, vx: (h - 0.5) * 9, vy: 2 + h2 * 4, vz: (h2 - 0.5) * 9, life: 0.45 + h * 0.5 });
+    const h = E.hash2(k, st.fx.length + 1), h2 = E.hash2(k * 7 + 3, 11), wd = C.WHEELS[k & 3], o = [0, 0, 0];
+    C.makeXform(st.car, { pose: 'display' })(wd.cx * 1.1, 0.15, wd.cz, 0, o);
+    st.fx.push({ x: o[0], y: o[1], z: o[2], vx: (h - 0.5) * 9, vy: 2 + h2 * 4, vz: (h2 - 0.5) * 9, life: 0.45 + h * 0.5 });
   }
 }
 function tint(R, col, amount) {
@@ -104,13 +206,14 @@ function renderAnim(a) {
   }
 }
 function frame(dt) {
-  E.time += dt; camera(dt); idle(dt); S.stepSparks(st.fx, dt);
-  const R = st.R; R.begin(); R.gradient('#0C1236', '#06081A'); R.drawStatic(st.ground);
+  E.time += dt; drive(dt); camera(dt); S.stepSparks(st.fx, dt);
+  const R = st.R; R.begin(); R.sky(); R.drawStatic(st.track.mesh);
   const a = st.anim;
   if (a) { a.t += dt; renderAnim(a); if (a.t > a.len) st.anim = null; }
   else { const xf = C.makeXform(st.car); R.drawDynamic(st.mesh, xf, 'shadow', 0); R.drawDynamic(st.mesh, xf, 'solid', 0); }
   S.drawSparks(R, st.fx); R.outline();
   if (a) { if (a.flash > 0) R.flash(a.flash); if (a.tint > 0) tint(R, [227, 30, 45], a.tint); }
+  minimap(R);
   R.present();
 }
 
@@ -185,12 +288,19 @@ const loopback = o => { try { const u = new URL(o); return u.hostname === '127.0
 async function detect(pref) {
   const here = /^https?:/.test(location.origin) ? location.origin : '';
   if (pref && pref !== 'replay' && pref !== here && !loopback(pref)) pref = 'replay';
-  const cands = pref === 'replay' ? [] : pref ? [pref] : [here, LOCAL].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i);
+  const cands = pref === 'replay' ? [] : pref ? [pref] : [here, location.protocol === 'http:' ? LOCAL : ''].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i);
   for (const o of cands) { const s = await probe(o); if (s) { goLive(o, s); return; } }
   goReplay();
+  if (pref || location.protocol !== 'http:' || !cands.length) return;
+  const again = setInterval(async () => {
+    for (const o of cands) { const s = await probe(o); if (!s) continue;
+      clearInterval(again); st.replay.all = []; st.rounds = []; st.lapsRun = 0; st.levels = C.levelsAfter([], 0);
+      goLive(o, s); rebuild(false); paint(true); paintActions(); return; }
+  }, 20000);
 }
 function goLive(origin, s) {
   st.source = 'live'; st.origin = origin; st.busy = !!s.busy; st.error = s.error || null;
+  if (st.root) paintActions();
   if (s.levels && Object.keys(s.levels).length) { st.levels = s.levels; rebuild(false); }
   st.run = s.run || 0;
   const es = new EventSource(origin + '/api/events'); st.es = es;
@@ -200,11 +310,16 @@ function goLive(origin, s) {
   es.onmessage = ev => { let d; try { d = JSON.parse(ev.data); } catch (e) { return; }
     if (d.seq !== undefined) { if (d.seq <= st.seenSeq) return; st.seenSeq = d.seq; }
     if (warm) settle(); st.linkDown = false; onLive(d, !warm); };
+  es.onopen = () => {
+    if (!st.linkDown) return;
+    st.linkDown = false; st.seenSeq = 0; st.rounds = []; st.lapsRun = 0; st.error = null;
+    warm = true; settle(); paint(true);
+  };
   es.onerror = () => { st.linkDown = true; paint(true); };
   settle(); paint(true);
 }
 function onLive(d, fresh) {
-  if (d.kind === 'phase') { st.phase = d.phase; if (d.phase === 'RUN') { st.run = d.generation + 1; st.lap = 0; st.laps = d.total || 0; st.busy = true; }
+  if (d.kind === 'phase') { st.phase = d.phase; if (d.phase === 'RUN') { st.run = d.generation + 1; st.lap = 0; st.laps = d.total || 0; st.busy = true; st.error = null; }
     if (d.levels && !fresh) { st.levels = d.levels; rebuild(false); } }
   else if (d.kind === 'lap') { if (d.race !== st.race) { st.race = d.race; st.lap = 0; } st.lap = d.index; st.laps = d.total; st.lapsRun++; }
   else if (d.kind === 'score') { st.claimed = d.claimed; st.official = d.official; }
@@ -225,9 +340,9 @@ const level = k => { const n = Math.floor(Number((st.levels || {})[k])); return 
 function paint(now) {
   const root = st.root; if (!root) return;
   const src = st.source === 'live' ? 'LIVE' : st.source === 'replay' ? 'REPLAY' : '';
-  const runNo = st.busy ? st.run || st.rounds.length + 1 : st.rounds.length;
+  const runNo = st.busy ? (st.source === 'live' && st.run ? st.run : st.rounds.length + 1) : st.rounds.length;
   const txt = st.source === 'probing' ? 'LOOKING FOR THE LOOP'
-    : st.error ? `${src} · RUN STOPPED` : st.busy && st.laps ? `${src} RUN ${runNo} · LAP ${st.lap}/${st.laps}`
+    : st.error ? `${src} · RUN STOPPED` : st.busy && st.laps && (st.phase === 'RUN' || !st.phase) ? `${src} RUN ${runNo} · LAP ${st.lap}/${st.laps}`
     : st.busy ? `${src} RUN ${runNo} · ${st.phase || 'STARTING'}` : `${src} · RUN ${runNo} · KEPT ${kept()}`;
   if (txt !== st.stripTxt) { st.stripTxt = txt; root.querySelector('.pit-txt').textContent = txt; }
   const dot = root.querySelector('.pit-dot'), dc = 'pit-dot ' + (st.source === 'live' ? (st.linkDown ? 'down' : st.busy ? 'busy' : 'live') : st.source === 'replay' ? 'replay' : 'probe');
@@ -277,8 +392,8 @@ function paintActions() {
   const a = st.root.querySelector('.pb-actions'); a.innerHTML = '';
   if (canPip()) { const pb = el('button', 'pb-btn', st.pip ? 'BRING IT BACK' : 'POP OUT ↗'); pb.type = 'button';
     pb.addEventListener('click', ev => { ev.stopPropagation(); if (st.pip) st.pip.close(); else P.popOut(); }); a.append(pb); }
-  const link = el('a', 'pb-link', 'THE BROADCAST ↗');
-  link.href = st.source === 'live' && (st.origin === location.origin || loopback(st.origin)) ? st.origin + '/' : 'https://scrutineer-one.vercel.app/'; link.target = '_blank'; link.rel = 'noopener'; a.append(link);
+  const link = el('a', 'pb-link', 'TELEMETRY ↗');
+  link.href = (st.source === 'live' && (st.origin === location.origin || loopback(st.origin)) ? st.origin : 'https://scrutineer-one.vercel.app') + '/telemetry'; link.target = '_blank'; link.rel = 'noopener'; a.append(link);
 }
 
 // ---------- the card on the page: drag, hover, pop out ----------
@@ -307,9 +422,9 @@ function wire() {
   const drop = () => { if (!st.drag) return; st.drag = null; r.classList.remove('dragging'); if (st.open) setOpen(true); };
   strip.addEventListener('pointerup', drop); strip.addEventListener('pointercancel', drop);
   // hover opens the board; a tap on the car does the same on a screen with no hover
-  r.addEventListener('mouseenter', () => setOpen(true)); r.addEventListener('mouseleave', () => setOpen(false));
+  r.addEventListener('mouseenter', () => { if (!st.open) st.openedAt = Date.now(); setOpen(true); }); r.addEventListener('mouseleave', () => setOpen(false));
   r.addEventListener('focusin', () => setOpen(true)); r.addEventListener('focusout', ev => { if (!r.contains(ev.relatedTarget)) setOpen(false); });
-  r.querySelector('canvas').addEventListener('click', () => setOpen(!st.open));
+  r.querySelector('canvas').addEventListener('click', () => { if (st.open && Date.now() - (st.openedAt || 0) < 400) return; setOpen(!st.open); });
   r.addEventListener('keydown', ev => { if (ev.key === 'Escape') setOpen(false); });
   window.addEventListener('resize', () => { if (!st.pip && r.style.left) place(parseFloat(r.style.left), parseFloat(r.style.top)); });
   const pop = r.querySelector('.pit-pop');
@@ -318,8 +433,9 @@ function wire() {
   pop.addEventListener('click', ev => { ev.stopPropagation(); if (st.pip) st.pip.close(); else P.popOut(); });
 }
 P.popOut = async function () {
-  if (!canPip() || st.pip) return;
-  let w; try { w = await window.documentPictureInPicture.requestWindow({ width: 288, height: 230 }); } catch (e) { return; }
+  if (st.pip) return true;
+  if (!canPip()) return false;
+  let w; try { w = await window.documentPictureInPicture.requestWindow({ width: 288, height: 230 }); } catch (e) { return false; }
   for (const n of document.querySelectorAll('link[data-pit],style[data-pit]')) w.document.head.append(n.cloneNode(true));
   w.document.title = 'Scrutineer · pit board'; w.document.body.className = 'pit-pipbody';
   w.document.body.append(st.root); st.root.classList.add('inpip'); st.root.classList.remove('open', 'up'); st.open = false;
@@ -328,6 +444,7 @@ P.popOut = async function () {
     if (st.pip !== w) return;
     st.pip = null; st.host.append(st.root); st.root.classList.remove('inpip'); restore(); swapLoop(window); paintActions(); paint(true);
   });
+  return true;
 };
 // the animation loop runs on whichever window holds the card: a background tab stops its own
 // frames, but the popped-out window keeps drawing
@@ -348,7 +465,8 @@ function ensureStyles() {
 
 // mount({host, source}) — source: 'auto' (default) | 'replay' | an origin such as http://127.0.0.1:7777
 P.mount = function (opts = {}) {
-  if (st.root) return P;
+  if (st.root) { if (opts.dock === false) { st.dock = false; st.root.classList.add('pit-away'); } return P; }
+  st.dock = opts.dock !== false;
   ensureStyles();
   st.host = opts.host || document.body; st.since = Date.now();
   const root = st.root = el('div', 'pit'); root.tabIndex = 0; root.setAttribute('role', 'group'); root.setAttribute('aria-label', 'Scrutineer pit board');
@@ -357,9 +475,12 @@ P.mount = function (opts = {}) {
     + '<div class="pit-strip"><i class="pit-dot probe"></i><span class="pit-txt">LOOKING FOR THE LOOP</span>'
     + '<button class="pit-pop" type="button" title="pop out — a window of its own, above every app" aria-label="pop out">↗</button></div>'
     + '<div class="pit-board"><div class="pb-body"></div><div class="pb-actions"></div></div>';
+  if (!st.dock) root.classList.add('pit-away');
   st.host.append(root); st.card = root.querySelector('.pit-card');
   st.R = E.createRenderer(root.querySelector('canvas'), W, H, 1); st.R.ambient = 0.22; st.R.seamCutoff = 40;
-  st.ground = makeGround(); st.car = C.displayState(0, 0, 0);
+  const L = window.SCRUTINEER_PIT || {};
+  st.track = makeTrack(L.seed === undefined ? 1994 : L.seed); Wd.applyVenue(st.R, st.track.circ.venue);
+  st.car = C.newState(); drive(0); st.camYaw = st.car.yaw;
   st.levels = C.levelsAfter([], 0); rebuild(false);
   restore(); wire(); paintActions(); paint(true); swapLoop(window);
   const q = new URLSearchParams(location.search).get('source');
