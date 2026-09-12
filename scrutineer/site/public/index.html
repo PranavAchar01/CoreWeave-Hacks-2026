@@ -394,6 +394,29 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .rh-tip .t-file{font-family:"VT323","Courier New",monospace;font-size:14px;line-height:14px;
   color:var(--mid);text-transform:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
+/* Timing tower / championship. Left edge, under the season summary. */
+.rh-stand{position:absolute;left:14px;top:118px;width:236px;
+  background:rgba(6,8,26,.9);border-left:3px solid var(--gold);padding:0 0 4px}
+.rh-stand .st-head{display:flex;justify-content:space-between;align-items:baseline;gap:6px;
+  padding:6px 8px;border-bottom:1px solid var(--studio);font-size:7px;color:var(--white)}
+.rh-stand .st-head i{font-style:normal;font-size:6px;color:var(--gold)}
+.rh-stand .st-cols{display:grid;grid-template-columns:12px minmax(0,1fr) 34px 30px 22px;gap:5px;
+  padding:3px 8px;font-size:5px;color:var(--mid);border-bottom:1px solid rgba(18,26,74,.6)}
+.rh-stand .st-row{display:grid;grid-template-columns:12px minmax(0,1fr) 34px 30px 22px;gap:5px;
+  align-items:baseline;padding:4px 8px;border-bottom:1px solid rgba(18,26,74,.45);font-size:6px}
+.rh-stand .st-row>b{color:var(--mid)}
+.rh-stand .st-row>span{color:var(--caption);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rh-stand .st-row>i,.rh-stand .st-row>u{font-style:normal;text-decoration:none;
+  font-family:"VT323","Courier New",monospace;font-size:16px;line-height:12px;
+  color:var(--white);font-variant-numeric:tabular-nums;text-align:right}
+.rh-stand .st-row.lead{background:rgba(255,163,24,.14)}
+.rh-stand .st-row.lead>b,.rh-stand .st-row.lead>span{color:var(--amber)}
+.rh-stand .st-row.chosen>span::after{content:" \25C0";color:var(--gold)}
+.rh-stand .st-row.kept>u{color:var(--green)}
+.rh-stand .st-none{padding:5px 8px;font-size:6px;color:var(--mid);line-height:10px}
+.rh-stand .st-note{padding:5px 8px;font-size:6px;color:var(--mid);line-height:11px;
+  border-top:1px solid rgba(18,26,74,.6)}
+
 /* Sector board. Three rows, the way a timing screen carries S1/S2/S3. */
 .rh-sectors{position:absolute;left:14px;bottom:118px;display:flex;flex-direction:column;gap:2px;
   background:rgba(6,8,26,.86);padding:6px 8px;border-left:3px solid var(--studio)}
@@ -877,6 +900,10 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
             </div>
             <div class="rh-phase" id="rhPhase">BUILDING</div>
           </div>
+
+          <!-- The timing tower: who is being blamed in this run, and the championship
+               across the season so far. -->
+          <div class="rh-stand" id="rhStand" hidden></div>
 
           <!-- Sectors. Not invented: the loop measured the task families as two separate
                populations, and these are those sides. Purple is the best that sector has ever
@@ -10295,6 +10322,88 @@ function showTip(k) {
 }
 function hideTip() { const tip = $('rhTip'); if (tip) tip.hidden = true; }
 
+// ---------------------------------------------------------------------------------------
+// The timing tower, and the championship.
+//
+// The loop only reports a component once its blame clears the evidence bar, so most runs name
+// exactly one. That is the honest shape of the data and the tower says so rather than padding
+// itself out to ten rows of zeroes.
+// ---------------------------------------------------------------------------------------
+function blameTower(r) {
+  const rows = Object.entries(r.standings || {})
+    .filter(([, v]) => v && v.n)
+    .sort((a, b) => b[1].blame_s - a[1].blame_s);
+  const host = $('rhStand');
+  host.textContent = '';
+  const h = el('div', 'st-head');
+  h.innerHTML = `<span>BLAME</span><i>RUN ${st.i + 1}</i>`;
+  host.append(h);
+  if (!rows.length) {
+    host.append(el('div', 'st-none',
+      'No component cleared the evidence bar. Nothing is blamed, and nothing changes.'));
+    return;
+  }
+  const cols = el('div', 'st-cols');
+  cols.innerHTML = '<span></span><span>COMPONENT</span><span>LOST</span><span>CASES</span><span></span>';
+  host.append(cols);
+  rows.forEach(([key, v], i) => {
+    const p = BY_KEY[key] || { name: key };
+    const n = el('div', 'st-row' + (i === 0 ? ' lead' : '') + (key === r.role ? ' chosen' : ''));
+    n.innerHTML = `<b>${i + 1}</b><span>${esc(p.name)}</span>`
+      + `<i>${fx(v.blame_s, 1)}s</i><u>${v.n}</u><span></span>`;
+    host.append(n);
+  });
+  const quiet = ALL.length - rows.length;
+  host.append(el('div', 'st-note',
+    `${quiet} others: no confirmed incidents this run. Blame is only recorded when correcting `
+    + 'the component actually flips the failure.'));
+}
+
+// Across the season so far: how often each component was blamed, and how often the change
+// written against it survived the gates.
+function championship(upTo) {
+  const tally = {};
+  for (let i = 0; i < upTo; i++) {
+    const r = st.rounds[i]; if (!r || !r.role) continue;
+    const t = tally[r.role] || (tally[r.role] = { blamed: 0, kept: 0, lost: 0 });
+    t.blamed++;
+    if (r.promoted) t.kept++;
+    const sd = (r.standings || {})[r.role];
+    if (sd) t.lost = Math.max(t.lost, sd.blame_s);
+  }
+  const rows = Object.entries(tally).sort((a, b) => b[1].kept - a[1].kept || b[1].blamed - a[1].blamed);
+  const host = $('rhStand');
+  host.textContent = '';
+  const h = el('div', 'st-head');
+  h.innerHTML = `<span>CHAMPIONSHIP</span><i>AFTER RUN ${upTo}</i>`;
+  host.append(h);
+  if (!rows.length) { host.append(el('div', 'st-none', 'No component has been changed yet.')); return; }
+  const cols = el('div', 'st-cols');
+  cols.innerHTML = '<span></span><span>COMPONENT</span><span>BLAMED</span><span>KEPT</span><span>LV</span>';
+  host.append(cols);
+  rows.forEach(([key, t], i) => {
+    const p = BY_KEY[key] || { name: key };
+    const n = el('div', 'st-row' + (i === 0 ? ' lead' : '') + (t.kept ? ' kept' : ''));
+    n.innerHTML = `<b>${i + 1}</b><span>${esc(p.name)}</span>`
+      + `<i>${t.blamed}</i><u>${t.kept}</u><span>L${st.levels[key] || 1}</span>`;
+    host.append(n);
+  });
+}
+
+function standings(r) {
+  const host = $('rhStand'); if (!host) return;
+  // Up while the loop is working out the cause and acting on it; the championship between runs.
+  // Down while it is building, so the picture is clean when there is nothing to rank.
+  const live = ['DIAGNOSE', 'SELECT', 'CHANGE', 'GATES'].includes(st.phase);
+  const table = st.phase === 'RESULT' || st.phase === 'INTRO';
+  host.hidden = !(r && (live || table));
+  if (host.hidden) { host.dataset.sig = ''; return; }
+  const sig = live ? `b${st.i}` : `c${st.i}|${st.phase}`;
+  if (host.dataset.sig === sig) return;
+  host.dataset.sig = sig;
+  if (live) blameTower(r); else championship(st.i + 1);
+}
+
 function sectors(r, tasks) {
   const host = $('rhSectors'); if (!host) return;
   if (!r || !tasks.length) { host.hidden = true; return; }
@@ -10479,6 +10588,7 @@ function paintHud() {
     put('rhGap', (gap.s >= 0 ? '+' : '\u2212') + fx(Math.abs(gap.s)) + 's', gap.s < -0.02 ? 'behind' : '');
   }
 
+  standings(r);
   sectors(r, tasks);
   fastestLap(r);
   sinceRunOne();

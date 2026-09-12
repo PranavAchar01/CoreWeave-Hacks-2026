@@ -381,6 +381,29 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .rh-tip .t-file{font-family:"VT323","Courier New",monospace;font-size:14px;line-height:14px;
   color:var(--mid);text-transform:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
+/* Timing tower / championship. Left edge, under the season summary. */
+.rh-stand{position:absolute;left:14px;top:118px;width:236px;
+  background:rgba(6,8,26,.9);border-left:3px solid var(--gold);padding:0 0 4px}
+.rh-stand .st-head{display:flex;justify-content:space-between;align-items:baseline;gap:6px;
+  padding:6px 8px;border-bottom:1px solid var(--studio);font-size:7px;color:var(--white)}
+.rh-stand .st-head i{font-style:normal;font-size:6px;color:var(--gold)}
+.rh-stand .st-cols{display:grid;grid-template-columns:12px minmax(0,1fr) 34px 30px 22px;gap:5px;
+  padding:3px 8px;font-size:5px;color:var(--mid);border-bottom:1px solid rgba(18,26,74,.6)}
+.rh-stand .st-row{display:grid;grid-template-columns:12px minmax(0,1fr) 34px 30px 22px;gap:5px;
+  align-items:baseline;padding:4px 8px;border-bottom:1px solid rgba(18,26,74,.45);font-size:6px}
+.rh-stand .st-row>b{color:var(--mid)}
+.rh-stand .st-row>span{color:var(--caption);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rh-stand .st-row>i,.rh-stand .st-row>u{font-style:normal;text-decoration:none;
+  font-family:"VT323","Courier New",monospace;font-size:16px;line-height:12px;
+  color:var(--white);font-variant-numeric:tabular-nums;text-align:right}
+.rh-stand .st-row.lead{background:rgba(255,163,24,.14)}
+.rh-stand .st-row.lead>b,.rh-stand .st-row.lead>span{color:var(--amber)}
+.rh-stand .st-row.chosen>span::after{content:" \25C0";color:var(--gold)}
+.rh-stand .st-row.kept>u{color:var(--green)}
+.rh-stand .st-none{padding:5px 8px;font-size:6px;color:var(--mid);line-height:10px}
+.rh-stand .st-note{padding:5px 8px;font-size:6px;color:var(--mid);line-height:11px;
+  border-top:1px solid rgba(18,26,74,.6)}
+
 /* Sector board. Three rows, the way a timing screen carries S1/S2/S3. */
 .rh-sectors{position:absolute;left:14px;bottom:118px;display:flex;flex-direction:column;gap:2px;
   background:rgba(6,8,26,.86);padding:6px 8px;border-left:3px solid var(--studio)}

@@ -835,6 +835,88 @@ function showTip(k) {
 }
 function hideTip() { const tip = $('rhTip'); if (tip) tip.hidden = true; }
 
+// ---------------------------------------------------------------------------------------
+// The timing tower, and the championship.
+//
+// The loop only reports a component once its blame clears the evidence bar, so most runs name
+// exactly one. That is the honest shape of the data and the tower says so rather than padding
+// itself out to ten rows of zeroes.
+// ---------------------------------------------------------------------------------------
+function blameTower(r) {
+  const rows = Object.entries(r.standings || {})
+    .filter(([, v]) => v && v.n)
+    .sort((a, b) => b[1].blame_s - a[1].blame_s);
+  const host = $('rhStand');
+  host.textContent = '';
+  const h = el('div', 'st-head');
+  h.innerHTML = `<span>BLAME</span><i>RUN ${st.i + 1}</i>`;
+  host.append(h);
+  if (!rows.length) {
+    host.append(el('div', 'st-none',
+      'No component cleared the evidence bar. Nothing is blamed, and nothing changes.'));
+    return;
+  }
+  const cols = el('div', 'st-cols');
+  cols.innerHTML = '<span></span><span>COMPONENT</span><span>LOST</span><span>CASES</span><span></span>';
+  host.append(cols);
+  rows.forEach(([key, v], i) => {
+    const p = BY_KEY[key] || { name: key };
+    const n = el('div', 'st-row' + (i === 0 ? ' lead' : '') + (key === r.role ? ' chosen' : ''));
+    n.innerHTML = `<b>${i + 1}</b><span>${esc(p.name)}</span>`
+      + `<i>${fx(v.blame_s, 1)}s</i><u>${v.n}</u><span></span>`;
+    host.append(n);
+  });
+  const quiet = ALL.length - rows.length;
+  host.append(el('div', 'st-note',
+    `${quiet} others: no confirmed incidents this run. Blame is only recorded when correcting `
+    + 'the component actually flips the failure.'));
+}
+
+// Across the season so far: how often each component was blamed, and how often the change
+// written against it survived the gates.
+function championship(upTo) {
+  const tally = {};
+  for (let i = 0; i < upTo; i++) {
+    const r = st.rounds[i]; if (!r || !r.role) continue;
+    const t = tally[r.role] || (tally[r.role] = { blamed: 0, kept: 0, lost: 0 });
+    t.blamed++;
+    if (r.promoted) t.kept++;
+    const sd = (r.standings || {})[r.role];
+    if (sd) t.lost = Math.max(t.lost, sd.blame_s);
+  }
+  const rows = Object.entries(tally).sort((a, b) => b[1].kept - a[1].kept || b[1].blamed - a[1].blamed);
+  const host = $('rhStand');
+  host.textContent = '';
+  const h = el('div', 'st-head');
+  h.innerHTML = `<span>CHAMPIONSHIP</span><i>AFTER RUN ${upTo}</i>`;
+  host.append(h);
+  if (!rows.length) { host.append(el('div', 'st-none', 'No component has been changed yet.')); return; }
+  const cols = el('div', 'st-cols');
+  cols.innerHTML = '<span></span><span>COMPONENT</span><span>BLAMED</span><span>KEPT</span><span>LV</span>';
+  host.append(cols);
+  rows.forEach(([key, t], i) => {
+    const p = BY_KEY[key] || { name: key };
+    const n = el('div', 'st-row' + (i === 0 ? ' lead' : '') + (t.kept ? ' kept' : ''));
+    n.innerHTML = `<b>${i + 1}</b><span>${esc(p.name)}</span>`
+      + `<i>${t.blamed}</i><u>${t.kept}</u><span>L${st.levels[key] || 1}</span>`;
+    host.append(n);
+  });
+}
+
+function standings(r) {
+  const host = $('rhStand'); if (!host) return;
+  // Up while the loop is working out the cause and acting on it; the championship between runs.
+  // Down while it is building, so the picture is clean when there is nothing to rank.
+  const live = ['DIAGNOSE', 'SELECT', 'CHANGE', 'GATES'].includes(st.phase);
+  const table = st.phase === 'RESULT' || st.phase === 'INTRO';
+  host.hidden = !(r && (live || table));
+  if (host.hidden) { host.dataset.sig = ''; return; }
+  const sig = live ? `b${st.i}` : `c${st.i}|${st.phase}`;
+  if (host.dataset.sig === sig) return;
+  host.dataset.sig = sig;
+  if (live) blameTower(r); else championship(st.i + 1);
+}
+
 function sectors(r, tasks) {
   const host = $('rhSectors'); if (!host) return;
   if (!r || !tasks.length) { host.hidden = true; return; }
@@ -1019,6 +1101,7 @@ function paintHud() {
     put('rhGap', (gap.s >= 0 ? '+' : '\u2212') + fx(Math.abs(gap.s)) + 's', gap.s < -0.02 ? 'behind' : '');
   }
 
+  standings(r);
   sectors(r, tasks);
   fastestLap(r);
   sinceRunOne();
