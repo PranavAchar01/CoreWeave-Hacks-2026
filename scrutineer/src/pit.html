@@ -25,18 +25,22 @@
     <section class="desk-col">
       <h2>WHERE THE NUMBERS COME FROM</h2>
       <p>The strip's dot says which. <i class="sw live"></i><b>LIVE</b> means a <code>scrutineer
-        watch</code> server answered — on this origin, or on <code>127.0.0.1:7777</code> from
-        anywhere — and every lap, score and verdict on the board is the loop's own, as it happens
-        on that machine. The key never leaves it.</p>
-      <p><i class="sw replay"></i><b>REPLAY</b> means no loop is running, so the board replays the
+        watch</code> server answered, and every lap, score and verdict on the board is the loop's
+        own, as it happens on that machine. The key never leaves it.</p>
+      <p><i class="sw replay"></i><b>REPLAY</b> means no loop answered, so the board replays the
         recorded season shipped with this page, one generation every 24 seconds, round again when
         it ends. The numbers are the season's; only the clock is the board's.</p>
+      <p>This page, on <code>https</code>, is always a replay: a browser will not let an
+        <code>https</code> page talk to a plain <code>http</code> server on your machine, and the
+        loop speaks plain http on your own hardware. So the live board is the one the loop serves
+        you itself.</p>
       <h2>RUN IT LIVE</h2>
       <pre class="desk-code">cd scrutineer/loop
 export ANTHROPIC_API_KEY=sk-ant-…
 uv run scrutineer watch</pre>
-      <p>Then open this page again — the dot turns green — or leave this one open: the card finds
-        the loop on <code>127.0.0.1:7777</code> by itself.</p>
+      <p>Then open <code>http://127.0.0.1:7777/pit</code> — same card, green dot, real numbers. The
+        embed does the same on any <code>http</code> page of yours on that machine: it finds the
+        loop on <code>127.0.0.1:7777</code> by itself.</p>
     </section>
   </main>
 </div>

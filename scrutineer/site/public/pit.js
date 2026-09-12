@@ -687,10 +687,13 @@ S.fmtD = d => (d <= 0 ? '−' : '+') + Math.abs(d).toFixed(2) + 's';
 //   · pop it out — Document Picture-in-Picture gives it a window of its own, above every app
 //   · drag it anywhere on the page it lives in; it remembers where you left it
 //   · embed it: one script tag, src="https://scrutineer-one.vercel.app/pit.js"
-// Two sources, and the strip says which. LIVE when a `scrutineer watch` server answers — on this
-// origin, or on 127.0.0.1:7777 from anywhere. Otherwise REPLAY: the recorded season shipped in
-// the bundle, one generation every `every` seconds, around again when it ends. Nothing on the
-// board is invented by the board: the numbers are the season's, live or recorded.
+// Two sources, and the strip says which. LIVE when a `scrutineer watch` server answers: this
+// origin first, then 127.0.0.1:7777. That second probe only ever succeeds from a page served over
+// plain http — a browser will not let an https page reach a plain-http server, loopback included
+// — so the hosted copy always replays and the live board is the one the loop serves itself.
+// REPLAY is the recorded season shipped in the bundle, one generation every `every` seconds,
+// around again when it ends. Nothing on the board is invented by the board: the numbers are the
+// season's, live or recorded.
 // ============================================================================
 (function (SCR) {
 'use strict';

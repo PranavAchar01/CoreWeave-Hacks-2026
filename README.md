@@ -26,8 +26,10 @@ VERIFICATION, compound with SAMPLING. Switch to `GARAGE` for the same state from
 The pit board is the car on a card that stays on top. Pop it out and it floats above every other
 app while the loop runs behind it; each time a generation lands the car rebuilds and a placard says
 what was kept. Hover it for how far the agent has run — runs, laps, score, the ten components. It
-turns live when a `scrutineer watch` server is running on the machine, and replays the recorded
-season otherwise. One line embeds it anywhere:
+turns live when a `scrutineer watch` server answers — open `http://127.0.0.1:7777/pit` while the
+loop is running — and replays the recorded season otherwise. The hosted copy is always a replay: a
+browser will not let an `https` page reach a plain-http server on your own machine. One line embeds
+it anywhere:
 
 ```html
 <script src="https://scrutineer-one.vercel.app/pit.js" async></script>
