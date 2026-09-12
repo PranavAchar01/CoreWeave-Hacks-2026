@@ -175,6 +175,8 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .top-right{display:flex;align-items:center;gap:12px}
 .runcount{font-family:"Press Start 2P","Courier New",monospace;font-size:8px;color:var(--mid)}
+.pitlink{font-family:"Press Start 2P","Courier New",monospace;font-size:7px;color:var(--gold);text-decoration:none;letter-spacing:.06em;padding:6px 8px;border:2px solid var(--studio)}
+.pitlink:hover{border-color:var(--gold)}
 .run{font-family:"Press Start 2P","Courier New",monospace;font-size:10px;padding:11px 18px;
   background:var(--gold);color:var(--ink);border:0;cursor:pointer;letter-spacing:.5px}
 .run:hover:not(:disabled){background:#FFD75E}

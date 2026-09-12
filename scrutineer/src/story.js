@@ -271,6 +271,10 @@ function onLive(d) {
       showGarage(d.role, true);
       say(`Approved. <b>${esc(p.name)}</b> is now level `
         + `<span class="num">${(d.levels || {})[d.role] || 2}</span>. The change is part of the agent.`);
+    } else if (d.rule === 'no_upgrade' || d.rule === 'circuit') {
+      // the generation ended without a change: nothing had enough evidence behind it
+      say('No change. Nothing had enough evidence behind it, so the agent wrote nothing and keeps what it had.');
+      showGarage();
     } else {
       const reason = (d.failed || [])[0];
       say(`Rejected. <span class="bad">${esc(GATE_FAILS[reason] || reason || 'it did not pass')}</span>. `

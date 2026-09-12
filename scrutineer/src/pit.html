@@ -1,0 +1,42 @@
+<!-- The pit board page. The card mounts itself, fixed, bottom right; this is the desk under it. -->
+<div class="desk">
+  <header class="desk-top">
+    <span class="desk-mark">SCRUTINEER</span>
+    <span class="desk-sub">pit board — the car, on your desk, while the loop runs behind it</span>
+    <a class="desk-link" href="/">the broadcast ↗</a>
+  </header>
+  <main class="desk-body">
+    <section class="desk-col">
+      <h2>WHAT IT IS</h2>
+      <p>A card that stays on top. The car on it is the agent's harness as it stands right now —
+        wings for retrieval, floor for verification, compound for sampling. Each time the loop
+        decides a generation the car rebuilds in front of you, and a placard says what was kept
+        and what was thrown out.</p>
+      <p><b>Hover</b> the card for the board: runs decided, changes kept, the held-out score and
+        what it has gained, the ten components and their levels, and how long it has been going.</p>
+      <h2>KEEP IT IN VIEW</h2>
+      <p><b>Pop it out.</b> The <span class="key">↗</span> on the strip gives it a window of its
+        own that floats above every other app — switch tabs, switch apps, the car keeps turning.
+        Chrome and Edge do this today; elsewhere the card stays on the page.</p>
+      <p><b>Drag it.</b> Take the strip and put the card anywhere. It remembers where you left it.</p>
+      <p><b>Embed it.</b> One line puts it on any page of yours:</p>
+      <pre class="desk-code" id="embed">&lt;script src="https://scrutineer-one.vercel.app/pit.js" async&gt;&lt;/script&gt;</pre>
+    </section>
+    <section class="desk-col">
+      <h2>WHERE THE NUMBERS COME FROM</h2>
+      <p>The strip's dot says which. <i class="sw live"></i><b>LIVE</b> means a <code>scrutineer
+        watch</code> server answered — on this origin, or on <code>127.0.0.1:7777</code> from
+        anywhere — and every lap, score and verdict on the board is the loop's own, as it happens
+        on that machine. The key never leaves it.</p>
+      <p><i class="sw replay"></i><b>REPLAY</b> means no loop is running, so the board replays the
+        recorded season shipped with this page, one generation every 24 seconds, round again when
+        it ends. The numbers are the season's; only the clock is the board's.</p>
+      <h2>RUN IT LIVE</h2>
+      <pre class="desk-code">cd scrutineer/loop
+export ANTHROPIC_API_KEY=sk-ant-…
+uv run scrutineer watch</pre>
+      <p>Then open this page again — the dot turns green — or leave this one open: the card finds
+        the loop on <code>127.0.0.1:7777</code> by itself.</p>
+    </section>
+  </main>
+</div>

@@ -30,39 +30,16 @@ const PARTS = [
   ['HISTORIAN', 'MEMORY', 'the archive', 'HIST'],
 ];
 const UI_OF = Object.fromEntries(PARTS.map(p => [p[0], p[3]]));
-const KEYS = PARTS.map(p => p[0]);
 const NAME = Object.fromEntries(PARTS.map(p => [p[0], p[1]]));
 
 const st = { rounds: [], i: 0, scene: null, mesh: null, dd: null, spec: null, raf: 0,
              dragging: false, A: null, R: null, view: 'car', garage: null, timer: null };
 
 /** Component levels after `n` generations have been decided. */
-function levelsAt(n) {
-  const lv = {};
-  for (const k of KEYS) lv[k] = 1;
-  for (let g = 0; g < n && g < st.rounds.length; g++) {
-    const r = st.rounds[g];
-    if (r.promoted && r.role && lv[r.role] !== undefined) lv[r.role]++;
-  }
-  return lv;
-}
+const levelsAt = n => SCR.car.levelsAfter(st.rounds, n);
 
 /** The car is the harness: every component that levels up moves a part you can see. */
-function specFor(lv) {
-  const C = SCR.car, cl = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
-  return {
-    ...C.GEN01,
-    frontWing: cl(1 + (lv.AERO - 1), 1, 5),
-    rearWing: cl(1 + Math.floor((lv.AERO - 1) * 0.8), 1, 5),
-    floor: cl(1 + (lv.DATA - 1), 1, 4),
-    engine: cl(1 + (lv.POWER_UNIT - 1), 1, 5),
-    gearbox: cl(6 + (lv.STRATEGIST - 1), 6, 8),
-    tyres: lv.TYRES > 2 ? 'SOFT' : lv.TYRES > 1 ? 'MEDIUM' : 'HARD',
-    drs: lv.SIMULATOR > 1,
-    fin: lv.AERO > 2,
-    brakes: cl(1 + Math.floor((lv.PIT_CREW - 1) * 1.5), 1, 4),
-  };
-}
+const specFor = lv => SCR.car.specForLevels(lv);
 
 // The garage was built for a long game: station tiers step at role level 4, 7 and 10, and the
 // eras begin at team level 26, 49, 73. A ten-run season moves the team from 10 to 15 and puts no
@@ -96,9 +73,7 @@ function rebuild() {
   const prev = specFor(levelsAt(Math.max(0, st.i - 1)));
   st.spec = specFor(lv);
   st.dd = SCR.car.derive(st.spec);
-  // era rises with the total level, so the livery matures across the season too
-  const total = Object.values(lv).reduce((a, b) => a + b, 0);
-  st.mesh = SCR.car.build(st.spec, Math.min(0.9, (total - KEYS.length) / 14));
+  st.mesh = SCR.car.build(st.spec, SCR.car.eraForLevels(lv));
 
   // The garage is the same state seen from the other side: each component owns a station, and a
   // station rebuilds itself at the tier its component has reached.

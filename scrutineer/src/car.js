@@ -37,6 +37,26 @@ C.PART_DEFS = [
 ];
 C.GEN01 = { frontWing: 2, rearWing: 2, floor: 1, sidepods: 'STD', fin: false, engine: 2, brakes: 2, tyres: 'MEDIUM', drs: false, ballast: 2, gearbox: 6 };
 C.fmtVal = v => typeof v === 'boolean' ? (v ? 'ON' : 'OFF') : typeof v === 'number' ? `L${v}` : v;
+// ---------- the car is the harness ----------
+// The loop's ten components, keyed the way the loop names them. A component that levels up moves
+// a part you can see, so the same mapping serves every surface that draws the car from a season.
+C.ROLE_KEYS = ['AERO', 'DATA', 'TYRES', 'POWER_UNIT', 'STRATEGIST', 'SIMULATOR', 'PIT_CREW', 'ENGINEER', 'SCRUTINEER', 'HISTORIAN'];
+// component levels after the first `n` rounds of a season have been decided
+C.levelsAfter = function (rounds, n) {
+  const lv = {}; for (const k of C.ROLE_KEYS) lv[k] = 1;
+  for (let g = 0; g < n && g < rounds.length; g++) { const r = rounds[g]; if (r.promoted && r.role && lv[r.role] !== undefined) lv[r.role]++; }
+  return lv;
+};
+C.specForLevels = function (lv) {
+  const cl = (x, lo, hi) => Math.max(lo, Math.min(hi, x)), L = k => lv[k] || 1;
+  return { ...C.GEN01,
+    frontWing: cl(1 + (L('AERO') - 1), 1, 5), rearWing: cl(1 + Math.floor((L('AERO') - 1) * 0.8), 1, 5),
+    floor: cl(1 + (L('DATA') - 1), 1, 4), engine: cl(1 + (L('POWER_UNIT') - 1), 1, 5),
+    gearbox: cl(6 + (L('STRATEGIST') - 1), 6, 8), tyres: L('TYRES') > 2 ? 'SOFT' : L('TYRES') > 1 ? 'MEDIUM' : 'HARD',
+    drs: L('SIMULATOR') > 1, fin: L('AERO') > 2, brakes: cl(1 + Math.floor((L('PIT_CREW') - 1) * 1.5), 1, 4) };
+};
+// era rises with the total level, so the livery matures across a season too
+C.eraForLevels = lv => { const total = C.ROLE_KEYS.reduce((a, k) => a + (lv[k] || 1), 0); return Math.min(0.9, (total - C.ROLE_KEYS.length) / 14); };
 // physics constants from the spec (+ optional team multipliers: {grip, wear, power, drag, braking, consistency})
 C.derive = function (sp, tm = {}) {
   const df = sp.frontWing * 1.2 + sp.rearWing * 1.3 + sp.floor * 1.5;

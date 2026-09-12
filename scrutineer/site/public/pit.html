@@ -1,0 +1,1196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="The Scrutineer pit board: the agent's car on a card that stays on top, rebuilding each time the loop lands a generation.">
+<meta property="og:title" content="Scrutineer — pit board">
+<meta name="theme-color" content="#06081A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2306081A'/%3E%3Cpath d='M2 3h4v4H2zM6 7h4v4H6zM10 3h4v4h-4zM2 11h4v4H2zM10 11h4v4h-4z' fill='%23F4C542'/%3E%3C/svg%3E">
+<title>Scrutineer — pit board</title>
+<link rel="stylesheet" data-pit href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<style data-pit>
+/* The pit board. Prefixed and self-contained: it lands on other people's pages too. */
+.pit,.pit *{box-sizing:border-box}
+.pit{position:fixed;right:24px;bottom:24px;width:262px;z-index:2147483000;color:#FFF;background:#06081A;
+  border:3px solid #F4C542;box-shadow:0 6px 0 #000,0 0 0 1px #000;font-family:"VT323","Courier New",monospace;
+  font-size:18px;line-height:1.1;user-select:none;-webkit-user-select:none;-webkit-font-smoothing:none;touch-action:none;
+  outline:none}
+.pit.dragging{cursor:grabbing}
+.pit:focus-visible{border-color:#3DD2FF}
+.pit canvas{display:block;width:256px;height:160px;image-rendering:pixelated;image-rendering:crisp-edges;cursor:pointer}
+.pit-strip{position:relative;display:flex;align-items:center;gap:8px;height:28px;padding:0 8px;background:#000;
+  font-family:"Press Start 2P","Courier New",monospace;font-size:7px;letter-spacing:.04em;text-transform:uppercase;cursor:grab}
+.pit.inpip .pit-strip{cursor:default}
+.pit-txt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#FFF}
+.pit-dot{width:7px;height:7px;flex:none;background:#6A6F8A}
+.pit-dot.live{background:#2FD968}.pit-dot.busy{background:#2FD968;animation:pit-blink 1s steps(2) infinite}
+.pit-dot.replay{background:#3DD2FF}.pit-dot.down{background:#E31E2D;animation:pit-blink .6s steps(2) infinite}
+.pit-dot.probe{animation:pit-blink .5s steps(2) infinite}
+.pit-pop{flex:none;border:0;background:#121A4A;color:#F4C542;font:inherit;font-size:9px;line-height:1;padding:4px 6px;cursor:pointer}
+.pit-pop:hover{background:#F4C542;color:#000}
+.pit-card{position:absolute;left:8px;right:8px;top:118px;padding:6px 8px;background:#F4C542;color:#000;
+  font-family:"Press Start 2P","Courier New",monospace;font-size:7px;line-height:1.5;text-transform:uppercase;
+  opacity:0;transform:translateY(14px);transition:opacity .2s steps(3),transform .2s steps(3);pointer-events:none;
+  box-shadow:0 3px 0 #000}
+.pit-card.show{opacity:1;transform:none}
+.pit-card.refused{background:#E31E2D;color:#FFF}.pit-card.none{background:#C8CBD8;color:#000}
+.pit-card b{margin-right:6px}.pit-card i{font-style:normal;opacity:.75}
+/* the board: opens under the card, or above it when the card sits low; overlays the car in its own window */
+.pit-board{display:none;background:#06081A;border-top:2px solid #121A4A;padding:8px 10px 10px}
+.pit.open .pit-board{display:block}
+.pit.up .pit-board{position:absolute;left:-3px;right:-3px;bottom:100%;border:3px solid #F4C542;border-bottom:0;box-shadow:0 0 0 1px #000}
+.pit.inpip .pit-board{position:absolute;inset:0 0 28px 0;overflow:auto;background:rgba(6,8,26,.94);border:0}
+.pb-head{display:flex;align-items:baseline;justify-content:space-between;font-family:"Press Start 2P","Courier New",monospace;font-size:8px;margin-bottom:8px}
+.pb-head b{color:#F4C542;border-bottom:2px solid #F4C542;padding-bottom:2px}
+.pb-src{font-size:6px;color:#6A6F8A;letter-spacing:.06em}.pb-src.live{color:#2FD968}.pb-src.replay{color:#3DD2FF}
+.pb-big{display:flex;gap:14px;align-items:flex-end}
+.pb-big span{display:flex;flex-direction:column}
+.pb-big em{font-style:normal;font-family:"Press Start 2P","Courier New",monospace;font-size:6px;color:#6A6F8A;letter-spacing:.1em;margin-bottom:3px}
+.pb-big b{font-size:30px;line-height:22px;color:#F4C542;font-weight:400}
+.pb-big i{font-style:normal;font-size:14px;color:#6A6F8A}
+.pb-gain{font-size:15px;color:#C8CBD8;margin:5px 0 7px;min-height:15px}
+.pb-ticks{display:flex;gap:3px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.pb-ticks i{width:11px;height:7px;background:#121A4A;flex:none}
+.pb-ticks i.keep{background:#F4C542}.pb-ticks i.drop{background:#E31E2D}.pb-ticks i.none{background:#6A6F8A}
+.pb-ticks i.now{width:22px;background:linear-gradient(90deg,#2FD968 calc(var(--p,0)*100%),#121A4A 0)}
+.pb-rig{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;font-family:"Press Start 2P","Courier New",monospace;font-size:6px;letter-spacing:.04em;margin-bottom:8px}
+.pb-comp{display:flex;align-items:center;gap:6px;color:#6A6F8A;white-space:nowrap}
+.pb-comp span{flex:1;overflow:hidden;text-overflow:ellipsis}
+.pb-comp b{font-weight:400;letter-spacing:-1px;color:#121A4A}.pb-comp.up{color:#C8CBD8}.pb-comp.up b{color:#3DD2FF}.pb-comp.now{color:#F4C542}.pb-comp.now b{color:#F4C542}
+.pb-comp em{font-style:normal;width:16px;text-align:right}
+.pb-last{font-size:15px;color:#C8CBD8;border-top:1px solid #121A4A;padding-top:6px;margin-bottom:6px;line-height:1.15}
+.pb-last b{font-family:"Press Start 2P","Courier New",monospace;font-size:6px;padding:2px 4px;margin-right:4px;vertical-align:1px;font-weight:400}
+.pb-last b.k{background:#F4C542;color:#000}.pb-last b.d{background:#E31E2D;color:#FFF}.pb-last b.n{background:#6A6F8A;color:#000}
+.pb-last code{font-family:inherit;color:#3DD2FF;margin-left:4px}.pb-last span{display:block;color:#6A6F8A;margin-top:2px}
+.pb-foot{font-size:14px;color:#6A6F8A;margin-bottom:8px}
+.pb-actions{display:flex;gap:6px;align-items:center}
+.pb-btn,.pb-link{font-family:"Press Start 2P","Courier New",monospace;font-size:6px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;
+  padding:7px 9px;border:0;cursor:pointer;background:#F4C542;color:#000}
+.pb-link{background:#121A4A;color:#FFF}.pb-btn:hover{background:#FFEDAE}.pb-link:hover{background:#1B245C}
+/* its own window: the card fills it */
+.pit-pipbody{margin:0;background:#06081A;overflow:hidden}
+.pit.inpip{position:absolute;inset:0;width:auto;right:auto;bottom:auto;border:0;box-shadow:none;display:flex;flex-direction:column}
+.pit.inpip canvas{width:100%;height:auto;flex:1;object-fit:contain;background:#06081A}
+.pit.inpip .pit-card{top:auto;bottom:40px}
+@keyframes pit-blink{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.pit-dot,.pit-card{animation:none;transition:none}}
+
+</style>
+<style>
+/* The desk under the pit board: the page that explains the card and hands out the embed. */
+:root{--night:#06081A;--studio:#121A4A;--ink:#000;--white:#FFF;--caption:#C8CBD8;--mid:#6A6F8A;--gold:#F4C542;--cyan:#3DD2FF;--green:#2FD968}
+html,body{background:var(--night);margin:0;color:var(--white);font-family:"VT323","Courier New",monospace;-webkit-font-smoothing:none}
+.desk{min-height:100vh;display:flex;flex-direction:column}
+.desk-top{display:flex;align-items:center;gap:18px;padding:0 20px;height:48px;border-bottom:2px solid var(--studio)}
+.desk-mark{font-family:"Press Start 2P","Courier New",monospace;font-size:15px;border-bottom:3px solid var(--gold);padding-bottom:2px}
+.desk-sub{font-size:19px;color:var(--mid);flex:1}
+.desk-link{font-family:"Press Start 2P","Courier New",monospace;font-size:8px;color:var(--white);text-decoration:none;background:var(--studio);padding:9px 13px;letter-spacing:.06em}
+.desk-link:hover{background:#1B245C}
+.desk-body{display:grid;grid-template-columns:1fr 1fr;gap:40px;padding:34px 24px 260px;max-width:1080px}
+.desk h2{font-family:"Press Start 2P","Courier New",monospace;font-size:9px;color:var(--gold);letter-spacing:.08em;margin:26px 0 12px}
+.desk h2:first-child{margin-top:0}
+.desk p{font-size:22px;line-height:1.25;color:var(--caption);margin:0 0 12px;max-width:52ch}
+.desk p b{color:var(--white)}
+.desk code{font-family:inherit;color:var(--cyan)}
+.desk .key{display:inline-block;background:var(--studio);color:var(--gold);padding:0 6px;font-size:16px;line-height:20px;vertical-align:1px}
+.desk-code{font-family:inherit;font-size:19px;line-height:1.3;background:var(--ink);color:var(--gold);padding:12px 14px;margin:0 0 14px;white-space:pre-wrap;word-break:break-all;border-left:3px solid var(--gold)}
+.sw{display:inline-block;width:9px;height:9px;margin-right:6px;vertical-align:1px}
+.sw.live{background:var(--green)}.sw.replay{background:var(--cyan)}
+@media (max-width:820px){.desk-body{grid-template-columns:1fr;padding-bottom:300px}.desk-sub{display:none}}
+
+</style>
+</head>
+<body>
+<!-- The pit board page. The card mounts itself, fixed, bottom right; this is the desk under it. -->
+<div class="desk">
+  <header class="desk-top">
+    <span class="desk-mark">SCRUTINEER</span>
+    <span class="desk-sub">pit board — the car, on your desk, while the loop runs behind it</span>
+    <a class="desk-link" href="/">the broadcast ↗</a>
+  </header>
+  <main class="desk-body">
+    <section class="desk-col">
+      <h2>WHAT IT IS</h2>
+      <p>A card that stays on top. The car on it is the agent's harness as it stands right now —
+        wings for retrieval, floor for verification, compound for sampling. Each time the loop
+        decides a generation the car rebuilds in front of you, and a placard says what was kept
+        and what was thrown out.</p>
+      <p><b>Hover</b> the card for the board: runs decided, changes kept, the held-out score and
+        what it has gained, the ten components and their levels, and how long it has been going.</p>
+      <h2>KEEP IT IN VIEW</h2>
+      <p><b>Pop it out.</b> The <span class="key">↗</span> on the strip gives it a window of its
+        own that floats above every other app — switch tabs, switch apps, the car keeps turning.
+        Chrome and Edge do this today; elsewhere the card stays on the page.</p>
+      <p><b>Drag it.</b> Take the strip and put the card anywhere. It remembers where you left it.</p>
+      <p><b>Embed it.</b> One line puts it on any page of yours:</p>
+      <pre class="desk-code" id="embed">&lt;script src="https://scrutineer-one.vercel.app/pit.js" async&gt;&lt;/script&gt;</pre>
+    </section>
+    <section class="desk-col">
+      <h2>WHERE THE NUMBERS COME FROM</h2>
+      <p>The strip's dot says which. <i class="sw live"></i><b>LIVE</b> means a <code>scrutineer
+        watch</code> server answered — on this origin, or on <code>127.0.0.1:7777</code> from
+        anywhere — and every lap, score and verdict on the board is the loop's own, as it happens
+        on that machine. The key never leaves it.</p>
+      <p><i class="sw replay"></i><b>REPLAY</b> means no loop is running, so the board replays the
+        recorded season shipped with this page, one generation every 24 seconds, round again when
+        it ends. The numbers are the season's; only the clock is the board's.</p>
+      <h2>RUN IT LIVE</h2>
+      <pre class="desk-code">cd scrutineer/loop
+export ANTHROPIC_API_KEY=sk-ant-…
+uv run scrutineer watch</pre>
+      <p>Then open this page again — the dot turns green — or leave this one open: the card finds
+        the loop on <code>127.0.0.1:7777</code> by itself.</p>
+    </section>
+  </main>
+</div>
+
+<script>
+window.SCRUTINEER_PIT = {"demo":true,"rounds":[{"generation":0,"promoted":true,"role":"DATA","part":"H-v0","official_s":86.617,"claimed_s":85.917,"rule_fired":"gain_per_usd","summary":"open the page in a browser and audit it before submitting","failed":[],"laps":40},{"generation":1,"promoted":false,"role":"DATA","part":null,"official_s":81.18,"claimed_s":80.44,"rule_fired":"gain_per_usd","summary":"raise verification from syntax to render","failed":["scrutineering"],"laps":40},{"generation":2,"promoted":true,"role":"AERO","part":"R-v0","official_s":81.18,"claimed_s":80.44,"rule_fired":"gain_per_usd","summary":"retrieve references by concept rather than keyword","failed":[],"laps":40},{"generation":3,"promoted":false,"role":"AERO","part":null,"official_s":77.743,"claimed_s":76.963,"rule_fired":"gain_per_usd","summary":"widen the reference budget","failed":["seesaw"],"laps":40},{"generation":4,"promoted":true,"role":"AERO","part":"R-v1","official_s":77.743,"claimed_s":76.963,"rule_fired":"gain_per_usd","summary":"add references for the rules it keeps failing","failed":[],"laps":40},{"generation":5,"promoted":false,"role":"TYRES","part":null,"official_s":74.307,"claimed_s":73.487,"rule_fired":"gain_per_usd","summary":"draw more candidates per brief","failed":["regression"],"laps":40},{"generation":6,"promoted":true,"role":"TYRES","part":"S-v0","official_s":74.307,"claimed_s":73.487,"rule_fired":"gain_per_usd","summary":"cool the decode policy and keep the extra candidate","failed":[],"laps":40},{"generation":7,"promoted":false,"role":"DATA","part":null,"official_s":71.87,"claimed_s":71.01,"rule_fired":"gain_per_usd","summary":"re-check the page after a fix","failed":["novelty"],"laps":40},{"generation":8,"promoted":true,"role":"DATA","part":"H-v1","official_s":71.87,"claimed_s":71.01,"rule_fired":"gain_per_usd","summary":"reject a candidate whose own audit is not clean","failed":[],"laps":40},{"generation":9,"promoted":false,"role":null,"part":null,"official_s":68.433,"claimed_s":67.533,"rule_fired":"no_upgrade","summary":"","failed":[],"laps":40}]};
+window.SCRUTINEER_PIT_CSS = "/* The pit board. Prefixed and self-contained: it lands on other people's pages too. */\n.pit,.pit *{box-sizing:border-box}\n.pit{position:fixed;right:24px;bottom:24px;width:262px;z-index:2147483000;color:#FFF;background:#06081A;\n  border:3px solid #F4C542;box-shadow:0 6px 0 #000,0 0 0 1px #000;font-family:\"VT323\",\"Courier New\",monospace;\n  font-size:18px;line-height:1.1;user-select:none;-webkit-user-select:none;-webkit-font-smoothing:none;touch-action:none;\n  outline:none}\n.pit.dragging{cursor:grabbing}\n.pit:focus-visible{border-color:#3DD2FF}\n.pit canvas{display:block;width:256px;height:160px;image-rendering:pixelated;image-rendering:crisp-edges;cursor:pointer}\n.pit-strip{position:relative;display:flex;align-items:center;gap:8px;height:28px;padding:0 8px;background:#000;\n  font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:7px;letter-spacing:.04em;text-transform:uppercase;cursor:grab}\n.pit.inpip .pit-strip{cursor:default}\n.pit-txt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#FFF}\n.pit-dot{width:7px;height:7px;flex:none;background:#6A6F8A}\n.pit-dot.live{background:#2FD968}.pit-dot.busy{background:#2FD968;animation:pit-blink 1s steps(2) infinite}\n.pit-dot.replay{background:#3DD2FF}.pit-dot.down{background:#E31E2D;animation:pit-blink .6s steps(2) infinite}\n.pit-dot.probe{animation:pit-blink .5s steps(2) infinite}\n.pit-pop{flex:none;border:0;background:#121A4A;color:#F4C542;font:inherit;font-size:9px;line-height:1;padding:4px 6px;cursor:pointer}\n.pit-pop:hover{background:#F4C542;color:#000}\n.pit-card{position:absolute;left:8px;right:8px;top:118px;padding:6px 8px;background:#F4C542;color:#000;\n  font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:7px;line-height:1.5;text-transform:uppercase;\n  opacity:0;transform:translateY(14px);transition:opacity .2s steps(3),transform .2s steps(3);pointer-events:none;\n  box-shadow:0 3px 0 #000}\n.pit-card.show{opacity:1;transform:none}\n.pit-card.refused{background:#E31E2D;color:#FFF}.pit-card.none{background:#C8CBD8;color:#000}\n.pit-card b{margin-right:6px}.pit-card i{font-style:normal;opacity:.75}\n/* the board: opens under the card, or above it when the card sits low; overlays the car in its own window */\n.pit-board{display:none;background:#06081A;border-top:2px solid #121A4A;padding:8px 10px 10px}\n.pit.open .pit-board{display:block}\n.pit.up .pit-board{position:absolute;left:-3px;right:-3px;bottom:100%;border:3px solid #F4C542;border-bottom:0;box-shadow:0 0 0 1px #000}\n.pit.inpip .pit-board{position:absolute;inset:0 0 28px 0;overflow:auto;background:rgba(6,8,26,.94);border:0}\n.pb-head{display:flex;align-items:baseline;justify-content:space-between;font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:8px;margin-bottom:8px}\n.pb-head b{color:#F4C542;border-bottom:2px solid #F4C542;padding-bottom:2px}\n.pb-src{font-size:6px;color:#6A6F8A;letter-spacing:.06em}.pb-src.live{color:#2FD968}.pb-src.replay{color:#3DD2FF}\n.pb-big{display:flex;gap:14px;align-items:flex-end}\n.pb-big span{display:flex;flex-direction:column}\n.pb-big em{font-style:normal;font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:6px;color:#6A6F8A;letter-spacing:.1em;margin-bottom:3px}\n.pb-big b{font-size:30px;line-height:22px;color:#F4C542;font-weight:400}\n.pb-big i{font-style:normal;font-size:14px;color:#6A6F8A}\n.pb-gain{font-size:15px;color:#C8CBD8;margin:5px 0 7px;min-height:15px}\n.pb-ticks{display:flex;gap:3px;align-items:center;margin-bottom:8px;flex-wrap:wrap}\n.pb-ticks i{width:11px;height:7px;background:#121A4A;flex:none}\n.pb-ticks i.keep{background:#F4C542}.pb-ticks i.drop{background:#E31E2D}.pb-ticks i.none{background:#6A6F8A}\n.pb-ticks i.now{width:22px;background:linear-gradient(90deg,#2FD968 calc(var(--p,0)*100%),#121A4A 0)}\n.pb-rig{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:6px;letter-spacing:.04em;margin-bottom:8px}\n.pb-comp{display:flex;align-items:center;gap:6px;color:#6A6F8A;white-space:nowrap}\n.pb-comp span{flex:1;overflow:hidden;text-overflow:ellipsis}\n.pb-comp b{font-weight:400;letter-spacing:-1px;color:#121A4A}.pb-comp.up{color:#C8CBD8}.pb-comp.up b{color:#3DD2FF}.pb-comp.now{color:#F4C542}.pb-comp.now b{color:#F4C542}\n.pb-comp em{font-style:normal;width:16px;text-align:right}\n.pb-last{font-size:15px;color:#C8CBD8;border-top:1px solid #121A4A;padding-top:6px;margin-bottom:6px;line-height:1.15}\n.pb-last b{font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:6px;padding:2px 4px;margin-right:4px;vertical-align:1px;font-weight:400}\n.pb-last b.k{background:#F4C542;color:#000}.pb-last b.d{background:#E31E2D;color:#FFF}.pb-last b.n{background:#6A6F8A;color:#000}\n.pb-last code{font-family:inherit;color:#3DD2FF;margin-left:4px}.pb-last span{display:block;color:#6A6F8A;margin-top:2px}\n.pb-foot{font-size:14px;color:#6A6F8A;margin-bottom:8px}\n.pb-actions{display:flex;gap:6px;align-items:center}\n.pb-btn,.pb-link{font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:6px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;\n  padding:7px 9px;border:0;cursor:pointer;background:#F4C542;color:#000}\n.pb-link{background:#121A4A;color:#FFF}.pb-btn:hover{background:#FFEDAE}.pb-link:hover{background:#1B245C}\n/* its own window: the card fills it */\n.pit-pipbody{margin:0;background:#06081A;overflow:hidden}\n.pit.inpip{position:absolute;inset:0;width:auto;right:auto;bottom:auto;border:0;box-shadow:none;display:flex;flex-direction:column}\n.pit.inpip canvas{width:100%;height:auto;flex:1;object-fit:contain;background:#06081A}\n.pit.inpip .pit-card{top:auto;bottom:40px}\n@keyframes pit-blink{50%{opacity:.25}}\n@media (prefers-reduced-motion:reduce){.pit-dot,.pit-card{animation:none;transition:none}}\n";
+// ============================================================================
+// SCR.engine — software rasterizer on 2D canvas, Bayer-dithered, pixel-art 3D
+// Shared by every scene. No DOM except the target canvas. No allocation in hot loops.
+// ============================================================================
+(function (SCR) {
+'use strict';
+const E = SCR.engine = {};
+
+// ---------- constants ----------
+const BAYER = [
+  0,32,8,40,2,34,10,42, 48,16,56,24,50,18,58,26, 12,44,4,36,14,46,6,38, 60,28,52,20,62,30,54,22,
+  3,35,11,43,1,33,9,41, 51,19,59,27,49,17,57,25, 15,47,7,39,13,45,5,37, 63,31,55,23,61,29,53,21];
+const bayer = E.bayer = (x, y) => (BAYER[((y & 7) << 3) | (x & 7)] + 0.5) / 64;
+const hex = E.hex = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+E.mulberry32 = function (a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
+E.hash2 = (a, b) => { let h = (a * 374761393 + b * 668265263) | 0; h = (h ^ (h >>> 13)) * 1274126177 | 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+E.norm = v => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
+
+// ---------- palette: 4-step ramps (dark, mid, base, light). Add ramps here; never invent colours elsewhere. ----------
+const RAMP = {
+  BODY:    ['#5A6076', '#A8AECB', '#E8EBF5', '#FFFFFF'], NAVY: ['#05060F', '#0C1236', '#1A245C', '#3A4CA8'],
+  STRIPE:  ['#4A0810', '#9E1220', '#E31E2D', '#FF6B72'], CARBON: ['#08090E', '#1C1F2B', '#343849', '#525872'],
+  TYRE:    ['#000000', '#08080C', '#141419', '#242430'], RIM: ['#3A3E52', '#7E8499', '#D2D6E4', '#FFFFFF'],
+  GOLD:    ['#6B4E0A', '#B8922C', '#F4C542', '#FFEDAE'], CYAN: ['#0A3A50', '#1F8FB0', '#3DD2FF', '#CDF4FF'],
+  GREEN:   ['#0F4A24', '#1C8A42', '#2FD968', '#8CF0AE'], AMBER: ['#5E3A08', '#A86E10', '#FFA318', '#FFD27A'],
+  PURPLE:  ['#3E1A5E', '#7A32B0', '#B04BFF', '#D9A0FF'], ASPHALT: ['#171922', '#252834', '#323544', '#434757'],
+  RUBBER:  ['#0B0C12', '#14161E', '#1E2028', '#2C2E3A'], GRASS: ['#0B2A17', '#123F24', '#1F6B3C', '#2E8A4E'],
+  GRASS2:  ['#0B2A17', '#123F24', '#1A5C33', '#27784A'], GRAVEL: ['#4A4030', '#6E5F44', '#8C7B58', '#B09C72'],
+  KERB_R:  ['#5E0C13', '#A5161F', '#E31E2D', '#FF5A63'], KERB_W: ['#6A6F8A', '#C8CBD8', '#FFFFFF', '#FFFFFF'],
+  ARMCO:   ['#2C2E3A', '#6A6F8A', '#C8CBD8', '#FFFFFF'], STAND: ['#0B1030', '#121A4A', '#1E2A6A', '#2A3A8A'],
+  STEEL:   ['#191C26', '#333849', '#525872', '#7E8499'], LAMP: ['#CDF4FF', '#FFFFFF', '#FFFFFF', '#FFFFFF'],
+  // garage / facility materials
+  BRICK:   ['#3A1E14', '#6B3A26', '#8C4E34', '#B06A48'], MORTAR: ['#2C2E3A', '#474A5A', '#6A6F8A', '#8A8FA6'],
+  CONCRETE:['#262A36', '#3E4354', '#5C6176', '#828799'], PANEL: ['#7E8499', '#BDC2D4', '#E4E8F2', '#FFFFFF'],
+  WOOD:    ['#33200E', '#6B4420', '#96612F', '#BE8248'], CHROME: ['#40445A', '#8F96AE', '#DFE4F2', '#FFFFFF'],
+  HOLO:    ['#0E4A5E', '#1F8FB0', '#3DD2FF', '#B8F0FF'], NEON_R: ['#5E0C13', '#E31E2D', '#FF5A63', '#FFFFFF'],
+  NEON_C:  ['#1F8FB0', '#3DD2FF', '#B8F0FF', '#FFFFFF'], NEON_P: ['#7A32B0', '#B04BFF', '#D9A0FF', '#FFFFFF'],
+  SKIN:    ['#5E3020', '#9C6342', '#D69A72', '#F5CDAA'], OVERALL: ['#0A0F2C', '#16205A', '#2E3F97', '#4F63C8'],
+  // per-pixel resolved materials (a hook decides the ramp per pixel)
+  LIVERY:  ['#6A6F8A', '#C8CBD8', '#FFFFFF', '#FFFFFF'], SIGN: ['#000000', '#000000', '#000000', '#000000'],
+  CROWD:   ['#2C2E3A', '#6A6F8A', '#C8CBD8', '#FFFFFF'], SCREEN: ['#0E4A5E', '#1F8FB0', '#3DD2FF', '#B8F0FF'],
+};
+const MAT_NAMES = E.MAT_NAMES = Object.keys(RAMP), RAMPS = E.RAMPS = MAT_NAMES.map(k => RAMP[k].map(hex));
+const M = E.M = {}; MAT_NAMES.forEach((k, i) => M[k] = i);
+E.SHADOW_MAT = 250; E.LIGHT_MAT = 251;
+const GROUND_MATS = E.GROUND_MATS = new Set([M.ASPHALT, M.RUBBER, M.GRASS, M.GRASS2, M.GRAVEL, M.KERB_R, M.KERB_W, M.CONCRETE]);
+// emissive materials ignore lighting; metallic ones get extra ambient
+const EMISSIVE = new Set([M.LAMP, M.NEON_R, M.NEON_C, M.NEON_P, M.SCREEN, M.HOLO]);
+const METAL = new Set([M.RIM, M.GOLD, M.CYAN, M.CHROME]);
+// per-pixel hooks: hooks[mat] = (mx, my, mz, aux) => ramp index. Registered by scene modules.
+const hooks = E.hooks = {};
+E.signs = [];          // shared registry of sign/screen/crowd descriptors, addressed by tri aux
+E.time = 0;            // simulation time for animated hooks
+
+// ---------- mesh construction ----------
+// Every builder pushes into the current list. Use E.begin() / E.end() to collect a mesh.
+let tris = [], group = 0, aux = 0;
+E.begin = () => { tris = []; group = 0; aux = 0; };
+E.setGroup = g => { group = g; };
+E.setAux = a => { aux = a; };
+E.current = () => tris;
+const T = E.T = (a, b, c, m) => tris.push({ v: [a, b, c], m, g: group, aux });
+const Q = E.Q = (a, b, c, d, m) => { T(a, b, c, m); T(a, c, d, m); };
+E.prism = function (zF, f, zB, b, m, opts = {}) {
+  const F = [[f.cx - f.w / 2, f.cy - f.h / 2, zF], [f.cx + f.w / 2, f.cy - f.h / 2, zF], [f.cx + f.w / 2, f.cy + f.h / 2, zF], [f.cx - f.w / 2, f.cy + f.h / 2, zF]];
+  const B = [[b.cx - b.w / 2, b.cy - b.h / 2, zB], [b.cx + b.w / 2, b.cy - b.h / 2, zB], [b.cx + b.w / 2, b.cy + b.h / 2, zB], [b.cx - b.w / 2, b.cy + b.h / 2, zB]];
+  Q(F[0], F[1], F[2], F[3], opts.front ?? m); Q(B[1], B[0], B[3], B[2], opts.back ?? m);
+  Q(F[3], F[2], B[2], B[3], opts.top ?? m); Q(F[1], F[0], B[0], B[1], opts.bottom ?? m);
+  Q(F[1], B[1], B[2], F[2], opts.side ?? m); Q(B[0], F[0], F[3], B[3], opts.side ?? m);
+};
+E.box = (cx, cy, cz, w, h, d, m, opts) => E.prism(cz + d / 2, { cx, cy, w, h }, cz - d / 2, { cx, cy, w, h }, m, opts);
+E.ring = function (z, s) {
+  const hw = s.w / 2, hh = s.h / 2, ch = s.ch ?? 0.38, cw = hw * ch, chh = hh * ch, cx = s.cx ?? 0, cy = s.cy;
+  return [[cx - hw + cw, cy - hh, z], [cx + hw - cw, cy - hh, z], [cx + hw, cy - hh + chh, z], [cx + hw, cy + hh - chh, z],
+          [cx + hw - cw, cy + hh, z], [cx - hw + cw, cy + hh, z], [cx - hw, cy + hh - chh, z], [cx - hw, cy - hh + chh, z]];
+};
+E.loft = function (sections, m, opts = {}) {
+  const rings = sections.map(s => E.ring(s.z, s));
+  for (let i = 0; i < rings.length - 1; i++) { const A = rings[i], B = rings[i + 1]; for (let k = 0; k < 8; k++) { const k2 = (k + 1) % 8; Q(A[k], B[k], B[k2], A[k2], m); } }
+  const F = rings[0], Bk = rings[rings.length - 1];
+  for (let k = 1; k < 7; k++) { T(F[0], F[k], F[k + 1], opts.front ?? m); T(Bk[0], Bk[k + 1], Bk[k], opts.back ?? m); }
+};
+E.sphere = function (cx, cy, cz, r, lat, lon, m, capMat) {
+  for (let i = 0; i < lat; i++) { const p0 = (i / lat) * Math.PI, p1 = ((i + 1) / lat) * Math.PI;
+    for (let j = 0; j < lon; j++) { const t0 = (j / lon) * Math.PI * 2, t1 = ((j + 1) / lon) * Math.PI * 2;
+      const v = (p, t) => [cx + r * Math.sin(p) * Math.sin(t), cy + r * Math.cos(p), cz + r * Math.sin(p) * Math.cos(t)];
+      const isCap = typeof capMat === 'function' ? capMat(i, j, (t0 + t1) / 2) : (capMat !== undefined && i >= 2 && i <= 3 && Math.cos((t0 + t1) / 2) > 0.35);
+      Q(v(p0, t0), v(p1, t0), v(p1, t1), v(p0, t1), isCap ? (typeof capMat === 'function' ? isCap : capMat) : m); } }
+};
+// cylinder along an axis: axis 'x' | 'y' | 'z'; caps optional
+E.cylinder = function (cx, cy, cz, r, len, n, axis, m, capMat) {
+  for (let i = 0; i < n; i++) {
+    const a0 = (i / n) * Math.PI * 2, a1 = ((i + 1) / n) * Math.PI * 2;
+    const P = (t, a) => { const u = Math.cos(a) * r, v = Math.sin(a) * r; return axis === 'y' ? [cx + u, cy + t, cz + v] : axis === 'x' ? [cx + t, cy + u, cz + v] : [cx + u, cy + v, cz + t]; };
+    const h = len / 2;
+    if (axis === 'y') Q(P(-h, a0), P(h, a0), P(h, a1), P(-h, a1), m); else Q(P(-h, a0), P(-h, a1), P(h, a1), P(h, a0), m);
+    if (capMat !== undefined) { const C0 = axis === 'y' ? [cx, cy + h, cz] : axis === 'x' ? [cx + h, cy, cz] : [cx, cy, cz + h], C1 = axis === 'y' ? [cx, cy - h, cz] : axis === 'x' ? [cx - h, cy, cz] : [cx, cy, cz - h];
+      if (axis === 'y') { T(C0, P(h, a1), P(h, a0), capMat); T(C1, P(-h, a0), P(-h, a1), capMat); } else { T(C0, P(h, a0), P(h, a1), capMat); T(C1, P(-h, a1), P(-h, a0), capMat); } }
+  }
+};
+// rotate every vertex object exactly once about Y (yaw) and translate, for tris from index `from`
+E.rotateRange = function (from, yaw, cx, cz, cy = 0) { const seen = new Set(), c = Math.cos(yaw), sn = Math.sin(yaw); for (let q = from; q < tris.length; q++) for (const v of tris[q].v) { if (seen.has(v)) continue; seen.add(v); const x = v[0], z = v[2]; v[0] = x * c + z * sn + cx; v[1] += cy; v[2] = -x * sn + z * c + cz; } };
+E.flatten = function (list) {
+  const n = list.length, pos = new Float32Array(n * 9), mat = new Uint8Array(n), grp = new Uint8Array(n), ax = new Uint16Array(n), cen = new Float32Array(n * 3), rad = new Float32Array(n);
+  list.forEach((t, i) => {
+    for (let k = 0; k < 3; k++) { pos[i * 9 + k * 3] = t.v[k][0]; pos[i * 9 + k * 3 + 1] = t.v[k][1]; pos[i * 9 + k * 3 + 2] = t.v[k][2]; }
+    mat[i] = t.m; grp[i] = t.g; ax[i] = t.aux;
+    const cx = (t.v[0][0] + t.v[1][0] + t.v[2][0]) / 3, cy = (t.v[0][1] + t.v[1][1] + t.v[2][1]) / 3, cz = (t.v[0][2] + t.v[1][2] + t.v[2][2]) / 3;
+    cen[i * 3] = cx; cen[i * 3 + 1] = cy; cen[i * 3 + 2] = cz; rad[i] = Math.max(...t.v.map(v => Math.hypot(v[0] - cx, v[1] - cy, v[2] - cz)));
+  });
+  return { pos, mat, grp, aux: ax, cen, rad, n };
+};
+E.end = () => { const m = E.flatten(tris); tris = []; return m; };
+// 3x5 bitmap font for signage (per-pixel SIGN hook) and 5x7 digits for decals
+E.FONT3 = { S: ['011', '100', '010', '001', '110'], C: ['011', '100', '100', '100', '011'], R: ['110', '101', '110', '101', '101'], U: ['101', '101', '101', '101', '111'], T: ['111', '010', '010', '010', '010'], I: ['111', '010', '010', '010', '111'],
+  N: ['101', '111', '111', '101', '101'], E: ['111', '100', '110', '100', '111'], P: ['110', '101', '110', '100', '100'], A: ['010', '101', '111', '101', '101'], L: ['100', '100', '100', '100', '111'], F: ['111', '100', '110', '100', '100'],
+  O: ['111', '101', '101', '101', '111'], D: ['110', '101', '101', '101', '110'], G: ['011', '100', '101', '101', '011'], M: ['101', '111', '101', '101', '101'], B: ['110', '101', '110', '101', '110'], K: ['101', '110', '100', '110', '101'],
+  H: ['101', '101', '111', '101', '101'], V: ['101', '101', '101', '101', '010'], W: ['101', '101', '101', '111', '101'], X: ['101', '101', '010', '101', '101'], Y: ['101', '101', '010', '010', '010'], Z: ['111', '001', '010', '100', '111'], J: ['001', '001', '001', '101', '010'], Q: ['111', '101', '101', '111', '001'],
+  '1': ['010', '110', '010', '010', '111'], '2': ['111', '001', '111', '100', '111'], '3': ['111', '001', '011', '001', '111'], '4': ['101', '101', '111', '001', '001'], '5': ['111', '100', '111', '001', '111'], '6': ['111', '100', '111', '101', '111'], '7': ['111', '001', '001', '001', '001'], '8': ['111', '101', '111', '101', '111'], '9': ['111', '101', '111', '001', '111'], '0': ['111', '101', '101', '101', '111'],
+  ' ': ['000', '000', '000', '000', '000'], '·': ['000', '000', '010', '000', '000'], '-': ['000', '000', '111', '000', '000'], '.': ['000', '000', '000', '000', '010'], '/': ['001', '001', '010', '100', '100'], ':': ['000', '010', '000', '010', '000'], '%': ['101', '001', '010', '100', '101'], '+': ['000', '010', '111', '010', '000'] };
+E.DIGITS = { '0': ['01110', '10001', '10011', '10101', '11001', '10001', '01110'], '1': ['00100', '01100', '00100', '00100', '00100', '00100', '01110'], '2': ['01110', '10001', '00001', '00110', '01000', '10000', '11111'], '3': ['11110', '00001', '00001', '01110', '00001', '00001', '11110'], '4': ['00010', '00110', '01010', '10010', '11111', '00010', '00010'], '5': ['11111', '10000', '11110', '00001', '00001', '10001', '01110'], '6': ['00110', '01000', '10000', '11110', '10001', '10001', '01110'], '7': ['11111', '00001', '00010', '00100', '01000', '01000', '01000'], '8': ['01110', '10001', '10001', '01110', '10001', '10001', '01110'], '9': ['01110', '10001', '10001', '01111', '00001', '00010', '01100'] };
+// generic sign hook: sign = {o, r, u, text, cell, fg, bg, u0}; returns ramp index
+E.signPixel = function (sg, wx, wy, wz) {
+  const dx = wx - sg.o[0], dy = wy - sg.o[1], dz = wz - sg.o[2], rl = Math.hypot(sg.r[0], sg.r[1], sg.r[2]);
+  const u = (sg.u0 || 0) + (dx * sg.r[0] + dy * sg.r[1] + dz * sg.r[2]) / (rl * rl), v = dx * sg.u[0] + dy * sg.u[1] + dz * sg.u[2];
+  const cell = sg.cell, col = Math.floor((u - cell) / cell), row = Math.floor((v - cell * 0.6) / cell);
+  if (row < 0 || row > 4) return sg.bg;
+  const ch = Math.floor(col / 4), c = col % 4; if (c === 3 || ch < 0 || ch >= sg.text.length) return sg.bg;
+  const g = E.FONT3[sg.text[ch]]; return g && g[4 - row] && g[4 - row][c] === '1' ? sg.fg : sg.bg;
+};
+E.signUV = function (sg, wx, wy, wz) { const dx = wx - sg.o[0], dy = wy - sg.o[1], dz = wz - sg.o[2], rl = Math.hypot(sg.r[0], sg.r[1], sg.r[2]); return [(sg.u0 || 0) + (dx * sg.r[0] + dy * sg.r[1] + dz * sg.r[2]) / (rl * rl), dx * sg.u[0] + dy * sg.u[1] + dz * sg.u[2]]; };
+hooks[M.SIGN] = (mx, my, mz, a) => { const sg = E.signs[a]; return sg ? E.signPixel(sg, mx, my, mz) : M.NAVY; };
+
+// ---------- renderer ----------
+E.createRenderer = function (canvas, W, H, SCALE) {
+  const R = { W, H, SCALE, NEAR: 0.35, FAR: 420, drawn: 0 };
+  canvas.width = W; canvas.height = H;
+  const vctx = canvas.getContext('2d', { alpha: false }); vctx.imageSmoothingEnabled = false;
+  const img = vctx.createImageData(W, H), px = img.data;
+  const depth = new Float32Array(W * H), matBuf = new Int16Array(W * H);
+  void SCALE;
+  R.px = px; R.depth = depth; R.matBuf = matBuf;
+  const cam = R.cam = { pos: [0, 2, -8], target: [0, 0.5, 0], fov: 40 };
+  let VM = { r: [1, 0, 0], u: [0, 1, 0], f: [0, 0, 1] }, FOCAL = 1, TANW = 1, TANH = 1;
+  R.LIGHT = E.norm([-0.45, 0.9, 0.35]);
+  R.ambient = 0.1;                    // scenes may raise for interiors
+  R.lookAt = function () {
+    const f = E.norm([cam.target[0] - cam.pos[0], cam.target[1] - cam.pos[1], cam.target[2] - cam.pos[2]]);
+    let r = E.norm([-f[2], 0, f[0]]); if (Math.abs(f[1]) > 0.999) r = [1, 0, 0];
+    const u = [r[1] * f[2] - r[2] * f[1], r[2] * f[0] - r[0] * f[2], r[0] * f[1] - r[1] * f[0]];
+    VM = { r, u, f }; FOCAL = (H / 2) / Math.tan((cam.fov * Math.PI / 180) / 2); TANH = (H / 2) / FOCAL; TANW = (W / 2) / FOCAL;
+    R.VM = VM; R.FOCAL = FOCAL;
+  };
+  const toView = R.toView = (x, y, z, o) => { const dx = x - cam.pos[0], dy = y - cam.pos[1], dz = z - cam.pos[2]; o[0] = dx * VM.r[0] + dy * VM.r[1] + dz * VM.r[2]; o[1] = dx * VM.u[0] + dy * VM.u[1] + dz * VM.u[2]; o[2] = dx * VM.f[0] + dy * VM.f[1] + dz * VM.f[2]; };
+  R.project = (x, y, z) => { toView(x, y, z, cv); if (cv[2] < R.NEAR) return null; return [W / 2 + cv[0] * FOCAL / cv[2], H / 2 - cv[1] * FOCAL / cv[2], cv[2]]; };
+  const va = [0, 0, 0, 0, 0, 0], vb = [0, 0, 0, 0, 0, 0], vc = [0, 0, 0, 0, 0, 0], cv = [0, 0, 0];
+  let G_aux = 0, G_zbias = 0, G_ma = null, G_mb = null, G_mc = null, G_light = [0, 0, 1], G_ghost = false, G_ghostMat = M.CYAN;
+  const clipBuf = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]];
+  const Lv = [0, 0, 0, 0, 0, 0], Rv = [0, 0, 0, 0, 0, 0];
+  function drawTri(ax, ay, az, bx, by, bz, cx, cy, cz, m, cull) {
+    toView(ax, ay, az, va); toView(bx, by, bz, vb); toView(cx, cy, cz, vc);
+    if (va[2] < R.NEAR && vb[2] < R.NEAR && vc[2] < R.NEAR) return;
+    if (va[2] > R.FAR && vb[2] > R.FAR && vc[2] > R.FAR) return;
+    const e1x = bx - ax, e1y = by - ay, e1z = bz - az, e2x = cx - ax, e2y = cy - ay, e2z = cz - az;
+    let nx = e1y * e2z - e1z * e2y, ny = e1z * e2x - e1x * e2z, nz = e1x * e2y - e1y * e2x; const nl = Math.hypot(nx, ny, nz) || 1; nx /= nl; ny /= nl; nz /= nl;
+    if (cull) { const f1x = vb[0] - va[0], f1y = vb[1] - va[1], f1z = vb[2] - va[2], f2x = vc[0] - va[0], f2y = vc[1] - va[1], f2z = vc[2] - va[2];
+      const vnx = f1y * f2z - f1z * f2y, vny = f1z * f2x - f1x * f2z, vnz = f1x * f2y - f1y * f2x; if (vnx * va[0] + vny * va[1] + vnz * va[2] < 0) return; }
+    let shade;
+    if (m === E.SHADOW_MAT || m === E.LIGHT_MAT) shade = 0;
+    else if (EMISSIVE.has(m)) shade = 1;
+    else {
+      const L = R.LIGHT, ndl = nx * L[0] + ny * L[1] + nz * L[2], key = 0.5 + 0.5 * ndl, sky = 0.5 + 0.5 * ny, fill = Math.max(0, -(nx * VM.f[0] + ny * VM.f[1] + nz * VM.f[2]));
+      shade = R.ambient + (METAL.has(m) ? 0.12 : 0) + 0.14 * sky + 0.56 * key * key + 0.2 * fill;
+      if (ndl > 0.97 && !GROUND_MATS.has(m)) shade += 0.3; shade = Math.min(1, shade);
+    }
+    const perPixel = hooks[m] !== undefined || m === E.LIGHT_MAT;
+    if (perPixel) { const ma = G_ma || [ax, ay, az], mb = G_mb || [bx, by, bz], mc = G_mc || [cx, cy, cz]; va[3] = ma[0]; va[4] = ma[1]; va[5] = ma[2]; vb[3] = mb[0]; vb[4] = mb[1]; vb[5] = mb[2]; vc[3] = mc[0]; vc[4] = mc[1]; vc[5] = mc[2]; }
+    if (va[2] >= R.NEAR && vb[2] >= R.NEAR && vc[2] >= R.NEAR) { raster(va, vb, vc, m, shade, perPixel); return; }
+    const inp = [va, vb, vc]; let cnt = 0;
+    for (let i = 0; i < 3; i++) { const A = inp[i], B = inp[(i + 1) % 3], ain = A[2] >= R.NEAR, bin = B[2] >= R.NEAR;
+      if (ain) { const o = clipBuf[cnt++]; for (let k = 0; k < 6; k++) o[k] = A[k]; }
+      if (ain !== bin) { const t = (R.NEAR - A[2]) / (B[2] - A[2]), o = clipBuf[cnt++]; for (let k = 0; k < 6; k++) o[k] = A[k] + (B[k] - A[k]) * t; o[2] = R.NEAR; } }
+    for (let i = 1; i + 1 < cnt; i++) raster(clipBuf[0], clipBuf[i], clipBuf[i + 1], m, shade, perPixel);
+  }
+  function raster(A, B, Cv, m, shade, perPixel) {
+    const iz0 = 1 / A[2], iz1 = 1 / B[2], iz2 = 1 / Cv[2];
+    let v0 = [W / 2 + A[0] * FOCAL * iz0, H / 2 - A[1] * FOCAL * iz0, iz0, A[3] * iz0, A[4] * iz0, A[5] * iz0];
+    let v1 = [W / 2 + B[0] * FOCAL * iz1, H / 2 - B[1] * FOCAL * iz1, iz1, B[3] * iz1, B[4] * iz1, B[5] * iz1];
+    let v2 = [W / 2 + Cv[0] * FOCAL * iz2, H / 2 - Cv[1] * FOCAL * iz2, iz2, Cv[3] * iz2, Cv[4] * iz2, Cv[5] * iz2];
+    if (v1[1] < v0[1]) { const t = v0; v0 = v1; v1 = t; } if (v2[1] < v0[1]) { const t = v0; v0 = v2; v2 = t; } if (v2[1] < v1[1]) { const t = v1; v1 = v2; v2 = t; }
+    const yTop = v0[1], yMid = v1[1], yBot = v2[1];
+    if (yBot < 0 || yTop > H || yBot - yTop < 1e-6) return;
+    if (Math.max(v0[0], v1[0], v2[0]) < 0 || Math.min(v0[0], v1[0], v2[0]) > W) return;
+    R.drawn++;
+    const ramp = (m === E.SHADOW_MAT || m === E.LIGHT_MAT) ? null : RAMPS[m], s3 = shade * 3, s0 = Math.floor(s3), fr = s3 - s0, zb = G_zbias, hook = hooks[m], auxv = G_aux, ghost = G_ghost;
+    const yStart = Math.max(0, Math.ceil(yTop - 0.5)), yEnd = Math.min(H - 1, Math.floor(yBot - 0.5));
+    for (let y = yStart; y <= yEnd; y++) {
+      const yc = y + 0.5; { const t = (yc - yTop) / (yBot - yTop); for (let k = 0; k < 6; k++) Lv[k] = v0[k] + (v2[k] - v0[k]) * t; }
+      if (yc < yMid) { if (yMid - yTop < 1e-9) continue; const t = (yc - yTop) / (yMid - yTop); for (let k = 0; k < 6; k++) Rv[k] = v0[k] + (v1[k] - v0[k]) * t; }
+      else { if (yBot - yMid < 1e-9) continue; const t = (yc - yMid) / (yBot - yMid); for (let k = 0; k < 6; k++) Rv[k] = v1[k] + (v2[k] - v1[k]) * t; }
+      let a = Lv, b = Rv; if (a[0] > b[0]) { a = Rv; b = Lv; }
+      const span = b[0] - a[0]; if (span < 1e-9) continue;
+      const xStart = Math.max(0, Math.ceil(a[0] - 0.5)), xEnd = Math.min(W - 1, Math.floor(b[0] - 0.5)); if (xStart > xEnd) continue;
+      const dz = (b[2] - a[2]) / span, d3 = (b[3] - a[3]) / span, d4 = (b[4] - a[4]) / span, d5 = (b[5] - a[5]) / span, t0 = xStart + 0.5 - a[0];
+      let iz = a[2] + dz * t0, q3 = a[3] + d3 * t0, q4 = a[4] + d4 * t0, q5 = a[5] + d5 * t0, i = y * W + xStart;
+      for (let x = xStart; x <= xEnd; x++, i++, iz += dz, q3 += d3, q4 += d4, q5 += d5) {
+        const z = 1 / iz - zb; if (z >= depth[i]) continue;
+        const o = i * 4;
+        if (m === E.SHADOW_MAT) { if (!GROUND_MATS.has(matBuf[i]) || bayer(x, y) > 0.6) continue; const cr = RAMPS[matBuf[i]][0]; px[o] = cr[0]; px[o + 1] = cr[1]; px[o + 2] = cr[2]; continue; }
+        if (m === E.LIGHT_MAT) { if (!GROUND_MATS.has(matBuf[i])) continue; const wz = 1 / iz, dx = q3 * wz - G_light[0], dzz = q5 * wz - G_light[1], rr = (dx * dx + dzz * dzz) / (G_light[2] * G_light[2]);
+          if (rr > 1 || (1 - rr) * 0.75 < bayer(x, y)) continue; const cr = RAMPS[matBuf[i]][3]; px[o] = cr[0]; px[o + 1] = cr[1]; px[o + 2] = cr[2]; continue; }
+        if (ghost) { if (bayer(x, y) < 0.62) continue; depth[i] = z; matBuf[i] = G_ghostMat; const cg = RAMPS[G_ghostMat][Math.min(3, s0 + 1)]; px[o] = cg[0]; px[o + 1] = cg[1]; px[o + 2] = cg[2]; continue; }
+        depth[i] = z; matBuf[i] = m;
+        let rp = ramp;
+        if (perPixel) { const wz = 1 / iz; rp = RAMPS[hook(q3 * wz, q4 * wz, q5 * wz, auxv)]; }
+        const idx = Math.min(3, fr > bayer(x, y) ? s0 + 1 : s0), c = rp[idx]; px[o] = c[0]; px[o + 1] = c[1]; px[o + 2] = c[2];
+      }
+    }
+  }
+  // ----- public drawing API -----
+  R.clear = function (color) {   // flat fill (interiors); color = ramp colour array or hex string
+    const c = typeof color === 'string' ? hex(color) : color;
+    for (let i = 0; i < W * H; i++) { const o = i * 4; px[o] = c[0]; px[o + 1] = c[1]; px[o + 2] = c[2]; px[o + 3] = 255; depth[i] = Infinity; matBuf[i] = -1; }
+  };
+  const NIGHT = hex('#06081A'), STUDIO = hex('#121A4A'), DUSK = hex('#2A3A8A'), INK = hex('#000000'), MOUNT = hex('#121A4A'), MOUNT2 = hex('#0B1030'), GLOW = hex('#7A32B0'), GOLDc = hex('#F4C542'), CYANc = hex('#3DD2FF'), WHITEc = hex('#FFFFFF'), GROUNDc = hex('#0B2A17'), CAPc = hex('#C8CBD8');
+  const colDir = new Float32Array(W), colM1 = new Float32Array(W), colM2 = new Float32Array(W), colCity = new Uint8Array(W);
+  R.sky = function () {   // night sky with dusk glow, mountains, city lights, moon, stars; sets depth to infinity
+    const hf = E.norm([VM.f[0], 0, VM.f[2]]); toView(cam.pos[0] + hf[0] * 5000, cam.pos[1], cam.pos[2] + hf[2] * 5000, cv);
+    const horizon = H / 2 - cv[1] * FOCAL / cv[2], baseAz = Math.atan2(VM.f[0], VM.f[2]);
+    for (let x = 0; x < W; x++) { const az = baseAz + Math.atan((x - W / 2) / FOCAL); colDir[x] = az;
+      colM1[x] = 14 + 11 * Math.sin(az * 2.3 + 0.4) + 6 * Math.sin(az * 5.1 + 2.0) + 3 * Math.sin(az * 11 + 1); colM2[x] = 7 + 6 * Math.sin(az * 3.7 + 1.9) + 3 * Math.sin(az * 8.3);
+      const hc = E.hash2(Math.floor(az * 300), 1); colCity[x] = hc > 0.55 ? (E.hash2(Math.floor(az * 300), 2) > 0.5 ? 1 : 2) : 0; }
+    const moonAz = 0.9, moonEl = 26 + (FOCAL - 160) * 0.1;
+    for (let y = 0; y < H; y++) {
+      const dyh = horizon - y, t = Math.min(1, Math.max(0, (dyh - 8) / 70)), tt = dyh < 26 ? (26 - dyh) / 26 : 0;
+      for (let x = 0; x < W; x++) {
+        const i = y * W + x, o = i * 4; depth[i] = Infinity; matBuf[i] = -1; let c;
+        if (dyh < 0) c = GROUNDc; else if (dyh < colM2[x]) c = MOUNT2; else if (dyh < colM1[x]) c = MOUNT; else if (dyh < colM1[x] + 2 && colCity[x]) c = colCity[x] === 1 ? GOLDc : CYANc;
+        else { c = t < bayer(x, y) ? STUDIO : NIGHT; if (tt > 0 && tt * 0.85 > bayer(x + 3, y)) c = DUSK; if (tt > 0.55 && (tt - 0.55) * 0.9 > bayer(x + 5, y + 2)) c = GLOW;
+          let dAz = colDir[x] - moonAz; while (dAz > Math.PI) dAz -= 2 * Math.PI; while (dAz < -Math.PI) dAz += 2 * Math.PI;
+          const mx = dAz * FOCAL, my = dyh - moonEl, rr = mx * mx + my * my;
+          if (rr < 121) c = (rr < 100 || bayer(x, y) < 0.5) ? (E.hash2(Math.floor(mx / 3), Math.floor(my / 3)) < 0.18 ? CAPc : WHITEc) : STUDIO;
+          else if (dyh > 44 && E.hash2(Math.floor(colDir[x] * 400), y) > 0.995) c = E.hash2(x, y) > 0.5 ? WHITEc : CAPc; }
+        px[o] = c[0]; px[o + 1] = c[1]; px[o + 2] = c[2]; px[o + 3] = 255;
+      }
+    }
+  };
+  R.gradient = function (top, bottom) {   // dithered vertical gradient backdrop (interiors)
+    const a = hex(top), b = hex(bottom);
+    for (let y = 0; y < H; y++) { const t = y / H; for (let x = 0; x < W; x++) { const i = y * W + x, o = i * 4, c = t > bayer(x, y) ? b : a; px[o] = c[0]; px[o + 1] = c[1]; px[o + 2] = c[2]; px[o + 3] = 255; depth[i] = Infinity; matBuf[i] = -1; } }
+  };
+  R.drawStatic = function (mesh, opts = {}) {   // frustum-culled static world mesh; ground materials get z-bias layering
+    const { pos, mat, aux: ax, cen, rad, n } = mesh, cullAll = opts.cull !== false;
+    for (let i = 0; i < n; i++) {
+      const c3 = i * 3; toView(cen[c3], cen[c3 + 1], cen[c3 + 2], cv); const r = rad[i], z = cv[2];
+      if (z + r < R.NEAR || z - r > R.FAR) continue; if (Math.abs(cv[0]) - r > (z + r) * TANW * 1.05) continue; if (Math.abs(cv[1]) - r > (z + r) * TANH * 1.05) continue;
+      const o = i * 9, m = mat[i];
+      G_aux = ax[i]; G_zbias = GROUND_MATS.has(m) ? (m === M.ASPHALT ? 0.02 : m === M.RUBBER ? 0.04 : m === M.KERB_R || m === M.KERB_W ? 0.06 : 0) : 0;
+      drawTri(pos[o], pos[o + 1], pos[o + 2], pos[o + 3], pos[o + 4], pos[o + 5], pos[o + 6], pos[o + 7], pos[o + 8], m, cullAll && !GROUND_MATS.has(m) && m !== M.CROWD && m !== M.SIGN && m !== M.SCREEN);
+    }
+    G_aux = 0; G_zbias = 0;
+  };
+  const p0 = [0, 0, 0], p1 = [0, 0, 0], p2 = [0, 0, 0], m0 = [0, 0, 0], m1 = [0, 0, 0], m2 = [0, 0, 0];
+  // dynamic mesh: xform(x,y,z,group,out) maps model -> world. mode: 'solid' | 'shadow' | 'ghost'. groundY for shadows.
+  R.drawDynamic = function (mesh, xform, mode = 'solid', groundY = 0, ghostMat = M.CYAN, cullDist = 260) {
+    const { pos, mat, grp, aux: ax, n } = mesh;
+    G_ghost = mode === 'ghost'; G_ghostMat = ghostMat;
+    for (let i = 0; i < n; i++) {
+      const o = i * 9;
+      m0[0] = pos[o]; m0[1] = pos[o + 1]; m0[2] = pos[o + 2]; m1[0] = pos[o + 3]; m1[1] = pos[o + 4]; m1[2] = pos[o + 5]; m2[0] = pos[o + 6]; m2[1] = pos[o + 7]; m2[2] = pos[o + 8];
+      xform(m0[0], m0[1], m0[2], grp[i], p0); xform(m1[0], m1[1], m1[2], grp[i], p1); xform(m2[0], m2[1], m2[2], grp[i], p2);
+      if (mode === 'shadow') { const L = R.LIGHT; for (const p of [p0, p1, p2]) { const k = (p[1] - groundY) / L[1]; p[0] -= L[0] * k; p[2] -= L[2] * k; p[1] = groundY; }
+        G_zbias = 0.05; drawTri(p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], p2[0], p2[1], p2[2], E.SHADOW_MAT, false); G_zbias = 0; }
+      else { G_aux = ax[i]; G_ma = m0; G_mb = m1; G_mc = m2; drawTri(p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], p2[0], p2[1], p2[2], mat[i], true); G_ma = G_mb = G_mc = null; G_aux = 0; }
+    }
+    G_ghost = false;
+  };
+  R.drawLightPools = function (pools) { for (const lp of pools) { const [x, z, r] = lp; toView(x, 0, z, cv); if (cv[2] - r > R.FAR || cv[2] + r < R.NEAR) continue; G_light = lp; G_zbias = 0.08;
+    drawTri(x - r, 0, z - r, x - r, 0, z + r, x + r, 0, z + r, E.LIGHT_MAT, false); drawTri(x - r, 0, z - r, x + r, 0, z + r, x + r, 0, z - r, E.LIGHT_MAT, false); G_zbias = 0; } };
+  R.drawPoint = function (x, y, z, color) { toView(x, y, z, cv); if (cv[2] < R.NEAR) return; const sx = Math.floor(W / 2 + cv[0] * FOCAL / cv[2]), sy = Math.floor(H / 2 - cv[1] * FOCAL / cv[2]);
+    if (sx < 0 || sx >= W || sy < 0 || sy >= H) return; const i = sy * W + sx; if (cv[2] >= depth[i]) return; const o = i * 4; px[o] = color[0]; px[o + 1] = color[1]; px[o + 2] = color[2]; };
+  // Edge pass. Two kinds of edge, both needed for definition at this resolution:
+  //   silhouette — an object against ground or sky: hard INK
+  //   seam       — two different materials meeting on the same object: the darkest step of the
+  //                FARTHER material, so a wing reads against a sidepod without a heavy black line
+  const seamBuf = new Int32Array(W * H);
+  R.outline = function () {
+    const cutoff = R.seamCutoff === undefined ? 999 : R.seamCutoff;
+    seamBuf.fill(-1);
+    for (let y = 0; y < H - 1; y++) {
+      for (let x = 0; x < W - 1; x++) {
+        const i = y * W + x, m = matBuf[i], d = depth[i];
+        for (let k = 0; k < 2; k++) {
+          const j = k === 0 ? i + 1 : i + W, m2 = matBuf[j], d2 = depth[j];
+          if (m === m2 && Math.abs(d - d2) < 0.12) continue;
+          const gi = m < 0 || GROUND_MATS.has(m), gj = m2 < 0 || GROUND_MATS.has(m2);
+          if (gi && gj) continue;
+          const far = d > d2 ? i : j, dd = Math.abs(d - d2);
+          if (gi !== gj) { if (dd > 0.1) seamBuf[far] = -2; continue; }
+          if (dd > 0.55) { seamBuf[far] = -2; continue; }
+          if (matBuf[far] === matBuf[far === i ? j : i]) continue;
+          if (depth[far] > cutoff) continue;
+          if (seamBuf[far] === -1) seamBuf[far] = matBuf[far];
+        }
+      }
+    }
+    for (let i = 0; i < W * H; i++) {
+      const v = seamBuf[i]; if (v === -1) continue;
+      const o = i * 4, c = v === -2 ? INK : RAMPS[v][0];
+      px[o] = c[0]; px[o + 1] = c[1]; px[o + 2] = c[2];
+    }
+  };
+  // post effects
+  R.flash = function (amount) { if (amount <= 0) return; for (let i = 0; i < W * H; i++) { const x = i % W, y = (i / W) | 0; if (amount > bayer(x, y)) { const o = i * 4; px[o] = 255; px[o + 1] = 255; px[o + 2] = 255; } } };
+  R.checkerWipe = function (t) {   // 0..1: growing black/white checker from the left
+    const cells = 8, lim = Math.floor(t * (W / cells + 4));
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const cx = (x / cells) | 0, cy = (y / cells) | 0; if (cx > lim) continue; const on = ((cx + cy) & 1) === 0; const o = (y * W + x) * 4; const v = on ? 255 : 0; px[o] = v; px[o + 1] = v; px[o + 2] = v; }
+  };
+  R.present = function () { vctx.putImageData(img, 0, 0); };
+  R.begin = function () { R.drawn = 0; R.lookAt(); };
+  return R;
+};
+})(window.SCR = window.SCR || {});
+
+// ============================================================================
+// SCR.car — the car: parts spec -> geometry + physics constants, per-pixel livery, transforms
+// era: 0 (1994 classic) .. 1 (Ultron). Body work evolves with the team:
+//   0.00-0.30 classic (halo, open cockpit, gold seams)      0.30-0.50 modern (neon seams, sharper nose)
+//   0.50-0.70 closed HOLO canopy, sculpted engine cover, LED rain light bar
+//   0.70-0.85 enclosed wheel fairings that steer, fan-car rear disk, stretched nose
+//   0.85-1.00 Ultron: chrome body, red neon seams + eyes, drone escort, pulsing underglow
+// groups: 0 body, 1-4 wheels (FL FR RL RR), 5 DRS flap, 6 rear fan, 7 drone escort,
+//         8-11 wheel fairings (FL FR RL RR, steer with the front wheels), 12 jack stands (grow with lift)
+// ============================================================================
+(function (SCR) {
+'use strict';
+const E = SCR.engine, M = E.M, C = SCR.car = {};
+const WB_F = 1.72, WB_R = -1.88, TRACK = 0.86, R_F = 0.355, R_R = 0.365;
+C.R_R = R_R;
+C.WHEELS = [
+  { g: 1, cx: -TRACK, cz: WB_F, r: R_F, w: 0.33, front: true }, { g: 2, cx: TRACK, cz: WB_F, r: R_F, w: 0.33, front: true },
+  { g: 3, cx: -TRACK, cz: WB_R, r: R_R, w: 0.42, front: false }, { g: 4, cx: TRACK, cz: WB_R, r: R_R, w: 0.42, front: false }];
+C.DRS_HINGE = { y: 0.93, z: -2.42 };
+C.GROUPS = { BODY: 0, FL: 1, FR: 2, RL: 3, RR: 4, DRS: 5, FAN: 6, DRONES: 7, FAIRING: 8, JACKS: 12 };
+C.ERA = { NEON: 0.3, CANOPY: 0.5, FAIRINGS: 0.7, CHROME: 0.85 };
+C.JACK_H = 0.5;                     // nominal jack-stand height; the stands are scaled to the lift in makeXform
+const AUX = { PANEL: 5, SEAM: 6, UNDERGLOW: 7, RAINLIGHT: 8, EYE: 9 };   // livery aux codes (resolved per pixel by the hook)
+const DRONE = { x: 1.0, y: 1.25, r: 1.65, h: 1.15 };
+C.PART_DEFS = [
+  { key: 'frontWing', label: 'FRONT WING', type: 'level', min: 1, max: 5, role: 'AERO' },
+  { key: 'rearWing', label: 'REAR WING', type: 'level', min: 1, max: 5, role: 'AERO' },
+  { key: 'floor', label: 'FLOOR + DIFFUSER', type: 'level', min: 1, max: 5, role: 'AERO' },
+  { key: 'sidepods', label: 'SIDEPODS', type: 'enum', values: ['SLIM', 'STD', 'WIDE'], role: 'AERO' },
+  { key: 'fin', label: 'SHARK FIN', type: 'bool', role: 'AERO' },
+  { key: 'engine', label: 'ENGINE MODE', type: 'level', min: 1, max: 5, role: 'POWER' },
+  { key: 'brakes', label: 'BRAKES', type: 'level', min: 1, max: 5, role: 'TOOLS' },
+  { key: 'tyres', label: 'TYRES', type: 'enum', values: ['HARD', 'MEDIUM', 'SOFT'], role: 'TYRES' },
+  { key: 'drs', label: 'DRS', type: 'bool', role: 'POWER' },
+  { key: 'ballast', label: 'BALLAST', type: 'level', min: 0, max: 3, role: 'TOOLS' },
+  { key: 'gearbox', label: 'GEARBOX', type: 'level', min: 5, max: 8, role: 'POWER' },
+];
+C.GEN01 = { frontWing: 2, rearWing: 2, floor: 1, sidepods: 'STD', fin: false, engine: 2, brakes: 2, tyres: 'MEDIUM', drs: false, ballast: 2, gearbox: 6 };
+C.fmtVal = v => typeof v === 'boolean' ? (v ? 'ON' : 'OFF') : typeof v === 'number' ? `L${v}` : v;
+// ---------- the car is the harness ----------
+// The loop's ten components, keyed the way the loop names them. A component that levels up moves
+// a part you can see, so the same mapping serves every surface that draws the car from a season.
+C.ROLE_KEYS = ['AERO', 'DATA', 'TYRES', 'POWER_UNIT', 'STRATEGIST', 'SIMULATOR', 'PIT_CREW', 'ENGINEER', 'SCRUTINEER', 'HISTORIAN'];
+// component levels after the first `n` rounds of a season have been decided
+C.levelsAfter = function (rounds, n) {
+  const lv = {}; for (const k of C.ROLE_KEYS) lv[k] = 1;
+  for (let g = 0; g < n && g < rounds.length; g++) { const r = rounds[g]; if (r.promoted && r.role && lv[r.role] !== undefined) lv[r.role]++; }
+  return lv;
+};
+C.specForLevels = function (lv) {
+  const cl = (x, lo, hi) => Math.max(lo, Math.min(hi, x)), L = k => lv[k] || 1;
+  return { ...C.GEN01,
+    frontWing: cl(1 + (L('AERO') - 1), 1, 5), rearWing: cl(1 + Math.floor((L('AERO') - 1) * 0.8), 1, 5),
+    floor: cl(1 + (L('DATA') - 1), 1, 4), engine: cl(1 + (L('POWER_UNIT') - 1), 1, 5),
+    gearbox: cl(6 + (L('STRATEGIST') - 1), 6, 8), tyres: L('TYRES') > 2 ? 'SOFT' : L('TYRES') > 1 ? 'MEDIUM' : 'HARD',
+    drs: L('SIMULATOR') > 1, fin: L('AERO') > 2, brakes: cl(1 + Math.floor((L('PIT_CREW') - 1) * 1.5), 1, 4) };
+};
+// era rises with the total level, so the livery matures across a season too
+C.eraForLevels = lv => { const total = C.ROLE_KEYS.reduce((a, k) => a + (lv[k] || 1), 0); return Math.min(0.9, (total - C.ROLE_KEYS.length) / 14); };
+// physics constants from the spec (+ optional team multipliers: {grip, wear, power, drag, braking, consistency})
+C.derive = function (sp, tm = {}) {
+  const df = sp.frontWing * 1.2 + sp.rearWing * 1.3 + sp.floor * 1.5;
+  const drag = (1.0 + sp.frontWing * 0.14 + sp.rearWing * 0.2 + (sp.sidepods === 'WIDE' ? 0.22 : sp.sidepods === 'SLIM' ? -0.12 : 0) + (sp.fin ? -0.04 : 0)) * (tm.drag ?? 1);
+  const power = (1 + sp.engine * 0.38) * (tm.power ?? 1);
+  const mass = 1 + sp.ballast * 0.06 + (sp.sidepods === 'WIDE' ? 0.03 : 0);
+  const grip = (sp.tyres === 'SOFT' ? 1.62 : sp.tyres === 'MEDIUM' ? 1.42 : 1.26) * (tm.grip ?? 1);
+  const wear = (sp.tyres === 'SOFT' ? 0.03 : sp.tyres === 'MEDIUM' ? 0.014 : 0.005) * (tm.wear ?? 1);
+  const topSpeed = 42 + power * 20 / Math.sqrt(drag);
+  const accel = (6 + power * 6 / mass) * (1 + (sp.gearbox - 6) * 0.03);
+  const braking = (15 + sp.brakes * 4.5) * Math.sqrt(grip / 1.42) * (tm.braking ?? 1);
+  const cornerG = 9.81 * (grip + df * 0.16) / mass;
+  return { df, drag, power, mass, grip, wear, topSpeed, accel, braking, cornerG, drsBoost: sp.drs ? 7.5 : 0, gears: sp.gearbox, consistency: tm.consistency ?? 1, learn: tm.learn ?? 0 };
+};
+// ---------- geometry ----------
+const { box, prism, loft, sphere, Q, T } = E;
+function wingElement(o) {
+  const segs = o.segs || 6, spoon = o.spoon || (() => 0), c = o.chord, a = o.aoa, th = o.thick;
+  const prof = y => [[o.zLE, y], [o.zLE - c * 0.45, y + c * 0.45 * Math.tan(a * 0.55)], [o.zLE - c, y + c * Math.tan(a)]];
+  for (let i = 0; i < segs; i++) {
+    const xa = o.x0 + (o.x1 - o.x0) * i / segs, xb = o.x0 + (o.x1 - o.x0) * (i + 1) / segs;
+    const PA = prof(o.yLE + spoon(i / segs)), PB = prof(o.yLE + spoon((i + 1) / segs));
+    for (let k = 0; k < 2; k++) {
+      const [z0, y0] = PA[k], [z1, y1] = PA[k + 1], [z0b, y0b] = PB[k], [z1b, y1b] = PB[k + 1];
+      Q([xa, y0, z0], [xb, y0b, z0b], [xb, y1b, z1b], [xa, y1, z1], o.matTop ?? o.mat);
+      Q([xa, y0 - th, z0], [xa, y1 - th, z1], [xb, y1b - th, z1b], [xb, y0b - th, z0b], o.matBottom ?? o.mat);
+    }
+    Q([xa, PA[0][1] - th, o.zLE], [xb, PB[0][1] - th, o.zLE], [xb, PB[0][1], o.zLE], [xa, PA[0][1], o.zLE], o.mat);
+    Q([xb, PB[2][1] - th, o.zLE - c], [xa, PA[2][1] - th, o.zLE - c], [xa, PA[2][1], o.zLE - c], [xb, PB[2][1], o.zLE - c], o.mat);
+  }
+}
+C.wingElement = wingElement;
+function wheel(cx, cy, cz, r, w, n, band, rimMat) {
+  const x0 = cx - w / 2, x1 = cx + w / 2, sh = 0.05, prof = [[x0, r * 0.9], [x0 + sh, r], [x1 - sh, r], [x1, r * 0.9]];
+  const P = (x, rr, a) => [x, cy + Math.cos(a) * rr, cz + Math.sin(a) * rr];
+  for (let i = 0; i < n; i++) {
+    const a0 = (i / n) * Math.PI * 2, a1 = ((i + 1) / n) * Math.PI * 2;
+    for (let j = 0; j < 3; j++) { const [xa, ra] = prof[j], [xb, rb] = prof[j + 1]; Q(P(xa, ra, a0), P(xa, ra, a1), P(xb, rb, a1), P(xb, rb, a0), M.TYRE); }
+    for (const s of [1, -1]) {
+      const x = s > 0 ? x1 : x0, e = s * 0.004, F = (a, b, c, m) => s > 0 ? T(a, b, c, m) : T(a, c, b, m);
+      F(P(x, 0, a0), P(x, r * 0.9, a0), P(x, r * 0.9, a1), M.TYRE);
+      F(P(x + e, r * 0.74, a0), P(x + e, r * 0.86, a0), P(x + e, r * 0.86, a1), band); F(P(x + e, r * 0.74, a0), P(x + e, r * 0.86, a1), P(x + e, r * 0.74, a1), band);
+      F(P(x + 2 * e, r * 0.56, a0), P(x + 2 * e, r * 0.64, a0), P(x + 2 * e, r * 0.64, a1), rimMat); F(P(x + 2 * e, r * 0.56, a0), P(x + 2 * e, r * 0.64, a1), P(x + 2 * e, r * 0.56, a1), rimMat);
+      F(P(x + 3 * e, 0, a0), P(x + 3 * e, r * 0.15, a0), P(x + 3 * e, r * 0.15, a1), M.GOLD);
+    }
+  }
+  for (const s of [1, -1]) { const x = (s > 0 ? x1 : x0) + s * 0.008, F = (a, b, c, m) => s > 0 ? T(a, b, c, m) : T(a, c, b, m);
+    for (let k = 0; k < 5; k++) { const ak = k * Math.PI * 2 / 5 + 0.3, di = 0.09 / (r * 0.15), doo = 0.05 / (r * 0.58);
+      F(P(x, r * 0.15, ak - di), P(x, r * 0.58, ak - doo), P(x, r * 0.58, ak + doo), rimMat); F(P(x, r * 0.15, ak - di), P(x, r * 0.58, ak + doo), P(x, r * 0.15, ak + di), rimMat); } }
+}
+// enclosed wheel fairing: an arch over the wheel (open at the bottom) with full side discs. s = side sign of the wheel.
+function fairing(wd, s, topMat, wallMat) {
+  const R2 = wd.r + 0.1, hw = wd.w / 2 + 0.05, N = 8, a0 = -0.35, a1 = Math.PI + 0.35;
+  const ang = k => a0 + (a1 - a0) * k / N, half = a => hw * (0.72 + 0.28 * Math.max(0, Math.sin(a)));   // pod tapers toward its open ends
+  const P = (k, side) => { const a = ang(k); return [wd.cx + side * s * half(a), wd.r + Math.sin(a) * R2, wd.cz + Math.cos(a) * R2]; };
+  const co = [wd.cx + s * hw * 0.72, wd.r, wd.cz], ci = [wd.cx - s * hw * 0.72, wd.r, wd.cz];
+  for (let k = 0; k < N; k++) {
+    const A = P(k, -1), B = P(k, 1), Cq = P(k + 1, 1), D = P(k + 1, -1);
+    if (s > 0) Q(A, B, Cq, D, topMat); else Q(A, D, Cq, B, topMat);
+    if (s > 0) { T(co, Cq, B, wallMat); T(ci, A, D, wallMat); } else { T(co, B, Cq, wallMat); T(ci, D, A, wallMat); }
+  }
+  for (const side of [-1, 1]) { const pa = P(0, side), pb = P(N, side); box(pa[0], pa[1] - 0.03, pa[2], 0.03, 0.06, 0.03, wallMat); box(pb[0], pb[1] - 0.03, pb[2], 0.03, 0.06, 0.03, wallMat); }
+}
+// build(spec, era, opts) -> mesh. era 0..1. opts: {wheels:false} car on stands (no wheels, no fairings), {noDriver:true},
+// {jacks:true} two steel jack stands under the floor (group 12, grow with makeXform lift), {drones:false} no escort,
+// {keepEra:true} do not retarget the livery hook, {pose:'display'} accepted for symmetry with makeXform.
+C.build = function (sp, era = 0, opts = {}) {
+  E.begin(); E.setGroup(0); E.setAux(0);
+  const f = Math.max(0, Math.min(1, era)), neon = f >= C.ERA.NEON, canopy = f >= C.ERA.CANOPY, fairings = f >= C.ERA.FAIRINGS, fan = f >= C.ERA.FAIRINGS, chrome = f >= C.ERA.CHROME;
+  if (!opts.keepEra) C.era = f;
+  const BODY = M.LIVERY, DARK = chrome ? M.CHROME : M.CARBON, PLAIN = chrome ? M.CHROME : M.BODY;
+  // accent seams: metallic cyan on the classic car; from the modern era on they are neon, resolved by the livery hook so they light red for Ultron
+  const ACC = neon ? BODY : M.CYAN, accent = fn => { E.setAux(neon ? AUX.SEAM : 0); fn(); E.setAux(0); };
+  const wide = sp.sidepods === 'WIDE' ? 1.18 : sp.sidepods === 'SLIM' ? 0.8 : 1, stretch = 1 + f * 0.12 + (fairings ? 0.08 : 0);
+  // floor
+  prism(1.6 * stretch, { cx: 0, cy: 0.045, w: 0.8, h: 0.05 }, -2.05, { cx: 0, cy: 0.045, w: 1.5, h: 0.05 }, DARK);
+  box(0, 0.02, -0.5, 1.62, 0.03, 2.4, DARK);
+  // monocoque + nose (sharper, lower tip from the modern era on)
+  const nose = neon
+    ? [{ z: 3.0 * stretch, cy: 0.22, w: 0.06, h: 0.05, ch: 0.5 }, { z: 2.55 * stretch, cy: 0.27, w: 0.16, h: 0.12 }, { z: 2.1 * stretch, cy: 0.33, w: 0.3, h: 0.22 }]
+    : [{ z: 2.9 * stretch, cy: 0.27, w: 0.1, h: 0.09, ch: 0.5 }, { z: 2.55 * stretch, cy: 0.29, w: 0.2, h: 0.15 }, { z: 2.1 * stretch, cy: 0.34, w: 0.32, h: 0.24 }];
+  loft([...nose, { z: 1.55, cy: 0.42, w: 0.48, h: 0.36 },
+    { z: 1.05, cy: 0.47, w: 0.66, h: 0.48 }, { z: 0.35, cy: 0.5, w: 0.72, h: 0.54 }, { z: -0.5, cy: 0.5, w: 0.68, h: 0.52 }, { z: -1.2, cy: 0.45, w: 0.5, h: 0.42 },
+    { z: -1.85, cy: 0.4, w: 0.32, h: 0.32 }, { z: -2.2, cy: 0.42, w: 0.2, h: 0.2 }], BODY);
+  if (neon) accent(() => prism(2.45 * stretch, { cx: 0, cy: 0.37, w: 0.03, h: 0.02 }, 1.2, { cx: 0, cy: 0.7, w: 0.03, h: 0.02 }, ACC));      // nose seam
+  // engine cover: airbox + cover (classic) or sculpted spine behind the canopy
+  if (canopy) {
+    loft([{ z: -0.45, cy: 0.85, w: 0.42, h: 0.48, ch: 0.5 }, { z: -1.05, cy: 0.7, w: 0.34, h: 0.44 }, { z: -1.6, cy: 0.56, w: 0.2, h: 0.26 }, { z: -1.95, cy: 0.5, w: 0.1, h: 0.12 }], BODY, { front: DARK });
+    prism(-0.4, { cx: 0, cy: 1.06, w: 0.06, h: 0.1 }, -1.85, { cx: 0, cy: 0.64, w: 0.04, h: 0.06 }, DARK);                    // spine ridge
+    for (const s of [-1, 1]) {
+      accent(() => prism(-0.55, { cx: s * 0.2, cy: 0.99, w: 0.02, h: 0.02 }, -1.5, { cx: s * 0.1, cy: 0.67, w: 0.02, h: 0.02 }, ACC));   // shoulder seams
+      for (let k = 0; k < 3; k++) box(s * 0.18, 0.92 - k * 0.1, -0.7 - k * 0.22, 0.1, 0.015, 0.06, DARK);                    // cooling louvres
+    }
+  } else {
+    const ab = 0.22 + sp.engine * 0.03;
+    loft([{ z: 0.42, cy: 0.9, w: ab, h: ab }, { z: 0.05, cy: 0.9, w: 0.36, h: 0.4 }, { z: -0.45, cy: 0.82, w: 0.4, h: 0.52 }, { z: -1.05, cy: 0.68, w: 0.32, h: 0.42 },
+      { z: -1.6, cy: 0.56, w: 0.2, h: 0.26 }, { z: -1.95, cy: 0.5, w: 0.1, h: 0.12 }], BODY, { front: DARK });
+  }
+  if (sp.fin) prism(-0.55, { cx: 0, cy: 0.98, w: 0.03, h: 0.3 }, -1.9, { cx: 0, cy: 0.72, w: 0.03, h: 0.44 }, BODY);
+  if (chrome) accent(() => box(0, 0.6, -1.55, 0.26, 0.1, 0.05, ACC)); else box(0, 0.6, -1.55, 0.26, 0.1, 0.05, M.GOLD);
+  // sidepods, floor edges, suspension
+  for (const s of [-1, 1]) {
+    loft([{ z: 0.78, cx: s * 0.64 * wide, cy: 0.33, w: 0.5 * wide, h: 0.46, ch: 0.3 }, { z: 0.25, cx: s * 0.66 * wide, cy: 0.34, w: 0.56 * wide, h: 0.5, ch: 0.3 },
+      { z: -0.55, cx: s * 0.62 * wide, cy: 0.32, w: 0.5 * wide, h: 0.44 }, { z: -1.25, cx: s * 0.48, cy: 0.27, w: 0.3, h: 0.3 }, { z: -1.8, cx: s * 0.38, cy: 0.23, w: 0.14, h: 0.16 }], BODY, { front: DARK });
+    box(s * 0.64 * wide, 0.36, 0.8, 0.44 * wide, 0.34, 0.05, DARK);
+    if (sp.floor >= 2) box(s * 0.55, 0.22, 1.2, 0.03, 0.36, 0.5, DARK);
+    if (sp.floor >= 3) box(s * 0.7, 0.1, 1.0, 0.3, 0.02, 0.7, DARK);
+    if (sp.floor >= 4) box(s * 0.82, 0.14, 0.2, 0.03, 0.12, 1.4, M.NAVY);
+    if (neon) accent(() => { box(s * 0.9 * wide, 0.3, 0.1, 0.02, 0.03, 1.2, ACC);                                             // glowing flank strip
+      prism(0.7, { cx: s * 0.66 * wide, cy: 0.565, w: 0.3 * wide, h: 0.015 }, -1.2, { cx: s * 0.48, cy: 0.43, w: 0.14, h: 0.015 }, ACC); });   // shoulder seam
+    if (chrome) { E.setAux(AUX.UNDERGLOW); box(s * (0.92 * wide + 0.05), 0.085, 0.05, 0.08, 0.025, 1.7, BODY); E.setAux(0); }   // pulsing underglow strip
+    box(s * 0.48, 0.74, 0.78, 0.08, 0.06, 0.1, DARK); box(s * 0.5, 0.8, 0.82, 0.18, 0.1, 0.05, M.CHROME);
+    const bd = 0.12 + sp.brakes * 0.02;
+    box(s * 0.62, 0.36, WB_F, bd, 0.2, 0.2, DARK); box(s * 0.6, 0.36, WB_R, bd, 0.22, 0.24, DARK);
+    box(s * 0.55, 0.38, 1.86, 0.5, 0.03, 0.06, DARK); box(s * 0.55, 0.38, 1.56, 0.5, 0.03, 0.06, DARK); box(s * 0.55, 0.2, WB_F, 0.5, 0.03, 0.05, DARK);
+    box(s * 0.5, 0.42, -1.76, 0.5, 0.03, 0.06, DARK); box(s * 0.5, 0.42, -2.0, 0.5, 0.03, 0.06, DARK); box(s * 0.5, 0.22, WB_R, 0.5, 0.03, 0.05, DARK);
+  }
+  box(0, 0.76, 0.3, 0.44, 0.05, 0.62, DARK); box(0, 0.66, 0.92, 0.5, 0.2, 0.28, BODY);
+  if (!opts.noDriver && !canopy) { box(0, 0.7, 0.05, 0.3, 0.12, 0.3, M.STRIPE); sphere(0, 0.88, 0.24, 0.155, 6, 10, M.GOLD, M.CYAN); }
+  if (canopy) {   // closed canopy: top stays below y = 1.18 so the T-cam keeps a clear view
+    loft([{ z: 1.05, cy: 0.74, w: 0.36, h: 0.14, ch: 0.5 }, { z: 0.6, cy: 0.86, w: 0.5, h: 0.4, ch: 0.5 }, { z: -0.2, cy: 0.9, w: 0.5, h: 0.5, ch: 0.5 }, { z: -0.75, cy: 0.82, w: 0.4, h: 0.36, ch: 0.5 }], M.HOLO, { front: DARK, back: DARK });
+    box(0, 1.155, 0.05, 0.05, 0.02, 0.9, DARK);
+  } else { for (let i = 0; i <= 40; i++) { const ang = (i / 40) * Math.PI; box(Math.cos(ang) * 0.42, 0.8 + Math.sin(ang) * 0.22, -0.28 + Math.sin(ang) * 1.05, 0.062, 0.062, 0.085, DARK); } box(0, 0.88, 0.73, 0.05, 0.3, 0.05, DARK); }
+  if (chrome) { E.setAux(AUX.EYE); for (const s of [-1, 1]) box(s * 0.045, 0.315, 2.64 * stretch, 0.045, 0.03, 0.09, BODY); E.setAux(0); }   // Ultron eyes
+  // front wing
+  const spoon = u => { const d = Math.abs(u - 0.5) * 2; return d > 0.55 ? (d - 0.55) * 0.16 : 0; }, fa = 0.08 + sp.frontWing * 0.035, zfw = 2.86 * stretch;
+  wingElement({ x0: -1.05, x1: 1.05, zLE: zfw, yLE: 0.06, chord: 0.4 + sp.frontWing * 0.02, aoa: fa, thick: 0.03, mat: DARK, matTop: PLAIN, segs: 10, spoon });
+  if (sp.frontWing >= 2) { wingElement({ x0: -0.92, x1: -0.16, zLE: zfw - 0.36, yLE: 0.13, chord: 0.24, aoa: fa * 3, thick: 0.028, mat: M.STRIPE, segs: 4, spoon: u => spoon(0.5 - u * 0.45) }); wingElement({ x0: 0.16, x1: 0.92, zLE: zfw - 0.36, yLE: 0.13, chord: 0.24, aoa: fa * 3, thick: 0.028, mat: M.STRIPE, segs: 4, spoon: u => spoon(0.5 + u * 0.45) }); }
+  if (sp.frontWing >= 3) { wingElement({ x0: -0.86, x1: -0.2, zLE: zfw - 0.53, yLE: 0.21, chord: 0.16, aoa: fa * 4.2, thick: 0.025, mat: DARK, matTop: PLAIN, segs: 3 }); wingElement({ x0: 0.2, x1: 0.86, zLE: zfw - 0.53, yLE: 0.21, chord: 0.16, aoa: fa * 4.2, thick: 0.025, mat: DARK, matTop: PLAIN, segs: 3 }); }
+  for (const s of [-1, 1]) { box(s * 1.07, 0.2, zfw - 0.26, 0.03, 0.3, 0.66, DARK, { side: M.NAVY }); box(s * 1.14, 0.06, zfw - 0.24, 0.16, 0.025, 0.5, DARK);
+    if (sp.frontWing >= 4) box(s * 0.98, 0.34, zfw - 0.5, 0.03, 0.1, 0.22, M.CYAN); if (sp.frontWing >= 5) box(s * 0.75, 0.3, zfw - 0.44, 0.03, 0.08, 0.18, M.CYAN); box(s * 0.13, 0.17, zfw - 0.2, 0.05, 0.18, 0.26, DARK);
+    if (neon) accent(() => box(s * 1.075, 0.33, zfw - 0.26, 0.036, 0.02, 0.5, ACC)); }                                       // endplate seam
+  // rear wing + DRS flap (group 5)
+  const rc = 0.24 + sp.rearWing * 0.04, ra = 0.1 + sp.rearWing * 0.05;
+  wingElement({ x0: -0.49, x1: 0.49, zLE: -2.18, yLE: 0.8, chord: rc, aoa: ra, thick: 0.035, mat: DARK, matTop: PLAIN, segs: 5 });
+  E.setGroup(5); wingElement({ x0: -0.49, x1: 0.49, zLE: C.DRS_HINGE.z, yLE: C.DRS_HINGE.y, chord: 0.16 + sp.rearWing * 0.02, aoa: ra * 2, thick: 0.03, mat: M.STRIPE, segs: 5 });
+  if (sp.rearWing >= 5) box(0, C.DRS_HINGE.y + 0.12, C.DRS_HINGE.z - 0.24, 0.98, 0.04, 0.02, M.GOLD); E.setGroup(0);
+  for (const s of [-1, 1]) { box(s * 0.51, 0.8, -2.38, 0.03, 0.56, 0.6, DARK, { side: M.NAVY }); accent(() => box(s * 0.515, 0.62, -2.3, 0.032, 0.03, 0.34, ACC)); box(s * 0.2, 0.68, -2.1, 0.03, 0.3, 0.12, DARK); }
+  if (sp.drs) box(0, 1.08, -2.5, 0.12, 0.06, 0.12, M.GOLD);
+  wingElement({ x0: -0.45, x1: 0.45, zLE: -2.22, yLE: 0.42, chord: 0.14, aoa: 0.2, thick: 0.025, mat: DARK, segs: 3 });
+  // diffuser, fan (group 6), rear lights
+  const dh = 0.3 + sp.floor * 0.06, dw = 1.0 + sp.floor * 0.05;
+  prism(-1.6, { cx: 0, cy: 0.14, w: 0.9, h: 0.16 }, -2.28, { cx: 0, cy: dh / 2 + 0.1, w: dw, h: dh }, DARK);
+  if (fan) {
+    E.cylinder(0, 0.34, -2.3, 0.34, 0.1, 12, 'z', DARK);                                                                  // shroud
+    E.setGroup(6); E.cylinder(0, 0.34, -2.35, 0.09, 0.08, 8, 'z', M.CHROME, DARK);                                            // hub
+    for (let k = 0; k < 6; k++) { const a = k * Math.PI / 3, cs = Math.cos(a), sn = Math.sin(a), r0 = 0.09, r1 = 0.3, hw = 0.035;   // blades
+      const p = (r, w) => [cs * r - sn * w, 0.34 + sn * r + cs * w, -2.37];
+      Q(p(r0, -hw), p(r0, hw), p(r1, hw), p(r1, -hw), k & 1 ? M.CHROME : M.RIM); Q(p(r0, -hw), p(r1, -hw), p(r1, hw), p(r0, hw), k & 1 ? M.CHROME : M.RIM); }
+    E.setGroup(0); E.setAux(AUX.UNDERGLOW); if (chrome) { E.cylinder(0, 0.34, -2.31, 0.36, 0.02, 12, 'z', BODY); } E.setAux(0);   // glowing fan ring
+  }
+  if (canopy) { E.setAux(AUX.RAINLIGHT); box(0, 0.54, -2.36, 0.5, 0.06, 0.03, BODY); E.setAux(0); }                          // LED rain light bar
+  else box(0, 0.58, -2.3, 0.1, 0.12, 0.05, M.STRIPE);
+  box(0, 0.5, -2.08, 0.09, 0.09, 0.2, DARK);
+  if (neon) accent(() => box(0, 0.24, -2.31, 0.9, 0.03, 0.02, ACC));
+  box(-0.16, 1.02, 0.34, 0.02, 0.16, 0.02, M.GOLD); box(0, 1.19, 0.1, 0.12, 0.1, 0.16, DARK, { front: M.CYAN });
+  // wheels (groups 1-4) and their fairings (groups 8-11)
+  if (opts.wheels !== false) {
+    const band = sp.tyres === 'SOFT' ? M.STRIPE : sp.tyres === 'MEDIUM' ? M.GOLD : M.BODY;
+    for (const wd of C.WHEELS) { E.setGroup(wd.g); wheel(wd.cx, wd.r, wd.cz, wd.r, wd.w, 16, band, chrome ? M.CHROME : M.RIM); }
+    if (fairings) for (const wd of C.WHEELS) { E.setGroup(C.GROUPS.FAIRING + wd.g - 1); E.setAux(AUX.PANEL); fairing(wd, wd.cx > 0 ? 1 : -1, BODY, chrome ? BODY : DARK); E.setAux(0); }
+    E.setGroup(0);
+  }
+  // drone escort (group 7): built beside the car, orbited by makeXform
+  if (chrome && opts.drones !== false) {
+    E.setGroup(7);
+    for (const s of [-1, 1]) { const dx = s * DRONE.x, dy = DRONE.y;
+      box(dx, dy, 0, 0.16, 0.05, 0.16, M.CHROME); box(dx, dy + 0.035, 0, 0.32, 0.012, 0.04, DARK); box(dx, dy + 0.035, 0, 0.04, 0.012, 0.32, DARK);
+      E.setAux(AUX.EYE); box(dx, dy - 0.03, 0.05, 0.05, 0.02, 0.04, BODY); E.setAux(0); }
+    E.setGroup(0);
+  }
+  // jack stands (group 12): nominal height JACK_H, scaled to the lift in makeXform
+  if (opts.jacks) {
+    E.setGroup(12);
+    for (const z of [1.4, -1.6]) { box(0, 0.03, z, 0.56, 0.06, 0.34, M.STEEL); box(0, C.JACK_H / 2, z, 0.1, C.JACK_H - 0.02, 0.1, M.STEEL);
+      for (const s of [-1, 1]) prism(z + 0.15, { cx: s * 0.2, cy: 0.07, w: 0.04, h: 0.02 }, z - 0.15, { cx: s * 0.06, cy: C.JACK_H * 0.6, w: 0.04, h: 0.02 }, M.STEEL);
+      box(0, C.JACK_H - 0.03, z, 0.5, 0.06, 0.18, M.STEEL); }
+    E.setGroup(0);
+  }
+  return E.end();
+};
+// holographic display copy: the same geometry (draw it with R.drawDynamic(..., 'ghost', 0, M.HOLO)); never retargets the livery
+C.buildGhostHolo = (sp, era = 0, opts = {}) => C.build(sp, era, { ...opts, keepEra: true, noDriver: true });
+// ---------- livery (per-pixel, model space) ----------
+C.raceNo = '22'; C.era = 0;   // C.era is read by the livery hook so the paint evolves with the team (build() sets it too)
+function numberAt(u, v, cell) { const col = Math.floor(u / cell), row = Math.floor(v / cell); if (row < 0 || row > 6 || col < 0) return false; const d = Math.floor(col / 6), c = col % 6; if (c === 5 || d >= C.raceNo.length) return false; const rows = E.DIGITS[C.raceNo[d]]; return rows ? rows[row][c] === '1' : false; }
+E.hooks[M.LIVERY] = function (mx, my, mz, aux) {
+  const ax = Math.abs(mx), f = C.era, chrome = f >= C.ERA.CHROME;
+  if (aux) {   // animated panels, driven by the simulation clock
+    const t = E.time;
+    if (aux === AUX.UNDERGLOW) { const p = 0.55 + 0.45 * Math.sin(t * 5); return p > E.bayer(Math.floor(mz / 0.02), Math.floor((mx + my) / 0.02)) ? M.NEON_C : M.CYAN; }
+    if (aux === AUX.RAINLIGHT) return (t % 0.5) < 0.25 ? M.NEON_R : M.STRIPE;
+    if (aux === AUX.EYE) return (t % 4) < 0.12 ? M.CARBON : M.NEON_R;
+    if (aux === AUX.SEAM) return chrome ? M.NEON_R : M.NEON_C;
+    if (aux === AUX.PANEL) { if (my > 0.6 && my < 0.635) return chrome ? M.NEON_R : M.NEON_C; return chrome ? M.CHROME : M.BODY; }
+  }
+  // Flat graphic shapes with hard edges; only the split itself dithers, over a narrow band, so the
+  // car reads as paint rather than noise. Light body forward, dark body aft, one swept division.
+  const light = chrome ? M.CHROME : M.BODY, dark = M.NAVY, accent = chrome ? M.NEON_R : f >= C.ERA.NEON ? M.NEON_C : M.GOLD;
+  if (mz > 2.45) return chrome ? M.NEON_R : M.STRIPE;                                  // nose tip
+  if (ax > 0.78 && mz > -0.12 && mz < 0.7 && my > 0.18 && my < 0.58) {                   // race number on the flank
+    const u = mx > 0 ? (0.62 - mz) : (mz + 0.04), v = 0.54 - my; if (numberAt(u, v, 0.044)) return chrome ? M.NEON_R : dark;
+  }
+  if (ax < 0.17 && mz < -0.48 && mz > -1.18 && my > 0.54) {                              // number on the engine cover
+    const u = -0.53 - mz, v = mx + 0.13; if (numberAt(u, v, 0.031)) return light;
+  }
+  if (mz < -1.5 && mz > -1.86) {                                                         // chequered tail band
+    const cx = Math.floor((mx + mz * 0.5) / 0.075), cy = Math.floor(my / 0.075); return ((cx + cy) & 1) ? light : dark;
+  }
+  if (my > 0.502 && my < 0.556 && ax > 0.42 && mz < 0.78 && mz > -1.34) return accent;   // shoulder line
+  if (ax > 0.56 && my < 0.33 && mz < 1.25 && mz > -1.45) return dark;                     // dark lower flank
+  const split = 0.62 - ax * 0.55 - Math.max(0, my - 0.5) * 0.9, t = (split - mz) / 0.34;  // swept division
+  if (t <= 0) return light; if (t >= 1) return dark;
+  return t > E.bayer(Math.floor(mz / 0.028) * 3, Math.floor((mx * 0.8 + my) / 0.028) * 3) ? dark : light;
+};
+// ---------- state + transform ----------
+C.newState = () => ({ x: 0, y: 0, z: 0, yaw: 0, roll: 0, pitch: 0, spin: 0, steer: 0, speed: 0, s: 0, lap: 1, lapStart: 0, best: null, last: null, sector: 0, drsAngle: 0, drsOn: false, lapsDone: 0, braking: false, fanSpin: 0, sectorTimes: [], lapTimes: [] });
+// a parked car for the garage / parc fermé / finale: static pose at a position and heading
+C.displayState = (x = 0, z = 0, yaw = 0) => ({ ...C.newState(), x, z, yaw });
+// returns xform(x,y,z,group,out) for a car state. opts: lift (raise the body on jacks), wheelDrop (wheels rest on the floor
+// while the body is lifted), pose:'display' (no spin, steer, roll, pitch, DRS or fan motion; the escort still hovers)
+C.makeXform = function (c, opts = {}) {
+  const lift = opts.lift || 0, drop = opts.wheelDrop || 0, display = opts.pose === 'display', jackScale = (lift + 0.02) / (C.JACK_H + 0.02);
+  return function (x, y, z, g, o) {
+    if (g >= 1 && g <= 4) {
+      const wd = C.WHEELS[g - 1];
+      if (!display) { let ry = y - wd.r, rz = z - wd.cz; const cs = Math.cos(c.spin), sn = Math.sin(c.spin), ny = ry * cs - rz * sn, nz = ry * sn + rz * cs; y = ny + wd.r; z = nz + wd.cz;
+        if (wd.front) { const rx = x - wd.cx; rz = z - wd.cz; const c2 = Math.cos(c.steer), s2 = Math.sin(c.steer); x = rx * c2 + rz * s2 + wd.cx; z = -rx * s2 + rz * c2 + wd.cz; } }
+      y -= drop;   // wheels resting on the floor while the body is on jacks
+    } else if (g >= 8 && g <= 11) {   // wheel fairings follow the steering, never the spin
+      const wd = C.WHEELS[g - 8];
+      if (wd.front && !display) { const rx = x - wd.cx, rz = z - wd.cz, c2 = Math.cos(c.steer), s2 = Math.sin(c.steer); x = rx * c2 + rz * s2 + wd.cx; z = -rx * s2 + rz * c2 + wd.cz; }
+      y -= drop;
+    } else if (g === 5 && c.drsAngle > 0 && !display) { const ry = y - C.DRS_HINGE.y, rz = z - C.DRS_HINGE.z, cs = Math.cos(-c.drsAngle), sn = Math.sin(-c.drsAngle); y = ry * cs - rz * sn + C.DRS_HINGE.y; z = ry * sn + rz * cs + C.DRS_HINGE.z; }
+    else if (g === 6 && !display) { const rx = x, ry = y - 0.34, cs = Math.cos(c.fanSpin), sn = Math.sin(c.fanSpin); x = rx * cs - ry * sn; y = rx * sn + ry * cs + 0.34; }
+    else if (g === 7) {   // drone escort: two units orbiting the car on the simulation clock
+      const side = x < 0 ? -1 : 1, a = E.time * 1.1 + (side > 0 ? 0 : Math.PI), lx = x - side * DRONE.x, ly = y - DRONE.y, ca = Math.cos(a), sa = Math.sin(a);
+      x = lx * ca + z * sa + Math.sin(a) * DRONE.r; z = -lx * sa + z * ca + Math.cos(a) * DRONE.r - 0.2; y = ly + DRONE.h + Math.sin(E.time * 2.7 + side) * 0.08;
+    }
+    else if (g === 12) y *= jackScale;
+    if (g === 0 || g === 5 || g === 6 || g === 7) y += lift;
+    const roll = display ? 0 : c.roll, pitch = display ? 0 : c.pitch;
+    const cr = Math.cos(roll), sr = Math.sin(roll), x2 = x * cr - (y - 0.3) * sr, y2 = (y - 0.3) * cr + x * sr + 0.3;
+    const cp2 = Math.cos(pitch), sp = Math.sin(pitch), z2 = z * cp2 - (y2 - 0.3) * sp, y3 = (y2 - 0.3) * cp2 + z * sp + 0.3;
+    const cy = Math.cos(c.yaw), sy = Math.sin(c.yaw); o[0] = x2 * cy + z2 * sy + c.x; o[1] = y3 + c.y; o[2] = -x2 * sy + z2 * cy + c.z;
+  };
+};
+})(window.SCR = window.SCR || {});
+
+// ============================================================================
+// SCR.sim — lap physics driven by the derived spec and team multipliers, lap prediction, sparks
+// ============================================================================
+(function (SCR) {
+'use strict';
+const E = SCR.engine, S = SCR.sim = {};
+const cornerSpeed = (k, dd, wearF) => Math.sqrt(dd.cornerG * wearF / Math.max(Math.abs(k), 0.0015));
+// physics(c, dd, sp, circuit, dt, opts) ; opts: {fx: sparks array, noise: fn()->[-1,1] for driver variance, timeNow}
+S.physics = function (c, dd, sp, circ, dt, opts = {}) {
+  const LAP = circ.len, at = circ.at, STEP = circ.step;
+  const wearF = Math.max(0.8, 1 - dd.wear * c.lapsDone);
+  const learnF = 1 + Math.min(0.06, (dd.learn || 0) * c.lapsDone);            // data department: the car learns the sealed circuit lap by lap
+  const i = Math.floor(c.s / STEP), f = (c.s / STEP) - i, a = at(i), b = at(i + 1);
+  const curv = a.curv + (b.curv - a.curv) * f;
+  const drsZone = sp.drs && Math.abs(curv) < 0.003 && c.speed > 36;
+  c.drsOn = drsZone; c.drsAngle += ((drsZone ? 0.75 : 0) - c.drsAngle) * Math.min(1, dt * 8);
+  const top = dd.topSpeed + (drsZone ? dd.drsBoost : 0);
+  const jitter = opts.noise ? 1 + opts.noise() * 0.06 * (1 - Math.min(1, dd.consistency)) : 1;   // driver inconsistency (tyre & performance role)
+  let vAllow = Math.min(top, cornerSpeed(curv, dd, wearF) * learnF * jitter);
+  for (let d = 6; d <= 130; d += 6) { const kk = at(Math.floor((c.s + d) / STEP)).curv; const va2 = Math.min(top, cornerSpeed(kk, dd, wearF) * learnF); vAllow = Math.min(vAllow, Math.sqrt(va2 * va2 + 2 * dd.braking * d)); }
+  const prev = c.speed;
+  if (c.speed < vAllow) c.speed = Math.min(vAllow, c.speed + dd.accel * (1 - 0.8 * c.speed / top) * dt); else c.speed = Math.max(vAllow, c.speed - dd.braking * dt);
+  c.braking = c.speed < prev - 1e-6; c.topSeen = Math.max(c.topSeen || 0, c.speed);
+  const sBefore = c.s; c.s += c.speed * dt;
+  const secNow = Math.floor(c.s / LAP * 3);
+  if (secNow !== c.sector && c.s < LAP) { const tNow = (opts.timeNow ?? E.time); c.sectorTimes[c.sector] = tNow - (c.sectorStart ?? c.lapStart); c.sectorStart = tNow; }
+  if (c.s >= LAP) { c.s -= LAP; c.lap++; c.lapsDone++; const tNow = (opts.timeNow ?? E.time), lt = tNow - c.lapStart; c.sectorTimes[2] = tNow - (c.sectorStart ?? c.lapStart); c.lastLapSectors = c.sectorTimes.slice(0, 3); c.lapTimes.push(lt); c.last = lt; c.best = c.best === null ? lt : Math.min(c.best, lt); c.lapStart = tNow; c.sectorStart = tNow; c.sectorTimes = []; }
+  c.x = a.x + (b.x - a.x) * f; c.z = a.z + (b.z - a.z) * f; c.y = 0;
+  const tx = a.tx + (b.tx - a.tx) * f, tz = a.tz + (b.tz - a.tz) * f; c.yaw = Math.atan2(tx, tz);
+  c.steer = Math.max(-0.35, Math.min(0.35, curv * 22));
+  c.roll += ((-curv * 9 * (c.speed / dd.topSpeed)) - c.roll) * Math.min(1, dt * 6);
+  c.pitch += (((c.speed - prev) / Math.max(dt, 1e-3)) * -0.0012 - c.pitch) * Math.min(1, dt * 5);
+  c.spin += c.speed / SCR.car.R_R * dt; c.fanSpin += c.speed * 0.6 * dt; c.sector = Math.min(2, secNow);
+  void sBefore;
+  if (opts.fx && c.braking && c.speed > 30) for (let k = 0; k < 3; k++) { const side = k % 2 ? 1 : -1, nx = -tz, nz = tx, n = opts.fx.length;
+    opts.fx.push({ x: c.x + nx * side * 0.6 - tx * 1.5, y: 0.05, z: c.z + nz * side * 0.6 - tz * 1.5, vx: -tx * (8 + E.hash2(n, 1) * 6) + nx * side * (E.hash2(n, 2) * 3), vy: 1 + E.hash2(n, 3) * 2, vz: -tz * (8 + E.hash2(n, 4) * 6) + nz * side * (E.hash2(n, 5) * 3), life: 0.25 + E.hash2(n, 6) * 0.25 }); }
+};
+S.stepSparks = function (fx, dt) { for (let k = fx.length - 1; k >= 0; k--) { const s = fx[k]; s.life -= dt; if (s.life <= 0) { fx.splice(k, 1); continue; } s.x += s.vx * dt; s.y += s.vy * dt; s.z += s.vz * dt; s.vy -= 9.8 * dt; if (s.y < 0) { s.y = 0; s.vy *= -0.3; } } };
+S.drawSparks = function (R, fx) { const W = E.hex('#FFFFFF'), G = E.hex('#F4C542'); for (const s of fx) R.drawPoint(s.x, s.y, s.z, s.life > 0.2 ? W : G); };
+// headless lap from a flying start; returns seconds. tm = team multipliers
+S.predictLap = function (sp, circ, tm) { const dd = SCR.car.derive(sp, tm), c = SCR.car.newState(); c.speed = 30; let t = 0; for (let n = 0; n < 20000 && c.lap === 1; n++) { S.physics(c, dd, sp, circ, 0.02, { timeNow: t }); t += 0.02; } return t; };
+S.fmt = t => { const m = Math.floor(t / 60), s = t - m * 60; return `${m}:${s < 10 ? '0' : ''}${s.toFixed(1)}`; };
+S.fmt3 = t => { const m = Math.floor(t / 60), s = t - m * 60; return `${m}:${s < 10 ? '0' : ''}${s.toFixed(3)}`; };
+S.fmtD = d => (d <= 0 ? '−' : '+') + Math.abs(d).toFixed(2) + 's';
+})(window.SCR = window.SCR || {});
+
+// ============================================================================
+// SCR.pit — the pit board: the car on your desk while the loop runs behind it.
+//
+// A small card that stays on top. The car turns on its pit-box floor; each time the loop lands a
+// generation the car rebuilds in front of you, and hovering the card opens the board: how far the
+// agent has run, what it kept, what it is running on. Three ways to keep it in view:
+//   · pop it out — Document Picture-in-Picture gives it a window of its own, above every app
+//   · drag it anywhere on the page it lives in; it remembers where you left it
+//   · embed it: one script tag, src="https://scrutineer-one.vercel.app/pit.js"
+// Two sources, and the strip says which. LIVE when a `scrutineer watch` server answers — on this
+// origin, or on 127.0.0.1:7777 from anywhere. Otherwise REPLAY: the recorded season shipped in
+// the bundle, one generation every `every` seconds, around again when it ends. Nothing on the
+// board is invented by the board: the numbers are the season's, live or recorded.
+// ============================================================================
+(function (SCR) {
+'use strict';
+const E = SCR.engine, C = SCR.car, S = SCR.sim, M = E.M, P = SCR.pit = {};
+const W = 128, H = 80;                        // the board's own pixels; CSS doubles them, nearest neighbour
+const LOCAL = 'http://127.0.0.1:7777';
+const FONTS = 'https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap';
+const NAME = { AERO: 'RETRIEVAL', DATA: 'VERIFICATION', TYRES: 'SAMPLING', POWER_UNIT: 'MODEL',
+  STRATEGIST: 'BUDGET', SIMULATOR: 'CURRICULUM', PIT_CREW: 'DEPLOY', ENGINEER: 'PROPOSER',
+  SCRUTINEER: 'AUDIT', HISTORIAN: 'MEMORY' };
+const WHY = { seesaw: 'the two splits disagreed', regression: 'it made the car slower', cost_cap: 'over the cost cap',
+  scrutineering: 'black-flagged', diff_size: 'too big a change', comparable_ab: 'the A/B was not comparable',
+  novelty: 'nothing new in it', evidence: 'not enough evidence', correlation: 'the splits did not track',
+  rl_entropy: 'the model collapsed', 'debrief gate': 'the debrief did not clear' };
+const esc = s => String(s === undefined || s === null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const el = (t, c, txt) => { const n = document.createElement(t); if (c) n.className = c; if (txt !== undefined) n.textContent = txt; return n; };
+const ease = x => x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x);
+const reduced = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const canPip = () => 'documentPictureInPicture' in window;
+
+const st = {
+  source: 'probing', origin: '', demo: false, linkDown: false,
+  rounds: [],                          // decided generations, oldest first
+  levels: {}, run: 0, laps: 0, lap: 0, lapsRun: 0, busy: false, phase: '', error: null,
+  claimed: null, official: null, since: 0, seenSeq: 0,
+  replay: { all: [], i: 0, every: 24, at: 0, elapsed: 0, beat: 0, laps: 40 },
+  orbit: 0.9, whip: 0, fx: [], anim: null, card: null, cardTimer: 0,
+  R: null, ground: null, spec: null, mesh: null, car: null,
+  root: null, host: null, win: window, raf: 0, last: 0, pip: null, open: false, drag: null, boardAt: 0, stripTxt: '',
+};
+P.state = () => st;
+
+// ---------- the floor: concrete, with the box painted on it ----------
+E.hooks[M.CONCRETE] = function (mx, my, mz) {
+  const ax = Math.abs(mx), az = Math.abs(mz);
+  return ((ax > 2.1 && ax < 2.26 && az < 3.95) || (az > 3.8 && az < 3.95 && ax < 2.26)) ? M.GOLD : M.CONCRETE;
+};
+function makeGround() { E.begin(); E.setGroup(0); E.setAux(0); E.Q([-8, 0, -8], [8, 0, -8], [8, 0, 8], [-8, 0, 8], M.CONCRETE); return E.end(); }
+
+// ---------- the car, idling: turntable camera, a wink of DRS, a steering check ----------
+function rebuild(animate) {
+  st.spec = C.specForLevels(st.levels);
+  const mesh = C.build(st.spec, C.eraForLevels(st.levels));
+  if (animate && st.mesh) st.anim = { kind: 'kept', t: 0, len: reduced() ? 1.3 : 3.2, from: st.mesh, to: mesh, flash: 0, tint: 0, sparked: false };
+  st.mesh = mesh;
+  if (animate && !reduced()) st.whip = 5.5;
+}
+function camera(dt) {
+  st.whip = Math.max(0, st.whip - dt * 4.5);
+  st.orbit += dt * (0.3 + st.whip);
+  const cam = st.R.cam, r = 5.35;
+  cam.pos = [Math.sin(st.orbit) * r, 1.5, Math.cos(st.orbit) * r]; cam.target = [0, 0.4, 0]; cam.fov = 31;
+}
+function idle(dt) {
+  const c = st.car, k = E.time % 9;
+  c.spin = 0; c.roll = 0; c.pitch = 0;
+  c.drsAngle = k > 6 && k < 6.9 ? 0.75 * Math.sin((k - 6) / 0.9 * Math.PI) : 0;
+  c.steer = k > 2.5 && k < 4 ? 0.3 * Math.sin((k - 2.5) / 1.5 * Math.PI * 2) : 0;
+  c.fanSpin += dt * 1.5;
+}
+const lifted = (xf, dy) => (x, y, z, g, o) => { xf(x, y, z, g, o); o[1] += dy; };
+function burst(n) {
+  for (let k = 0; k < n; k++) {
+    const h = E.hash2(k, st.fx.length + 1), h2 = E.hash2(k * 7 + 3, 11), wd = C.WHEELS[k & 3];
+    st.fx.push({ x: wd.cx * 1.1, y: 0.15, z: wd.cz, vx: (h - 0.5) * 9, vy: 2 + h2 * 4, vz: (h2 - 0.5) * 9, life: 0.45 + h * 0.5 });
+  }
+}
+function tint(R, col, amount) {
+  if (amount <= 0) return;
+  const px = R.px, w = R.W, n = w * R.H;
+  for (let i = 0; i < n; i++) { if (amount <= E.bayer(i % w, (i / w) | 0)) continue; const o = i * 4; px[o] = (px[o] + col[0]) >> 1; px[o + 1] = (px[o + 1] + col[1]) >> 1; px[o + 2] = (px[o + 2] + col[2]) >> 1; }
+}
+function renderAnim(a) {
+  const R = st.R, t = a.t, xf = C.makeXform(st.car);
+  if (a.kind === 'kept') {
+    // the old car lifts away as a hologram; the new one rises into its place; then it stands
+    // solid, the sparks fly and the flash pops. `fast` is the reduced-motion cut.
+    const fast = a.len < 2, up = ease(t / (fast ? 0.25 : 0.5)), dn = ease((t - (fast ? 0.15 : 0.35)) / (fast ? 0.4 : 0.75)), solid = fast ? 0.6 : 1.1;
+    if (t < solid * 0.5) R.drawDynamic(a.from, lifted(xf, up * 1.4), 'ghost', 0, M.HOLO);
+    if (t >= (fast ? 0.15 : 0.35) && t < solid) R.drawDynamic(a.to, lifted(xf, -(1 - dn) * 0.9), 'ghost', 0, M.CYAN);
+    if (t >= solid) { R.drawDynamic(a.to, xf, 'shadow', 0); R.drawDynamic(a.to, xf, 'solid', 0); if (!a.sparked) { a.sparked = true; burst(36); } }
+    a.flash = fast ? 0 : t < 0.18 ? (0.18 - t) / 0.18 * 0.85 : t >= solid && t < solid + 0.25 ? (solid + 0.25 - t) / 0.25 * 0.6 : 0;
+  } else {   // refused, or no change: the car stays; a red pulse, and a nudge of the camera
+    R.drawDynamic(st.mesh, xf, 'shadow', 0); R.drawDynamic(st.mesh, xf, 'solid', 0);
+    a.tint = t < 0.35 && !reduced() ? (0.35 - t) / 0.35 * 0.55 : 0;
+  }
+}
+function frame(dt) {
+  E.time += dt; camera(dt); idle(dt); S.stepSparks(st.fx, dt);
+  const R = st.R; R.begin(); R.gradient('#0C1236', '#06081A'); R.drawStatic(st.ground);
+  const a = st.anim;
+  if (a) { a.t += dt; renderAnim(a); if (a.t > a.len) st.anim = null; }
+  else { const xf = C.makeXform(st.car); R.drawDynamic(st.mesh, xf, 'shadow', 0); R.drawDynamic(st.mesh, xf, 'solid', 0); }
+  S.drawSparks(R, st.fx); R.outline();
+  if (a) { if (a.flash > 0) R.flash(a.flash); if (a.tint > 0) tint(R, [227, 30, 45], a.tint); }
+  R.present();
+}
+
+// ---------- a generation landed ----------
+function landed(r, animate) {
+  st.rounds.push(r);
+  st.levels = r.levels && Object.keys(r.levels).length ? r.levels : C.levelsAfter(st.rounds, st.rounds.length);
+  st.run = st.rounds.length; st.busy = false; st.lap = 0;
+  if (r.promoted) rebuild(animate);
+  else { rebuild(false); if (animate) { st.anim = { kind: 'refused', t: 0, len: 1.4, flash: 0, tint: 0 }; if (!reduced()) st.whip = 1.6; } }
+  if (animate) card(r.promoted ? 'kept' : r.rule_fired === 'no_upgrade' ? 'none' : 'refused',
+    r.promoted ? `<b>KEPT</b> ${esc(NAME[r.role] || r.role)} <i>L${esc((st.levels || {})[r.role] || '')}</i>`
+      : r.rule_fired === 'no_upgrade' ? '<b>NO CHANGE</b> not enough evidence'
+      : `<b>REFUSED</b> ${esc(NAME[r.role] || r.role || '')} <i>${esc(WHY[(r.failed || [])[0]] || (r.failed || [])[0] || 'thrown out')}</i>`);
+  paint(true);
+}
+function card(kind, html) {
+  const c = st.card; if (!c) return;
+  clearTimeout(st.cardTimer);
+  c.className = 'pit-card ' + kind; c.innerHTML = html;
+  void c.offsetWidth; c.classList.add('show');
+  st.cardTimer = setTimeout(() => c.classList.remove('show'), 3400);
+}
+
+// ---------- replay: the recorded season, on a clock ----------
+function goReplay() {
+  const L = window.SCRUTINEER_PIT || {};
+  st.source = 'replay'; st.demo = !!L.demo; st.replay.all = (L.rounds || []).slice();
+  const q = new URLSearchParams(location.search).get('every');
+  if (q && +q >= 2) st.replay.every = +q;
+  st.laps = st.replay.laps; st.busy = st.replay.all.length > 0; st.phase = 'RUN';
+  paint(true);
+}
+// The replay keeps wall-clock time, not frame time: a tab in the background draws no frames, but
+// its rounds still fall due, and when it comes back every round that fell due lands at once —
+// silently but for the last, so the board catches up without a burst of placards.
+function replayTick(now) {
+  const rp = st.replay; if (!rp.all.length) return;
+  if (!rp.at) rp.at = now;
+  const elapsed = (now - rp.at) / 1000;
+  if (rp.beat) {                                          // the beat between seasons
+    if (elapsed < rp.beat) return;
+    rp.beat = 0; rp.at = now; rp.i = 0;
+    st.rounds = []; st.levels = C.levelsAfter([], 0); st.run = 0; rebuild(true);
+    card('none', '<b>NEW SEASON</b> back to level one'); paint(true);
+    return;
+  }
+  const due = Math.floor(elapsed / rp.every);
+  for (let k = 0; k < due && rp.i < rp.all.length; k++) {
+    const r = rp.all[rp.i], last = k === due - 1 || rp.i === rp.all.length - 1;
+    st.lapsRun += (r.laps || rp.laps) - st.lap;
+    landed(r, last); rp.i++; rp.at += rp.every * 1000;
+    if (rp.i >= rp.all.length) { rp.beat = 6; rp.at = now; st.busy = false; st.phase = 'END'; rp.elapsed = 0; return; }
+  }
+  const r = rp.all[rp.i], t = (now - rp.at) / 1000;
+  rp.elapsed = t; st.busy = true; st.laps = r.laps || rp.laps;
+  const lap = Math.min(st.laps, Math.floor(t / rp.every * st.laps));
+  if (lap !== st.lap) { st.lapsRun += Math.max(0, lap - st.lap); st.lap = lap; }
+  st.phase = t / rp.every < 0.7 ? 'RUN' : t / rp.every < 0.86 ? 'DIAGNOSE' : 'GATES';
+}
+
+// ---------- live: a `scrutineer watch` server, here or on this machine ----------
+async function probe(origin) {
+  try {
+    const r = await fetch(origin + '/api/state', { cache: 'no-store', signal: AbortSignal.timeout(1500) });
+    if (!r.ok) return null; const j = await r.json(); return j && j.live ? j : null;
+  } catch (e) { return null; }
+}
+async function detect(pref) {
+  const here = /^https?:/.test(location.origin) ? location.origin : '';
+  const cands = pref === 'replay' ? [] : pref ? [pref] : [here, LOCAL].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i);
+  for (const o of cands) { const s = await probe(o); if (s) { goLive(o, s); return; } }
+  goReplay();
+}
+function goLive(origin, s) {
+  st.source = 'live'; st.origin = origin; st.busy = !!s.busy; st.error = s.error || null;
+  if (s.levels && Object.keys(s.levels).length) { st.levels = s.levels; rebuild(false); }
+  st.run = s.run || 0;
+  const es = new EventSource(origin + '/api/events'); st.es = es;
+  // the server replays its whole history on every connect; those are facts, not news
+  let warm = true, timer = 0;
+  const settle = () => { clearTimeout(timer); timer = setTimeout(() => { warm = false; paint(true); }, 900); };
+  es.onmessage = ev => { let d; try { d = JSON.parse(ev.data); } catch (e) { return; }
+    if (d.seq !== undefined) { if (d.seq <= st.seenSeq) return; st.seenSeq = d.seq; }
+    if (warm) settle(); st.linkDown = false; onLive(d, !warm); };
+  es.onerror = () => { st.linkDown = true; paint(true); };
+  settle(); paint(true);
+}
+function onLive(d, fresh) {
+  if (d.kind === 'phase') { st.phase = d.phase; if (d.phase === 'RUN') { st.run = d.generation + 1; st.lap = 0; st.laps = d.total || 0; st.busy = true; }
+    if (d.levels && !fresh) { st.levels = d.levels; rebuild(false); } }
+  else if (d.kind === 'lap') { st.lap = d.index; st.laps = d.total; st.lapsRun++; }
+  else if (d.kind === 'score') { st.claimed = d.claimed; st.official = d.official; }
+  else if (d.kind === 'result') { landed({ generation: d.generation, promoted: !!d.promoted, role: d.role || null, part: d.part || null,
+    rule_fired: d.rule || null, failed: d.failed || [], official_s: st.official, claimed_s: st.claimed, levels: d.levels }, fresh); return; }
+  else if (d.kind === 'error') { st.error = d.message; st.busy = false; }
+  else if (d.kind === 'boot') { st.phase = 'BOOT'; st.busy = true; st.error = null; }
+  paint(d.kind !== 'lap');
+}
+
+// ---------- the board ----------
+function fmtT(s) { s = Math.max(0, Math.floor(s)); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), q = s % 60; return `${h ? h + ':' : ''}${h && m < 10 ? '0' : ''}${m}:${q < 10 ? '0' : ''}${q}`; }
+const kept = () => st.rounds.filter(r => r.promoted).length;
+// paint(now): the strip every time; the board when it is open and something changed, or once a
+// second for the clocks. The actions row is built once so a button is never replaced under a click.
+function paint(now) {
+  const root = st.root; if (!root) return;
+  const src = st.source === 'live' ? 'LIVE' : st.source === 'replay' ? 'REPLAY' : '';
+  const runNo = st.busy ? st.run || st.rounds.length + 1 : st.rounds.length;
+  const txt = st.source === 'probing' ? 'LOOKING FOR THE LOOP'
+    : st.error ? `${src} · RUN STOPPED` : st.busy && st.laps ? `${src} RUN ${runNo} · LAP ${st.lap}/${st.laps}`
+    : st.busy ? `${src} RUN ${runNo} · ${st.phase || 'STARTING'}` : `${src} · RUN ${runNo} · KEPT ${kept()}`;
+  if (txt !== st.stripTxt) { st.stripTxt = txt; root.querySelector('.pit-txt').textContent = txt; }
+  const dot = root.querySelector('.pit-dot'), dc = 'pit-dot ' + (st.source === 'live' ? (st.linkDown ? 'down' : st.busy ? 'busy' : 'live') : st.source === 'replay' ? 'replay' : 'probe');
+  if (dot.className !== dc) { dot.className = dc; dot.title = st.source === 'live' ? `live · ${st.origin}` : st.source === 'replay' ? 'replaying the recorded season' : 'looking for a running loop'; }
+  if (!st.open) return;
+  const t = performance.now(); if (!now && t - st.boardAt < 1000) return; st.boardAt = t;
+  paintBoard();
+}
+function paintBoard() {
+  const b = st.root.querySelector('.pb-body'); b.innerHTML = '';
+  const total = st.source === 'replay' ? st.replay.all.length : 0, last = st.rounds[st.rounds.length - 1], first = st.rounds[0];
+  const score = last && typeof last.official_s === 'number' ? last.official_s : null;
+  const gain = score !== null && first && typeof first.official_s === 'number' ? first.official_s - score : 0;
+  const head = el('div', 'pb-head'); head.append(el('b', '', 'PIT BOARD'));
+  head.append(el('span', 'pb-src ' + st.source, st.source === 'live' ? `LIVE · ${st.origin.replace(/^https?:\/\//, '')}`
+    : st.source === 'replay' ? (st.demo ? 'REPLAY · DEMO SEASON' : 'REPLAY · RECORDED') : 'PROBING'));
+  b.append(head);
+  const big = el('div', 'pb-big');
+  const cell = (k, v, u) => { const c = el('span'); c.innerHTML = `<em>${k}</em><b>${esc(v)}</b>${u ? `<i>${esc(u)}</i>` : ''}`; return c; };
+  big.append(cell('RUNS', st.rounds.length, total ? `of ${total}` : ''), cell('KEPT', kept(), ''), cell('LAPS', st.lapsRun, ''),
+             cell('SCORE', score === null ? '—' : score.toFixed(2), score === null ? '' : 's'));
+  b.append(big);
+  b.append(el('div', 'pb-gain', score === null ? (st.source === 'live' ? 'no run scored yet' : '') : gain > 0.005 ? `−${gain.toFixed(2)} s since the start · held-out score` : 'the harness it started with · held-out score'));
+  if (st.rounds.length || total) {
+    const ticks = el('div', 'pb-ticks'), n = Math.max(st.rounds.length, total);
+    for (let k = 0; k < n; k++) { const r = st.rounds[k]; ticks.append(el('i', r ? (r.promoted ? 'keep' : r.rule_fired === 'no_upgrade' ? 'none' : 'drop') : 'todo')); }
+    if (st.busy && st.laps) { const p = el('i', 'now'); p.style.setProperty('--p', (st.lap / st.laps).toFixed(3)); ticks.append(p); }
+    b.append(ticks);
+  }
+  const rig = el('div', 'pb-rig');
+  for (const k of C.ROLE_KEYS) { const lv = (st.levels || {})[k] || 1, row = el('div', 'pb-comp' + (lv > 1 ? ' up' : '') + (last && last.promoted && last.role === k ? ' now' : ''));
+    row.innerHTML = `<span>${esc(NAME[k])}</span><b>${'▮'.repeat(Math.min(6, lv))}</b><em>L${lv}</em>`; rig.append(row); }
+  b.append(rig);
+  if (last) { const l = el('div', 'pb-last');
+    l.innerHTML = last.promoted ? `<b class="k">KEPT</b> ${esc(NAME[last.role] || last.role)} → L${esc((st.levels || {})[last.role] || '')}${last.part ? ` <code>${esc(last.part)}</code>` : ''}${last.summary ? `<span>${esc(last.summary)}</span>` : ''}`
+      : last.rule_fired === 'no_upgrade' ? '<b class="n">NO CHANGE</b> nothing had enough evidence behind it'
+      : `<b class="d">REFUSED</b> ${esc(NAME[last.role] || last.role || '')} <span>${esc(WHY[(last.failed || [])[0]] || (last.failed || [])[0] || 'its own gates threw it out')}</span>`;
+    b.append(l); }
+  const up = fmtT((performance.now() - st.since) / 1000);
+  b.append(el('div', 'pb-foot', st.error ? `stopped: ${st.error}`
+    : st.source === 'live' ? (st.linkDown ? 'link down · reconnecting' : st.busy ? `running · ${st.phase || 'RUN'} · watching for ${up}` : `idle · waiting for a run · watching for ${up}`)
+    : st.source === 'replay' ? (st.phase === 'END' ? 'season over · starting again' : `next run in ${Math.max(0, Math.ceil(st.replay.every - st.replay.elapsed))} s · on the board ${up}`)
+    : 'looking for a loop on this origin and on 127.0.0.1:7777'));
+}
+function paintActions() {
+  const a = st.root.querySelector('.pb-actions'); a.innerHTML = '';
+  if (canPip()) { const pb = el('button', 'pb-btn', st.pip ? 'BRING IT BACK' : 'POP OUT ↗'); pb.type = 'button';
+    pb.addEventListener('click', ev => { ev.stopPropagation(); if (st.pip) st.pip.close(); else P.popOut(); }); a.append(pb); }
+  const link = el('a', 'pb-link', 'THE BROADCAST ↗'); link.href = st.source === 'live' ? st.origin + '/' : 'https://scrutineer-one.vercel.app/'; link.target = '_blank'; link.rel = 'noopener'; a.append(link);
+}
+
+// ---------- the card on the page: drag, hover, pop out ----------
+function place(x, y) {
+  const r = st.root, w = r.offsetWidth, h = r.offsetHeight, vw = window.innerWidth, vh = window.innerHeight;
+  x = Math.max(4, Math.min(vw - w - 4, x)); y = Math.max(4, Math.min(vh - h - 4, y));
+  r.style.left = x + 'px'; r.style.top = y + 'px'; r.style.right = 'auto'; r.style.bottom = 'auto';
+  try { localStorage.setItem('scrutineer.pit.pos', JSON.stringify([x, y])); } catch (e) { /* private mode */ }
+}
+function restore() {
+  try { const p = JSON.parse(localStorage.getItem('scrutineer.pit.pos') || 'null'); if (p && p.length === 2) place(p[0], p[1]); } catch (e) { /* stay in the corner */ }
+}
+function setOpen(on) {
+  const r = st.root; st.open = on;
+  if (on) { const b = r.getBoundingClientRect(); r.classList.toggle('up', !st.pip && b.top + b.height / 2 > window.innerHeight / 2); paint(true); }
+  r.classList.toggle('open', on);
+}
+function wire() {
+  const r = st.root, strip = r.querySelector('.pit-strip');
+  strip.addEventListener('pointerdown', ev => {
+    if (st.pip || ev.button !== 0) return;
+    const b = r.getBoundingClientRect(); st.drag = { dx: ev.clientX - b.left, dy: ev.clientY - b.top };
+    strip.setPointerCapture(ev.pointerId); r.classList.add('dragging');
+  });
+  strip.addEventListener('pointermove', ev => { if (st.drag) place(ev.clientX - st.drag.dx, ev.clientY - st.drag.dy); });
+  const drop = () => { if (!st.drag) return; st.drag = null; r.classList.remove('dragging'); if (st.open) setOpen(true); };
+  strip.addEventListener('pointerup', drop); strip.addEventListener('pointercancel', drop);
+  // hover opens the board; a tap on the car does the same on a screen with no hover
+  r.addEventListener('mouseenter', () => setOpen(true)); r.addEventListener('mouseleave', () => setOpen(false));
+  r.addEventListener('focusin', () => setOpen(true)); r.addEventListener('focusout', ev => { if (!r.contains(ev.relatedTarget)) setOpen(false); });
+  r.querySelector('canvas').addEventListener('click', () => setOpen(!st.open));
+  r.addEventListener('keydown', ev => { if (ev.key === 'Escape') setOpen(false); });
+  window.addEventListener('resize', () => { if (!st.pip && r.style.left) place(parseFloat(r.style.left), parseFloat(r.style.top)); });
+  const pop = r.querySelector('.pit-pop');
+  if (!canPip()) pop.hidden = true;
+  pop.addEventListener('pointerdown', ev => ev.stopPropagation());
+  pop.addEventListener('click', ev => { ev.stopPropagation(); if (st.pip) st.pip.close(); else P.popOut(); });
+}
+P.popOut = async function () {
+  if (!canPip() || st.pip) return;
+  let w; try { w = await window.documentPictureInPicture.requestWindow({ width: 288, height: 230 }); } catch (e) { return; }
+  for (const n of document.querySelectorAll('link[data-pit],style[data-pit]')) w.document.head.append(n.cloneNode(true));
+  w.document.title = 'Scrutineer · pit board'; w.document.body.className = 'pit-pipbody';
+  w.document.body.append(st.root); st.root.classList.add('inpip'); st.root.classList.remove('open', 'up'); st.open = false;
+  st.pip = w; swapLoop(w); paintActions();
+  w.addEventListener('pagehide', () => {
+    if (st.pip !== w) return;
+    st.pip = null; st.host.append(st.root); st.root.classList.remove('inpip'); restore(); swapLoop(window); paintActions(); paint(true);
+  });
+};
+// the animation loop runs on whichever window holds the card: a background tab stops its own
+// frames, but the popped-out window keeps drawing
+function swapLoop(win) {
+  try { st.win.cancelAnimationFrame(st.raf); } catch (e) { /* the old window is gone */ }
+  st.win = win; st.last = 0;
+  const tick = now => {
+    if (!st.last) st.last = now; const dt = Math.min(0.05, (now - st.last) / 1000); st.last = now;
+    frame(dt); if (st.source === 'replay') replayTick(now); paint(false);
+    st.raf = win.requestAnimationFrame(tick);
+  };
+  st.raf = win.requestAnimationFrame(tick);
+}
+function ensureStyles() {
+  if (!document.querySelector('link[data-pit]')) { const l = el('link'); l.rel = 'stylesheet'; l.href = FONTS; l.dataset.pit = '1'; document.head.append(l); }
+  if (!document.querySelector('style[data-pit]') && window.SCRUTINEER_PIT_CSS) { const s = el('style'); s.dataset.pit = '1'; s.textContent = window.SCRUTINEER_PIT_CSS; document.head.append(s); }
+}
+
+// mount({host, source}) — source: 'auto' (default) | 'replay' | an origin such as http://127.0.0.1:7777
+P.mount = function (opts = {}) {
+  if (st.root) return P;
+  ensureStyles();
+  st.host = opts.host || document.body; st.since = performance.now();
+  const root = st.root = el('div', 'pit'); root.tabIndex = 0; root.setAttribute('role', 'group'); root.setAttribute('aria-label', 'Scrutineer pit board');
+  root.innerHTML = '<canvas width="128" height="80" aria-label="the car, as the harness stands now"></canvas>'
+    + '<div class="pit-card" aria-live="polite"></div>'
+    + '<div class="pit-strip"><i class="pit-dot probe"></i><span class="pit-txt">LOOKING FOR THE LOOP</span>'
+    + '<button class="pit-pop" type="button" title="pop out — a window of its own, above every app" aria-label="pop out">↗</button></div>'
+    + '<div class="pit-board"><div class="pb-body"></div><div class="pb-actions"></div></div>';
+  st.host.append(root); st.card = root.querySelector('.pit-card');
+  st.R = E.createRenderer(root.querySelector('canvas'), W, H, 1); st.R.ambient = 0.22; st.R.seamCutoff = 40;
+  st.ground = makeGround(); st.car = C.displayState(0, 0, 0);
+  st.levels = C.levelsAfter([], 0); rebuild(false);
+  restore(); wire(); paintActions(); paint(true); swapLoop(window);
+  const q = new URLSearchParams(location.search).get('source');
+  detect(opts.source && opts.source !== 'auto' ? opts.source : q || undefined);
+  return P;
+};
+P.land = (r, animate = true) => landed(r, animate);   // for a page that drives the board itself
+{
+  const me = document.currentScript;
+  if (me && me.dataset.pit !== 'manual') {
+    const go = () => P.mount({ source: me.dataset.source });
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+  }
+}
+})(window.SCR = window.SCR || {});
+
+</script>
+</body>
+</html>

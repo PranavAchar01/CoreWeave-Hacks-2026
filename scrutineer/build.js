@@ -118,6 +118,64 @@ fs.writeFileSync(path.join(tlDir, 'index.html'), tlDoc);
 }
 console.log(`build: site-timeline/public/index.html ${(tlDoc.length / 1024).toFixed(0)} KB`);
 
+// ---------------------------------------------------------------------------------------
+// The pit board: the car on a card that stays on top. One bundle that mounts itself, shipped
+// twice — as a page (site/public/pit.html) and as the embed (site/public/pit.js) any page can
+// load in one line. It carries only what the card needs of the recorded season.
+// ---------------------------------------------------------------------------------------
+{
+  const PIT_ORDER = ['engine.js', 'car.js', 'sim.js', 'pit.js'];
+  const pitSrc = PIT_ORDER.map(f => fs.readFileSync(path.join(src, f), 'utf8')).join('\n');
+  const pitCss = fs.readFileSync(path.join(src, 'pit.css'), 'utf8');
+  const pageCss = fs.readFileSync(path.join(src, 'pitpage.css'), 'utf8');
+  const pitHtml = fs.readFileSync(path.join(src, 'pit.html'), 'utf8');
+  let season = { demo: false, rounds: [] };
+  if (fs.existsSync(bundlePath)) {
+    const b = JSON.parse(fs.readFileSync(bundlePath, 'utf8'));
+    season = { demo: !!b.demo, rounds: (b.rounds || []).map(r => ({
+      generation: r.generation, promoted: !!r.promoted, role: r.role || null, part: r.part || null,
+      official_s: r.official_s, claimed_s: r.claimed_s, rule_fired: r.rule_fired || null,
+      summary: r.diff_summary || '', failed: (r.gates || []).filter(g => !g.ok).map(g => g.gate),
+      laps: (r.tasks || []).length * 2 || 40 })) };
+  }
+  const pitJs = `window.SCRUTINEER_PIT = ${JSON.stringify(season)};\nwindow.SCRUTINEER_PIT_CSS = ${JSON.stringify(pitCss)};\n${pitSrc}`;
+  fs.writeFileSync(path.join(siteDir, 'pit.js'), pitJs);
+  const fonts = 'https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap';
+  // inlined in a <script>, so the bundle must not contain the sequence that would close it
+  const pitInline = pitJs.replace(/<\/script/gi, '<\\/script');
+  const pitDoc = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="The Scrutineer pit board: the agent's car on a card that stays on top, rebuilding each time the loop lands a generation.">
+<meta property="og:title" content="Scrutineer — pit board">
+<meta name="theme-color" content="#06081A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2306081A'/%3E%3Cpath d='M2 3h4v4H2zM6 7h4v4H6zM10 3h4v4h-4zM2 11h4v4H2zM10 11h4v4h-4z' fill='%23F4C542'/%3E%3C/svg%3E">
+<title>Scrutineer — pit board</title>
+<link rel="stylesheet" data-pit href="${fonts}">
+<style data-pit>
+${pitCss}
+</style>
+<style>
+${pageCss}
+</style>
+</head>
+<body>
+${pitHtml}
+<script>
+${pitInline}
+</script>
+</body>
+</html>`;
+  fs.writeFileSync(path.join(siteDir, 'pit.html'), pitDoc);
+  const t3 = path.join(root, '.build-check-pit.js'); fs.writeFileSync(t3, pitJs);
+  const r3 = cp.spawnSync(process.execPath, ['--check', t3], { encoding: 'utf8' });
+  fs.unlinkSync(t3);
+  if (r3.status !== 0) { console.error(r3.stderr); process.exit(1); }
+  console.log(`build: site/public/pit.html ${(pitDoc.length / 1024).toFixed(0)} KB, pit.js ${(pitJs.length / 1024).toFixed(0)} KB, ${season.rounds.length} rounds`);
+}
+
 // syntax check
 const tmp = path.join(root, '.build-check.js'); fs.writeFileSync(tmp, js);
 const r = cp.spawnSync(process.execPath, ['--check', tmp], { encoding: 'utf8' }); fs.unlinkSync(tmp);

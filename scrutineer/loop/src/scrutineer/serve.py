@@ -5,6 +5,10 @@ events over SSE while a run is in progress, and serves every interface the agent
 off disk so you can open one the moment it exists.
 
 The key never leaves the machine. There is no relay here and nothing is uploaded.
+
+The two read-only endpoints, `/api/state` and `/api/events`, answer any origin: that is how the
+hosted pit board finds a loop running on this machine and turns live. Starting a run stays
+same-origin only — a page you happened to open cannot spend your key.
 """
 
 from __future__ import annotations
@@ -90,6 +94,9 @@ class Runner:
 
 
 RUNNER = Runner()
+# what a page from another origin may read; never what it may start
+READ_ONLY = {"/api/state", "/api/events"}
+CORS = {"Access-Control-Allow-Origin": "*"}
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -109,14 +116,14 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def _json(self, obj: Any, code: int = 200) -> None:
-        self._send(code, json.dumps(obj).encode(), "application/json")
+    def _json(self, obj: Any, code: int = 200, extra: dict[str, str] | None = None) -> None:
+        self._send(code, json.dumps(obj).encode(), "application/json", extra)
 
     # -- routes ----------------------------------------------------------------------------
     def do_GET(self) -> None:
         path = self.path.split("?")[0]
         if path == "/api/state":
-            return self._json(RUNNER.status())
+            return self._json(RUNNER.status(), extra=CORS)
         if path == "/api/events":
             return self._sse()
         if path.startswith("/pages/"):
@@ -124,6 +131,17 @@ class Handler(BaseHTTPRequestHandler):
         if path in ("/", "/index.html"):
             return self._file(SITE / "index.html")
         return self._file(SITE / path.lstrip("/"))
+
+    def do_OPTIONS(self) -> None:
+        # a browser asks before reading a local server from a public page (private network access)
+        if self.path.split("?")[0] not in READ_ONLY:
+            return self._json({"error": "not found"}, 404)
+        self.send_response(204)
+        for k, v in {**CORS, "Access-Control-Allow-Methods": "GET", "Access-Control-Allow-Headers": "*",
+                     "Access-Control-Allow-Private-Network": "true", "Access-Control-Max-Age": "600"}.items():
+            self.send_header(k, v)
+        self.send_header("Content-Length", "0")
+        self.end_headers()
 
     def do_POST(self) -> None:
         if self.path.split("?")[0] == "/api/run":
@@ -147,6 +165,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "text/event-stream")
         self.send_header("Cache-Control", "no-store")
         self.send_header("Connection", "keep-alive")
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
         try:
             for ev in events.history():                     # catch a late tab up
@@ -175,6 +194,7 @@ def serve(port: int = 7777, open_browser: bool = True) -> None:
     srv = ThreadingHTTPServer(("127.0.0.1", port), Handler)
     url = f"http://127.0.0.1:{port}/"
     print(f"\n  Scrutineer is running at {url}")
+    print(f"  The pit board — the car on a card that stays on top — is at {url}pit")
     print("  Press RUN THE AGENT in the page. Your key stays on this machine.\n")
     if open_browser:
         threading.Timer(0.6, lambda: webbrowser.open(url)).start()

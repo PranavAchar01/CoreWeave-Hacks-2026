@@ -1,0 +1,65 @@
+/* The pit board. Prefixed and self-contained: it lands on other people's pages too. */
+.pit,.pit *{box-sizing:border-box}
+.pit{position:fixed;right:24px;bottom:24px;width:262px;z-index:2147483000;color:#FFF;background:#06081A;
+  border:3px solid #F4C542;box-shadow:0 6px 0 #000,0 0 0 1px #000;font-family:"VT323","Courier New",monospace;
+  font-size:18px;line-height:1.1;user-select:none;-webkit-user-select:none;-webkit-font-smoothing:none;touch-action:none;
+  outline:none}
+.pit.dragging{cursor:grabbing}
+.pit:focus-visible{border-color:#3DD2FF}
+.pit canvas{display:block;width:256px;height:160px;image-rendering:pixelated;image-rendering:crisp-edges;cursor:pointer}
+.pit-strip{position:relative;display:flex;align-items:center;gap:8px;height:28px;padding:0 8px;background:#000;
+  font-family:"Press Start 2P","Courier New",monospace;font-size:7px;letter-spacing:.04em;text-transform:uppercase;cursor:grab}
+.pit.inpip .pit-strip{cursor:default}
+.pit-txt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#FFF}
+.pit-dot{width:7px;height:7px;flex:none;background:#6A6F8A}
+.pit-dot.live{background:#2FD968}.pit-dot.busy{background:#2FD968;animation:pit-blink 1s steps(2) infinite}
+.pit-dot.replay{background:#3DD2FF}.pit-dot.down{background:#E31E2D;animation:pit-blink .6s steps(2) infinite}
+.pit-dot.probe{animation:pit-blink .5s steps(2) infinite}
+.pit-pop{flex:none;border:0;background:#121A4A;color:#F4C542;font:inherit;font-size:9px;line-height:1;padding:4px 6px;cursor:pointer}
+.pit-pop:hover{background:#F4C542;color:#000}
+.pit-card{position:absolute;left:8px;right:8px;top:118px;padding:6px 8px;background:#F4C542;color:#000;
+  font-family:"Press Start 2P","Courier New",monospace;font-size:7px;line-height:1.5;text-transform:uppercase;
+  opacity:0;transform:translateY(14px);transition:opacity .2s steps(3),transform .2s steps(3);pointer-events:none;
+  box-shadow:0 3px 0 #000}
+.pit-card.show{opacity:1;transform:none}
+.pit-card.refused{background:#E31E2D;color:#FFF}.pit-card.none{background:#C8CBD8;color:#000}
+.pit-card b{margin-right:6px}.pit-card i{font-style:normal;opacity:.75}
+/* the board: opens under the card, or above it when the card sits low; overlays the car in its own window */
+.pit-board{display:none;background:#06081A;border-top:2px solid #121A4A;padding:8px 10px 10px}
+.pit.open .pit-board{display:block}
+.pit.up .pit-board{position:absolute;left:-3px;right:-3px;bottom:100%;border:3px solid #F4C542;border-bottom:0;box-shadow:0 0 0 1px #000}
+.pit.inpip .pit-board{position:absolute;inset:0 0 28px 0;overflow:auto;background:rgba(6,8,26,.94);border:0}
+.pb-head{display:flex;align-items:baseline;justify-content:space-between;font-family:"Press Start 2P","Courier New",monospace;font-size:8px;margin-bottom:8px}
+.pb-head b{color:#F4C542;border-bottom:2px solid #F4C542;padding-bottom:2px}
+.pb-src{font-size:6px;color:#6A6F8A;letter-spacing:.06em}.pb-src.live{color:#2FD968}.pb-src.replay{color:#3DD2FF}
+.pb-big{display:flex;gap:14px;align-items:flex-end}
+.pb-big span{display:flex;flex-direction:column}
+.pb-big em{font-style:normal;font-family:"Press Start 2P","Courier New",monospace;font-size:6px;color:#6A6F8A;letter-spacing:.1em;margin-bottom:3px}
+.pb-big b{font-size:30px;line-height:22px;color:#F4C542;font-weight:400}
+.pb-big i{font-style:normal;font-size:14px;color:#6A6F8A}
+.pb-gain{font-size:15px;color:#C8CBD8;margin:5px 0 7px;min-height:15px}
+.pb-ticks{display:flex;gap:3px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.pb-ticks i{width:11px;height:7px;background:#121A4A;flex:none}
+.pb-ticks i.keep{background:#F4C542}.pb-ticks i.drop{background:#E31E2D}.pb-ticks i.none{background:#6A6F8A}
+.pb-ticks i.now{width:22px;background:linear-gradient(90deg,#2FD968 calc(var(--p,0)*100%),#121A4A 0)}
+.pb-rig{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;font-family:"Press Start 2P","Courier New",monospace;font-size:6px;letter-spacing:.04em;margin-bottom:8px}
+.pb-comp{display:flex;align-items:center;gap:6px;color:#6A6F8A;white-space:nowrap}
+.pb-comp span{flex:1;overflow:hidden;text-overflow:ellipsis}
+.pb-comp b{font-weight:400;letter-spacing:-1px;color:#121A4A}.pb-comp.up{color:#C8CBD8}.pb-comp.up b{color:#3DD2FF}.pb-comp.now{color:#F4C542}.pb-comp.now b{color:#F4C542}
+.pb-comp em{font-style:normal;width:16px;text-align:right}
+.pb-last{font-size:15px;color:#C8CBD8;border-top:1px solid #121A4A;padding-top:6px;margin-bottom:6px;line-height:1.15}
+.pb-last b{font-family:"Press Start 2P","Courier New",monospace;font-size:6px;padding:2px 4px;margin-right:4px;vertical-align:1px;font-weight:400}
+.pb-last b.k{background:#F4C542;color:#000}.pb-last b.d{background:#E31E2D;color:#FFF}.pb-last b.n{background:#6A6F8A;color:#000}
+.pb-last code{font-family:inherit;color:#3DD2FF;margin-left:4px}.pb-last span{display:block;color:#6A6F8A;margin-top:2px}
+.pb-foot{font-size:14px;color:#6A6F8A;margin-bottom:8px}
+.pb-actions{display:flex;gap:6px;align-items:center}
+.pb-btn,.pb-link{font-family:"Press Start 2P","Courier New",monospace;font-size:6px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;
+  padding:7px 9px;border:0;cursor:pointer;background:#F4C542;color:#000}
+.pb-link{background:#121A4A;color:#FFF}.pb-btn:hover{background:#FFEDAE}.pb-link:hover{background:#1B245C}
+/* its own window: the card fills it */
+.pit-pipbody{margin:0;background:#06081A;overflow:hidden}
+.pit.inpip{position:absolute;inset:0;width:auto;right:auto;bottom:auto;border:0;box-shadow:none;display:flex;flex-direction:column}
+.pit.inpip canvas{width:100%;height:auto;flex:1;object-fit:contain;background:#06081A}
+.pit.inpip .pit-card{top:auto;bottom:40px}
+@keyframes pit-blink{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.pit-dot,.pit-card{animation:none;transition:none}}

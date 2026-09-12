@@ -318,13 +318,19 @@ class Season:
             self.pending_manifest = None
 
         # branches that end the generation without a harness mutation ------------------------
+        # A generation that mutates nothing still ends, and a listener has to hear that it did:
+        # without this the pit board waits on a run that has already been decided.
         if sel.rule_fired == "no_upgrade":
             rep.tts_ghost = self._tts_ghost(rg, n)
             rep.notes += sel.notes
+            events.emit("result", generation=n, promoted=False, role=sel.role,
+                        rule=sel.rule_fired, levels=self._levels())
             return self._finish(rep, quali, official, tracer, t0, promoted=False)
         if sel.rule_fired == "circuit":
             rep.circuit = self._circuit_generation(rg, quali, n)
             rep.notes += sel.notes
+            events.emit("result", generation=n, promoted=False, role=sel.role,
+                        rule=sel.rule_fired, levels=self._levels())
             return self._finish(rep, quali, official, tracer, t0, promoted=False)
 
         # 4/5 propose, install, A/B ----------------------------------------------------------

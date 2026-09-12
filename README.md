@@ -13,6 +13,7 @@ Built for **CoreWeave Hacks: Agent Loops**, September 2026.
 |---|---|
 | **The broadcast** | https://scrutineer-one.vercel.app |
 | **The timeline** | https://scrutineer-timeline.vercel.app |
+| **The pit board** | https://scrutineer-one.vercel.app/pit |
 
 The broadcast has two surfaces: `TRACK`, where a season plays out as a race, and `TELEMETRY`, a
 live instrument panel — held-out score, laps as they land, the ten gates resolving, credit per
@@ -21,6 +22,16 @@ component, and a three-dimensional violation landscape that erodes as the harnes
 The timeline is one scrubber across the whole season. Drag it and the car rebuilds at that
 generation, because the car *is* the harness: wings move with RETRIEVAL, the floor with
 VERIFICATION, compound with SAMPLING. Switch to `GARAGE` for the same state from the other side.
+
+The pit board is the car on a card that stays on top. Pop it out and it floats above every other
+app while the loop runs behind it; each time a generation lands the car rebuilds and a placard says
+what was kept. Hover it for how far the agent has run — runs, laps, score, the ten components. It
+turns live when a `scrutineer watch` server is running on the machine, and replays the recorded
+season otherwise. One line embeds it anywhere:
+
+```html
+<script src="https://scrutineer-one.vercel.app/pit.js" async></script>
+```
 
 ## What it measures, including where it failed
 
