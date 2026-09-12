@@ -455,11 +455,13 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   .rh-wipe.on .wipe-bar{animation:none}}
 
 /* Sound toggle. Off until asked: a page that makes noise before you ask deserves closing. */
-.snd{display:flex;align-items:center;gap:6px;font-family:"Press Start 2P","Courier New",monospace;
-  font-size:7px;background:transparent;color:var(--mid);border:1px solid var(--studio);
-  padding:7px 9px;cursor:pointer;letter-spacing:.4px}
-.snd:hover{color:var(--caption);border-color:var(--mid)}
-.snd[aria-pressed="true"]{color:var(--gold);border-color:var(--gold)}
+.snd{display:flex;align-items:center;gap:7px;font-family:"Press Start 2P","Courier New",monospace;
+  font-size:8px;background:var(--studio);color:var(--caption);border:2px solid var(--mid);
+  padding:8px 11px;cursor:pointer;letter-spacing:.5px;white-space:nowrap}
+.snd:hover{color:var(--white);border-color:var(--caption)}
+/* Loud when it is making noise, so the way to stop it is the most obvious control on the page. */
+.snd[aria-pressed="true"]{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+.snd[aria-pressed="true"]:hover{background:#FFD75E}
 .snd-ico{display:flex;align-items:flex-end;gap:1px;height:9px}
 .snd-ico i{display:block;width:2px;background:currentColor;height:30%}
 .snd-ico i:nth-child(2){height:65%}

@@ -100,6 +100,9 @@ function levelsAt(n) {
 // does it. Same panels, driven by events instead of a timer.
 // ---------------------------------------------------------------------------------------
 const D = (kind, d) => { if (SCR.dash) SCR.dash.on(kind, d || {}); };
+// The loop's own events, out loud. Watching the strip fill is the point of the page; this lets
+// you follow it without watching it.
+const CUE = n => { if (SCR.audio && SCR.audio.cue) SCR.audio.cue(n); };
 
 const live = { on: false, es: null, run: 0, laps: [], clean: 0, total: 0, gates: [], pages: [],
                busy: false, rounds: [], claimed: null, official: null };
@@ -695,6 +698,8 @@ track.update = function (dt) {
       if (track.scene.duel) track.scene.duel();
     }
   }
+  if (track.car.lapsDone !== lapWas) CUE('lap');
+  if (track.car.drsOn !== track.drsWas) { if (track.car.drsOn) CUE('drs'); track.drsWas = track.car.drsOn; }
   SCR.sim.stepSparks(track.scene.fx, dt);
   track.scene.updateCamera(dt);
 };
@@ -814,6 +819,7 @@ function pitStep(dt) {
       pit.fitted = done; pit.pending = null;
       paintRail(done.role);
       showSting(done.role, st.levels[done.role] || 1, done.summary);
+      CUE('kept');
     }
     if (pit.t >= BOX_HOLD) { pit.state = 'exit'; pit.t = 0; car.lift = 0; }
     return 0;
@@ -1690,6 +1696,7 @@ function phase(name) {
       const reason = why ? (GATE_FAILS[why.gate] || why.gate) : null;
       const extra = (why && why.gate === 'scrutineering' && verdict === 'REFER_TO_STEWARDS')
         ? ' — it could not verify the change either way, so it refused rather than guess' : '';
+      CUE('refused');
       say(`Rejected. ${reason ? `<span class="bad">${esc(reason)}</span>${esc(extra)}. ` : ''}`
         + 'The agent throws it away and keeps what it had. '
         + '<b>A loop that cannot refuse itself is not a loop.</b>');
@@ -1977,6 +1984,7 @@ S.frame = function (dt) {
       const t = tasks[st.shown++];
       const ok = t.solved > 0;
       if (ok) st.solvedNow++;
+      CUE(ok ? 'pageOk' : 'pageBad');
       const grid = $('taskGrid');
       if (grid) {
         const n = el('div', 'task ' + (ok ? 'ok' : 'no'));
@@ -2007,6 +2015,7 @@ S.frame = function (dt) {
         node.classList.add('on', g.ok ? 'pass' : 'fail');
         node.querySelector('i').textContent = g.ok ? '✓' : '✗';
       }
+      CUE(g.ok ? 'gateOk' : 'gateBad');
       st.shown++;
       if (!g.ok) { st.t = st.dur; break; }
     }
@@ -2058,7 +2067,8 @@ function wire() {
     if (!SCR.audio || !SCR.audio.available()) snd.hidden = true;
     else {
       const paint = on => { snd.setAttribute('aria-pressed', on ? 'true' : 'false');
-        snd.lastChild.nodeValue = on ? 'SOUND' : 'MUTED'; };
+        snd.lastChild.nodeValue = on ? 'MUTE \u00B7 M' : 'SOUND OFF';
+        snd.title = on ? 'mute (M)' : 'sound on (M)'; };
       paint(false);
       snd.addEventListener('click', () => {
         const on = SCR.audio.toggle();
