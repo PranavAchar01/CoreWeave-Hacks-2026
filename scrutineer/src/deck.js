@@ -35,6 +35,37 @@ const HUE = { AERO: 'cyan', POWER_UNIT: 'red', TYRES: 'amber', DATA: 'green', SI
 const GATE = { diff_size: 'SIZE', comparable_ab: 'FAIR A/B', novelty: 'NOVELTY', evidence: 'EVIDENCE', seesaw: 'SPLITS AGREE',
   correlation: 'CORRELATION', regression: 'REGRESSION', cost_cap: 'COST', scrutineering: 'SCRUTINEER', rl_entropy: 'RL ENTROPY', ladder: 'LADDER' };
 const NAMED = new Set(['diff_size', 'novelty', 'evidence', 'regression', 'seesaw', 'cost_cap']);
+// the partners whose parts the car runs on: one per slide in the band, all ten on the wall
+const PARTNER = {
+  coreweave: { name: 'COREWEAVE HACKS', hue: 'cyan', line: 'Built at CoreWeave Hacks: Agent Loops. A whole weekend about the loop.' },
+  wandb: { name: 'WEIGHTS & BIASES', hue: 'gold', line: 'Model, traces, runs and registry: the whole loop lives on W&B.' },
+  rl: { name: 'W&B SERVERLESS RL', hue: 'gold', line: 'When the model is the part to change: a real LoRA job, one command away.' },
+  inference: { name: 'W&B INFERENCE', hue: 'gold', line: 'The agent builds on W&B Inference. Open models, OpenAI-compatible, nothing to host.' },
+  evals: { name: 'W&B WEAVE · EVALS', hue: 'gold', line: 'Both timings land in the Weave Evals tab: the scores the gates actually read.' },
+  sandboxes: { name: 'W&B SANDBOXES', hue: 'amber', line: 'A seal needs isolation. Sandboxes keep the agent’s own code out of process.' },
+  weave: { name: 'W&B WEAVE', hue: 'gold', line: 'Build, audit, replay, blame, gate: every step traced. That is how blame lands.' },
+  runs: { name: 'W&B RUNS', hue: 'gold', line: 'One W&B run per component, so credit is a curve you can open.' },
+  marimo: { name: 'MARIMO', hue: 'green', line: 'Memory writes a marimo notebook every generation. Executable, not a summary.' },
+  typesafe: { name: 'TYPESAFE SYSTEM1', hue: 'purple', line: 'The credit router speaks in typed decisions. No free-text guesswork.' },
+  registry: { name: 'W&B REGISTRY', hue: 'gold', line: 'Our archive of agents: every harness version registered in W&B Registry.' },
+  gate: { name: 'MARIMO', hue: 'green', line: 'The last gate is a marimo notebook that must reproduce the promotion.' },
+  aria: { name: 'ARIA', hue: 'cyan', line: 'Every generation, kept or refused, reported to the ARIA board.' },
+  alias: { name: 'W&B REGISTRY', hue: 'gold', line: 'Registered with an alias: the car that raced is the car that was promoted.' },
+  cwwb: { name: 'W&B · A COREWEAVE COMPANY', hue: 'cyan', line: 'From Inference to Weave, the stack under the car. Part of CoreWeave since 2025.' },
+  thanks: { name: 'OUR PIT WALL', hue: 'gold', line: 'None of this laps without them. Thank you.' },
+};
+const WALL = [
+  { name: 'COREWEAVE', role: 'TITLE HOST', hue: 'cyan', says: 'The hackathon this loop was built for, and the home of W&B since 2025.' },
+  { name: 'W&B INFERENCE', role: 'ENGINE SUPPLIER', hue: 'gold', says: 'The model behind the pages. Open models, OpenAI-compatible, nothing to self-host.' },
+  { name: 'W&B WEAVE', role: 'TELEMETRY', hue: 'gold', says: 'Every build, audit, replay, blame and gate traced. Nothing the car does goes unseen.' },
+  { name: 'W&B RUNS', role: 'TIMING', hue: 'gold', says: 'A run per component: credit you can open as a curve, not dig out of a log.' },
+  { name: 'W&B REGISTRY', role: 'HOMOLOGATION', hue: 'gold', says: 'Every harness version registered with an alias. What raced is what was promoted.' },
+  { name: 'W&B SERVERLESS RL', role: 'WIND TUNNEL', hue: 'gold', says: 'A real LoRA job registered from one command, rollouts through the trainer’s own client.' },
+  { name: 'W&B SANDBOXES', role: 'PARC FERME', hue: 'amber', says: 'Built for exactly what a seal needs: the agent’s own code, isolated.' },
+  { name: 'ARIA', role: 'RACE CONTROL', hue: 'cyan', says: 'The board every generation reports to, kept or refused.' },
+  { name: 'TYPESAFE SYSTEM1', role: 'TEAM RADIO', hue: 'purple', says: 'Typed decisions for the pit wall, the credit router and the gates.' },
+  { name: 'MARIMO', role: 'DEBRIEF ROOM', hue: 'green', says: 'A notebook that must reproduce every promotion. If it cannot, the change is refused.' },
+];
 
 // ---------- pixel icons: 12×12 drawings, X = colour, o = white ----------
 const ICONS = {
@@ -97,7 +128,15 @@ function build() {
     const top = document.createElement('header'); top.className = 's-top';
     top.innerHTML = `<span class="s-mark">SCRUTINEER</span><span class="s-kick">${esc(s.dataset.kick)}</span><span class="s-num">${String(i + 1).padStart(2, '0')} / ${total}</span>`;
     s.prepend(top);
+    const pt = PARTNER[s.dataset.partner];
+    if (pt) {
+      const band = document.createElement('footer'); band.className = 's-partner'; band.style.setProperty('--h', `var(--${pt.hue})`);
+      band.innerHTML = `<span class="lbl">PIT PARTNER</span><b>${esc(pt.name)}</b><p>${esc(pt.line)}</p>`;
+      s.append(band);
+    }
   });
+  const wall = $('wall16');
+  if (wall) wall.innerHTML = WALL.map(w => `<div class="partner" style="--h:var(--${w.hue})"><span class="lbl">${esc(w.role)}</span><b>${esc(w.name)}</b><p>${esc(w.says)}</p></div>`).join('');
   document.querySelectorAll('[data-icon]').forEach(n => { n.outerHTML = icon(n.dataset.icon, n.dataset.c || 'gold', +(n.dataset.s || 72)); });
 
   // 01

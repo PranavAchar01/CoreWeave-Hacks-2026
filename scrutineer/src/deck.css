@@ -240,3 +240,19 @@ canvas.px{display:block;image-rendering:pixelated;image-rendering:crisp-edges}
 .progress{position:absolute;left:0;bottom:0;height:8px;background:var(--gold);transition:width .3s steps(6);z-index:3}
 .export .hud,.export .progress{display:none}
 @media (prefers-reduced-motion:reduce){.blink,.scan{animation:none}.slide{transition:none}}
+
+/* ---------- partners ---------- */
+.s-partner{display:flex;align-items:center;gap:22px;border-top:3px solid var(--studio);min-width:0}
+.s-partner b{flex:none;font:16px var(--px);letter-spacing:1px;color:var(--h);background:#000;padding:12px 16px 12px 14px;border-left:8px solid var(--h);box-shadow:5px 5px 0 rgba(0,0,0,.6)}
+.s-partner p{margin:0;flex:1;min-width:0;font:31px/34px var(--vt);color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s-partner .s-event{flex:none;font:11px var(--px);letter-spacing:1px;color:var(--mid)}
+.hackbadge{display:inline-flex;white-space:nowrap;align-items:center;gap:14px;align-self:flex-start;margin-bottom:26px;padding:12px 18px 12px 12px;background:#000;border:3px solid var(--cyan);box-shadow:6px 6px 0 rgba(61,210,255,.25)}
+.hackbadge i{width:26px;height:26px;background:conic-gradient(var(--cyan) 0 25%,#000 0 50%,var(--cyan) 0 75%,#000 0);background-size:13px 13px}
+.hackbadge span{font:11px var(--px);letter-spacing:1px;color:var(--mid)}.hackbadge b{font:15px var(--px);letter-spacing:1px;color:var(--cyan)}
+.s16{display:flex;flex-direction:column;gap:34px;width:100%}
+.s16-head{display:grid;grid-template-columns:auto 1fr;gap:70px;align-items:end}
+.s16-head .lead{margin:0 0 8px}.s16-head code{font:inherit;color:var(--gold)}
+.wall{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:22px}
+.partner{display:flex;flex-direction:column;gap:12px;padding:22px 22px 24px;background:var(--studio);border-top:10px solid var(--h);box-shadow:8px 8px 0 #000;min-height:246px}
+.partner b{font:17px/26px var(--px);font-weight:400;color:var(--h)}
+.partner p{margin:0;font:27px/28px var(--vt);color:var(--caption)}
