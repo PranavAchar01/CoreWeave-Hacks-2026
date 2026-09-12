@@ -381,6 +381,19 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .rh-tip .t-file{font-family:"VT323","Courier New",monospace;font-size:14px;line-height:14px;
   color:var(--mid);text-transform:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
+/* The pit stop. Bottom centre, above the lap strip, only while the car is in the lane. */
+.rh-pit{position:absolute;left:50%;bottom:52px;transform:translateX(-50%);z-index:5;
+  min-width:250px;background:rgba(6,8,26,.94);border:2px solid var(--cyan);padding:8px 12px}
+.rh-pit .pit-head{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+  font-size:9px;letter-spacing:1px;color:var(--cyan)}
+.rh-pit .pit-head i{font-style:normal;font-family:"VT323","Courier New",monospace;font-size:24px;
+  line-height:16px;color:var(--white);font-variant-numeric:tabular-nums}
+.rh-pit .pit-what{margin-top:5px;font-family:"VT323","Courier New",monospace;font-size:17px;
+  line-height:17px;color:var(--caption);text-transform:none}
+.rh-pit .pit-what b{color:var(--gold)}
+.rh-pit.done{border-color:var(--green)}
+.rh-pit.done .pit-head{color:var(--green)}
+
 /* Timing tower / championship. Left edge, under the season summary. */
 .rh-stand{position:absolute;left:14px;top:118px;width:236px;
   background:rgba(6,8,26,.9);border-left:3px solid var(--gold);padding:0 0 4px}

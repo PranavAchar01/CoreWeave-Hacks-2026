@@ -626,6 +626,7 @@ const trackSeed = () => (A.seed + st.i * 7 + salt()) | 0;
 
 const track = { name: 'run' };
 track.enter = function () {
+  pitAbort();
   const seed = trackSeed();
   const circ = SCR.world.makeCircuit(seed);
   const world = SCR.world.build(circ, { detail: progress() });
@@ -653,7 +654,9 @@ track.enter = function () {
 track.update = function (dt) {
   const circ = track.scene.circ;
   const lapWas = track.car.lapsDone;
-  SCR.sim.physics(track.car, track.dd, track.spec, circ, dt, { fx: track.scene.fx });
+  const cap = pitStep(dt);
+  SCR.sim.physics(track.car, track.dd, track.spec, circ, dt,
+    { fx: track.scene.fx, speedCap: cap });
   if (track.scene.ghostActive) {
     SCR.sim.physics(track.ghost, track.ghostDd, track.ghostSpec, circ, dt, {});
     // The ghost is a lap reference, not a cumulative one. Both cars start every lap together at
@@ -686,6 +689,125 @@ function ghostGap() {
   const v = Math.max(8, track.ghost.speed);
   return { d, s: d / v };
 }
+// ---------------------------------------------------------------------------------------
+// The pit stop.
+//
+// A kept change is a part fitted to the car, so the car comes in and has it fitted. The lane,
+// the box and the openings in the armco are real geometry from world.build; the car is driven
+// down them under a limiter by the same physics as everywhere else, with a lateral offset.
+// ---------------------------------------------------------------------------------------
+const LIMITER = 22, BOX_HOLD = 2.4, BLEND = 34;   // m/s, seconds, metres to cross into the lane
+const pit = track.pit = { state: 'off', pending: null, t: 0, clock: 0 };
+
+function pitLane() { return track.scene && track.scene.world && track.scene.world.pit; }
+
+// Ask for a stop. It happens the next time the car reaches the pit entry, the way it would.
+function callToPits(r) {
+  if (!pitLane() || !r || !r.role) return false;
+  pit.pending = { role: r.role, part: r.part || 'REVISION', summary: r.diff_summary || '' };
+  if (pit.state === 'off') pit.state = 'called';
+  return true;
+}
+
+function pitAbort() {
+  if (pit.thenCall && pit.state !== 'off') { callToGarage(pit.thenCall); }
+  pit.thenCall = null;
+  pit.state = 'off'; pit.pending = null; pit.fitted = null;
+  if (track.car) track.car.off = 0;
+  if (track.scene && track.scene.mode === 'STUDIO') track.scene.setMode('AUTO');
+}
+
+// distance from the car to a circuit index, forwards along the lap
+function aheadOf(idx) {
+  const circ = track.scene.circ;
+  let d = idx * circ.step - track.car.s;
+  while (d < -circ.len / 2) d += circ.len;
+  while (d > circ.len / 2) d -= circ.len;
+  return d;
+}
+
+// Returns the speed cap to apply this frame, or undefined.
+function pitStep(dt) {
+  const p = pitLane();
+  if (!p || pit.state === 'off') return undefined;
+  const car = track.car, lane = p.lane;
+
+  if (pit.state === 'called') {
+    // wait for the entry to come round; start crossing once it is close
+    const d = aheadOf(p.entry);
+    if (d > 0 && d < BLEND) { pit.state = 'enter'; pit.t = 0; pit.clock = 0; }
+    return d > 0 && d < 120 ? Math.max(LIMITER + 10, car.speed - 6) : undefined;   // slow for the entry
+  }
+
+  if (pit.state === 'enter') {
+    // cross into the lane over the first stretch past the entry, not in one step
+    const past = -aheadOf(p.entry);
+    car.off = lane * Math.max(0, Math.min(1, past / BLEND));
+    const d = aheadOf(p.box);
+    // Brake into the box rather than arriving at it still doing eighty, so the clock measures
+    // a car that is actually stationary.
+    if (d < 30 || d > 200) {
+      if (car.speed < 0.8) { pit.state = 'stopped'; pit.t = 0; car.off = lane;
+        if (track.scene) track.scene.setMode('STUDIO'); }
+      return 0;
+    }
+    return LIMITER;
+  }
+
+  if (pit.state === 'stopped') {
+    car.off = lane;
+    pit.t += dt; pit.clock = pit.t;
+    // The part goes on halfway through the stop, so the car that leaves is the new one.
+    if (pit.t > BOX_HOLD * 0.5 && pit.pending) {
+      st.levels = levelsAt(st.i + 1);
+      paintRig(pit.pending.role);
+      track.refit();
+      pit.fitted = pit.pending; pit.pending = null;
+    }
+    if (pit.t >= BOX_HOLD) { pit.state = 'exit'; pit.t = 0;
+      if (track.scene) track.scene.setMode('AUTO'); }
+    return 0;
+  }
+
+  if (pit.state === 'exit') {
+    const d = aheadOf(p.exit);
+    car.off = lane * Math.max(0, Math.min(1, d / BLEND));
+    pit.t += dt;
+    if ((d <= 0.6 && d > -30) || pit.t > 12) {
+      car.off = 0; pit.state = 'off'; pit.fitted = null;
+      if (pit.thenCall) { callToGarage(pit.thenCall); pit.thenCall = null; }
+    }
+    return LIMITER;
+  }
+  return undefined;
+}
+
+function paintPit() {
+  const host = $('rhPit'); if (!host) return;
+  const on = pit.state !== 'off';
+  host.hidden = !on;
+  // The stop owns the bottom of the screen while it is happening; an offer to go and read about
+  // a change can wait until the car is back out.
+  const call = $('garageCall');
+  if (call) {
+    if (on) call.hidden = true;
+    else if (st.pending && !st.garage) call.hidden = false;
+  }
+  if (!on) return;
+  const what = pit.pending || pit.fitted || {};
+  const p = BY_KEY[what.role] || { name: what.role || '' };
+  const label = pit.state === 'called' ? 'BOX BOX'
+    : pit.state === 'enter' ? 'PIT ENTRY'
+    : pit.state === 'stopped' ? 'IN THE BOX' : 'PIT EXIT';
+  host.className = 'rh-pit' + (pit.state === 'exit' ? ' done' : '');
+  put('pitState', label);
+  put('pitClock', pit.state === 'stopped' ? pit.clock.toFixed(1) + 's'
+    : pit.state === 'exit' ? BOX_HOLD.toFixed(1) + 's' : '');
+  const n = $('pitWhat');
+  const html = `<b>${esc(p.name)}</b> \u2014 ${esc(what.summary || 'a revision to the harness')}`;
+  if (n && n.dataset.h !== html) { n.innerHTML = html; n.dataset.h = html; }
+}
+
 // A kept change reaches the car without stopping it: new bodywork, same lap, same corner.
 track.refit = function () {
   if (!track.scene) return;
@@ -1101,6 +1223,7 @@ function paintHud() {
     put('rhGap', (gap.s >= 0 ? '+' : '\u2212') + fx(Math.abs(gap.s)) + 's', gap.s < -0.02 ? 'behind' : '');
   }
 
+  paintPit();
   standings(r);
   sectors(r, tasks);
   fastestLap(r);
@@ -1182,6 +1305,9 @@ function enterLiveIntro() {
 function startRun() {
   if (live.on) return startLiveRun();
   if (st.playing) return;
+  // A stop that has been called but not served holds the next run, the way a race does not
+  // restart until the car has come back out.
+  if (pit.state !== 'off') { scheduleNext(700); return; }
   st.i++;
   if (st.i >= st.rounds.length) {
     // Round the cycle again from the beginning, the way a loop does — without ever leaving
@@ -1304,10 +1430,17 @@ function phase(name) {
     st.dur = 6.5;
     const p = BY_KEY[r.role] || { name: r.role || '' };
     if (r.promoted) {
-      st.levels = levelsAt(st.i + 1);
-      paintRig(r.role);
-      if (!st.garage) enterTrack();      // the new bodywork goes on without breaking the lap
-      callToGarage(r);
+      // The part is fitted in the box, not in mid-air: call the car in and let the stop apply
+      // it. If there is no pit lane on this circuit, fit it where it stands.
+      if (!st.garage && callToPits(r)) {
+        st.dur = 14;                     // hold the result until the stop has been served
+        pit.thenCall = r;                // the garage is offered after the stop, not over it
+      } else {
+        st.levels = levelsAt(st.i + 1);
+        paintRig(r.role);
+        if (!st.garage) enterTrack();
+      }
+      if (!pit.thenCall) callToGarage(r);
       const next = st.rounds[st.i + 1];
       say(`Approved. <b>${esc(p.name)}</b> is now level <span class="num">${st.levels[r.role]}</span>`
         + (next ? `, and the next run scored <span class="num">${fx(next.official_s)}</span> — `

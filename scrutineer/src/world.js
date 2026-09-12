@@ -119,6 +119,7 @@ Wd.build = function (c, opts = {}) {
     (side === geomInside(i)) ? Math.min(w, maxInside(i)) : w,
     c.room ? c.room(i, side) : w);
   const LIGHTPOOLS = [], TVCAMS = [], signs = E.signs, tris = () => E.current();
+  let PIT = null;   // where the pit lane is, so a car can actually be driven down it
   E.begin(); E.setGroup(0); E.setAux(0);
   let minx = 1e9, maxx = -1e9, minz = 1e9, maxz = -1e9;
   for (const p of cp) { minx = Math.min(minx, p.x); maxx = Math.max(maxx, p.x); minz = Math.min(minz, p.z); maxz = Math.max(maxz, p.z); }
@@ -180,6 +181,10 @@ Wd.build = function (c, opts = {}) {
     if (!clearRun(i0, len, side, ROAD_W + 15)) side = -side;
     if (clearRun(i0, len, side, ROAD_W + 15)) {
       const wf = ROAD_W + 4.6, wb = ROAD_W + 13.6, hgt = 5.2;
+      // The lane itself: between the armco and the front of the building, with the box
+      // halfway along it.
+      PIT = { i0, len, side, lane: side * (ROAD_W + 3.5), box: i0 + Math.floor(len / 2),
+              entry: i0 - 6, exit: i0 + len + 6 };
       for (let k = i0; k < i0 + len; k++) {
         segWall(k, side, wf, 0, hgt, M.BODY); segQuad(k, side, wf, wb, hgt, hgt, M.STEEL);
         const A = pos(k, side * wb, 0), B = pos(k + 1, side * wb, 0), Cq = pos(k + 1, side * wb, hgt), Dq = pos(k, side * wb, hgt); if (side > 0) Q(A, Dq, Cq, B, M.BODY); else Q(A, B, Cq, Dq, M.BODY);
@@ -187,7 +192,9 @@ Wd.build = function (c, opts = {}) {
         if ((k - i0) % 2 === 0) { segWall(k, side, wf - 0.08, 0.1, 2.9, M.STEEL); segWall(k, side, wf - 0.1, 2.95, 3.05, M.GOLD); }
         if ((k - i0) % 2 === 1) { const p = pos(k, side * (wf - 0.12)); box(p[0], 1.5, p[2], 0.16, 2.9, 0.16, M.CARBON); }
         if (k > i0 + 1 && k < i0 + len - 2) segSign(k, side, wf - 0.14, 4.1, 4.9, 'PIT LANE · PARC FERME · SCRUTINEERING BAY · PIT LANE · PARC FERME', (k - i0 - 2) * 4, 0.3, M.CYAN, M.NAVY);
-        segWall(k, side, ROAD_W + 2.4, 0, 1.0, M.ARMCO);
+        // Leave the ends open: that is the pit entry and the pit exit, and without them the
+        // car would have to drive through the barrier to be serviced.
+        if (k > i0 + 2 && k < i0 + len - 3) segWall(k, side, ROAD_W + 2.4, 0, 1.0, M.ARMCO);
       }
       const mid = pos(i0 + Math.floor(len / 2), side * (wf + 4.5)); box(mid[0], hgt + 0.8, mid[2], 3, 1.6, 8, M.STEEL); box(mid[0], hgt + 2.2, mid[2], 0.3, 2.6, 0.3, M.STEEL);
     }
@@ -245,6 +252,6 @@ Wd.build = function (c, opts = {}) {
       n++; if (sees(tc.x, tc.z, q[0], q[2])) ok++; }
     tc.clear = ok / n;
   }
-  return { mesh: E.end(), lightpools: LIGHTPOOLS, tvcams: TVCAMS, circuit: c };
+  return { mesh: E.end(), lightpools: LIGHTPOOLS, tvcams: TVCAMS, circuit: c, pit: PIT };
 };
 })(window.SCR = window.SCR || {});
