@@ -734,3 +734,63 @@ overfitting result is the one a builder would not have expected.
 Next: not another season chasing a positive. The honest next experiment is whether a larger sealed
 split closes the generalisation gap — which is a question about the loop, measurable, and the
 thing this run actually surfaced.
+
+## Iteration 12 — ADVANCE — the loop corrected against the two mechanisms that produced −6.6
+
+Written 2026-09-12 during the hackathon. Research basis: `research/R10-what-the-literature-says.md`
+(26 primary sources opened; 24 adversarial verification votes).
+
+**Diagnosis, now with published names.** Iteration 11's regression had two mechanisms.
+
+1. *Credit was never controlled against resampling.* Every counterfactual replay re-runs the lap,
+   which re-draws the driver, and credit was measured from the original lap. A lap that passed on
+   the second draw credited whichever role was being replayed. AERO's counterfactual *adds
+   references*, which perturbs the prompt hardest, so it collected the most. Causal Agent Replay
+   (arXiv:2606.08275) treats plain resampling — `do_resample` — as the null intervention every
+   other arm is measured against. Our ghost-swap / patch-replay / null-stub are its do_policy /
+   do_context / do_observation; we had never run the fourth.
+2. *The sealed split was reused adaptively.* 24 items queried every generation for five
+   generations. Dwork et al. (arXiv:1411.2664): adaptive reuse makes the required sample size grow
+   linearly in the number of queries. The +0.33 s sealed delta was noise the loop was allowed to
+   climb.
+
+**What changed** (commits b1c857c, 5aa010c).
+
+- `replay.py`: one shared `do_resample` null arm per failing lap, same seeds, harness untouched.
+  Credit is `null_s − replayed_s`; a flip must beat the null. Budget divides by 1 + ablate_top_k.
+- `gates.py`: a **Ladder** gate. A sealed delta is revealed only if it beats the standing best by
+  one standard error of the split (4.47 s at 20 items); the split stops answering after 12 queries.
+  The counter lives on `SealedEvaluator`, so nothing can query without paying. The +0.33 s that
+  promoted the regressing champion is withheld under this gate.
+- `resolution.py`: every comparison reports exact McNemar power, the minimum detectable effect,
+  Connor n\*, and q = n/n\*. An unresolved comparison may not say "better" or "worse".
+- A third harness, **scaling**: the starting harness with one more sample per mode, choosing between
+  draws by the docstring's own examples. The selector is not optional — at the starting harness's
+  `syntax` probe every parsing candidate scores 1.0, ties keep the first, and extra draws are
+  thrown away. arXiv:2607.12227 found parallel sampling beat harness evolution at matched budget
+  (+13.1 vs +2.9), and a harness gain now has to beat this arm too.
+- Unchanged: `min_incidents`, the CI bar, the sandbox, every split, the final 76.
+
+**Measured so far.**
+
+- Smoke generation, `local-sim` driver, 36 controlled replays: the old estimator would have credited
+  **+1.413 s**; resampling alone was worth **+1.616 s**; controlled credit **−0.202 s**; **0 of 36**
+  replays beat the null. Simulator, not the real driver — it shows the mechanism works, not the
+  size of the effect on Claude.
+- The recorded comparison, re-scored with no API calls: **unresolved, −6.6 pp, exact McNemar
+  p = 0.267, n = 76.** Minimum detectable effect at 80 % power: **13.5 pp**. Resolving the observed
+  effect would need **n\* = 308**; q = **0.247**. Exact power agrees with an independent 20,000-draw
+  simulation to within 0.007 at every point checked.
+- Context from the leaderboard's backing dataset (`bigcode/bigcodebench-hard-results`, 202 entries):
+  the best Hard-Instruct score ever recorded is **33.1 %**. Our baseline is **32.9 %** on a 76-task
+  subset — band-comparable, not leaderboard-comparable. The effect needed to prove a win is larger
+  than the headroom above the baseline.
+
+**Prediction, written before the scaling arm's number exists.** Scaling vs starting: between 0 and
++5 pp, **unresolved** at n = 76. One extra draw is a small intervention, and the selector is weaker
+than unit tests — many BigCodeBench-Hard docstrings carry no executable examples, so on those tasks
+the draws still tie. Champion vs scaling: unresolved. Headline: `unresolved`. If scaling clears
+13.5 pp over the starting harness, this prediction was wrong and resampling — not the loop — is
+the strongest harness change we have measured.
+
+Bar check: 1 ✓ 2 ✓ 3 ✓ 4 prediction written in advance, result pending 5 ✓ 6 pending.
