@@ -27,6 +27,9 @@
         <!-- The world feed. Every value in it is read from the loop's own bundle; the only
              invented numbers are the car's speed and gear, which are the car, not a result. -->
         <div class="rhud" id="raceHud">
+          <!-- Nine cells on a grid, not nine hand-placed boxes. Every panel sits in its own
+               cell and is pinned to the edge it belongs to, so a panel that grows or
+               disappears cannot push another one out of line. -->
           <div class="rh-tl">
             <div class="rh-tl-top">
               <span class="rh-live" id="rhLive">LIVE</span>
@@ -35,6 +38,15 @@
             <!-- The iteration, and what is actually different about the agent since run 1.
                  Deliberately quiet: there to be read, not to be announced. -->
             <div class="rh-since" id="rhSince" hidden></div>
+            <!-- The timing tower: who is being blamed in this run, and the championship
+                 across the season so far. Hangs under the block above it. -->
+            <div class="rh-stand" id="rhStand" hidden></div>
+          </div>
+
+          <div class="rh-tc">
+            <div class="rh-fastest" id="rhFastest" hidden>
+              <b>FASTEST LAP</b><i id="rhFastestVal"></i>
+            </div>
           </div>
 
           <div class="rh-tr">
@@ -51,19 +63,31 @@
             <div class="rh-phase" id="rhPhase">BUILDING</div>
           </div>
 
-          <!-- The timing tower: who is being blamed in this run, and the championship
-               across the season so far. -->
-          <div class="rh-stand" id="rhStand" hidden></div>
-
-          <!-- Sectors. Not invented: the loop measured the task families as two separate
-               populations, and these are those sides. Purple is the best that sector has ever
-               been this season, green is better than run 1, yellow is no better. -->
-          <div class="rh-sectors" id="rhSectors"></div>
-
           <div class="rh-bl">
-            <div class="rh-speed"><b id="rhSpeed">0</b><em>KM/H</em></div>
-            <div class="rh-bar"><i id="rhSpeedBar"></i></div>
-            <div class="rh-drive"><span class="rh-gear" id="rhGear">N</span><span class="rh-drs" id="rhDrs">DRS</span></div>
+            <!-- Sectors. Not invented: the loop measured the task families as two separate
+                 populations, and these are those sides. Purple is the best that sector has
+                 ever been this season, green is better than run 1, yellow is no better. -->
+            <div class="rh-sectors" id="rhSectors"></div>
+            <div class="rh-car">
+              <div class="rh-speed"><b id="rhSpeed">0</b><em>KM/H</em></div>
+              <div class="rh-bar"><i id="rhSpeedBar"></i></div>
+              <div class="rh-drive"><span class="rh-gear" id="rhGear">N</span><span class="rh-drs" id="rhDrs">DRS</span></div>
+            </div>
+          </div>
+
+          <div class="rh-bc">
+            <!-- The stop itself. The part named here is the component the loop changed. -->
+            <div class="rh-pit" id="rhPit" hidden>
+              <div class="pit-head"><b id="pitState">BOX BOX</b><i id="pitClock"></i></div>
+              <div class="pit-what" id="pitWhat"></div>
+            </div>
+            <!-- The only thing that ever interrupts the race: the loop kept a change, and the
+                 garage is where you can go and look at it. Nothing moves until you press it. -->
+            <div class="garage-call" id="garageCall" hidden>
+              <span class="gc-eyebrow" id="gcEyebrow">UPGRADE FITTED</span>
+              <span class="gc-what" id="gcWhat"></span>
+              <button class="gc-go" id="gcGo">OPEN THE GARAGE</button>
+            </div>
           </div>
 
           <div class="rh-br" id="rhGates" hidden></div>
@@ -74,23 +98,9 @@
             <div class="rh-cap" id="rhCap"></div>
             <div class="rh-strip" id="rhStrip"></div>
           </div>
-          <div class="rh-tip" id="rhTip" hidden></div>
-          <!-- The stop itself. The part named here is the component the loop changed. -->
-          <div class="rh-pit" id="rhPit" hidden>
-            <div class="pit-head"><b id="pitState">BOX BOX</b><i id="pitClock"></i></div>
-            <div class="pit-what" id="pitWhat"></div>
-          </div>
 
-          <div class="rh-fastest" id="rhFastest" hidden>
-            <b>FASTEST LAP</b><i id="rhFastestVal"></i>
-          </div>
+          <div class="rh-tip" id="rhTip" hidden></div>
         </div>
-        <!-- The only thing that ever interrupts the race: the loop kept a change, and the
-             garage is where you can go and look at it. Nothing moves until you press it. -->
-        <div class="garage-call" id="garageCall" hidden>
-          <span class="gc-eyebrow" id="gcEyebrow">UPGRADE FITTED</span>
-          <span class="gc-what" id="gcWhat"></span>
-          <button class="gc-go" id="gcGo">OPEN THE GARAGE</button>
         </div>
         <button class="track-back" id="trackBack" hidden>&larr; BACK TO THE TRACK</button>
       </div>

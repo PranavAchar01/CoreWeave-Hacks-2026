@@ -247,8 +247,7 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .top-ghost{margin-top:0;padding:6px 9px;font-size:6px}
 
 /* The garage call. It sits on the track and waits; the loop does not stop for it. */
-.garage-call{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);z-index:4;
-  display:flex;align-items:center;gap:12px;max-width:calc(100% - 32px);
+.garage-call{pointer-events:auto;display:flex;align-items:center;gap:12px;max-width:100%;
   background:rgba(6,8,26,.92);border:2px solid var(--gold);padding:9px 12px}
 .gc-eyebrow{font-family:"Press Start 2P","Courier New",monospace;font-size:7px;color:var(--gold);
   letter-spacing:.5px;white-space:nowrap}
@@ -259,7 +258,7 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   white-space:nowrap;animation:runpulse 1.6s ease-in-out infinite}
 .gc-go:hover{background:#FFD75E}
 @media (prefers-reduced-motion:reduce){.gc-go{animation:none}}
-.track-back{position:absolute;left:12px;top:12px;z-index:4;
+.track-back{position:absolute;left:14px;top:14px;z-index:4;
   font-family:"Press Start 2P","Courier New",monospace;font-size:7px;padding:8px 11px;
   background:rgba(6,8,26,.92);color:var(--caption);border:1px solid var(--mid);cursor:pointer}
 .track-back:hover{color:var(--white);border-color:var(--gold)}
@@ -271,18 +270,37 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
    the timing tower top-right, the car's own instruments bottom-left, and the
    lap strip across the bottom. Hidden entirely outside race mode.
    ========================================================================= */
+/* One grid, nine cells, one gutter. Each panel is pinned to the edge of its own cell, so a
+   panel that grows a row, or disappears entirely, cannot shift any of the others. */
 .rhud{position:absolute;inset:0;pointer-events:none;z-index:3;
-  font-family:"Press Start 2P","Courier New",monospace;font-size:7px;text-transform:uppercase}
+  font-family:"Press Start 2P","Courier New",monospace;font-size:7px;text-transform:uppercase;
+  display:grid;gap:10px;padding:14px;box-sizing:border-box;
+  grid-template-columns:minmax(0,auto) minmax(0,1fr) minmax(0,auto);
+  grid-template-rows:auto minmax(0,1fr) auto auto auto;
+  grid-template-areas:
+    "tl  tc  tr"
+    "tl  cc  mr"
+    "bl  cc2 br"
+    "bc  bc  bc"
+    "lap lap lap"}
 .app:not(.race) .rhud{display:none}
+.rh-tl{grid-area:tl;align-self:start;justify-self:start}
+.rh-tc{grid-area:tc;align-self:start;justify-self:center;min-width:0}
+.rh-tr{grid-area:tr;align-self:start;justify-self:end}
 
-.rh-tl{position:absolute;left:14px;top:14px;display:flex;flex-direction:column;
-  align-items:flex-start;gap:5px;max-width:340px}
+.rh-bl{grid-area:bl;align-self:end;justify-self:start}
+.rh-bc{grid-area:bc;align-self:end;justify-self:center;max-width:100%;display:flex;
+  flex-direction:column;align-items:center;gap:8px}
+.rh-br{grid-area:br;align-self:end;justify-self:end}
+.rh-lapbar{grid-area:lap;align-self:end}
+
+.rh-tl{display:flex;flex-direction:column;align-items:flex-start;gap:6px;max-width:340px}
 .rh-tl-top{display:flex;align-items:center;gap:8px}
 .rh-live{background:var(--red);color:var(--white);padding:5px 7px;letter-spacing:.5px}
 .rh-live.held{background:var(--mid)}
 .rh-circuit{background:rgba(6,8,26,.86);color:var(--caption);padding:5px 8px;letter-spacing:.5px}
 
-.rh-tr{position:absolute;right:14px;top:14px;width:214px;display:flex;flex-direction:column;gap:3px}
+.rh-tr{width:214px;display:flex;flex-direction:column;gap:4px}
 .rh-tower{background:rgba(6,8,26,.9);border-left:3px solid var(--gold)}
 .rh-t-head{display:flex;justify-content:space-between;align-items:baseline;gap:6px;
   padding:6px 8px;border-bottom:1px solid var(--studio);color:var(--white)}
@@ -310,8 +328,8 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .rh-phase.kept{background:var(--green);color:var(--ink)}
 .rh-phase.dropped{background:var(--red);color:var(--white)}
 
-.rh-bl{position:absolute;left:14px;bottom:44px;display:flex;flex-direction:column;gap:4px;
-  align-items:flex-start}
+.rh-bl{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.rh-car{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
 .rh-speed{display:flex;align-items:baseline;gap:5px;background:rgba(6,8,26,.86);padding:4px 8px}
 .rh-speed b{font-family:"VT323","Courier New",monospace;font-size:34px;line-height:24px;
   color:var(--white);font-variant-numeric:tabular-nums}
@@ -323,7 +341,7 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .rh-drs{background:var(--studio);color:var(--mid);padding:5px 7px}
 .rh-drs.on{background:var(--green);color:var(--ink)}
 
-.rh-br{position:absolute;right:14px;bottom:44px;display:flex;flex-direction:column;gap:2px;
+.rh-br{display:flex;flex-direction:column;gap:2px;
   background:rgba(6,8,26,.9);padding:6px 8px;border-left:3px solid var(--white);max-width:250px}
 .rh-br .g{display:grid;grid-template-columns:11px minmax(0,1fr);gap:6px;align-items:baseline;
   font-family:"VT323","Courier New",monospace;font-size:15px;line-height:15px;
@@ -358,7 +376,7 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .rh-since .s-parts>b b{color:var(--gold)}
 
 /* The lap bar: the caption reads the interface in progress, the cells answer on hover. */
-.rh-lapbar{position:absolute;left:14px;right:14px;bottom:14px;display:flex;flex-direction:column;gap:4px}
+.rh-lapbar{display:flex;flex-direction:column;gap:4px}
 .rh-cap{font-size:7px;letter-spacing:.4px;color:var(--mid);height:9px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rh-cap b{color:var(--caption)}
@@ -382,8 +400,8 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   color:var(--mid);text-transform:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* The pit stop. Bottom centre, above the lap strip, only while the car is in the lane. */
-.rh-pit{position:absolute;left:50%;bottom:52px;transform:translateX(-50%);z-index:5;
-  min-width:250px;background:rgba(6,8,26,.94);border:2px solid var(--cyan);padding:8px 12px}
+.rh-pit{min-width:250px;max-width:100%;background:rgba(6,8,26,.94);
+  border:2px solid var(--cyan);padding:8px 12px}
 .rh-pit .pit-head{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
   font-size:9px;letter-spacing:1px;color:var(--cyan)}
 .rh-pit .pit-head i{font-style:normal;font-family:"VT323","Courier New",monospace;font-size:24px;
@@ -395,8 +413,8 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .rh-pit.done .pit-head{color:var(--green)}
 
 /* Timing tower / championship. Left edge, under the season summary. */
-.rh-stand{position:absolute;left:14px;top:118px;width:236px;
-  background:rgba(6,8,26,.9);border-left:3px solid var(--gold);padding:0 0 4px}
+.rh-stand{width:236px;max-width:100%;background:rgba(6,8,26,.9);
+  border-left:3px solid var(--gold);padding:0 0 4px}
 .rh-stand .st-head{display:flex;justify-content:space-between;align-items:baseline;gap:6px;
   padding:6px 8px;border-bottom:1px solid var(--studio);font-size:7px;color:var(--white)}
 .rh-stand .st-head i{font-style:normal;font-size:6px;color:var(--gold)}
@@ -418,7 +436,7 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   border-top:1px solid rgba(18,26,74,.6)}
 
 /* Sector board. Three rows, the way a timing screen carries S1/S2/S3. */
-.rh-sectors{position:absolute;left:14px;bottom:118px;display:flex;flex-direction:column;gap:2px;
+.rh-sectors{display:flex;flex-direction:column;gap:2px;
   background:rgba(6,8,26,.86);padding:6px 8px;border-left:3px solid var(--studio)}
 .rh-sec{display:grid;grid-template-columns:14px 96px 42px 26px;gap:6px;align-items:center;
   font-size:6px;letter-spacing:.3px;color:var(--mid)}
@@ -439,19 +457,18 @@ button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .rh-cell.s2{border-top-color:rgba(255,163,24,.55)}
 
 /* The purple flag. Only ever raised on a genuine season best. */
-.rh-fastest{position:absolute;left:50%;top:52px;transform:translateX(-50%);z-index:5;
-  display:flex;align-items:baseline;gap:10px;background:var(--purple);color:var(--white);
-  padding:8px 14px;font-size:9px;letter-spacing:1px;
+.rh-fastest{display:flex;align-items:baseline;gap:10px;background:var(--purple);
+  color:var(--white);padding:8px 14px;font-size:9px;letter-spacing:1px;
   animation:fastin .35s ease-out}
 .rh-fastest i{font-style:normal;font-family:"VT323","Courier New",monospace;font-size:20px;
   line-height:14px;font-variant-numeric:tabular-nums}
-@keyframes fastin{from{opacity:0;transform:translateX(-50%) translateY(-8px)}
-  to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes fastin{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 @media (prefers-reduced-motion:reduce){.rh-fastest{animation:none}}
 
 @media (max-width:900px){.rh-tr{width:172px}.rh-br{display:none}.rh-since{display:none}
   .rh-sectors{display:none}}
-@media (max-height:560px){.rh-lapbar,.rh-bl{display:none}}
+@media (max-height:620px){.rh-bl,.rh-stand{display:none}}
+@media (max-height:480px){.rh-lapbar{display:none}}
 
 
 
