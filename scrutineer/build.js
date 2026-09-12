@@ -2,6 +2,9 @@
 // Concatenates src/ into the single artifact fragment scrutineer.html and syntax-checks the script.
 const fs = require('fs'), path = require('path'), cp = require('child_process');
 const root = __dirname, src = path.join(root, 'src');
+// The mark: a two-by-two chequer, gold on night, centred with a two-pixel margin. One
+// definition — it used to be pasted into two of the three documents and missing from the third.
+const FAVICON = `<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Crect width='16' height='16' fill='%2306081A'/%3E%3Cpath d='M2 2h6v6H2zM8 8h6v6H8z' fill='%23F4C542'/%3E%3C/svg%3E">`;
 const ORDER = ['engine.js', 'car.js', 'world.js', 'sim.js', 'trackscene.js', 'team.js', 'garage.js', 'scenes.js', 'season.js', 'ui.js', 'trial.js', 'dash.js', 'story.js', 'main.js'];
 const present = ORDER.filter(f => fs.existsSync(path.join(src, f)));
 const missing = ORDER.filter(f => !present.includes(f));
@@ -51,7 +54,7 @@ ${css}
 <meta property="og:title" content="Scrutineer">
 <meta property="og:description" content="Watch an agent rewrite its own harness, run by run. Every interface it builds is a real page you can open and audit with axe-core yourself.">
 <meta name="theme-color" content="#06081A">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2306081A'/%3E%3Cpath d='M2 3h4v4H2zM6 7h4v4H6zM10 3h4v4h-4zM2 11h4v4H2zM10 11h4v4h-4z' fill='%23F4C542'/%3E%3C/svg%3E">
+${FAVICON}
 ${head}
 </head>
 <body>
@@ -94,6 +97,7 @@ const tlDoc = `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Scrutineer — the car, run by run</title>
+${FAVICON}
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
 <style>
 ${tlCss}
@@ -151,7 +155,7 @@ console.log(`build: site-timeline/public/index.html ${(tlDoc.length / 1024).toFi
 <meta name="description" content="The Scrutineer pit board: the agent's car on a card that stays on top, rebuilding each time the loop lands a generation.">
 <meta property="og:title" content="Scrutineer — pit board">
 <meta name="theme-color" content="#06081A">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%2306081A'/%3E%3Cpath d='M2 3h4v4H2zM6 7h4v4H6zM10 3h4v4h-4zM2 11h4v4H2zM10 11h4v4h-4z' fill='%23F4C542'/%3E%3C/svg%3E">
+${FAVICON}
 <title>Scrutineer — pit board</title>
 <link rel="stylesheet" data-pit href="${fonts}">
 <style data-pit>
