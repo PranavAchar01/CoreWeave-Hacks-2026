@@ -50,7 +50,7 @@ An **agent loop that builds and improves web interfaces**. One agent generates i
 | | |
 |---|---|
 | **Homepage** | [scrutineer-one.vercel.app](https://scrutineer-one.vercel.app) — car rebuilds itself, one metric per loop |
-| **TRACK** | Live race: watch laps land, car gets faster as harness improves |
+| **TRACK** | [/watch](https://scrutineer-one.vercel.app/watch) — live race: watch laps land, car gets faster as harness improves |
 | **TELEMETRY** | Instrument panel: gates, component credit, violation landscape |
 | **Timeline** | Scrub through any generation; car rebuilds to show that harness state |
 | **Pit Board** | Floating card with current progress (embed anywhere with one line of JS) |
@@ -111,6 +111,9 @@ uv run pytest                     # 84 tests
 
 # Build all surfaces
 cd .. && node build.js
+
+# …or build, serve on :4173 and rebuild on save, in one command
+cd .. && ./run.sh
 ```
 
 **To watch live while running:** Start `scrutineer watch` server and open `http://127.0.0.1:7777/pit`
@@ -131,6 +134,9 @@ cd .. && node build.js
 | **W&B Runs** | One run per component; credit curves are clickable, not buried in logs |
 | **W&B Registry** | Harness versions registered with alias; promoted thing = versioned thing |
 | **TypeSafe System1** | Typed decisions: pit wall, credit router, gate outcomes (not local policy) |
+| **W&B Sandboxes** | The agent's own code runs isolated rather than in-process |
+| **W&B Serverless RL** | `scrutineer train` registers a real LoRA job and collects rollouts through the trainer's client |
+| **ARIA** | The board each generation is reported to |
 | **marimo** | Debrief: every promotion writes executable notebook that proves the decision |
 
 **Honest reporting:** Every tool reports live or stand-in status. `uv run scrutineer doctor` prints the table; site shows it too.
