@@ -59,7 +59,7 @@ def _close_pool() -> None:
 
 @dataclass
 class RaceResult:
-    name: str                       # "quali" | "sealed" | "smoke"
+    name: str  # "quali" | "sealed" | "smoke"
     generation: int
     laps: list[LapRecord] = field(default_factory=list)
     scores: list[LapScore] = field(default_factory=list)
@@ -149,14 +149,25 @@ def run_race(
     # a season is thousands of laps. The budget is therefore allocated up front and the laps run
     # concurrently; RETIRE still binds inside each lap.
     lap_cap = budget / total * 2.0
-    jobs = [(trial, idx, item)
-            for trial, item, idx in ((t, it, t * len(items) + i)
-                                     for t in range(trials) for i, it in enumerate(items))]
+    jobs = [
+        (trial, idx, item)
+        for trial, item, idx in (
+            (t, it, t * len(items) + i) for t in range(trials) for i, it in enumerate(items)
+        )
+    ]
 
     def one(job):
         trial, idx, item = job
-        lap = run_lap(theta=theta, item=item, tracer=tr, regs=regs, seed=seed + trial * 1000,
-                      lap_index=idx, race_id=race_id, cap_usd=lap_cap)
+        lap = run_lap(
+            theta=theta,
+            item=item,
+            tracer=tr,
+            regs=regs,
+            seed=seed + trial * 1000,
+            lap_index=idx,
+            race_id=race_id,
+            cap_usd=lap_cap,
+        )
         passed = verify(item, lap.submitted)
         # reported here rather than after the pool drains, so a watcher sees each interface land
         # as it lands instead of twenty at once
@@ -165,12 +176,21 @@ def run_race(
             with _emit_lock:
                 _emit_state["done"] += 1
                 seen = _emit_state["done"]
-            events.emit("lap", race=name, generation=generation, index=seen, total=total,
-                        item=item.id, family=item.family,
-                        title=getattr(item, "title", item.family), passed=bool(passed),
-                        weighted=(a.weighted if a else 0),
-                        rules=[v["id"] for v in (a.violations if a else [])][:3],
-                        missing=(a.missing[:2] if a else []), steps=lap.steps)
+            events.emit(
+                "lap",
+                race=name,
+                generation=generation,
+                index=seen,
+                total=total,
+                item=item.id,
+                family=item.family,
+                title=getattr(item, "title", item.family),
+                passed=bool(passed),
+                weighted=(a.weighted if a else 0),
+                rules=[v["id"] for v in (a.violations if a else [])][:3],
+                missing=(a.missing[:2] if a else []),
+                steps=lap.steps,
+            )
         return trial, idx, item, lap, passed
 
     if workers and workers > 1 and total > 1:
@@ -180,20 +200,41 @@ def run_race(
 
     eval_rows: list[dict[str, Any]] = []
     for trial, _idx, item, lap, passed in sorted(done, key=lambda d: d[1]):
-        sc = score_lap(regs, passed=passed, cost_usd=lap.cost_usd, wall_s=lap.wall_s,
-                       cap_usd=max(lap_cap, 1e-9), timed_out=lap.retired)
+        sc = score_lap(
+            regs,
+            passed=passed,
+            cost_usd=lap.cost_usd,
+            wall_s=lap.wall_s,
+            cap_usd=max(lap_cap, 1e-9),
+            timed_out=lap.retired,
+        )
         res.laps.append(lap)
         res.scores.append(sc)
         res.per_item[f"{item.id}#{trial}"] = passed
         res.cost_usd += lap.cost_usd
-        eval_rows.append({"item": item.id, "passed": passed, "lap_s": sc.lap_s,
-                          "cost_usd": lap.cost_usd, "steps": lap.steps})
+        eval_rows.append(
+            {
+                "item": item.id,
+                "passed": passed,
+                "lap_s": sc.lap_s,
+                "cost_usd": lap.cost_usd,
+                "steps": lap.steps,
+            }
+        )
     # the same pass/fail the gates used, on the Evals tab where a reviewer can page through it
     if name in ("quali", "sealed"):
-        evals().log_race(name=name, generation=generation, theta_hash=theta.full_hash[:16],
-                         rows=eval_rows,
-                         summary={"race_s": round(res.race_s, 4), "pass_rate": round(res.pass_rate, 4),
-                                  "cost_usd": round(res.cost_usd, 5), "laps": len(res.laps)})
+        evals().log_race(
+            name=name,
+            generation=generation,
+            theta_hash=theta.full_hash[:16],
+            rows=eval_rows,
+            summary={
+                "race_s": round(res.race_s, 4),
+                "pass_rate": round(res.pass_rate, 4),
+                "cost_usd": round(res.cost_usd, 5),
+                "laps": len(res.laps),
+            },
+        )
     return res
 
 
@@ -204,16 +245,36 @@ class SealedEvaluator:
         self._items = items
         self._regs = regs
         self._salt = salt
+        # Every question ever put to this split. The counter lives here rather than on the
+        # caller because the caller is the thing being kept honest: a holdout loses its validity
+        # by being asked, and only the object holding it can see every ask.
+        self.queries = 0
+
+    @property
+    def n_items(self) -> int:
+        """The size of the split. A count is not the split, so this does not breach the rule that
+        only `official` leaves the object — and the Ladder's margin is derived from it."""
+        return len(self._items)
 
     def opaque(self, item_id: str) -> str:
         return hashlib.sha256(f"{self._salt}:{item_id}".encode()).hexdigest()[:10]
 
-    def official(self, theta: Theta, generation: int, seed: int, publish: bool = True,
-                 trials: int = 2) -> dict[str, Any]:
+    def official(
+        self, theta: Theta, generation: int, seed: int, publish: bool = True, trials: int = 2
+    ) -> dict[str, Any]:
+        self.queries += 1
         # two trials, as the evaluation contract specifies: at one trial a single flipped item
         # moves the race time by more than the seesaw's whole decision margin
-        res = run_race(theta=theta, items=self._items, regs=self._regs, generation=generation,
-                       name="sealed", seed=seed, trials=trials, tracer=Tracer(generation=generation))
+        res = run_race(
+            theta=theta,
+            items=self._items,
+            regs=self._regs,
+            generation=generation,
+            name="sealed",
+            seed=seed,
+            trials=trials,
+            tracer=Tracer(generation=generation),
+        )
         obj = {
             "generation": generation,
             "race_s": round(res.race_s, 4),
@@ -221,14 +282,18 @@ class SealedEvaluator:
             "cost_usd": round(res.cost_usd, 5),
             # opaque ids. `pass` is every trial; `any` is at least one, so the regression gate can
             # tell a real loss from an item that merely flapped between trials.
-            "per_item_pass": {self.opaque(k.split("#")[0]):
-                              all(v2 for k2, v2 in res.per_item.items()
-                                  if k2.split("#")[0] == k.split("#")[0])
-                              for k in res.per_item},
-            "per_item_any": {self.opaque(k.split("#")[0]):
-                             any(v2 for k2, v2 in res.per_item.items()
-                                 if k2.split("#")[0] == k.split("#")[0])
-                             for k in res.per_item},
+            "per_item_pass": {
+                self.opaque(k.split("#")[0]): all(
+                    v2 for k2, v2 in res.per_item.items() if k2.split("#")[0] == k.split("#")[0]
+                )
+                for k in res.per_item
+            },
+            "per_item_any": {
+                self.opaque(k.split("#")[0]): any(
+                    v2 for k2, v2 in res.per_item.items() if k2.split("#")[0] == k.split("#")[0]
+                )
+                for k in res.per_item
+            },
             "n_items": len(self._items),
         }
         if publish:

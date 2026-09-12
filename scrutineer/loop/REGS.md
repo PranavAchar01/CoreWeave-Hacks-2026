@@ -88,6 +88,17 @@ gates:
   zero_variance_groups: 0.40
   entropy_collapse_ratio: 0.50   # RL candidate ineligible below 50 % of step-0 entropy
   kl_ratio: 3.0                  # only meaningful when kl_penalty_coef > 0
+  ladder_margin_z: 1.0           # Ladder margin in units of the sealed split's own standard
+                                 # error. A candidate has to beat the standing best by more than
+                                 # one SE before its sealed score is reported at all, so a
+                                 # generation cannot climb the split's noise. At z=1 and 20 sealed
+                                 # items the margin is ~4.5 s, which is about what one item is
+                                 # worth: the loop must win an item, not a rounding difference.
+                                 # Blum & Hardt's Ladder; Dwork et al. arXiv:1411.2664.
+  sealed_query_budget: 12        # how many times a season may query the sealed split before its
+                                 # answers stop being reported. Adaptive reuse costs sample
+                                 # complexity linear in the number of queries, so this is the
+                                 # budget that keeps the split honest rather than nominal.
 
 # Per-role cost table. Upgrade cost is charged to cost_r and sits outside the race cap.
 roles:

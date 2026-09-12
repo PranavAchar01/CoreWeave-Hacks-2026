@@ -40,7 +40,9 @@ class Standing:
         }
 
 
-def bootstrap_ci(xs: list[float], level: float = 0.90, iters: int = 2000, seed: int = 7) -> tuple[float, float]:
+def bootstrap_ci(
+    xs: list[float], level: float = 0.90, iters: int = 2000, seed: int = 7
+) -> tuple[float, float]:
     """CI over the *sum* of credits, because that is the quantity the selection rule spends."""
     if not xs:
         return (0.0, 0.0)
@@ -60,9 +62,18 @@ def record_credit(tracer: Tracer, call_id: str, rec: ReplayRecord) -> dict[str, 
     ref = publish_object(
         f"replay-{rec.role.lower()}-{rec.item_id}-{rec.mode}",
         {
-            "role": rec.role, "mode": rec.mode, "item": rec.item_id,
-            "actual_s": rec.actual_s, "replayed_s": rec.replayed_s,
-            "seeds": rec.seeds, "flipped": rec.flipped, **rec.detail,
+            "role": rec.role,
+            "mode": rec.mode,
+            "item": rec.item_id,
+            "actual_s": rec.actual_s,
+            "replayed_s": rec.replayed_s,
+            "null_s": rec.null_s,
+            "null_passes": rec.null_passes,
+            "raw_credit_s": round(rec.raw_credit_s, 3),
+            "resample_credit_s": round(rec.resample_credit_s, 3),
+            "seeds": rec.seeds,
+            "flipped": rec.flipped,
+            **rec.detail,
         },
     )
     row = {
@@ -71,6 +82,12 @@ def record_credit(tracer: Tracer, call_id: str, rec: ReplayRecord) -> dict[str, 
         "mode": rec.mode,
         "seeds": rec.seeds,
         "flipped": rec.flipped,
+        # What the uncontrolled estimator would have credited, and how much of that gap was
+        # resampling rather than the intervention. Kept on the row itself so a reader of the
+        # Weave feedback can see the correction without opening the replay object.
+        "raw_delta_s": round(rec.raw_credit_s, 3),
+        "resample_delta_s": round(rec.resample_credit_s, 3),
+        "controlled": rec.controlled,
         "replay_ref": ref,
     }
     tracer.add_feedback(call_id, "scrutineer.credit", row)
@@ -97,6 +114,8 @@ def standings(tracer: Tracer, regs: Regs, seed: int = 7) -> dict[str, Standing]:
     return out
 
 
-def publish_standings(generation: int, table: dict[str, Standing], extra: dict[str, Any] | None = None) -> str:
+def publish_standings(
+    generation: int, table: dict[str, Standing], extra: dict[str, Any] | None = None
+) -> str:
     obj = {"generation": generation, "roles": {r: s.row() for r, s in table.items()}, **(extra or {})}
     return publish_object(f"standings:gen-{generation}", obj, tags=[f"gen-{generation}"])
