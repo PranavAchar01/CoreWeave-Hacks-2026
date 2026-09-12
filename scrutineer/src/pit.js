@@ -45,7 +45,7 @@ const st = {
   replay: { all: [], i: 0, every: 24, at: 0, elapsed: 0, beat: 0, laps: 40 },
   orbit: 0, camYaw: 0, along: 0, whip: 0, fx: [], anim: null, card: null, cardTimer: 0,
   R: null, track: null, spec: null, mesh: null, car: null,
-  root: null, host: null, win: window, raf: 0, last: 0, pip: null, open: false, drag: null, boardAt: 0, stripTxt: '',
+  root: null, host: null, win: window, raf: 0, last: 0, pip: null, vpip: null, placard: null, open: false, drag: null, boardAt: 0, stripTxt: '',
 };
 P.state = () => st;
 
@@ -236,6 +236,7 @@ function card(kind, html) {
   const c = st.card; if (!c) return;
   clearTimeout(st.cardTimer);
   c.className = 'pit-card ' + kind; c.innerHTML = html;
+  st.placard = { kind, text: c.textContent.replace(/\s+/g, ' ').trim(), until: Date.now() + 3400 };
   void c.offsetWidth; c.classList.add('show');
   st.cardTimer = setTimeout(() => c.classList.remove('show'), 3400);
 }
@@ -390,8 +391,8 @@ function paintBoard() {
 }
 function paintActions() {
   const a = st.root.querySelector('.pb-actions'); a.innerHTML = '';
-  if (canPip()) { const pb = el('button', 'pb-btn', st.pip ? 'BRING IT BACK' : 'POP OUT ↗'); pb.type = 'button';
-    pb.addEventListener('click', ev => { ev.stopPropagation(); if (st.pip) st.pip.close(); else P.popOut(); }); a.append(pb); }
+  if (canPip() || canVideoPip()) { const pb = el('button', 'pb-btn', st.pip || st.vpip ? 'BRING IT BACK' : 'POP OUT ↗'); pb.type = 'button';
+    pb.addEventListener('click', ev => { ev.stopPropagation(); togglePop(); }); a.append(pb); }
   const link = el('a', 'pb-link', 'TELEMETRY ↗');
   link.href = (st.source === 'live' && (st.origin === location.origin || loopback(st.origin)) ? st.origin : 'https://scrutineer-one.vercel.app') + '/telemetry'; link.target = '_blank'; link.rel = 'noopener'; a.append(link);
 }
@@ -428,12 +429,124 @@ function wire() {
   r.addEventListener('keydown', ev => { if (ev.key === 'Escape') setOpen(false); });
   window.addEventListener('resize', () => { if (!st.pip && r.style.left) place(parseFloat(r.style.left), parseFloat(r.style.top)); });
   const pop = r.querySelector('.pit-pop');
-  if (!canPip()) pop.hidden = true;
+  if (!canPip() && !canVideoPip()) pop.hidden = true;
   pop.addEventListener('pointerdown', ev => ev.stopPropagation());
-  pop.addEventListener('click', ev => { ev.stopPropagation(); if (st.pip) st.pip.close(); else P.popOut(); });
+  pop.addEventListener('click', ev => { ev.stopPropagation(); togglePop(); });
 }
+// ---------- the pop-out ----------
+// Chrome gives a document picture-in-picture window a title bar with the site's address and the
+// system's window buttons, and no page can take them off. A video picture-in-picture window has
+// neither: it is only the picture, with its controls on hover. So the pop-out is a live video of
+// the card, drawn frame by frame, and its play/pause button flips between the car and the board.
+// Where a browser has no video pop-out, the document window is still there.
+const VW = 512, VH = 360, SH = 40;
+const canVideoPip = () => !!(document.pictureInPictureEnabled && HTMLCanvasElement.prototype.captureStream);
+function togglePop() { if (st.vpip) stopVideoPip(); else if (st.pip) st.pip.close(); else P.popOut(); }
 P.popOut = async function () {
-  if (st.pip) return true;
+  if (st.pip || st.vpip) return true;
+  if (canVideoPip() && await videoPip()) return true;
+  return docPip();
+};
+async function videoPip() {
+  const cv = el('canvas'); cv.width = VW; cv.height = VH;
+  const manual = !!(window.CanvasCaptureMediaStreamTrack && 'requestFrame' in CanvasCaptureMediaStreamTrack.prototype);
+  const stream = cv.captureStream(manual ? 0 : 30), track = stream.getVideoTracks()[0];
+  const video = el('video'); video.muted = true; video.playsInline = true; video.setAttribute('aria-hidden', 'true');
+  video.style.cssText = 'position:fixed;left:-9999px;top:0;width:2px;height:2px;opacity:0;pointer-events:none';
+  document.body.append(video); video.srcObject = stream;
+  const v = st.vpip = { cv, ctx: cv.getContext('2d'), track, manual, video, board: false, last: 0, worker: null, timer: 0 };
+  composeFrame();
+  try {
+    await Promise.race([video.play(), new Promise((_, no) => setTimeout(() => no(new Error('no frame')), 1500))]);
+    await video.requestPictureInPicture();
+  } catch (e) { stopVideoPip(); return false; }
+  video.addEventListener('leavepictureinpicture', () => stopVideoPip(), { once: true });
+  // a hidden tab draws no animation frames, but a worker's clock keeps running, so the car keeps lapping
+  try { st.win.cancelAnimationFrame(st.raf); } catch (e) { /* nothing was scheduled */ }
+  const step = () => {
+    if (st.vpip !== v) return;
+    const now = performance.now(), dt = v.last ? Math.min(0.05, (now - v.last) / 1000) : 0; v.last = now;
+    frame(dt); if (st.source === 'replay') replayTick(); paint(false); composeFrame();
+  };
+  const interval = () => { if (!v.timer) v.timer = setInterval(step, 33); };
+  try {
+    v.worker = new Worker(URL.createObjectURL(new Blob(['setInterval(function(){postMessage(0)},33)'], { type: 'text/javascript' })));
+    v.worker.onmessage = step; v.worker.onerror = () => { v.worker.terminate(); v.worker = null; interval(); };
+  } catch (e) { interval(); }   // a page whose policy refuses workers still gets a clock, a slower one when hidden
+  if ('mediaSession' in navigator) {
+    const flip = () => { v.board = !v.board; composeFrame(); video.play().catch(() => {}); };
+    for (const a of ['play', 'pause', 'nexttrack', 'previoustrack']) { try { navigator.mediaSession.setActionHandler(a, flip); } catch (e) { /* not offered here */ } }
+  }
+  paintActions();
+  return true;
+}
+function stopVideoPip() {
+  const v = st.vpip; if (!v) return; st.vpip = null;
+  if (v.worker) v.worker.terminate(); if (v.timer) clearInterval(v.timer);
+  try { if (document.pictureInPictureElement === v.video) document.exitPictureInPicture(); } catch (e) { /* already closed */ }
+  v.track.stop(); v.video.remove();
+  if ('mediaSession' in navigator) for (const a of ['play', 'pause', 'nexttrack', 'previoustrack']) { try { navigator.mediaSession.setActionHandler(a, null); } catch (e) { /* not offered here */ } }
+  swapLoop(window); paintActions(); paint(true);
+}
+// one frame of the pop-out: the car (or the board), the strip under it, and any placard
+function composeFrame() {
+  const v = st.vpip; if (!v) return;
+  const g = v.ctx, px = '"Press Start 2P","Courier New",monospace', big = '"VT323","Courier New",monospace';
+  g.imageSmoothingEnabled = false;
+  if (v.board) drawPipBoard(g, px, big);
+  else {
+    g.drawImage(st.root.querySelector('canvas'), 0, 0, VW, VH - SH);
+    const pc = st.placard;
+    if (pc && Date.now() < pc.until) {
+      const bg = pc.kind === 'refused' ? '#E31E2D' : pc.kind === 'none' ? '#C8CBD8' : '#F4C542';
+      g.fillStyle = '#000'; g.fillRect(16, VH - SH - 66, VW - 32, 46); g.fillStyle = bg; g.fillRect(16, VH - SH - 70, VW - 32, 46);
+      g.fillStyle = pc.kind === 'refused' ? '#FFF' : '#000'; g.font = `14px ${px}`; g.textBaseline = 'middle';
+      g.fillText(pc.text.toUpperCase().slice(0, 30), 30, VH - SH - 47);
+    }
+  }
+  g.fillStyle = '#000'; g.fillRect(0, VH - SH, VW, SH);
+  g.fillStyle = st.source === 'live' ? (st.linkDown ? '#E31E2D' : '#2FD968') : st.source === 'replay' ? '#3DD2FF' : '#6A6F8A';
+  g.fillRect(14, VH - SH / 2 - 6, 12, 12);
+  g.fillStyle = '#FFF'; g.font = `12px ${px}`; g.textBaseline = 'middle';
+  g.fillText((st.stripTxt || '').slice(0, 28), 38, VH - SH / 2 + 1);
+  // the pop-out's own pause button is what flips the view, so the hint draws that button
+  g.fillStyle = '#6A6F8A'; g.font = `9px ${px}`; g.textAlign = 'right';
+  const hint = v.board ? 'CAR' : 'BOARD', hw = g.measureText(hint).width;
+  g.fillText(hint, VW - 12, VH - SH / 2 + 1); g.textAlign = 'left';
+  g.fillRect(VW - 12 - hw - 16, VH - SH / 2 - 5, 3, 10); g.fillRect(VW - 12 - hw - 10, VH - SH / 2 - 5, 3, 10);
+  g.fillStyle = '#121A4A'; g.fillRect(0, VH - 3, VW, 3);
+  g.fillStyle = '#F4C542'; g.fillRect(0, VH - 3, Math.round(VW * runFraction()), 3);
+  if (v.manual) v.track.requestFrame();
+}
+function drawPipBoard(g, px, big) {
+  const H = VH - SH, total = st.source === 'replay' ? st.replay.all.length : 0, last = st.rounds[st.rounds.length - 1];
+  g.fillStyle = '#06081A'; g.fillRect(0, 0, VW, H);
+  g.textBaseline = 'alphabetic'; g.font = `14px ${px}`; g.fillStyle = '#F4C542'; g.fillText('PIT BOARD', 20, 36);
+  g.fillRect(20, 42, 126, 2);
+  g.font = `9px ${px}`; g.textAlign = 'right'; g.fillStyle = st.source === 'live' ? '#2FD968' : '#3DD2FF';
+  g.fillText(st.source === 'live' ? 'LIVE' : st.demo ? 'REPLAY · DEMO SEASON' : 'REPLAY', VW - 20, 36); g.textAlign = 'left';
+  const score = last && typeof last.official_s === 'number' ? last.official_s.toFixed(2) : '—';
+  [['RUNS', `${st.rounds.length}`, total ? `of ${total}` : ''], ['KEPT', `${kept()}`, ''], ['LAPS', `${st.lapsRun}`, ''], ['SCORE', score, score === '—' ? '' : 's']]
+    .forEach(([k, val, unit], i) => {
+      const x = 20 + i * 122;
+      g.font = `8px ${px}`; g.fillStyle = '#6A6F8A'; g.fillText(k, x, 74);
+      g.font = `46px ${big}`; g.fillStyle = '#F4C542'; g.fillText(val, x, 116);
+      if (unit) { const w = g.measureText(val).width; g.font = `20px ${big}`; g.fillStyle = '#6A6F8A'; g.fillText(unit, x + w + 6, 116); }
+    });
+  const n = Math.max(st.rounds.length, total), tw = Math.min(40, (VW - 40) / Math.max(1, n) - 4);
+  for (let k = 0; k < n; k++) {
+    const r = st.rounds[k], x = 20 + k * (tw + 4);
+    g.fillStyle = !r ? '#121A4A' : r.promoted ? '#F4C542' : unchanged(r) ? '#6A6F8A' : '#E31E2D';
+    g.fillRect(x, 134, tw, 12);
+  }
+  C.ROLE_KEYS.forEach((key, i) => {
+    const col = i % 2, row = Math.floor(i / 2), x = 20 + col * 246, y = 178 + row * 26, lv = level(key), hot = last && last.promoted && last.role === key;
+    g.font = `9px ${px}`; g.fillStyle = hot ? '#F4C542' : lv > 1 ? '#FFFFFF' : '#6A6F8A'; g.fillText(NAME[key], x, y);
+    for (let b = 0; b < Math.min(6, lv); b++) { g.fillStyle = hot && b === lv - 1 ? '#2FD968' : '#F4C542'; g.fillRect(x + 128 + b * 12, y - 9, 9, 10); }
+    g.font = `20px ${big}`; g.fillStyle = '#6A6F8A'; g.fillText(`L${lv}`, x + 206, y + 1);
+  });
+}
+async function docPip() {
   if (!canPip()) return false;
   let w; try { w = await window.documentPictureInPicture.requestWindow({ width: 288, height: 230 }); } catch (e) { return false; }
   for (const n of document.querySelectorAll('link[data-pit],style[data-pit]')) w.document.head.append(n.cloneNode(true));
@@ -445,7 +558,7 @@ P.popOut = async function () {
     st.pip = null; st.host.append(st.root); st.root.classList.remove('inpip'); restore(); swapLoop(window); paintActions(); paint(true);
   });
   return true;
-};
+}
 // the animation loop runs on whichever window holds the card: a background tab stops its own
 // frames, but the popped-out window keeps drawing
 function swapLoop(win) {
@@ -465,6 +578,7 @@ function ensureStyles() {
 
 // mount({host, source}) — source: 'auto' (default) | 'replay' | an origin such as http://127.0.0.1:7777
 P.mount = function (opts = {}) {
+  if (document.fonts && document.fonts.load) { document.fonts.load('12px "Press Start 2P"').catch(() => {}); document.fonts.load('20px "VT323"').catch(() => {}); }
   if (st.root) { if (opts.dock === false) { st.dock = false; st.root.classList.add('pit-away'); } return P; }
   st.dock = opts.dock !== false;
   ensureStyles();
