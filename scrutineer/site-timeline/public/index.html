@@ -6394,7 +6394,14 @@ TS.create = function (o) {
     let shot = force;
     if (!shot) {
       let total = 0; const w = {};
-      for (const k of SHOT_KEYS) { w[k] = k === prev ? 0 : SHOTS[k].w; total += w[k]; }
+      // While the old harness is close enough to frame alongside, reach for the two shots that
+      // can hold both cars. The comparison is the point of the ghost, and it is no use if the
+      // director is on a T-cam while it happens.
+      const duel = sc.ghostActive && sc.pairS > 4;
+      for (const k of SHOT_KEYS) {
+        w[k] = k === prev ? 0 : SHOTS[k].w * (duel && (k === 'CHASE' || k === 'HELI') ? 2.6 : 1);
+        total += w[k];
+      }
       let r = rng() * total;
       shot = SHOT_KEYS[SHOT_KEYS.length - 1];
       for (const k of SHOT_KEYS) { r -= w[k]; if (r <= 0) { shot = k; break; } }
