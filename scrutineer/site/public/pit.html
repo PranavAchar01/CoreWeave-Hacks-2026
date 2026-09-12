@@ -854,7 +854,12 @@ S.physics = function (c, dd, sp, circ, dt, opts = {}) {
     c.yaw += Math.max(-0.35, Math.min(0.35, dOff / Math.max(6, c.speed)));
   }
   c.offPrev = c.off || 0;
-  c.steer = Math.max(-0.35, Math.min(0.35, curv * 22));
+  // Steering was geared so high it pinned against its own limit for a quarter of some laps, so
+  // the wheels sat at full lock through anything quick. Geometry says steer ~ wheelbase/radius;
+  // this is still exaggerated for readability, but it no longer saturates on an ordinary corner.
+  // Low-passed as well, so the wheels turn into a corner rather than snapping to it.
+  const steerTarget = Math.max(-0.4, Math.min(0.4, curv * 12));
+  c.steer += (steerTarget - c.steer) * Math.min(1, dt * 9);
   c.roll += ((-curv * 9 * (c.speed / dd.topSpeed)) - c.roll) * Math.min(1, dt * 6);
   c.pitch += (((c.speed - prev) / Math.max(dt, 1e-3)) * -0.0012 - c.pitch) * Math.min(1, dt * 5);
   c.spin += c.speed / SCR.car.R_R * dt; c.fanSpin += c.speed * 0.6 * dt; c.sector = Math.min(2, secNow);
@@ -885,6 +890,9 @@ Wd.crowdFill = 0.8;
 // How much of the circuit either side of a point counts as "the corner you are standing on"
 // when working out how much room there is beside the track. Lower is stricter.
 Wd.ROOM_NEAR = 4;
+// How hard the centreline is relaxed before the road is laid on it. Higher rounds off tighter
+// corners; too high and every circuit becomes an oval.
+Wd.RELAX_PASSES = 6;
 // ---------------------------------------------------------------------------------------
 // Venues. A circuit is somewhere, and where it is decides the sky, the ground and the light.
 // Each one repaints the material ramps the world is drawn in, so the same geometry reads as a
@@ -945,11 +953,48 @@ const SHAPES = [
   { name: 'TECHNICAL', pts: [13, 17], base: [118, 150], spread: [90, 150], wander: [0.38, 0.70] },
 ];
 
+// A Catmull-Rom through randomly placed control points can double back on itself: the curve
+// makes a little loop and the centreline has a cusp, where the heading reverses between one
+// four-metre step and the next. That is what the wonky corners were — not a rendering fault but
+// a road that genuinely folds. Rather than try to repair a folded spline, generate, measure, and
+// take the first layout that is actually drivable. Deterministic: the retry seeds come from the
+// seed you asked for.
 Wd.makeCircuit = function (seed) {
+  // A heading step is what the car's yaw has to swallow in one four-metre bite: at racing speed
+  // 0.42 rad spikes the yaw rate past 200 deg/s, which is a snap, not a corner. 0.24 keeps it
+  // near what a car can actually do.
+  const MAX_STEP_RAD = 0.24;
+  const MIN_RADIUS = 18;              // metres; tighter than this and the road is wider than the corner
+  let best = null, bestScore = -Infinity;
+  for (let attempt = 0; attempt < 14; attempt++) {
+    // Each retry is a different road AND a gentler one: if this seed keeps folding, stop
+    // fighting it and smooth harder until it is drivable.
+    const c = buildCircuit((seed + attempt * 1013) | 0, seed, Wd.RELAX_PASSES + attempt * 3);
+    let worstStep = 0, maxCurv = 0;
+    for (let i = 0; i < c.n; i++) {
+      const a2 = c.pts[i], b2 = c.pts[(i + 1) % c.n];
+      let dh = Math.atan2(b2.tx, b2.tz) - Math.atan2(a2.tx, a2.tz);
+      while (dh > Math.PI) dh -= 2 * Math.PI; while (dh < -Math.PI) dh += 2 * Math.PI;
+      if (Math.abs(dh) > worstStep) worstStep = Math.abs(dh);
+      if (Math.abs(a2.curv) > maxCurv) maxCurv = Math.abs(a2.curv);
+    }
+    const radius = 1 / Math.max(maxCurv, 1e-9);
+    if (worstStep <= MAX_STEP_RAD && radius >= MIN_RADIUS) return c;
+    // nothing clean yet: remember the least bad one in case ten tries all fold
+    const score = -worstStep * 10 - Math.max(0, MIN_RADIUS - radius) * 0.1;
+    if (score > bestScore) { bestScore = score; best = c; }
+  }
+  return best;
+};
+
+function buildCircuit(seed, labelSeed, relaxPasses) {
   const rng = E.mulberry32(seed);
   // Where this circuit is, and what shape of circuit it is. Both are drawn from the seed through
   // their own hash, so consecutive seeds do not march through the list in step.
-  const vpick = E.mulberry32((seed ^ 0x9E3779B9) | 0), spick = E.mulberry32((seed ^ 0x85EBCA6B) | 0);
+  // Venue and shape key off the seed that was ASKED for, so retrying a folded layout changes the
+  // road without changing where the race is or what kind of circuit it claims to be.
+  const key = labelSeed === undefined ? seed : labelSeed;
+  const vpick = E.mulberry32((key ^ 0x9E3779B9) | 0), spick = E.mulberry32((key ^ 0x85EBCA6B) | 0);
   const venue = VENUES[Math.floor(vpick() * VENUES.length) % VENUES.length];
   const shape = SHAPES[Math.floor(spick() * SHAPES.length) % SHAPES.length];
   const span = (r, k) => r[0] + (r[1] - r[0]) * k;
@@ -970,17 +1015,91 @@ Wd.makeCircuit = function (seed) {
   const pts = [], cr = (p0, p1, p2, p3, t) => { const t2 = t * t, t3 = t2 * t; return 0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3); };
   for (let i = 0; i < N; i++) { const p0 = ctrl[(i - 1 + N) % N], p1 = ctrl[i], p2 = ctrl[(i + 1) % N], p3 = ctrl[(i + 2) % N]; const steps = Math.max(8, Math.round(Math.hypot(p2[0] - p1[0], p2[1] - p1[1]) / 3.5));
     for (let k = 0; k < steps; k++) { const t = k / steps; pts.push([cr(p0[0], p1[0], p2[0], p3[0], t), cr(p0[1], p1[1], p2[1], p3[1], t)]); } }
-  const STEP = 4, S = []; let acc = 0, prev = pts[0]; const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
-  S.push({ x: prev[0], z: prev[1] });
-  for (let i = 1; i <= pts.length; i++) { const p = pts[i % pts.length]; let d = dist(prev, p);
-    while (acc + d >= STEP) { const t = (STEP - acc) / d, q = [prev[0] + (p[0] - prev[0]) * t, prev[1] + (p[1] - prev[1]) * t]; S.push({ x: q[0], z: q[1] }); d -= (STEP - acc); acc = 0; prev = q; }
-    acc += d; prev = p; }
-  if (dist([S[S.length - 1].x, S[S.length - 1].z], [S[0].x, S[0].z]) < STEP * 0.5) S.pop();
+  const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+  // -------------------------------------------------------------------------------------
+  // Resample the closed spline at a UNIFORM arc length that divides the lap exactly.
+  //
+  // The old walk stepped a fixed 4 m and then dropped the last point if it landed near the
+  // start, which left one segment per circuit anywhere between 2 and 6 m — always at the
+  // start/finish line, which is where the car begins and crosses every lap. A short segment
+  // next to a normal one throws the tangent and the curvature estimate right off, and that
+  // is where the heading was jumping by up to 170 degrees in a single step.
+  //
+  // Choosing n = round(total / 4) and stepping total / n instead means the last point is
+  // exactly one step from the first, by construction.
+  // -------------------------------------------------------------------------------------
+  const resample = (poly, target) => {
+    let total = 0;
+    for (let i = 0; i < poly.length; i++) total += dist(poly[i], poly[(i + 1) % poly.length]);
+    const cnt = Math.max(48, Math.round(total / target)), step = total / cnt;
+    const out = [poly[0].slice()];
+    let acc = 0, prev = poly[0].slice(), idx = 0, guard = 0;
+    while (out.length < cnt && guard++ < poly.length * 40) {
+      const nxt = poly[(idx + 1) % poly.length], d = dist(prev, nxt);
+      if (acc + d >= step) {
+        const t = (step - acc) / (d || 1);
+        prev = [prev[0] + (nxt[0] - prev[0]) * t, prev[1] + (nxt[1] - prev[1]) * t];
+        out.push(prev.slice()); acc = 0;
+      } else { acc += d; prev = nxt.slice(); idx++; }
+    }
+    return { pts: out, step };
+  };
+  // Round off the corners the control points happened to make too tight to drive. A few gentle
+  // Laplacian passes; the loop is resampled afterwards so the spacing stays exact.
+  const relax = (poly, passes, k) => {
+    let cur = poly.map(q => q.slice());
+    for (let it = 0; it < passes; it++) {
+      cur = cur.map((q, i) => {
+        const a = cur[(i - 1 + cur.length) % cur.length], b = cur[(i + 1) % cur.length];
+        return [q[0] + k * ((a[0] + b[0]) / 2 - q[0]), q[1] + k * ((a[1] + b[1]) / 2 - q[1])];
+      });
+    }
+    return cur;
+  };
+  const RELAX_PASSES = relaxPasses === undefined ? Wd.RELAX_PASSES : relaxPasses;
+  // Relaxing the whole loop softens everything a little; it does not fix one corner that is
+  // genuinely too tight, which is why a fraction of layouts kept failing however many times they
+  // were re-rolled. This goes after the kinks themselves: any point where the road turns more
+  // than it should in one step is pulled toward the line between its neighbours, by as much as
+  // it is over, until nothing is over. It converges because every move strictly reduces the
+  // angle it was called for.
+  const easeKinks = (poly, maxTurn, iters) => {
+    const cur = poly.map(q => q.slice()), m = cur.length;
+    for (let it = 0; it < iters; it++) {
+      let worst = 0;
+      for (let i = 0; i < m; i++) {
+        const a2 = cur[(i - 1 + m) % m], q = cur[i], b2 = cur[(i + 1) % m];
+        const h1 = Math.atan2(q[0] - a2[0], q[1] - a2[1]), h2 = Math.atan2(b2[0] - q[0], b2[1] - q[1]);
+        let d = h2 - h1; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
+        const ad = Math.abs(d);
+        if (ad > worst) worst = ad;
+        if (ad > maxTurn) {
+          const k = Math.min(0.85, (ad - maxTurn) / ad);
+          cur[i] = [q[0] + k * ((a2[0] + b2[0]) / 2 - q[0]), q[1] + k * ((a2[1] + b2[1]) / 2 - q[1])];
+        }
+      }
+      if (worst <= maxTurn) break;
+    }
+    return cur;
+  };
+  // The cap has to hold on the grid the car actually drives, and resampling redistributes the
+  // points — so ease and re-grid together until it sticks, rather than easing once on a polyline
+  // that is about to be resampled out from under the result.
+  let poly = relax(resample(pts, 4).pts, RELAX_PASSES, 0.5);
+  for (let pass = 0; pass < 3; pass++) poly = easeKinks(resample(poly, 4).pts, 0.16, 70);
+  const lane = resample(poly, 4);
+  const STEP = lane.step;
+  const S = lane.pts.map(q => ({ x: q[0], z: q[1] }));
   const n = S.length;
   for (let i = 0; i < n; i++) { const a = S[(i - 1 + n) % n], b = S[(i + 1) % n], p = S[i]; let tx = b.x - a.x, tz = b.z - a.z; const l = Math.hypot(tx, tz) || 1; tx /= l; tz /= l;
     p.tx = tx; p.tz = tz; p.nx = -tz; p.nz = tx; const ta = S[(i - 2 + n) % n], tb = S[(i + 2) % n];
     const h1 = Math.atan2(p.x - ta.x, p.z - ta.z), h2 = Math.atan2(tb.x - p.x, tb.z - p.z); let dh = h2 - h1; while (dh > Math.PI) dh -= 2 * Math.PI; while (dh < -Math.PI) dh += 2 * Math.PI; p.curv = dh / (4 * STEP); }
-  const KER = [1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1], KR = 5, KSUM = KER.reduce((a, b) => a + b, 0);
+  // This is the number the physics brakes for, so it has to be the corner the car is actually
+  // going to drive. Smoothed over plus or minus twenty metres it was reporting a gentle bend
+  // where the road had a kink, the car carried far too much speed into it, and the yaw snapped
+  // round at over two hundred degrees a second. Now the geometry is smooth in its own right,
+  // this only needs enough filtering to take the sampling noise off.
+  const KER = [1, 3, 4, 3, 1], KR = 2, KSUM = KER.reduce((a, b) => a + b, 0);
   const sm = S.map((p, i) => { let s = 0; for (let k = -KR; k <= KR; k++) s += S[(i + k + n) % n].curv * KER[k + KR]; return s / KSUM; });
   S.forEach((p, i) => p.curv = sm[i]);
   let best = 0, bestLen = 0;
@@ -1032,7 +1151,8 @@ Wd.makeCircuit = function (seed) {
   c.room = (i, side) => { const k = ((i % n) + n) % n; return side > 0 ? rp[k] : rn[k]; };
   c.venue = venue;
   c.shape = shape.name;
-  c.name = Wd.circuitName(seed);
+  // named for the seed that was asked for, so a retry does not rename the circuit
+  c.name = Wd.circuitName(labelSeed === undefined ? seed : labelSeed);
   return c;
 };
 const NAMES = ['SILVERSTONE-LIKE', 'MONZA-LIKE', 'SUZUKA-LIKE', 'SPA-LIKE', 'INTERLAGOS-LIKE', 'MONACO-LIKE', 'IMOLA-LIKE', 'ZANDVOORT-LIKE', 'ESTORIL-LIKE', 'HOCKENHEIM-LIKE', 'KYALAMI-LIKE', 'JEREZ-LIKE', 'FUJI-LIKE', 'ADELAIDE-LIKE', 'MAGNY-COURS-LIKE', 'MONTREAL-LIKE', 'SEPANG-LIKE', 'ISTANBUL-LIKE', 'BAHRAIN-LIKE', 'SOCHI-LIKE', 'AUSTIN-LIKE', 'LAS VEGAS-LIKE'];

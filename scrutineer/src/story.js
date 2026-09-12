@@ -100,6 +100,9 @@ function levelsAt(n) {
 // does it. Same panels, driven by events instead of a timer.
 // ---------------------------------------------------------------------------------------
 const D = (kind, d) => { if (SCR.dash) SCR.dash.on(kind, d || {}); };
+// The loop's own events, out loud. Watching the strip fill is the point of the page; this lets
+// you follow it without watching it.
+const CUE = n => { if (SCR.audio && SCR.audio.cue) SCR.audio.cue(n); };
 
 const live = { on: false, es: null, run: 0, laps: [], clean: 0, total: 0, gates: [], pages: [],
                busy: false, rounds: [], claimed: null, official: null };
@@ -634,6 +637,9 @@ const trackSeed = () => (A.seed + Math.max(0, st.i) * 7 + salt()) | 0;
 const track = { name: 'run' };
 track.enter = function () {
   pitAbort();
+  // A new scene means new cars. The ghost's label was drawn for the old pair earlier in the
+  // same frame, so drop it rather than let it hang over the new one until the next repaint.
+  const gt = $('ghostTag'); if (gt) gt.hidden = true;
   const seed = trackSeed();
   const circ = SCR.world.makeCircuit(seed);
   // Where this one is: the sky and the ground the world is painted in.
@@ -668,6 +674,18 @@ track.update = function (dt) {
   const cap = pitStep(dt);
   SCR.sim.physics(track.car, track.dd, track.spec, circ, dt,
     { fx: track.scene.fx, speedCap: cap });
+  // A pit stop takes the car out of the race for the best part of ten seconds. The ghost was
+  // still lapping through all of it, so it came out hundreds of metres AHEAD — and a label
+  // reading "the harness before" then sat on a car in front, which is the opposite of what it
+  // means. The ghost waits out the stop and is put back on the line with the car afterwards.
+  if (pit.state !== 'off') {
+    if (track.scene.ghostActive) { track.scene.ghostActive = false; pit.ghostHeld = true; }
+  } else if (pit.ghostHeld) {
+    pit.ghostHeld = false;
+    track.ghost.s = track.car.s; track.ghost.lapsDone = track.car.lapsDone;
+    track.ghost.speed = track.car.speed;
+    track.scene.ghostActive = ghostWorthShowing();
+  }
   if (track.scene.ghostActive) {
     SCR.sim.physics(track.ghost, track.ghostDd, track.ghostSpec, circ, dt, {});
     // The ghost is a lap reference, not a cumulative one. Both cars start every lap together at
@@ -680,6 +698,8 @@ track.update = function (dt) {
       if (track.scene.duel) track.scene.duel();
     }
   }
+  if (track.car.lapsDone !== lapWas) CUE('lap');
+  if (track.car.drsOn !== track.drsWas) { if (track.car.drsOn) CUE('drs'); track.drsWas = track.car.drsOn; }
   SCR.sim.stepSparks(track.scene.fx, dt);
   track.scene.updateCamera(dt);
 };
@@ -799,6 +819,7 @@ function pitStep(dt) {
       pit.fitted = done; pit.pending = null;
       paintRail(done.role);
       showSting(done.role, st.levels[done.role] || 1, done.summary);
+      CUE('kept');
     }
     if (pit.t >= BOX_HOLD) { pit.state = 'exit'; pit.t = 0; car.lift = 0; }
     return 0;
@@ -1244,14 +1265,30 @@ function detailCaption() {
 }
 
 // The ghost is the same agent one season earlier, not a rival. Say so, on the car.
+// What the tag decided and why, so a question about it can be answered rather than guessed at.
+const ghostDbg = { gap: null, why: 'init' };
 function ghostTag() {
   const n = $('ghostTag'); if (!n) return;
   const sc = track.scene;
   const on = sc && sc.ghostActive && track.ghost && st.view === 'track' && !st.garage;
-  if (!on) { if (!n.hidden) n.hidden = true; return; }
+  if (!on) { ghostDbg.why = 'no ghost'; ghostDbg.gap = null; if (!n.hidden) n.hidden = true; return; }
+  // The tag has to be unmistakably on the ghost. Two ways it was not: the ghost has to actually
+  // be behind (a ghost that has got ahead is not "the harness before" any more), and the two
+  // cars have to be far enough apart on screen that the label cannot read as belonging to the
+  // one in front.
+  const circ = sc.circ, L = circ.len;
+  let gap = track.car.s - track.ghost.s;
+  if (gap > L / 2) gap -= L; if (gap < -L / 2) gap += L;
+  ghostDbg.gap = gap;
+  if (gap < 6) { ghostDbg.why = 'not behind'; if (!n.hidden) n.hidden = true; return; }
   // a little above the roll hoop, and only while it is close enough to read
   const p = project(track.ghost.x, 1.5, track.ghost.z);
-  if (!p || p.z > 140) { if (!n.hidden) n.hidden = true; return; }
+  if (!p || p.z > 140) { ghostDbg.why = p ? 'too far' : 'off camera'; if (!n.hidden) n.hidden = true; return; }
+  const pc = project(track.car.x, 1.5, track.car.z);
+  // proportional to the picture, so the rule is the same on a phone and on a wall
+  const apart = Math.max(44, (proj.box ? proj.box.w : 900) * 0.055);
+  if (pc && Math.hypot(p.x - pc.x, p.y - pc.y) < apart) { ghostDbg.why = 'too close to the car'; if (!n.hidden) n.hidden = true; return; }
+  ghostDbg.why = 'shown';
   n.hidden = false;
   // Keep it in the picture: the tag is centred on the car and would otherwise hang off the
   // edge when the ghost is near the side of frame.
@@ -1659,6 +1696,7 @@ function phase(name) {
       const reason = why ? (GATE_FAILS[why.gate] || why.gate) : null;
       const extra = (why && why.gate === 'scrutineering' && verdict === 'REFER_TO_STEWARDS')
         ? ' — it could not verify the change either way, so it refused rather than guess' : '';
+      CUE('refused');
       say(`Rejected. ${reason ? `<span class="bad">${esc(reason)}</span>${esc(extra)}. ` : ''}`
         + 'The agent throws it away and keeps what it had. '
         + '<b>A loop that cannot refuse itself is not a loop.</b>');
@@ -1910,7 +1948,26 @@ function showOutcome(r) {
 // ---------------------------------------------------------------------------------------
 // per-frame: reveal tasks and gates in time with the run
 // ---------------------------------------------------------------------------------------
+// What the car is doing, in the terms the synth needs. Read straight off the same state the
+// renderer draws from, so the sound cannot describe a different car than the one on screen.
+function feedAudio(dt) {
+  if (!SCR.audio || !SCR.audio.isOn()) return;
+  const on = A.sceneName === 'run' && track.car && track.dd && st.view === 'track' && !st.garage;
+  SCR.audio.update(on ? {
+    active: true,
+    speed: track.car.speed,
+    topSpeed: track.dd.topSpeed,
+    gears: track.dd.gears,
+    braking: track.car.braking,
+    drs: track.car.drsOn,
+    steer: track.car.steer,
+    pit: pit.state === 'off' ? null : pit.state,
+    lift: track.car.lift,
+  } : { active: false }, dt);
+}
+
 S.frame = function (dt) {
+  feedAudio(dt);
   paintHud();
   paintTags(st.phase === 'DIAGNOSE' || st.phase === 'CHANGE' || st.phase === 'GATES'
     || st.phase === 'RESULT' ? (st.rounds[st.i] || {}).role : null);
@@ -1927,6 +1984,7 @@ S.frame = function (dt) {
       const t = tasks[st.shown++];
       const ok = t.solved > 0;
       if (ok) st.solvedNow++;
+      CUE(ok ? 'pageOk' : 'pageBad');
       const grid = $('taskGrid');
       if (grid) {
         const n = el('div', 'task ' + (ok ? 'ok' : 'no'));
@@ -1957,6 +2015,7 @@ S.frame = function (dt) {
         node.classList.add('on', g.ok ? 'pass' : 'fail');
         node.querySelector('i').textContent = g.ok ? '✓' : '✗';
       }
+      CUE(g.ok ? 'gateOk' : 'gateBad');
       st.shown++;
       if (!g.ok) { st.t = st.dur; break; }
     }
@@ -2003,6 +2062,24 @@ function showView(which) {
 function wire() {
   const hold = $('holdBtn');
   if (hold) hold.addEventListener('click', () => setHold(!auto.paused));
+  const snd = $('sndBtn');
+  if (snd) {
+    if (!SCR.audio || !SCR.audio.available()) snd.hidden = true;
+    else {
+      const paint = on => { snd.setAttribute('aria-pressed', on ? 'true' : 'false');
+        snd.lastChild.nodeValue = on ? 'MUTE \u00B7 M' : 'SOUND OFF';
+        snd.title = on ? 'mute (M)' : 'sound on (M)'; };
+      paint(false);
+      snd.addEventListener('click', () => {
+        const on = SCR.audio.toggle();
+        paint(on);
+        try { localStorage.setItem('scrutineer.sound', on ? '1' : '0'); } catch (e) { /* private window */ }
+      });
+      // A stored yes is remembered, but it still cannot start the audio on its own — the
+      // browser wants a gesture on this page, so the first click is what actually begins it.
+      try { if (localStorage.getItem('scrutineer.sound') === '1') snd.classList.add('wants'); } catch (e) { /* ignore */ }
+    }
+  }
   const tabs = [['tabTrack', 'track'], ['tabDash', 'dash']];
   for (const [id, which] of tabs) {
     const t = $(id); if (t) t.addEventListener('click', () => showView(which));
@@ -2021,6 +2098,7 @@ function wire() {
     if (ev.key === '1') showView('track');
     if (ev.key === '2') showView('dash');
     if (ev.key === 'g' || ev.key === 'G') { if (st.garage) closeGarage(); else openGarage(); }
+    if (ev.key === 'm' || ev.key === 'M') { const b = $('sndBtn'); if (b) b.click(); }
     if (ev.key === 'Escape' && st.garage) closeGarage();
   });
 }
@@ -2039,7 +2117,9 @@ S.seekTo = function (runIndex, phaseName) {
   if (st.phase === 'GATES') { S.frame(st.dur * 0.92); }
 };
 
-S.diag = () => ({ story: { phase: st.phase, run: st.i + 1, of: st.rounds.length,
+S.diag = () => ({ audio: SCR.audio ? SCR.audio.diag() : null,
+  story: { phase: st.phase, run: st.i + 1, of: st.rounds.length,
   playing: st.playing, levels: st.levels, shown: st.shown, scene: A && A.sceneName,
+  ghostTag: { ...ghostDbg },
   garage: st.garage, pending: !!st.pending } });
 })(window.SCR = window.SCR || {});

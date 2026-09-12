@@ -5,7 +5,7 @@ const root = __dirname, src = path.join(root, 'src');
 // The mark: a two-by-two chequer, gold on night, centred with a two-pixel margin. One
 // definition — it used to be pasted into two of the three documents and missing from the third.
 const FAVICON = `<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Crect width='16' height='16' fill='%2306081A'/%3E%3Cpath d='M2 2h6v6H2zM8 8h6v6H8z' fill='%23F4C542'/%3E%3C/svg%3E">`;
-const ORDER = ['engine.js', 'car.js', 'world.js', 'sim.js', 'trackscene.js', 'team.js', 'garage.js', 'scenes.js', 'season.js', 'ui.js', 'trial.js', 'dash.js', 'story.js', 'main.js'];
+const ORDER = ['engine.js', 'car.js', 'world.js', 'sim.js', 'trackscene.js', 'team.js', 'garage.js', 'scenes.js', 'season.js', 'ui.js', 'trial.js', 'dash.js', 'audio.js', 'story.js', 'main.js'];
 const present = ORDER.filter(f => fs.existsSync(path.join(src, f)));
 const missing = ORDER.filter(f => !present.includes(f));
 if (missing.length) console.log('build: skipping missing modules:', missing.join(', '));
@@ -66,7 +66,7 @@ ${loopJs}${js}
 </script>
 </body>
 </html>`;
-  fs.writeFileSync(path.join(siteDir, 'index.html'), doc);
+  fs.writeFileSync(path.join(siteDir, 'watch.html'), doc);
   // The interfaces the agent built, copied in as real documents so each one has a URL a
   // reviewer can open and audit independently. They have to be the pages the inlined bundle
   // describes, so the seeded season's pages and a live season's pages live in separate
@@ -96,8 +96,56 @@ ${loopJs}${js}
     console.log(`build: copied ${n} ${seeded ? 'seeded' : 'built'} interface(s) `
                 + 'into site/public/pages');
   }
-  console.log(`build: site/public/index.html ${(doc.length / 1024).toFixed(0)} KB`);
+  console.log(`build: site/public/watch.html ${(doc.length / 1024).toFixed(0)} KB`);
 }
+// ---------------------------------------------------------------------------------------
+// The front door. Same palette, same two typefaces, same car — it has to read as the same
+// object as the broadcast rather than as marketing wrapped around it. It carries only what
+// the hero needs of the recorded season: which runs promoted, and which component.
+// ---------------------------------------------------------------------------------------
+if (fs.existsSync(path.dirname(siteDir))) {
+  const LD_ORDER = ['engine.js', 'car.js', 'landing.js'];
+  const ldSrc = LD_ORDER.map(f => fs.readFileSync(path.join(src, f), 'utf8')).join('\n');
+  const ldCss = fs.readFileSync(path.join(src, 'landing.css'), 'utf8');
+  const ldHtml = fs.readFileSync(path.join(src, 'landing.html'), 'utf8');
+  let slim = { rounds: [] };
+  if (fs.existsSync(bundlePath)) {
+    const b = JSON.parse(fs.readFileSync(bundlePath, 'utf8'));
+    slim.rounds = (b.rounds || []).map(r => ({ promoted: !!r.promoted, role: r.role || null }));
+  }
+  const ldDoc = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scrutineer — an agent that rebuilds its own harness</title>
+<meta name="description" content="An agent builds web interfaces, measures which part of itself caused its failures, rewrites that part, and keeps the change only if it survives ten checks and a held-out split.">
+<meta property="og:title" content="Scrutineer">
+<meta property="og:description" content="The car is the agent. Ten components decide how it works, and it rewrites them itself.">
+<meta name="theme-color" content="#06081A">
+${FAVICON}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<style>
+${ldCss}
+</style>
+</head>
+<body>
+${ldHtml}
+<script>
+window.SCRUTINEER_LOOP = ${JSON.stringify(slim)};
+${ldSrc}
+window.addEventListener('DOMContentLoaded', () => SCR.landing.boot());
+</script>
+</body>
+</html>`;
+  fs.writeFileSync(path.join(siteDir, 'index.html'), ldDoc);
+  const t4 = path.join(root, '.build-check-ld.js'); fs.writeFileSync(t4, ldSrc);
+  const r4 = cp.spawnSync(process.execPath, ['--check', t4], { encoding: 'utf8' });
+  fs.unlinkSync(t4);
+  if (r4.status !== 0) { console.error(r4.stderr); process.exit(1); }
+  console.log(`build: site/public/index.html (landing) ${(ldDoc.length / 1024).toFixed(0)} KB`);
+}
+
 // ---------------------------------------------------------------------------------------
 // A second, separate site: the car across the whole season on one scrubber. Stubbed on purpose —
 // it reads the recorded season, so it is the same ten runs every time and nothing waits on a
