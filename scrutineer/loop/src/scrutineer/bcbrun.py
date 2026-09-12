@@ -1,22 +1,24 @@
 """Measure a harness on BigCodeBench-Hard's final held-out set.
 
-One command, one harness, one number, always on the same 76 problems the loop never sees. The
-comparison is made by running it twice: once with the harness the loop starts from, once with the
-champion a season produced.
+One command, one harness, one number, always on the same 76 problems the loop never sees. Three
+harnesses can be measured: the one the loop starts from, the champion a season produced, and the
+starting harness spending more on samples instead — the arm a harness claim has to beat before it
+is a harness claim at all (arXiv:2607.12227). Every comparison carries its own resolution, and the
+headline is written by `resolution.verdict`, nowhere else.
 """
 
 from __future__ import annotations
 
 import json
-from math import comb
 from pathlib import Path
 from typing import Any
 
 from .bcb import build_pool, three_way
 from .evaluator import run_race
 from .regs import Regs
+from .resolution import mcnemar_exact, paired, verdict
 from .theta import Theta
-from .trial import starting_harness
+from .trial import scaling_harness, starting_harness
 
 
 def champion_harness(base: Theta) -> Theta:
@@ -40,7 +42,8 @@ def champion_harness(base: Theta) -> Theta:
 
 def measure(name: str, *, n: int = 0, seed: int = 1994, cap_usd: float = 60.0) -> dict[str, Any]:
     regs, base = Regs.load(), Theta.load(None)
-    theta = starting_harness(base) if name == "starting" else champion_harness(base)
+    builders = {"starting": starting_harness, "champion": champion_harness, "scaling": scaling_harness}
+    theta = builders[name](base)
     _, _, held = three_way(build_pool(), seed)
     if n:
         held = held[:n]
@@ -53,11 +56,7 @@ def measure(name: str, *, n: int = 0, seed: int = 1994, cap_usd: float = 60.0) -
 
 
 def mcnemar(b: int, c: int) -> float:
-    n = b + c
-    if n == 0:
-        return 1.0
-    k = min(b, c)
-    return min(1.0, 2 * sum(comb(n, i) for i in range(k + 1)) / (2 ** n))
+    return mcnemar_exact(b, c)
 
 
 def compare(a: dict[str, Any], b: dict[str, Any]) -> dict[str, Any]:
@@ -71,7 +70,29 @@ def compare(a: dict[str, Any], b: dict[str, Any]) -> dict[str, Any]:
                      "solved": b["solved"], "cost_usd": b["cost_usd"]},
             "delta_pp": round(100 * (b["pass_at_1"] - a["pass_at_1"]), 2),
             "fixed": fixed, "broken": broken,
-            "p_two_sided": round(mcnemar(len(fixed), len(broken)), 5)}
+            "p_two_sided": round(mcnemar(len(fixed), len(broken)), 5),
+            # what this comparison was able to detect, beside what it detected
+            "resolution": paired(pa, pb)}
+
+
+def arms(state: Path) -> dict[str, dict[str, Any]]:
+    """Whichever of the three harnesses have been measured, keyed by name."""
+    out = {}
+    for name in ("starting", "champion", "scaling"):
+        f = state / f"bcb_{name}.json"
+        if f.exists():
+            out[name] = json.loads(f.read_text())
+    return out
+
+
+def write_verdict(state: Path) -> dict[str, Any] | None:
+    """The headline needs a baseline and a champion; the resampling arm sharpens it when present."""
+    got = arms(state)
+    if "starting" not in got or "champion" not in got:
+        return None
+    v = verdict(got["starting"], got["champion"], got.get("scaling"))
+    write(state / "bcb_verdict.json", v)
+    return v
 
 
 def write(path: Path, obj: dict[str, Any]) -> Path:

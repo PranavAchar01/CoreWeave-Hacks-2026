@@ -142,10 +142,10 @@ class Season:
         # every generation's gate rows, so a gate that can never pass is visible as
         # a pattern rather than absorbed one generation at a time
         self.gate_history: list[list[dict[str, Any]]] = []
-        # The Ladder's state. `sealed_best` is the highest sealed delta this season has been
-        # allowed to *learn*, and it only moves when a candidate clears it by more than the
-        # split's own noise. `sealed_queries` counts every question put to the sealed split,
-        # because adaptive reuse is what costs the split its validity.
+        # The Ladder's rung: the highest sealed delta this season has been allowed to *learn*. It
+        # only moves when a candidate clears it by more than the split's own noise. The count of
+        # questions put to the split lives on `self.sealed`, which is the only thing that sees
+        # every one of them.
         self.sealed_best = 0.0
         self.router_calls: list[tuple[str, str]] = []  # (blamed, upgraded-and-improved?)
         self.pending_manifest: dict[str, Any] | None = None
@@ -835,14 +835,12 @@ class Season:
         self.p_fix[role] = self.p_fix_hits[role] / self.p_fix_counts[role]
 
     def _tts_ghost(self, rg: Regs, n: int) -> dict[str, Any]:
-        """The matched-budget test-time-scaling ghost: one more sample everywhere, no upgrade."""
-        import yaml
+        """The test-time-scaling ghost: one more sample everywhere, no upgrade. Its spend is
+        reported rather than assumed equal — more draws cost more, and a comparison that calls
+        itself matched without checking is the thing this arm exists to prevent."""
+        from .trial import with_extra_samples
 
-        ty = yaml.safe_load(self.theta.files["skills/tyres/tyres.yaml"]) or {}
-        modes = {k: {**v, "samples": int(v["samples"]) + 1} for k, v in ty.get("modes", {}).items()}
-        files = dict(self.theta.files)
-        files["skills/tyres/tyres.yaml"] = yaml.safe_dump({**ty, "modes": modes}, sort_keys=False)
-        ghost = Theta.from_files(self.theta.root, files)
+        ghost = with_extra_samples(self.theta, 1)
         res = run_race(
             theta=ghost,
             items=self.circuit_items,
@@ -857,7 +855,8 @@ class Season:
         return {
             "race_s": round(res.race_s, 3),
             "pass_rate": round(res.pass_rate, 3),
-            "note": "extra-lap ghost: k+1 samples at the same budget, no upgrade",
+            "cost_usd": round(res.cost_usd, 4),
+            "note": "extra-sample ghost: k+1 draws per mode, no upgrade; spend reported, not assumed equal",
         }
 
     def _circuit_generation(self, rg: Regs, quali: RaceResult, n: int) -> dict[str, Any]:
@@ -1025,6 +1024,13 @@ class Season:
                     "circuit_version": self.circuit_version,
                     "regs_sha256": self.regs.sha256,
                     "halted": self.halted,
+                    # how much of the sealed split's validity this season has spent, and on what
+                    "ladder": {
+                        "sealed_best_s": round(self.sealed_best, 3),
+                        "sealed_queries": self.sealed.queries,
+                        "sealed_query_budget": int(self.regs.g("gates", "sealed_query_budget")),
+                        "sealed_items": self.sealed.n_items,
+                    },
                     "backends": self.backends,
                     "meters": self.meters,
                     "circuit": {

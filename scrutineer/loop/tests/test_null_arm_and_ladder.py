@@ -130,13 +130,21 @@ def test_the_standing_best_has_to_be_beaten_not_matched():
 
 def test_the_split_stops_answering_once_its_query_budget_is_spent():
     budget = int(regs().g("gates", "sealed_query_budget"))
-    g = _ladder(50.0, used=budget)
+    assert _ladder(50.0, used=budget).ok, "the budget-th query is still inside the budget"
+    g = _ladder(50.0, used=budget + 1)
     assert not g.ok, "a huge delta must not buy its way past an exhausted split"
     assert "exhausted" in g.detail
     assert g.about == COMPARISON, (
         "an exhausted split means the experiment was not valid, not that the component failed — "
         "recording it as a failed fix would retire the component for the loop's own bookkeeping"
     )
+
+
+def test_a_five_generation_season_fits_inside_the_budget():
+    """Two sealed queries a generation — the incumbent's official time and the candidate's — so a
+    five-generation season asks ten questions. The budget has to admit a normal season, or the
+    Ladder is just a slower way to refuse everything."""
+    assert int(regs().g("gates", "sealed_query_budget")) >= 2 * 5
 
 
 def test_the_sealed_split_counts_every_question_put_to_it():

@@ -76,7 +76,9 @@ def ladder(regs: Regs, d_sealed: float, standing_best: float, n_sealed: int, que
     # seesaw is denominated in. This is a ruler, not a significance test: it says "smaller than
     # this is indistinguishable from redrawing the split", which is all the Ladder needs.
     tau = z * span * (0.25 / max(1, n_sealed)) ** 0.5
-    if queries_used >= budget:
+    # `queries_used` already includes the answer being judged — the evaluator counts on the way
+    # in — so the budget-th query is still inside the budget and the next one is not.
+    if queries_used > budget:
         return Gate(
             "ladder",
             False,

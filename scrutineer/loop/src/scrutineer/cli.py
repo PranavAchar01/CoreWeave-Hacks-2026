@@ -245,25 +245,31 @@ def cmd_bcb(args: argparse.Namespace) -> int:
     """One harness, BigCodeBench-Hard's final held-out set."""
     from pathlib import Path
 
-    from .bcbrun import compare, measure, write
+    from .bcbrun import compare, measure, write, write_verdict
 
     state = Path(args.state)
     res = measure(args.harness, n=args.n)
     print(f"{res['benchmark']} · {res['harness']:9s} pass@1 {res['pass_at_1'] * 100:5.1f}%  "
           f"{res['solved']}/{res['n']}  ${res['cost_usd']:.2f}")
     write(state / f"bcb_{args.harness}.json", res)
-    other = state / ("bcb_champion.json" if args.harness == "starting" else "bcb_starting.json")
-    if other.exists():
+    starting, champion = state / "bcb_starting.json", state / "bcb_champion.json"
+    if args.harness in ("starting", "champion") and starting.exists() and champion.exists():
         import json as _j
 
         # compare(baseline, loop) — the starting harness is always the baseline, whichever run
         # happened second. Getting this backwards prints the regression as a gain.
-        prev = _j.loads(other.read_text())
-        a, b = (prev, res) if args.harness == "champion" else (res, prev)
-        c = compare(a, b)
+        c = compare(_j.loads(starting.read_text()), _j.loads(champion.read_text()))
         print(f"  delta {c['delta_pp']:+.1f} points   fixed {len(c['fixed'])}   "
               f"broken {len(c['broken'])}   McNemar p = {c['p_two_sided']}")
+        print(f"  {c['resolution']['claim']}")
         write(state / "bcb_compare.json", c)
+    v = write_verdict(state)
+    if v:
+        print(f"  headline: {v['headline']}")
+        if v.get("loop_vs_scaling"):
+            print(f"  vs matched-budget resampling: {v['loop_vs_scaling']['claim']}")
+            print(f"  budget ratio loop/scaling {v['budget_ratio_loop_to_scaling']}  "
+                  f"matched={v['budget_matched']}")
     return 0
 
 
@@ -378,7 +384,8 @@ def main(argv: list[str] | None = None) -> int:
     pt.set_defaults(fn=cmd_partition)
 
     bc = sub.add_parser("bcb", help="measure a harness on BigCodeBench-Hard held-out")
-    bc.add_argument("--harness", choices=["starting", "champion"], default="starting")
+    bc.add_argument("--harness", choices=["starting", "champion", "scaling"], default="starting",
+                    help="scaling = the starting harness with one more sample per mode, nothing else")
     bc.add_argument("--state", default="state")
     bc.add_argument("-n", type=int, default=0)
     bc.set_defaults(fn=cmd_bcb)
