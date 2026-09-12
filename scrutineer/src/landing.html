@@ -1,0 +1,89 @@
+<div class="ld">
+  <header class="ld-top">
+    <span class="ld-mark">SCRUTINEER</span>
+    <span class="ld-tag">an agent that rebuilds its own harness</span>
+    <a class="ld-go" href="/watch.html">WATCH IT RUN &rarr;</a>
+  </header>
+
+  <!-- The one idea, shown rather than explained: this car is the agent, and every part of it
+       is a component of the harness. It rebuilds as the season runs. -->
+  <section class="ld-hero">
+    <div class="ld-stage">
+      <canvas id="ldCar" width="384" height="216" aria-label="the agent's harness, drawn as a car"></canvas>
+      <div class="ld-run"><b id="ldRun">RUN 1</b><i id="ldWhat">the harness it started with</i></div>
+    </div>
+    <div class="ld-hero-say">
+      <h1>THE CAR <em>IS</em> THE AGENT</h1>
+      <p>Ten components decide how it works.<br>It rewrites them itself, one per run.</p>
+      <div class="ld-rail" id="ldRail"></div>
+      <span class="ld-rail-cap">wings &middot; retrieval &nbsp; floor &middot; verification &nbsp; compound &middot; sampling</span>
+    </div>
+  </section>
+
+  <!-- three steps, three pictures -->
+  <section class="ld-how">
+    <div class="ld-step">
+      <div class="ld-pic ld-pic-build" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
+      <b>IT BUILDS</b>
+      <span>20 web interfaces a run. Every one opened in a real browser and audited by axe-core.</span>
+    </div>
+    <div class="ld-step">
+      <div class="ld-pic ld-pic-blame" aria-hidden="true">
+        <i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
+      <b>IT FINDS THE CAUSE</b>
+      <span>Each failure is rebuilt with one component corrected. Blame counts only when the correction flips it.</span>
+    </div>
+    <div class="ld-step">
+      <div class="ld-pic ld-pic-gate" aria-hidden="true">
+        <i class="ok"></i><i class="ok"></i><i class="ok"></i><i class="ok"></i><i class="ok"></i>
+        <i class="ok"></i><i class="ok"></i><i class="ok"></i><i class="no"></i><i></i>
+      </div>
+      <b>TEN CHECKS DECIDE</b>
+      <span>The change it writes is kept only if it survives all ten &mdash; including a held-out set it never sees.</span>
+    </div>
+  </section>
+
+  <!-- what you can actually do with it -->
+  <section class="ld-use">
+    <h2>WHAT YOU CAN DO</h2>
+    <div class="ld-tiles">
+      <a class="ld-tile" href="/watch.html">
+        <span class="ld-ico ld-ico-track" aria-hidden="true"></span>
+        <b>WATCH A SEASON</b><span>Ten runs as a race. Blame, the ten gates, the pit stop when a change is kept.</span>
+      </a>
+      <a class="ld-tile" href="/pit.html">
+        <span class="ld-ico ld-ico-card" aria-hidden="true"></span>
+        <b>KEEP IT ON YOUR DESK</b><span>A card that floats over every app. It turns live when your own loop is running.</span>
+      </a>
+      <a class="ld-tile" href="https://scrutineer-timeline.vercel.app" target="_blank" rel="noopener">
+        <span class="ld-ico ld-ico-scrub" aria-hidden="true"></span>
+        <b>SCRUB THE SEASON</b><span>One slider across all ten runs. Drag it and the car rebuilds at that generation.</span>
+      </a>
+      <a class="ld-tile" href="/pages/run-09/checkout-w01.html" target="_blank" rel="noopener">
+        <span class="ld-ico ld-ico-audit" aria-hidden="true"></span>
+        <b>AUDIT IT YOURSELF</b><span>Every interface it built is a real document at a real URL. Run axe on it.</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- the measured record, the bad one included -->
+  <section class="ld-nums">
+    <h2>WHAT IT MEASURED</h2>
+    <div class="ld-num-row">
+      <div class="ld-num"><b>165</b><span>confirmed incidents,<br>each one causally re-run</span></div>
+      <div class="ld-num"><b>0.520</b><span>task families split into<br>two populations, CI&#8329;&#8320; clear of zero</span></div>
+      <div class="ld-num"><b>+16.7s</b><span>gain from racing a<br>harness per side</span></div>
+      <div class="ld-num bad"><b>&minus;6.6</b><span>points on BigCodeBench-Hard.<br>It overfit its own split.</span></div>
+    </div>
+    <p class="ld-honest">That last one went against us. It is here because the whole point is a loop
+      that can be checked &mdash; and one that cannot refuse itself is not a loop.</p>
+  </section>
+
+  <footer class="ld-foot">
+    <a class="ld-go big" href="/watch.html">WATCH IT RUN &rarr;</a>
+    <span>CoreWeave Hacks &middot; Agent Loops &middot; September 2026</span>
+  </footer>
+</div>

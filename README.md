@@ -11,9 +11,14 @@ Built for **CoreWeave Hacks: Agent Loops**, September 2026.
 
 | | |
 |---|---|
-| **The broadcast** | https://scrutineer-one.vercel.app |
+| **Start here** | https://scrutineer-one.vercel.app |
+| **The broadcast** | https://scrutineer-one.vercel.app/watch |
 | **The timeline** | https://scrutineer-timeline.vercel.app |
 | **The pit board** | https://scrutineer-one.vercel.app/pit |
+
+The front page is the car on a turntable, rebuilding itself run by run — the one idea, shown
+rather than argued — and four doors out of it: the race, the pit board, the scrubber, and the
+interfaces the agent built.
 
 The broadcast has two surfaces: `TRACK`, where a season plays out as a race, and `TELEMETRY`, a
 live instrument panel — held-out score, laps as they land, the ten gates resolving, credit per
@@ -73,7 +78,8 @@ uv run scrutineer doctor            # which rails are live, which are stand-ins
 uv run scrutineer demo              # seed a labelled demonstration season
 uv run scrutineer season -g 5       # a real season (needs ANTHROPIC_API_KEY)
 uv run pytest                       # 84 tests
-cd .. && node build.js              # both sites
+cd .. && node build.js              # every surface
+cd .. && ./run.sh                   # …or build, serve and watch, in one command
 ```
 
 Keys are read from the environment and never written to the repo. The Ed25519 signing key in
