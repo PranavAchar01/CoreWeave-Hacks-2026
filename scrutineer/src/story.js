@@ -629,6 +629,8 @@ track.enter = function () {
   pitAbort();
   const seed = trackSeed();
   const circ = SCR.world.makeCircuit(seed);
+  // Where this one is: the sky and the ground the world is painted in.
+  SCR.world.applyVenue(R, circ.venue);
   const world = SCR.world.build(circ, { detail: progress() });
   track.seed = seed;
   track.spec = harnessSpec();
@@ -650,6 +652,8 @@ track.enter = function () {
   track.scene.ghostActive = ghostWorthShowing();
   track.scene.setMode('AUTO');
   track.circuitName = circ.name;
+  track.venue = circ.venue;
+  track.shape = circ.shape;
 };
 track.update = function (dt) {
   const circ = track.scene.circ;
@@ -1157,7 +1161,8 @@ function paintHud() {
   if (st.view !== 'track' || st.garage) return;
   const r = st.rounds[st.i] || null, tasks = (r && r.tasks) || [];
 
-  put('rhCircuit', track.circuitName || 'SEALED CIRCUIT');
+  put('rhCircuit', (track.circuitName || 'SEALED CIRCUIT')
+    + (track.venue ? ' \u00B7 ' + track.venue.name : ''));
   const live_ = $('rhLive');
   if (live_) live_.className = 'rh-live' + (auto.paused ? ' held' : '');
   put('rhRun', st.rounds.length ? `RUN ${Math.max(1, st.i + 1)} / ${st.rounds.length}` : 'STANDING BY');

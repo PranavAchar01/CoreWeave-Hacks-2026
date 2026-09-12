@@ -42,6 +42,15 @@ const RAMP = {
 };
 const MAT_NAMES = E.MAT_NAMES = Object.keys(RAMP), RAMPS = E.RAMPS = MAT_NAMES.map(k => RAMP[k].map(hex));
 const M = E.M = {}; MAT_NAMES.forEach((k, i) => M[k] = i);
+// The world stores material indices, not colours, so repainting a ramp repaints everything drawn
+// in it. That is how one circuit is a desert and the next is a night race. Always applied from a
+// pristine copy, so calling it twice is the same as calling it once.
+const BASE_RAMPS = RAMPS.map(r => r.map(c2 => c2));
+E.setPalette = function (over) {
+  for (let i = 0; i < RAMPS.length; i++) RAMPS[i] = BASE_RAMPS[i];
+  if (!over) return;
+  for (const k in over) { const i = M[k]; if (i !== undefined) RAMPS[i] = over[k].map(hex); }
+};
 E.SHADOW_MAT = 250; E.LIGHT_MAT = 251;
 const GROUND_MATS = E.GROUND_MATS = new Set([M.ASPHALT, M.RUBBER, M.GRASS, M.GRASS2, M.GRAVEL, M.KERB_R, M.KERB_W, M.CONCRETE]);
 // emissive materials ignore lighting; metallic ones get extra ambient
@@ -222,9 +231,24 @@ E.createRenderer = function (canvas, W, H, SCALE) {
     const c = typeof color === 'string' ? hex(color) : color;
     for (let i = 0; i < W * H; i++) { const o = i * 4; px[o] = c[0]; px[o + 1] = c[1]; px[o + 2] = c[2]; px[o + 3] = 255; depth[i] = Infinity; matBuf[i] = -1; }
   };
-  const NIGHT = hex('#06081A'), STUDIO = hex('#121A4A'), DUSK = hex('#2A3A8A'), INK = hex('#000000'), MOUNT = hex('#121A4A'), MOUNT2 = hex('#0B1030'), GLOW = hex('#7A32B0'), GOLDc = hex('#F4C542'), CYANc = hex('#3DD2FF'), WHITEc = hex('#FFFFFF'), GROUNDc = hex('#0B2A17'), CAPc = hex('#C8CBD8');
+  const INK = hex('#000000');
+  // The sky is a palette rather than a set of constants, so a circuit can be at dusk in the
+  // desert, under snow, or at night under floodlights without a second sky routine.
+  const SKY_DEFAULT = { night: '#06081A', studio: '#121A4A', dusk: '#2A3A8A', mount: '#121A4A',
+    mount2: '#0B1030', glow: '#7A32B0', cityA: '#F4C542', cityB: '#3DD2FF', star: '#FFFFFF',
+    starDim: '#C8CBD8', ground: '#0B2A17', stars: true, moon: true };
+  let SKY = null;
+  R.setSky = function (o) {
+    const s2 = Object.assign({}, SKY_DEFAULT, o || {});
+    SKY = { NIGHT: hex(s2.night), STUDIO: hex(s2.studio), DUSK: hex(s2.dusk), MOUNT: hex(s2.mount),
+      MOUNT2: hex(s2.mount2), GLOW: hex(s2.glow), GOLDc: hex(s2.cityA), CYANc: hex(s2.cityB),
+      WHITEc: hex(s2.star), CAPc: hex(s2.starDim), GROUNDc: hex(s2.ground),
+      stars: s2.stars !== false, moon: s2.moon !== false };
+  };
+  R.setSky();
   const colDir = new Float32Array(W), colM1 = new Float32Array(W), colM2 = new Float32Array(W), colCity = new Uint8Array(W);
-  R.sky = function () {   // night sky with dusk glow, mountains, city lights, moon, stars; sets depth to infinity
+  R.sky = function () {   // sky with glow band, mountains, lights, optional moon and stars
+    const { NIGHT, STUDIO, DUSK, MOUNT, MOUNT2, GLOW, GOLDc, CYANc, WHITEc, CAPc, GROUNDc } = SKY;
     const hf = E.norm([VM.f[0], 0, VM.f[2]]); toView(cam.pos[0] + hf[0] * 5000, cam.pos[1], cam.pos[2] + hf[2] * 5000, cv);
     const horizon = H / 2 - cv[1] * FOCAL / cv[2], baseAz = Math.atan2(VM.f[0], VM.f[2]);
     for (let x = 0; x < W; x++) { const az = baseAz + Math.atan((x - W / 2) / FOCAL); colDir[x] = az;
@@ -239,8 +263,8 @@ E.createRenderer = function (canvas, W, H, SCALE) {
         else { c = t < bayer(x, y) ? STUDIO : NIGHT; if (tt > 0 && tt * 0.85 > bayer(x + 3, y)) c = DUSK; if (tt > 0.55 && (tt - 0.55) * 0.9 > bayer(x + 5, y + 2)) c = GLOW;
           let dAz = colDir[x] - moonAz; while (dAz > Math.PI) dAz -= 2 * Math.PI; while (dAz < -Math.PI) dAz += 2 * Math.PI;
           const mx = dAz * FOCAL, my = dyh - moonEl, rr = mx * mx + my * my;
-          if (rr < 121) c = (rr < 100 || bayer(x, y) < 0.5) ? (E.hash2(Math.floor(mx / 3), Math.floor(my / 3)) < 0.18 ? CAPc : WHITEc) : STUDIO;
-          else if (dyh > 44 && E.hash2(Math.floor(colDir[x] * 400), y) > 0.995) c = E.hash2(x, y) > 0.5 ? WHITEc : CAPc; }
+          if (SKY.moon && rr < 121) c = (rr < 100 || bayer(x, y) < 0.5) ? (E.hash2(Math.floor(mx / 3), Math.floor(my / 3)) < 0.18 ? CAPc : WHITEc) : STUDIO;
+          else if (SKY.stars && dyh > 44 && E.hash2(Math.floor(colDir[x] * 400), y) > 0.995) c = E.hash2(x, y) > 0.5 ? WHITEc : CAPc; }
         px[o] = c[0]; px[o + 1] = c[1]; px[o + 2] = c[2]; px[o + 3] = 255;
       }
     }

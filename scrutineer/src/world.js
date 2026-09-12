@@ -12,15 +12,81 @@ Wd.crowdFill = 0.8;
 // How much of the circuit either side of a point counts as "the corner you are standing on"
 // when working out how much room there is beside the track. Lower is stricter.
 Wd.ROOM_NEAR = 4;
+// ---------------------------------------------------------------------------------------
+// Venues. A circuit is somewhere, and where it is decides the sky, the ground and the light.
+// Each one repaints the material ramps the world is drawn in, so the same geometry reads as a
+// desert at dusk, a parkland afternoon or a street race at night.
+// ---------------------------------------------------------------------------------------
+const VENUES = Wd.VENUES = [
+  { name: 'NIGHT', sky: {} },      // the original: floodlit, mountains, a moon and stars
+  { name: 'DESERT DUSK',
+    sky: { night: '#2A1838', studio: '#6A3450', dusk: '#C85A2A', glow: '#FF8C3A',
+           mount: '#4A2C48', mount2: '#2A1832', ground: '#6E5F44',
+           cityA: '#FFD27A', cityB: '#FFA318', stars: false, moon: false },
+    mats: { GRASS: ['#4A4030', '#6E5F44', '#8C7B58', '#B09C72'],
+            GRASS2: ['#443A2C', '#665840', '#857452', '#A8946C'],
+            GRAVEL: ['#6E5F44', '#8C7B58', '#B09C72', '#D8C79A'] } },
+  { name: 'PARKLAND',
+    sky: { night: '#4E86C8', studio: '#9CC5F0', dusk: '#D6E8FB', glow: '#FFFFFF',
+           mount: '#3A5A7A', mount2: '#2A4058', ground: '#1F6B3C',
+           cityA: '#E8EBF5', cityB: '#C8CBD8', stars: false, moon: false },
+    mats: { GRASS: ['#123F24', '#1F6B3C', '#2E8A4E', '#5CB878'],
+            GRASS2: ['#0F3A20', '#1A5C33', '#27784A', '#4FA468'] } },
+  { name: 'AUTUMN',
+    sky: { night: '#3A3050', studio: '#8A7288', dusk: '#D08A4A', glow: '#F0B070',
+           mount: '#4A3A52', mount2: '#2E2438', ground: '#6B3A26',
+           cityA: '#FFD27A', cityB: '#E8EBF5', stars: false, moon: false },
+    mats: { GRASS: ['#3A1E14', '#6B3A26', '#96612F', '#BE8248'],
+            GRASS2: ['#33200E', '#5E3A08', '#A86E10', '#D89A30'],
+            GRAVEL: ['#4A3020', '#6B4420', '#96612F', '#BE8248'] } },
+  { name: 'COASTAL SUNSET',
+    sky: { night: '#14235A', studio: '#3A4CA8', dusk: '#E0567A', glow: '#FFA318',
+           mount: '#222E6A', mount2: '#131A40', ground: '#123F24',
+           cityA: '#FFA318', cityB: '#3DD2FF', stars: false, moon: false } },
+  { name: 'WINTER',
+    sky: { night: '#6F87A4', studio: '#AEBDD2', dusk: '#E4E8F2', glow: '#FFFFFF',
+           mount: '#8A8FA6', mount2: '#6A6F8A', ground: '#AEB6C6',
+           cityA: '#E8EBF5', cityB: '#CDF4FF', stars: false, moon: false },
+    mats: { GRASS: ['#6A6F8A', '#AEB6C6', '#E4E8F2', '#FFFFFF'],
+            GRASS2: ['#626880', '#A4ACBE', '#DCE2EE', '#F6F8FC'],
+            GRAVEL: ['#4A4E5E', '#7E8499', '#BDC2D4', '#E4E8F2'] } },
+  { name: 'STREET NIGHT',
+    sky: { night: '#0A0518', studio: '#2A0C4A', dusk: '#7A32B0', glow: '#B04BFF',
+           mount: '#1A0E30', mount2: '#0E0620', ground: '#171922',
+           cityA: '#B04BFF', cityB: '#3DD2FF' },
+    mats: { GRASS: ['#171922', '#252834', '#323544', '#434757'],
+            GRASS2: ['#14161E', '#1E2028', '#2C2E3A', '#3A3D4C'],
+            GRAVEL: ['#262A36', '#3E4354', '#5C6176', '#828799'] } },
+];
+// Repaint the world for a venue. Idempotent: always applied from the pristine ramps.
+Wd.applyVenue = function (R, venue) {
+  const v = venue || VENUES[0];
+  E.setPalette(v.mats || null);
+  if (R && R.setSky) R.setSky(v.sky || {});
+};
+
+// Three shapes of circuit, so layouts differ in character and not only in outline.
+const SHAPES = [
+  { name: 'SPEEDWAY',  pts: [8, 11],  base: [168, 210], spread: [40, 80],  wander: [0.14, 0.30] },
+  { name: 'BALANCED',  pts: [10, 14], base: [140, 180], spread: [70, 120], wander: [0.24, 0.50] },
+  { name: 'TECHNICAL', pts: [13, 17], base: [118, 150], spread: [90, 150], wander: [0.38, 0.70] },
+];
+
 Wd.makeCircuit = function (seed) {
   const rng = E.mulberry32(seed);
-  // Layout character, drawn from the seed: how many corners it is built from, how stretched the
-  // loop is, and how far a corner may wander off the ring. A circuit is its seed.
-  const N = 9 + Math.floor(rng() * 6);              // 9..14 control points
+  // Where this circuit is, and what shape of circuit it is. Both are drawn from the seed through
+  // their own hash, so consecutive seeds do not march through the list in step.
+  const vpick = E.mulberry32((seed ^ 0x9E3779B9) | 0), spick = E.mulberry32((seed ^ 0x85EBCA6B) | 0);
+  const venue = VENUES[Math.floor(vpick() * VENUES.length) % VENUES.length];
+  const shape = SHAPES[Math.floor(spick() * SHAPES.length) % SHAPES.length];
+  const span = (r, k) => r[0] + (r[1] - r[0]) * k;
+  // Layout character: how many corners it is built from, how stretched the loop is, and how far
+  // a corner may wander off the ring. A circuit is its seed.
+  const N = Math.round(span(shape.pts, rng()));
   const aspect = 1.08 + rng() * 0.62;               // 1.08..1.70, long-and-thin through to square
-  const wander = 0.24 + rng() * 0.34;               // how irregular the spacing gets
-  const spread = 60 + rng() * 70;                   // radius variation, so straights and hairpins
-  const base = 138 + rng() * 46;
+  const wander = span(shape.wander, rng());         // how irregular the spacing gets
+  const spread = span(shape.spread, rng());         // radius variation, so straights and hairpins
+  const base = span(shape.base, rng());
   const phase = rng() * Math.PI * 2;
   const ctrl = [];
   for (let i = 0; i < N; i++) {
@@ -91,6 +157,8 @@ Wd.makeCircuit = function (seed) {
   const tighten = arr => arr.map((_, i) => { let m = 1e9; for (let k = -2; k <= 2; k++) m = Math.min(m, arr[((i + k) % n + n) % n]); return m; });
   const rp = tighten(roomP), rn = tighten(roomN);
   c.room = (i, side) => { const k = ((i % n) + n) % n; return side > 0 ? rp[k] : rn[k]; };
+  c.venue = venue;
+  c.shape = shape.name;
   c.name = Wd.circuitName(seed);
   return c;
 };
