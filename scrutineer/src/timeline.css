@@ -79,3 +79,7 @@ html,body{background:var(--night);margin:0;color:var(--white);
 .tl-era{font-family:"Courier New",monospace;font-size:11px;color:var(--cyan);
   background:var(--ink);padding:5px 8px;letter-spacing:.08em}
 .tl-note{display:block;font-size:14px;color:#4A4F68;margin-top:2px}
+
+/* the mode chip: a recording, until a visitor brings a key. mode.js makes it the trigger. */
+.tl-demo{color:#FFA318;border-color:#3a2a10;white-space:nowrap}
+.tl-demo[data-scrm-live]{color:#2FD968}

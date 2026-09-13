@@ -9069,6 +9069,9 @@ function render() {
       `<option value="${i}">${esc(t.title)}</option>`).join('')}</select></label>
     <button id="tRun" class="run">BUILD BOTH</button>`;
   body.append(form);
+  if (SCR.mode && SCR.mode.live()) {
+    $('tKey').placeholder = 'using the key from the LIVE badge';
+  }
   const note = el('p'); note.id = 'tNote'; note.style.color = 'var(--mid)'; body.append(note);
   const out = el('div', 'two'); out.id = 'tOut'; body.append(out);
   $('tRun').addEventListener('click', go);
@@ -9098,8 +9101,13 @@ function showTask() {
 
 async function go() {
   if (state.busy) return;
-  const key = ($('tKey').value || '').trim();
-  if (!key) { $('tNote').textContent = 'Paste a key first.'; return; }
+  // The mode badge in the corner takes a key too, and a visitor who pasted one there should not
+  // have to paste it again here. Whichever field they used, this is the one place that reads it.
+  const key = ($('tKey').value || '').trim() || (SCR.mode ? SCR.mode.key() : '');
+  if (!key) {
+    $('tNote').textContent = 'Paste a key first — here, or in the DEMO badge at the bottom left.';
+    return;
+  }
   const provider = key.startsWith('sk-ant-') ? 'anthropic' : 'wandb';
   const model = provider === 'anthropic' ? 'claude-haiku-4-5-20251001' : state.data.models[0];
   const t = state.data.tasks[state.task];

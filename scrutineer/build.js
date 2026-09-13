@@ -5,6 +5,20 @@ const root = __dirname, src = path.join(root, 'src');
 // The mark: a two-by-two chequer, gold on night, centred with a two-pixel margin. One
 // definition — it used to be pasted into two of the three documents and missing from the third.
 const FAVICON = `<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Crect width='16' height='16' fill='%2306081A'/%3E%3Cpath d='M2 2h6v6H2zM8 8h6v6H8z' fill='%23F4C542'/%3E%3C/svg%3E">`;
+// The mode layer. Every hosted surface has to say, in the corner, that it is a recording and
+// what a visitor's own key would turn on. It is injected into each document rather than imported
+// by one of them, because "which page did we forget to put it on" is exactly the class of mistake
+// an honesty banner cannot afford.
+// Where the main site lives, for the surfaces that are deployed somewhere else and link back.
+const SITE_URL = 'https://scrutineer-demo.vercel.app';
+const MODE_CSS = fs.readFileSync(path.join(src, 'mode.css'), 'utf8');
+const MODE_JS = fs.readFileSync(path.join(src, 'mode.js'), 'utf8');
+{
+  const t = path.join(root, '.build-check-mode.js'); fs.writeFileSync(t, MODE_JS);
+  const r = cp.spawnSync(process.execPath, ['--check', t], { encoding: 'utf8' });
+  fs.unlinkSync(t);
+  if (r.status !== 0) { console.error(r.stderr); process.exit(1); }
+}
 const ORDER = ['engine.js', 'car.js', 'world.js', 'sim.js', 'trackscene.js', 'team.js', 'garage.js', 'scenes.js', 'season.js', 'ui.js', 'trial.js', 'dash.js', 'audio.js', 'story.js', 'main.js'];
 const present = ORDER.filter(f => fs.existsSync(path.join(src, f)));
 const missing = ORDER.filter(f => !present.includes(f));
@@ -46,6 +60,7 @@ if (fs.existsSync(path.dirname(siteDir))) {
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&family=Press+Start+2P&family=VT323&display=swap">
 <style>
 ${css}
+${MODE_CSS}
 </style>`;
   const doc = `<!doctype html>
 <html lang="en">
@@ -63,6 +78,7 @@ ${head}
 ${html}
 <script>
 ${loopJs}${js}
+${MODE_JS}
 </script>
 </body>
 </html>`;
@@ -127,6 +143,7 @@ ${FAVICON}
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
 <style>
 ${ldCss}
+${MODE_CSS}
 </style>
 </head>
 <body>
@@ -135,6 +152,7 @@ ${ldHtml}
 window.SCRUTINEER_LOOP = ${JSON.stringify(slim)};
 ${ldSrc}
 window.addEventListener('DOMContentLoaded', () => SCR.landing.boot());
+${MODE_JS}
 </script>
 </body>
 </html>`;
@@ -166,6 +184,7 @@ ${FAVICON}
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
 <style>
 ${tlCss}
+${MODE_CSS}
 </style>
 </head>
 <body>
@@ -173,6 +192,8 @@ ${tlHtml}
 <script>
 ${loopJs}${tlSrc}
 window.addEventListener('DOMContentLoaded', () => SCR.timeline.boot());
+window.SCRUTINEER_SITE = ${JSON.stringify(SITE_URL)};
+${MODE_JS}
 </script>
 </body>
 </html>`;
@@ -232,12 +253,14 @@ ${pitCss}
 </style>
 <style>
 ${pageCss}
+${MODE_CSS}
 </style>
 </head>
 <body>
 ${pitHtml}
 <script>
 ${pitInline}
+${MODE_JS}
 </script>
 </body>
 </html>`;
@@ -270,12 +293,13 @@ ${FAVICON}
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 ${fs.readFileSync(path.join(src, 'telemetry.css'), 'utf8')}
+${MODE_CSS}
 </style>
 </head>
 <body>
 ${fs.readFileSync(path.join(src, 'telemetry.html'), 'utf8')}
 <script>
-${safe(loopJs + appJs)}
+${safe(loopJs + appJs + '\n' + MODE_JS)}
 </script>
 </body>
 </html>`;
@@ -306,12 +330,13 @@ ${FAVICON}
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
 <style>
 ${fs.readFileSync(path.join(src, 'deck.css'), 'utf8')}
+${MODE_CSS}
 </style>
 </head>
 <body>
 ${fs.readFileSync(path.join(src, 'deck.html'), 'utf8')}
 <script>
-${safe(loopJs + deckJs)}
+${safe(loopJs + deckJs + '\n' + MODE_JS)}
 </script>
 </body>
 </html>`;
