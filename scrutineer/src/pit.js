@@ -7,7 +7,7 @@
 // agent has run, what it kept, what it is running on. Three ways to keep it in view:
 //   · pop it out — Document Picture-in-Picture gives it a window of its own, above every app
 //   · drag it anywhere on the page it lives in; it remembers where you left it
-//   · embed it: one script tag, src="https://scrutineer-one.vercel.app/pit.js"
+//   · embed it: one script tag, src="https://scrutineer-demo.vercel.app/pit.js"
 // Two sources, and the strip says which. LIVE when a `scrutineer watch` server answers: this
 // origin first, then 127.0.0.1:7777. That second probe only ever succeeds from a page served over
 // plain http — a browser will not let an https page reach a plain-http server, loopback included
@@ -394,7 +394,7 @@ function paintActions() {
   if (canPip() || canVideoPip()) { const pb = el('button', 'pb-btn', st.pip || st.vpip ? 'BRING IT BACK' : 'POP OUT ↗'); pb.type = 'button';
     pb.addEventListener('click', ev => { ev.stopPropagation(); togglePop(); }); a.append(pb); }
   const link = el('a', 'pb-link', 'TELEMETRY ↗');
-  link.href = (st.source === 'live' && (st.origin === location.origin || loopback(st.origin)) ? st.origin : 'https://scrutineer-one.vercel.app') + '/telemetry'; link.target = '_blank'; link.rel = 'noopener'; a.append(link);
+  link.href = (st.source === 'live' && (st.origin === location.origin || loopback(st.origin)) ? st.origin : 'https://scrutineer-demo.vercel.app') + '/telemetry'; link.target = '_blank'; link.rel = 'noopener'; a.append(link);
 }
 
 // ---------- the card on the page: drag, hover, pop out ----------
