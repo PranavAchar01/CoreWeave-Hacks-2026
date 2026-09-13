@@ -60,7 +60,7 @@ TS.create = function (o) {
 
   const sc = {
     world: o.world, circ: o.world.circuit, car: o.car, ghost: o.ghost || null, ghostActive: false,
-    mode: 'AUTO', activeTV: -1, label: 'CAM · CHASE', fx: [], orbit: 0.9, style,
+    mode: 'AUTO', activeTV: -1, label: 'CAM · CHASE', fx: [], orbit: 0.9, style, studioDist: o.studioDist || 5.4,
     smooth: { x: 0, y: 3, z: -10, tx: 0, ty: 0, tz: 0, fov: 40, init: false },
     // low-passed track state: the raw values step every 4 m of circuit, and stepping is what
     // made the corners feel rough
@@ -240,7 +240,7 @@ TS.create = function (o) {
       tx_ = car.x + tx * aim; ty_ = 0.75; tz_ = car.z + tz * aim;
       fov = shape.fov || 42; lag = shape.lag || 7;
     } else if (mode === 'STUDIO') {
-      const ang = E.time * 0.5 + sc.orbit, rr = 5.4;
+      const ang = E.time * 0.5 + sc.orbit, rr = sc.studioDist;
       px_ = car.x + Math.sin(ang) * rr; py_ = 1.75; pz_ = car.z + Math.cos(ang) * rr;
       tx_ = car.x; ty_ = 0.45; tz_ = car.z; fov = 34; lag = 60;
     } else if (mode === 'ONBOARD') {

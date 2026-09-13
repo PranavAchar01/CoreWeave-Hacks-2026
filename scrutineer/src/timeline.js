@@ -195,7 +195,7 @@ function fromPointer(ev) {
 
 function wire() {
   const rail = $('tlRail');
-  const down = ev => { st.dragging = true; fromPointer(ev); ev.preventDefault(); };
+  const down = ev => { stopTour(); st.dragging = true; fromPointer(ev); ev.preventDefault(); };
   const move = ev => { if (st.dragging) fromPointer(ev); };
   const up = () => { st.dragging = false; };
   rail.addEventListener('mousedown', down);
@@ -209,10 +209,11 @@ function wire() {
   let acc = 0;
   document.addEventListener('wheel', ev => {
     acc += ev.deltaY;
-    if (Math.abs(acc) > 40) { go(st.i + (acc > 0 ? 1 : -1)); acc = 0; }
+    if (Math.abs(acc) > 40) { stopTour(); go(st.i + (acc > 0 ? 1 : -1)); acc = 0; }
   }, { passive: true });
 
   document.addEventListener('keydown', ev => {
+    if (['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(ev.key)) stopTour();
     if (ev.key === 'ArrowRight') go(st.i + 1);
     if (ev.key === 'ArrowLeft') go(st.i - 1);
     if (ev.key === 'Home') go(0);
@@ -221,38 +222,61 @@ function wire() {
 
   for (const [id, view] of [['tlViewCar', 'car'], ['tlViewGarage', 'garage']]) {
     const b = $(id);
-    if (b) b.addEventListener('click', () => {
-      st.view = view;
-      for (const [i2] of [['tlViewCar'], ['tlViewGarage']]) {
-        const n = $(i2); if (n) n.classList.toggle('on', i2 === id);
-      }
-      // the ambient the garage sets on entry is the app's, so hand it back when we leave
-      if (st.R) st.R.ambient = view === 'garage' ? 0.34 : 1;
-      const note = $('tlNote');
-      if (note) {
-        note.textContent = view === 'garage'
-          ? 'station fit-out and era are scaled ×' + GARAGE_SCALE + ' — ten runs move the real '
-            + 'team level from 10 to 15, which the garage alone would not show'
-          : '';
-      }
-      rebuild();
-    });
+    if (b) b.addEventListener('click', () => { stopTour(); showView(view); rebuild(); });
   }
 
   const play = $('tlPlay');
-  if (play) {
-    play.addEventListener('click', () => {
-      if (st.timer) { clearInterval(st.timer); st.timer = null; play.classList.remove('on');
-                      play.textContent = '▶ PLAY'; return; }
-      play.classList.add('on'); play.textContent = '❚❚ PAUSE';
-      if (st.i >= st.rounds.length) go(0);
-      st.timer = setInterval(() => {
-        if (st.i >= st.rounds.length) { clearInterval(st.timer); st.timer = null;
-          play.classList.remove('on'); play.textContent = '▶ PLAY'; return; }
-        go(st.i + 1);
-      }, 1400);
-    });
+  if (play) play.addEventListener('click', () => (st.timer ? stopTour() : startTour()));
+}
+
+// The car or the garage, and the controls that say which. The garage sets its own ambient on
+// entry, so it is handed back when the car view returns.
+function showView(view) {
+  st.view = view;
+  for (const [id, v] of [['tlViewCar', 'car'], ['tlViewGarage', 'garage']]) {
+    const n = $(id); if (n) n.classList.toggle('on', v === view);
   }
+  if (st.R) st.R.ambient = view === 'garage' ? 0.34 : 1;
+  const note = $('tlNote');
+  if (note) {
+    note.textContent = view === 'garage'
+      ? 'station fit-out and era are scaled ×' + GARAGE_SCALE + ' — ten runs move the real '
+        + 'team level from 10 to 15, which the garage alone would not show'
+      : '';
+  }
+}
+
+// PLAY is the season as one tour, about 35 seconds: the starting car, then every run in order.
+// A kept run cuts to the garage, where that component's station is rebuilt, then back to the car
+// it produced; a refused run holds on the unchanged car.
+const HOLD = 1.4;
+function tourBeats() {
+  const beats = [{ k: 0, view: 'car', s: 1.5 }];
+  st.rounds.forEach((r, i) => {
+    if (r.promoted && r.role && st.garage) beats.push({ k: i + 1, view: 'garage', s: SCR.garage.UPGRADE_DUR, up: UI_OF[r.role] });
+    beats.push({ k: i + 1, view: 'car', s: HOLD });
+  });
+  return beats;
+}
+function startTour() {
+  const beats = tourBeats(), play = $('tlPlay');
+  if (play) { play.classList.add('on'); play.textContent = '❚❚ PAUSE'; }
+  let n = 0;
+  const next = () => {
+    if (n >= beats.length) { stopTour(); return; }
+    const b = beats[n++];
+    showView(b.view);
+    st.i = b.k;
+    rebuild();
+    if (b.up) st.garage.playUpgrade(b.up, { tier: SCR.garage.tierFor(teamFor(levelsAt(b.k), true).roles[b.up].level) });
+    st.timer = setTimeout(next, b.s * 1000);
+  };
+  next();
+}
+function stopTour() {
+  if (!st.timer) return;
+  clearTimeout(st.timer); st.timer = null;
+  const play = $('tlPlay'); if (play) { play.classList.remove('on'); play.textContent = '▶ PLAY'; }
 }
 
 // ---------------------------------------------------------------------------------------
@@ -266,7 +290,8 @@ T.boot = function () {
   const circ = SCR.world.makeCircuit(1994), world = SCR.world.build(circ);
   const car = SCR.car.newState();
   SCR.sim.physics(car, SCR.car.derive(specFor(levelsAt(0))), specFor(levelsAt(0)), circ, 0, {});
-  st.scene = SCR.trackScene.create({ R: st.R, world, car });
+  // pulled back from the broadcast's studio shot, so the whole car stays in a wide 16:9 frame
+  st.scene = SCR.trackScene.create({ R: st.R, world, car, studioDist: 7.4 });
   st.scene.setMode('STUDIO');            // the car turning on the spot, not lapping
 
   // The garage wants an app. It needs three things from one, so it gets three things.
@@ -299,5 +324,5 @@ T.boot = function () {
   st.raf = requestAnimationFrame(loop);
 };
 
-T.go = go;
+T.go = go; T.play = startTour;
 })(window.SCR = window.SCR || {});
