@@ -1140,8 +1140,8 @@ window.SCRUTINEER_LOOP = {
     {
       "generation": 0,
       "mode": "attended",
-      "claimed_s": 85.917,
-      "official_s": 86.617,
+      "claimed_s": 71.917,
+      "official_s": 72.617,
       "d_quali": 0.0,
       "d_sealed": 0.0,
       "rule_fired": "gain_per_usd",
@@ -1226,12 +1226,12 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w03",
           "title": "Checkout form (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w04",
           "title": "Sortable invoice table",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w05",
@@ -1241,22 +1241,22 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w06",
           "title": "Sortable invoice table (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w07",
           "title": "Destructive confirm dialog",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w08",
           "title": "Destructive confirm dialog (2)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w09",
           "title": "Destructive confirm dialog (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w10",
@@ -1266,17 +1266,17 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w11",
           "title": "Site header (2)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w12",
           "title": "Site header (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w13",
           "title": "Pricing plans",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w14",
@@ -1286,12 +1286,12 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w15",
           "title": "Pricing plans (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w16",
           "title": "Sign-up with validation",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w17",
@@ -1301,17 +1301,17 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w18",
           "title": "Sign-up with validation (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w19",
           "title": "Image gallery",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w20",
           "title": "Image gallery (2)",
-          "solved": 0
+          "solved": 1
         }
       ],
       "samples": [],
@@ -1351,36 +1351,24 @@ window.SCRUTINEER_LOOP = {
           "family": "checkout",
           "title": "Checkout form (3)",
           "file": "run-00/checkout-w03.html",
-          "passed": false,
-          "weighted": 30,
-          "critical": 6,
-          "rules": [
-            {
-              "id": "color-contrast",
-              "impact": "serious",
-              "n": 6
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1712
+          "bytes": 1637
         },
         {
           "id": "w04",
           "family": "invoices",
           "title": "Sortable invoice table",
           "file": "run-00/invoices-w04.html",
-          "passed": false,
-          "weighted": 150,
-          "critical": 30,
-          "rules": [
-            {
-              "id": "color-contrast",
-              "impact": "serious",
-              "n": 30
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1871
+          "bytes": 1796
         },
         {
           "id": "w05",
@@ -1388,89 +1376,70 @@ window.SCRUTINEER_LOOP = {
           "title": "Sortable invoice table (2)",
           "file": "run-00/invoices-w05.html",
           "passed": false,
-          "weighted": 150,
-          "critical": 30,
+          "weighted": 4,
+          "critical": 0,
           "rules": [
             {
-              "id": "color-contrast",
-              "impact": "serious",
-              "n": 30
+              "id": "landmark-one-main",
+              "impact": "moderate",
+              "n": 1
+            },
+            {
+              "id": "region",
+              "impact": "moderate",
+              "n": 1
             }
           ],
           "missing": [],
-          "bytes": 1879
+          "bytes": 1802
         },
         {
           "id": "w06",
           "family": "invoices",
           "title": "Sortable invoice table (3)",
           "file": "run-00/invoices-w06.html",
-          "passed": false,
-          "weighted": 150,
-          "critical": 30,
-          "rules": [
-            {
-              "id": "color-contrast",
-              "impact": "serious",
-              "n": 30
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1879
+          "bytes": 1804
         },
         {
           "id": "w07",
           "family": "dialog",
           "title": "Destructive confirm dialog",
           "file": "run-00/dialog-w07.html",
-          "passed": false,
-          "weighted": 2,
+          "passed": true,
+          "weighted": 0,
           "critical": 0,
-          "rules": [
-            {
-              "id": "region",
-              "impact": "moderate",
-              "n": 1
-            }
-          ],
+          "rules": [],
           "missing": [],
-          "bytes": 1394
+          "bytes": 1396
         },
         {
           "id": "w08",
           "family": "dialog",
           "title": "Destructive confirm dialog (2)",
           "file": "run-00/dialog-w08.html",
-          "passed": false,
-          "weighted": 2,
+          "passed": true,
+          "weighted": 0,
           "critical": 0,
-          "rules": [
-            {
-              "id": "region",
-              "impact": "moderate",
-              "n": 1
-            }
-          ],
+          "rules": [],
           "missing": [],
-          "bytes": 1402
+          "bytes": 1404
         },
         {
           "id": "w09",
           "family": "dialog",
           "title": "Destructive confirm dialog (3)",
           "file": "run-00/dialog-w09.html",
-          "passed": false,
-          "weighted": 2,
+          "passed": true,
+          "weighted": 0,
           "critical": 0,
-          "rules": [
-            {
-              "id": "region",
-              "impact": "moderate",
-              "n": 1
-            }
-          ],
+          "rules": [],
           "missing": [],
-          "bytes": 1402
+          "bytes": 1404
         },
         {
           "id": "w10",
@@ -1495,54 +1464,36 @@ window.SCRUTINEER_LOOP = {
           "family": "header",
           "title": "Site header (2)",
           "file": "run-00/header-w11.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "html-has-lang",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1532
         },
         {
           "id": "w12",
           "family": "header",
           "title": "Site header (3)",
           "file": "run-00/header-w12.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "html-has-lang",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1532
         },
         {
           "id": "w13",
           "family": "pricing",
           "title": "Pricing plans",
           "file": "run-00/pricing-w13.html",
-          "passed": false,
-          "weighted": 10,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "label",
-              "impact": "critical",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1442
+          "bytes": 1489
         },
         {
           "id": "w14",
@@ -1567,36 +1518,24 @@ window.SCRUTINEER_LOOP = {
           "family": "pricing",
           "title": "Pricing plans (3)",
           "file": "run-00/pricing-w15.html",
-          "passed": false,
-          "weighted": 30,
-          "critical": 3,
-          "rules": [
-            {
-              "id": "button-name",
-              "impact": "critical",
-              "n": 3
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1559
+          "bytes": 1497
         },
         {
           "id": "w16",
           "family": "signup",
           "title": "Sign-up with validation",
           "file": "run-00/signup-w16.html",
-          "passed": false,
-          "weighted": 10,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "button-name",
-              "impact": "critical",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1470
+          "bytes": 1451
         },
         {
           "id": "w17",
@@ -1621,54 +1560,36 @@ window.SCRUTINEER_LOOP = {
           "family": "signup",
           "title": "Sign-up with validation (3)",
           "file": "run-00/signup-w18.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1459
         },
         {
           "id": "w19",
           "family": "gallery",
           "title": "Image gallery",
           "file": "run-00/gallery-w19.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2510
+          "bytes": 2447
         },
         {
           "id": "w20",
           "family": "gallery",
           "title": "Image gallery (2)",
           "file": "run-00/gallery-w20.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2518
+          "bytes": 2455
         }
       ],
       "diff": "",
@@ -1685,10 +1606,10 @@ window.SCRUTINEER_LOOP = {
     {
       "generation": 1,
       "mode": "attended",
-      "claimed_s": 80.44,
-      "official_s": 81.18,
-      "d_quali": 5.477,
-      "d_sealed": 5.437,
+      "claimed_s": 70.44,
+      "official_s": 71.18,
+      "d_quali": 1.477,
+      "d_sealed": 1.437,
       "rule_fired": "gain_per_usd",
       "role": "DATA",
       "part": null,
@@ -1785,7 +1706,7 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w05",
           "title": "Sortable invoice table (2)",
-          "solved": 1
+          "solved": 0
         },
         {
           "id": "w06",
@@ -1795,17 +1716,17 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w07",
           "title": "Destructive confirm dialog",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w08",
           "title": "Destructive confirm dialog (2)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w09",
           "title": "Destructive confirm dialog (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w10",
@@ -1815,17 +1736,17 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w11",
           "title": "Site header (2)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w12",
           "title": "Site header (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w13",
           "title": "Pricing plans",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w14",
@@ -1835,12 +1756,12 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w15",
           "title": "Pricing plans (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w16",
           "title": "Sign-up with validation",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w17",
@@ -1850,17 +1771,17 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w18",
           "title": "Sign-up with validation (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w19",
           "title": "Image gallery",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w20",
           "title": "Image gallery (2)",
-          "solved": 0
+          "solved": 1
         }
       ],
       "samples": [],
@@ -1918,12 +1839,23 @@ window.SCRUTINEER_LOOP = {
           "family": "invoices",
           "title": "Sortable invoice table (2)",
           "file": "run-01/invoices-w05.html",
-          "passed": true,
-          "weighted": 0,
+          "passed": false,
+          "weighted": 4,
           "critical": 0,
-          "rules": [],
+          "rules": [
+            {
+              "id": "landmark-one-main",
+              "impact": "moderate",
+              "n": 1
+            },
+            {
+              "id": "region",
+              "impact": "moderate",
+              "n": 1
+            }
+          ],
           "missing": [],
-          "bytes": 1804
+          "bytes": 1802
         },
         {
           "id": "w06",
@@ -1942,54 +1874,36 @@ window.SCRUTINEER_LOOP = {
           "family": "dialog",
           "title": "Destructive confirm dialog",
           "file": "run-01/dialog-w07.html",
-          "passed": false,
-          "weighted": 2,
+          "passed": true,
+          "weighted": 0,
           "critical": 0,
-          "rules": [
-            {
-              "id": "region",
-              "impact": "moderate",
-              "n": 1
-            }
-          ],
+          "rules": [],
           "missing": [],
-          "bytes": 1394
+          "bytes": 1396
         },
         {
           "id": "w08",
           "family": "dialog",
           "title": "Destructive confirm dialog (2)",
           "file": "run-01/dialog-w08.html",
-          "passed": false,
-          "weighted": 2,
+          "passed": true,
+          "weighted": 0,
           "critical": 0,
-          "rules": [
-            {
-              "id": "region",
-              "impact": "moderate",
-              "n": 1
-            }
-          ],
+          "rules": [],
           "missing": [],
-          "bytes": 1402
+          "bytes": 1404
         },
         {
           "id": "w09",
           "family": "dialog",
           "title": "Destructive confirm dialog (3)",
           "file": "run-01/dialog-w09.html",
-          "passed": false,
-          "weighted": 2,
+          "passed": true,
+          "weighted": 0,
           "critical": 0,
-          "rules": [
-            {
-              "id": "region",
-              "impact": "moderate",
-              "n": 1
-            }
-          ],
+          "rules": [],
           "missing": [],
-          "bytes": 1402
+          "bytes": 1404
         },
         {
           "id": "w10",
@@ -2014,54 +1928,36 @@ window.SCRUTINEER_LOOP = {
           "family": "header",
           "title": "Site header (2)",
           "file": "run-01/header-w11.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "html-has-lang",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1532
         },
         {
           "id": "w12",
           "family": "header",
           "title": "Site header (3)",
           "file": "run-01/header-w12.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "html-has-lang",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1532
         },
         {
           "id": "w13",
           "family": "pricing",
           "title": "Pricing plans",
           "file": "run-01/pricing-w13.html",
-          "passed": false,
-          "weighted": 10,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "label",
-              "impact": "critical",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1442
+          "bytes": 1489
         },
         {
           "id": "w14",
@@ -2086,36 +1982,24 @@ window.SCRUTINEER_LOOP = {
           "family": "pricing",
           "title": "Pricing plans (3)",
           "file": "run-01/pricing-w15.html",
-          "passed": false,
-          "weighted": 30,
-          "critical": 3,
-          "rules": [
-            {
-              "id": "button-name",
-              "impact": "critical",
-              "n": 3
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1559
+          "bytes": 1497
         },
         {
           "id": "w16",
           "family": "signup",
           "title": "Sign-up with validation",
           "file": "run-01/signup-w16.html",
-          "passed": false,
-          "weighted": 10,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "button-name",
-              "impact": "critical",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1470
+          "bytes": 1451
         },
         {
           "id": "w17",
@@ -2140,54 +2024,36 @@ window.SCRUTINEER_LOOP = {
           "family": "signup",
           "title": "Sign-up with validation (3)",
           "file": "run-01/signup-w18.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1459
         },
         {
           "id": "w19",
           "family": "gallery",
           "title": "Image gallery",
           "file": "run-01/gallery-w19.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2510
+          "bytes": 2447
         },
         {
           "id": "w20",
           "family": "gallery",
           "title": "Image gallery (2)",
           "file": "run-01/gallery-w20.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2518
+          "bytes": 2455
         }
       ],
       "diff": "",
@@ -2204,8 +2070,8 @@ window.SCRUTINEER_LOOP = {
     {
       "generation": 2,
       "mode": "attended",
-      "claimed_s": 80.44,
-      "official_s": 81.18,
+      "claimed_s": 70.44,
+      "official_s": 71.18,
       "d_quali": 0.0,
       "d_sealed": 0.0,
       "rule_fired": "gain_per_usd",
@@ -2300,7 +2166,7 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w05",
           "title": "Sortable invoice table (2)",
-          "solved": 1
+          "solved": 0
         },
         {
           "id": "w06",
@@ -2310,17 +2176,17 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w07",
           "title": "Destructive confirm dialog",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w08",
           "title": "Destructive confirm dialog (2)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w09",
           "title": "Destructive confirm dialog (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w10",
@@ -2330,17 +2196,17 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w11",
           "title": "Site header (2)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w12",
           "title": "Site header (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w13",
           "title": "Pricing plans",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w14",
@@ -2350,12 +2216,12 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w15",
           "title": "Pricing plans (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w16",
           "title": "Sign-up with validation",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w17",
@@ -2365,17 +2231,17 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w18",
           "title": "Sign-up with validation (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w19",
           "title": "Image gallery",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w20",
           "title": "Image gallery (2)",
-          "solved": 0
+          "solved": 1
         }
       ],
       "samples": [],
@@ -2433,12 +2299,23 @@ window.SCRUTINEER_LOOP = {
           "family": "invoices",
           "title": "Sortable invoice table (2)",
           "file": "run-02/invoices-w05.html",
-          "passed": true,
-          "weighted": 0,
+          "passed": false,
+          "weighted": 4,
           "critical": 0,
-          "rules": [],
+          "rules": [
+            {
+              "id": "landmark-one-main",
+              "impact": "moderate",
+              "n": 1
+            },
+            {
+              "id": "region",
+              "impact": "moderate",
+              "n": 1
+            }
+          ],
           "missing": [],
-          "bytes": 1804
+          "bytes": 1802
         },
         {
           "id": "w06",
@@ -2457,54 +2334,36 @@ window.SCRUTINEER_LOOP = {
           "family": "dialog",
           "title": "Destructive confirm dialog",
           "file": "run-02/dialog-w07.html",
-          "passed": false,
-          "weighted": 2,
+          "passed": true,
+          "weighted": 0,
           "critical": 0,
-          "rules": [
-            {
-              "id": "region",
-              "impact": "moderate",
-              "n": 1
-            }
-          ],
+          "rules": [],
           "missing": [],
-          "bytes": 1394
+          "bytes": 1396
         },
         {
           "id": "w08",
           "family": "dialog",
           "title": "Destructive confirm dialog (2)",
           "file": "run-02/dialog-w08.html",
-          "passed": false,
-          "weighted": 2,
+          "passed": true,
+          "weighted": 0,
           "critical": 0,
-          "rules": [
-            {
-              "id": "region",
-              "impact": "moderate",
-              "n": 1
-            }
-          ],
+          "rules": [],
           "missing": [],
-          "bytes": 1402
+          "bytes": 1404
         },
         {
           "id": "w09",
           "family": "dialog",
           "title": "Destructive confirm dialog (3)",
           "file": "run-02/dialog-w09.html",
-          "passed": false,
-          "weighted": 2,
+          "passed": true,
+          "weighted": 0,
           "critical": 0,
-          "rules": [
-            {
-              "id": "region",
-              "impact": "moderate",
-              "n": 1
-            }
-          ],
+          "rules": [],
           "missing": [],
-          "bytes": 1402
+          "bytes": 1404
         },
         {
           "id": "w10",
@@ -2529,54 +2388,36 @@ window.SCRUTINEER_LOOP = {
           "family": "header",
           "title": "Site header (2)",
           "file": "run-02/header-w11.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "html-has-lang",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1532
         },
         {
           "id": "w12",
           "family": "header",
           "title": "Site header (3)",
           "file": "run-02/header-w12.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "html-has-lang",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1532
         },
         {
           "id": "w13",
           "family": "pricing",
           "title": "Pricing plans",
           "file": "run-02/pricing-w13.html",
-          "passed": false,
-          "weighted": 10,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "label",
-              "impact": "critical",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1442
+          "bytes": 1489
         },
         {
           "id": "w14",
@@ -2601,36 +2442,24 @@ window.SCRUTINEER_LOOP = {
           "family": "pricing",
           "title": "Pricing plans (3)",
           "file": "run-02/pricing-w15.html",
-          "passed": false,
-          "weighted": 30,
-          "critical": 3,
-          "rules": [
-            {
-              "id": "button-name",
-              "impact": "critical",
-              "n": 3
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1559
+          "bytes": 1497
         },
         {
           "id": "w16",
           "family": "signup",
           "title": "Sign-up with validation",
           "file": "run-02/signup-w16.html",
-          "passed": false,
-          "weighted": 10,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "button-name",
-              "impact": "critical",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1470
+          "bytes": 1451
         },
         {
           "id": "w17",
@@ -2655,54 +2484,36 @@ window.SCRUTINEER_LOOP = {
           "family": "signup",
           "title": "Sign-up with validation (3)",
           "file": "run-02/signup-w18.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1459
         },
         {
           "id": "w19",
           "family": "gallery",
           "title": "Image gallery",
           "file": "run-02/gallery-w19.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2510
+          "bytes": 2447
         },
         {
           "id": "w20",
           "family": "gallery",
           "title": "Image gallery (2)",
           "file": "run-02/gallery-w20.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2518
+          "bytes": 2455
         }
       ],
       "diff": "",
@@ -2719,10 +2530,10 @@ window.SCRUTINEER_LOOP = {
     {
       "generation": 3,
       "mode": "attended",
-      "claimed_s": 76.963,
-      "official_s": 77.743,
-      "d_quali": 3.477,
-      "d_sealed": 3.437,
+      "claimed_s": 68.963,
+      "official_s": 69.743,
+      "d_quali": 1.477,
+      "d_sealed": 1.437,
       "rule_fired": "gain_per_usd",
       "role": "AERO",
       "part": null,
@@ -2845,17 +2656,17 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w11",
           "title": "Site header (2)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w12",
           "title": "Site header (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w13",
           "title": "Pricing plans",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w14",
@@ -2865,12 +2676,12 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w15",
           "title": "Pricing plans (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w16",
           "title": "Sign-up with validation",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w17",
@@ -2880,17 +2691,17 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w18",
           "title": "Sign-up with validation (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w19",
           "title": "Image gallery",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w20",
           "title": "Image gallery (2)",
-          "solved": 0
+          "solved": 1
         }
       ],
       "samples": [],
@@ -3026,54 +2837,36 @@ window.SCRUTINEER_LOOP = {
           "family": "header",
           "title": "Site header (2)",
           "file": "run-03/header-w11.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "html-has-lang",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1532
         },
         {
           "id": "w12",
           "family": "header",
           "title": "Site header (3)",
           "file": "run-03/header-w12.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "html-has-lang",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1532
         },
         {
           "id": "w13",
           "family": "pricing",
           "title": "Pricing plans",
           "file": "run-03/pricing-w13.html",
-          "passed": false,
-          "weighted": 10,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "label",
-              "impact": "critical",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1442
+          "bytes": 1489
         },
         {
           "id": "w14",
@@ -3098,36 +2891,24 @@ window.SCRUTINEER_LOOP = {
           "family": "pricing",
           "title": "Pricing plans (3)",
           "file": "run-03/pricing-w15.html",
-          "passed": false,
-          "weighted": 30,
-          "critical": 3,
-          "rules": [
-            {
-              "id": "button-name",
-              "impact": "critical",
-              "n": 3
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1559
+          "bytes": 1497
         },
         {
           "id": "w16",
           "family": "signup",
           "title": "Sign-up with validation",
           "file": "run-03/signup-w16.html",
-          "passed": false,
-          "weighted": 10,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "button-name",
-              "impact": "critical",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1470
+          "bytes": 1451
         },
         {
           "id": "w17",
@@ -3152,54 +2933,36 @@ window.SCRUTINEER_LOOP = {
           "family": "signup",
           "title": "Sign-up with validation (3)",
           "file": "run-03/signup-w18.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1459
         },
         {
           "id": "w19",
           "family": "gallery",
           "title": "Image gallery",
           "file": "run-03/gallery-w19.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2510
+          "bytes": 2447
         },
         {
           "id": "w20",
           "family": "gallery",
           "title": "Image gallery (2)",
           "file": "run-03/gallery-w20.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2518
+          "bytes": 2455
         }
       ],
       "diff": "",
@@ -3216,8 +2979,8 @@ window.SCRUTINEER_LOOP = {
     {
       "generation": 4,
       "mode": "attended",
-      "claimed_s": 76.963,
-      "official_s": 77.743,
+      "claimed_s": 68.963,
+      "official_s": 69.743,
       "d_quali": 0.0,
       "d_sealed": 0.0,
       "rule_fired": "gain_per_usd",
@@ -3342,17 +3105,17 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w11",
           "title": "Site header (2)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w12",
           "title": "Site header (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w13",
           "title": "Pricing plans",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w14",
@@ -3362,12 +3125,12 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w15",
           "title": "Pricing plans (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w16",
           "title": "Sign-up with validation",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w17",
@@ -3377,17 +3140,17 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w18",
           "title": "Sign-up with validation (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w19",
           "title": "Image gallery",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w20",
           "title": "Image gallery (2)",
-          "solved": 0
+          "solved": 1
         }
       ],
       "samples": [],
@@ -3523,54 +3286,36 @@ window.SCRUTINEER_LOOP = {
           "family": "header",
           "title": "Site header (2)",
           "file": "run-04/header-w11.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "html-has-lang",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1532
         },
         {
           "id": "w12",
           "family": "header",
           "title": "Site header (3)",
           "file": "run-04/header-w12.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "html-has-lang",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1532
         },
         {
           "id": "w13",
           "family": "pricing",
           "title": "Pricing plans",
           "file": "run-04/pricing-w13.html",
-          "passed": false,
-          "weighted": 10,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "label",
-              "impact": "critical",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1442
+          "bytes": 1489
         },
         {
           "id": "w14",
@@ -3595,36 +3340,24 @@ window.SCRUTINEER_LOOP = {
           "family": "pricing",
           "title": "Pricing plans (3)",
           "file": "run-04/pricing-w15.html",
-          "passed": false,
-          "weighted": 30,
-          "critical": 3,
-          "rules": [
-            {
-              "id": "button-name",
-              "impact": "critical",
-              "n": 3
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1559
+          "bytes": 1497
         },
         {
           "id": "w16",
           "family": "signup",
           "title": "Sign-up with validation",
           "file": "run-04/signup-w16.html",
-          "passed": false,
-          "weighted": 10,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "button-name",
-              "impact": "critical",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1470
+          "bytes": 1451
         },
         {
           "id": "w17",
@@ -3649,54 +3382,36 @@ window.SCRUTINEER_LOOP = {
           "family": "signup",
           "title": "Sign-up with validation (3)",
           "file": "run-04/signup-w18.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1459
         },
         {
           "id": "w19",
           "family": "gallery",
           "title": "Image gallery",
           "file": "run-04/gallery-w19.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2510
+          "bytes": 2447
         },
         {
           "id": "w20",
           "family": "gallery",
           "title": "Image gallery (2)",
           "file": "run-04/gallery-w20.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2518
+          "bytes": 2455
         }
       ],
       "diff": "",
@@ -3713,10 +3428,10 @@ window.SCRUTINEER_LOOP = {
     {
       "generation": 5,
       "mode": "attended",
-      "claimed_s": 73.487,
-      "official_s": 74.307,
-      "d_quali": 3.476,
-      "d_sealed": 3.436,
+      "claimed_s": 67.487,
+      "official_s": 68.307,
+      "d_quali": 1.476,
+      "d_sealed": 1.436,
       "rule_fired": "gain_per_usd",
       "role": "TYRES",
       "part": null,
@@ -3849,7 +3564,7 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w13",
           "title": "Pricing plans",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w14",
@@ -3859,12 +3574,12 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w15",
           "title": "Pricing plans (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w16",
           "title": "Sign-up with validation",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w17",
@@ -3874,17 +3589,17 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w18",
           "title": "Sign-up with validation (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w19",
           "title": "Image gallery",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w20",
           "title": "Image gallery (2)",
-          "solved": 0
+          "solved": 1
         }
       ],
       "samples": [],
@@ -4038,18 +3753,12 @@ window.SCRUTINEER_LOOP = {
           "family": "pricing",
           "title": "Pricing plans",
           "file": "run-05/pricing-w13.html",
-          "passed": false,
-          "weighted": 10,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "label",
-              "impact": "critical",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1442
+          "bytes": 1489
         },
         {
           "id": "w14",
@@ -4074,36 +3783,24 @@ window.SCRUTINEER_LOOP = {
           "family": "pricing",
           "title": "Pricing plans (3)",
           "file": "run-05/pricing-w15.html",
-          "passed": false,
-          "weighted": 30,
-          "critical": 3,
-          "rules": [
-            {
-              "id": "button-name",
-              "impact": "critical",
-              "n": 3
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1559
+          "bytes": 1497
         },
         {
           "id": "w16",
           "family": "signup",
           "title": "Sign-up with validation",
           "file": "run-05/signup-w16.html",
-          "passed": false,
-          "weighted": 10,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "button-name",
-              "impact": "critical",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1470
+          "bytes": 1451
         },
         {
           "id": "w17",
@@ -4128,54 +3825,36 @@ window.SCRUTINEER_LOOP = {
           "family": "signup",
           "title": "Sign-up with validation (3)",
           "file": "run-05/signup-w18.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1459
         },
         {
           "id": "w19",
           "family": "gallery",
           "title": "Image gallery",
           "file": "run-05/gallery-w19.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2510
+          "bytes": 2447
         },
         {
           "id": "w20",
           "family": "gallery",
           "title": "Image gallery (2)",
           "file": "run-05/gallery-w20.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2518
+          "bytes": 2455
         }
       ],
       "diff": "",
@@ -4192,8 +3871,8 @@ window.SCRUTINEER_LOOP = {
     {
       "generation": 6,
       "mode": "attended",
-      "claimed_s": 73.487,
-      "official_s": 74.307,
+      "claimed_s": 67.487,
+      "official_s": 68.307,
       "d_quali": 0.0,
       "d_sealed": 0.0,
       "rule_fired": "gain_per_usd",
@@ -4328,7 +4007,7 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w13",
           "title": "Pricing plans",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w14",
@@ -4338,12 +4017,12 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w15",
           "title": "Pricing plans (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w16",
           "title": "Sign-up with validation",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w17",
@@ -4353,17 +4032,17 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w18",
           "title": "Sign-up with validation (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w19",
           "title": "Image gallery",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w20",
           "title": "Image gallery (2)",
-          "solved": 0
+          "solved": 1
         }
       ],
       "samples": [],
@@ -4517,18 +4196,12 @@ window.SCRUTINEER_LOOP = {
           "family": "pricing",
           "title": "Pricing plans",
           "file": "run-06/pricing-w13.html",
-          "passed": false,
-          "weighted": 10,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "label",
-              "impact": "critical",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1442
+          "bytes": 1489
         },
         {
           "id": "w14",
@@ -4553,36 +4226,24 @@ window.SCRUTINEER_LOOP = {
           "family": "pricing",
           "title": "Pricing plans (3)",
           "file": "run-06/pricing-w15.html",
-          "passed": false,
-          "weighted": 30,
-          "critical": 3,
-          "rules": [
-            {
-              "id": "button-name",
-              "impact": "critical",
-              "n": 3
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1559
+          "bytes": 1497
         },
         {
           "id": "w16",
           "family": "signup",
           "title": "Sign-up with validation",
           "file": "run-06/signup-w16.html",
-          "passed": false,
-          "weighted": 10,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "button-name",
-              "impact": "critical",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1470
+          "bytes": 1451
         },
         {
           "id": "w17",
@@ -4607,54 +4268,36 @@ window.SCRUTINEER_LOOP = {
           "family": "signup",
           "title": "Sign-up with validation (3)",
           "file": "run-06/signup-w18.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1459
         },
         {
           "id": "w19",
           "family": "gallery",
           "title": "Image gallery",
           "file": "run-06/gallery-w19.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2510
+          "bytes": 2447
         },
         {
           "id": "w20",
           "family": "gallery",
           "title": "Image gallery (2)",
           "file": "run-06/gallery-w20.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2518
+          "bytes": 2455
         }
       ],
       "diff": "",
@@ -4671,10 +4314,10 @@ window.SCRUTINEER_LOOP = {
     {
       "generation": 7,
       "mode": "attended",
-      "claimed_s": 71.01,
-      "official_s": 71.87,
-      "d_quali": 2.477,
-      "d_sealed": 2.437,
+      "claimed_s": 66.01,
+      "official_s": 66.87,
+      "d_quali": 1.477,
+      "d_sealed": 1.437,
       "rule_fired": "gain_per_usd",
       "role": "DATA",
       "part": null,
@@ -4817,12 +4460,12 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w15",
           "title": "Pricing plans (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w16",
           "title": "Sign-up with validation",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w17",
@@ -4832,17 +4475,17 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w18",
           "title": "Sign-up with validation (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w19",
           "title": "Image gallery",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w20",
           "title": "Image gallery (2)",
-          "solved": 0
+          "solved": 1
         }
       ],
       "samples": [],
@@ -5020,36 +4663,24 @@ window.SCRUTINEER_LOOP = {
           "family": "pricing",
           "title": "Pricing plans (3)",
           "file": "run-07/pricing-w15.html",
-          "passed": false,
-          "weighted": 30,
-          "critical": 3,
-          "rules": [
-            {
-              "id": "button-name",
-              "impact": "critical",
-              "n": 3
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1559
+          "bytes": 1497
         },
         {
           "id": "w16",
           "family": "signup",
           "title": "Sign-up with validation",
           "file": "run-07/signup-w16.html",
-          "passed": false,
-          "weighted": 10,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "button-name",
-              "impact": "critical",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1470
+          "bytes": 1451
         },
         {
           "id": "w17",
@@ -5074,54 +4705,36 @@ window.SCRUTINEER_LOOP = {
           "family": "signup",
           "title": "Sign-up with validation (3)",
           "file": "run-07/signup-w18.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1459
         },
         {
           "id": "w19",
           "family": "gallery",
           "title": "Image gallery",
           "file": "run-07/gallery-w19.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2510
+          "bytes": 2447
         },
         {
           "id": "w20",
           "family": "gallery",
           "title": "Image gallery (2)",
           "file": "run-07/gallery-w20.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2518
+          "bytes": 2455
         }
       ],
       "diff": "",
@@ -5138,8 +4751,8 @@ window.SCRUTINEER_LOOP = {
     {
       "generation": 8,
       "mode": "attended",
-      "claimed_s": 71.01,
-      "official_s": 71.87,
+      "claimed_s": 66.01,
+      "official_s": 66.87,
       "d_quali": 0.0,
       "d_sealed": 0.0,
       "rule_fired": "gain_per_usd",
@@ -5284,12 +4897,12 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w15",
           "title": "Pricing plans (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w16",
           "title": "Sign-up with validation",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w17",
@@ -5299,17 +4912,17 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w18",
           "title": "Sign-up with validation (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w19",
           "title": "Image gallery",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w20",
           "title": "Image gallery (2)",
-          "solved": 0
+          "solved": 1
         }
       ],
       "samples": [],
@@ -5487,36 +5100,24 @@ window.SCRUTINEER_LOOP = {
           "family": "pricing",
           "title": "Pricing plans (3)",
           "file": "run-08/pricing-w15.html",
-          "passed": false,
-          "weighted": 30,
-          "critical": 3,
-          "rules": [
-            {
-              "id": "button-name",
-              "impact": "critical",
-              "n": 3
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1559
+          "bytes": 1497
         },
         {
           "id": "w16",
           "family": "signup",
           "title": "Sign-up with validation",
           "file": "run-08/signup-w16.html",
-          "passed": false,
-          "weighted": 10,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "button-name",
-              "impact": "critical",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1470
+          "bytes": 1451
         },
         {
           "id": "w17",
@@ -5541,54 +5142,36 @@ window.SCRUTINEER_LOOP = {
           "family": "signup",
           "title": "Sign-up with validation (3)",
           "file": "run-08/signup-w18.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1459
         },
         {
           "id": "w19",
           "family": "gallery",
           "title": "Image gallery",
           "file": "run-08/gallery-w19.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2510
+          "bytes": 2447
         },
         {
           "id": "w20",
           "family": "gallery",
           "title": "Image gallery (2)",
           "file": "run-08/gallery-w20.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2518
+          "bytes": 2455
         }
       ],
       "diff": "",
@@ -5605,10 +5188,10 @@ window.SCRUTINEER_LOOP = {
     {
       "generation": 9,
       "mode": "attended",
-      "claimed_s": 67.533,
-      "official_s": 68.433,
-      "d_quali": 3.477,
-      "d_sealed": 3.437,
+      "claimed_s": 64.533,
+      "official_s": 65.433,
+      "d_quali": 1.477,
+      "d_sealed": 1.437,
       "rule_fired": "no_upgrade",
       "role": null,
       "part": null,
@@ -5710,17 +5293,17 @@ window.SCRUTINEER_LOOP = {
         {
           "id": "w18",
           "title": "Sign-up with validation (3)",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w19",
           "title": "Image gallery",
-          "solved": 0
+          "solved": 1
         },
         {
           "id": "w20",
           "title": "Image gallery (2)",
-          "solved": 0
+          "solved": 1
         }
       ],
       "samples": [],
@@ -5934,54 +5517,36 @@ window.SCRUTINEER_LOOP = {
           "family": "signup",
           "title": "Sign-up with validation (3)",
           "file": "run-09/signup-w18.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 1522
+          "bytes": 1459
         },
         {
           "id": "w19",
           "family": "gallery",
           "title": "Image gallery",
           "file": "run-09/gallery-w19.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2510
+          "bytes": 2447
         },
         {
           "id": "w20",
           "family": "gallery",
           "title": "Image gallery (2)",
           "file": "run-09/gallery-w20.html",
-          "passed": false,
-          "weighted": 5,
-          "critical": 1,
-          "rules": [
-            {
-              "id": "aria-hidden-focus",
-              "impact": "serious",
-              "n": 1
-            }
-          ],
+          "passed": true,
+          "weighted": 0,
+          "critical": 0,
+          "rules": [],
           "missing": [],
-          "bytes": 2518
+          "bytes": 2455
         }
       ],
       "diff": "",

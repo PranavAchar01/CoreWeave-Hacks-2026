@@ -1,7 +1,5 @@
-window.SCRUTINEER_PIT = {"demo":true,"seed":1994,"rounds":[{"generation":0,"promoted":true,"role":"DATA","part":"H-v0","official_s":86.617,"claimed_s":85.917,"rule_fired":"gain_per_usd","summary":"open the page in a browser and audit it before submitting","failed":[],"laps":40},{"generation":1,"promoted":false,"role":"DATA","part":null,"official_s":81.18,"claimed_s":80.44,"rule_fired":"gain_per_usd","summary":"raise verification from syntax to render","failed":["scrutineering"],"laps":40},{"generation":2,"promoted":true,"role":"AERO","part":"R-v0","official_s":81.18,"claimed_s":80.44,"rule_fired":"gain_per_usd","summary":"retrieve references by concept rather than keyword","failed":[],"laps":40},{"generation":3,"promoted":false,"role":"AERO","part":null,"official_s":77.743,"claimed_s":76.963,"rule_fired":"gain_per_usd","summary":"widen the reference budget","failed":["seesaw"],"laps":40},{"generation":4,"promoted":true,"role":"AERO","part":"R-v1","official_s":77.743,"claimed_s":76.963,"rule_fired":"gain_per_usd","summary":"add references for the rules it keeps failing","failed":[],"laps":40},{"generation":5,"promoted":false,"role":"TYRES","part":null,"official_s":74.307,"claimed_s":73.487,"rule_fired":"gain_per_usd","summary":"draw more candidates per brief","failed":["regression"],"laps":40},{"generation":6,"promoted":true,"role":"TYRES","part":"S-v0","official_s":74.307,"claimed_s":73.487,"rule_fired":"gain_per_usd","summary":"cool the decode policy and keep the extra candidate","failed":[],"laps":40},{"generation":7,"promoted":false,"role":"DATA","part":null,"official_s":71.87,"claimed_s":71.01,"rule_fired":"gain_per_usd","summary":"re-check the page after a fix","failed":["novelty"],"laps":40},{"generation":8,"promoted":true,"role":"DATA","part":"H-v1","official_s":71.87,"claimed_s":71.01,"rule_fired":"gain_per_usd","summary":"reject a candidate whose own audit is not clean","failed":[],"laps":40},{"generation":9,"promoted":false,"role":null,"part":null,"official_s":68.433,"claimed_s":67.533,"rule_fired":"no_upgrade","summary":"","failed":[],"laps":40}]};
-window.SCRUTINEER_PIT_CSS = "/* The pit board. Prefixed and self-contained: it lands on other people's pages too. */\n.pit,.pit *{box-sizing:border-box}\n.pit{position:fixed;right:24px;bottom:24px;width:262px;z-index:2147483000;color:#FFF;background:#06081A;\n  border:3px solid #F4C542;box-shadow:0 6px 0 #000,0 0 0 1px #000;font-family:\"VT323\",\"Courier New\",monospace;\n  font-size:18px;line-height:1.1;user-select:none;-webkit-user-select:none;-webkit-font-smoothing:none;touch-action:none;\n  outline:none}\n.pit.dragging{cursor:grabbing}\n.pit:focus-visible{border-color:#3DD2FF}\n.pit canvas{display:block;width:256px;height:160px;image-rendering:pixelated;image-rendering:crisp-edges;cursor:pointer}\n.pit-strip{position:relative;display:flex;align-items:center;gap:8px;height:28px;padding:0 8px;background:#000;\n  font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:7px;letter-spacing:.04em;text-transform:uppercase;cursor:grab}\n.pit.inpip .pit-strip{cursor:default}\n.pit-txt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#FFF}\n.pit-dot{width:7px;height:7px;flex:none;background:#6A6F8A}\n.pit-dot.live{background:#2FD968}.pit-dot.busy{background:#2FD968;animation:pit-blink 1s steps(2) infinite}\n.pit-dot.replay{background:#3DD2FF}.pit-dot.down{background:#E31E2D;animation:pit-blink .6s steps(2) infinite}\n.pit-dot.probe{animation:pit-blink .5s steps(2) infinite}\n.pit-pop{flex:none;border:0;background:#121A4A;color:#F4C542;font:inherit;font-size:9px;line-height:1;padding:4px 6px;cursor:pointer}\n.pit-pop:hover{background:#F4C542;color:#000}\n.pit-card{position:absolute;left:8px;right:8px;top:118px;padding:6px 8px;background:#F4C542;color:#000;\n  font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:7px;line-height:1.5;text-transform:uppercase;\n  opacity:0;transform:translateY(14px);transition:opacity .2s steps(3),transform .2s steps(3);pointer-events:none;\n  box-shadow:0 3px 0 #000}\n.pit-card.show{opacity:1;transform:none}\n.pit-card.refused{background:#E31E2D;color:#FFF}.pit-card.none{background:#C8CBD8;color:#000}\n.pit-card b{margin-right:6px}.pit-card i{font-style:normal;opacity:.75}\n/* the board: opens under the card, or above it when the card sits low; overlays the car in its own window */\n.pit-board{display:none;background:#06081A;border-top:2px solid #121A4A;padding:8px 10px 10px}\n.pit.open .pit-board{display:block}\n.pit.up .pit-board{position:absolute;left:-3px;right:-3px;bottom:100%;border:3px solid #F4C542;border-bottom:0;box-shadow:0 0 0 1px #000}\n.pit.inpip .pit-board{position:absolute;inset:0 0 28px 0;overflow:auto;background:rgba(6,8,26,.94);border:0}\n.pb-head{display:flex;align-items:baseline;justify-content:space-between;font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:8px;margin-bottom:8px}\n.pb-head b{color:#F4C542;border-bottom:2px solid #F4C542;padding-bottom:2px}\n.pb-src{font-size:6px;color:#6A6F8A;letter-spacing:.06em}.pb-src.live{color:#2FD968}.pb-src.replay{color:#3DD2FF}\n.pb-big{display:flex;gap:14px;align-items:flex-end}\n.pb-big span{display:flex;flex-direction:column}\n.pb-big em{font-style:normal;font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:6px;color:#6A6F8A;letter-spacing:.1em;margin-bottom:3px}\n.pb-big b{font-size:30px;line-height:22px;color:#F4C542;font-weight:400}\n.pb-big i{font-style:normal;font-size:14px;color:#6A6F8A}\n.pb-gain{font-size:15px;color:#C8CBD8;margin:5px 0 7px;min-height:15px}\n.pb-ticks{display:flex;gap:3px;align-items:center;margin-bottom:8px;flex-wrap:wrap}\n.pb-ticks i{width:11px;height:7px;background:#121A4A;flex:none}\n.pb-ticks i.keep{background:#F4C542}.pb-ticks i.drop{background:#E31E2D}.pb-ticks i.none{background:#6A6F8A}\n.pb-ticks i.now{width:22px;background:linear-gradient(90deg,#2FD968 calc(var(--p,0)*100%),#121A4A 0)}\n.pb-rig{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:6px;letter-spacing:.04em;margin-bottom:8px}\n.pb-comp{display:flex;align-items:center;gap:6px;color:#6A6F8A;white-space:nowrap}\n.pb-comp span{flex:1;overflow:hidden;text-overflow:ellipsis}\n.pb-comp b{font-weight:400;letter-spacing:-1px;color:#121A4A}.pb-comp.up{color:#C8CBD8}.pb-comp.up b{color:#3DD2FF}.pb-comp.now{color:#F4C542}.pb-comp.now b{color:#F4C542}\n.pb-comp em{font-style:normal;width:16px;text-align:right}\n.pb-last{font-size:15px;color:#C8CBD8;border-top:1px solid #121A4A;padding-top:6px;margin-bottom:6px;line-height:1.15}\n.pb-last b{font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:6px;padding:2px 4px;margin-right:4px;vertical-align:1px;font-weight:400}\n.pb-last b.k{background:#F4C542;color:#000}.pb-last b.d{background:#E31E2D;color:#FFF}.pb-last b.n{background:#6A6F8A;color:#000}\n.pb-last code{font-family:inherit;color:#3DD2FF;margin-left:4px}.pb-last span{display:block;color:#6A6F8A;margin-top:2px}\n.pb-foot{font-size:14px;color:#6A6F8A;margin-bottom:8px}\n.pb-actions{display:flex;gap:6px;align-items:center}\n.pb-btn,.pb-link{font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:6px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;\n  padding:7px 9px;border:0;cursor:pointer;background:#F4C542;color:#000}\n.pb-link{background:#121A4A;color:#FFF}.pb-btn:hover{background:#FFEDAE}.pb-link:hover{background:#1B245C}\n/* its own window: the card fills it */\n.pit-pipbody{margin:0;background:#06081A;overflow:hidden}\n.pit.inpip{position:absolute;inset:0;width:auto;right:auto;bottom:auto;border:0;box-shadow:none;display:flex;flex-direction:column}\n.pit.inpip canvas{width:100%;height:auto;flex:1;object-fit:contain;background:#06081A}\n.pit.inpip .pit-card{top:auto;bottom:40px}\n@keyframes pit-blink{50%{opacity:.25}}\n@media (prefers-reduced-motion:reduce){.pit-dot,.pit-card{animation:none;transition:none}}\n.pit.pit-away:not(.inpip){display:none}\n";
-(function () {
-var __SCR = {};
+window.SCRUTINEER_PIT = {"demo":true,"rounds":[{"generation":0,"promoted":true,"role":"DATA","part":"H-v0","official_s":72.617,"claimed_s":71.917,"rule_fired":"gain_per_usd","summary":"open the page in a browser and audit it before submitting","failed":[],"laps":40},{"generation":1,"promoted":false,"role":"DATA","part":null,"official_s":71.18,"claimed_s":70.44,"rule_fired":"gain_per_usd","summary":"raise verification from syntax to render","failed":["scrutineering"],"laps":40},{"generation":2,"promoted":true,"role":"AERO","part":"R-v0","official_s":71.18,"claimed_s":70.44,"rule_fired":"gain_per_usd","summary":"retrieve references by concept rather than keyword","failed":[],"laps":40},{"generation":3,"promoted":false,"role":"AERO","part":null,"official_s":69.743,"claimed_s":68.963,"rule_fired":"gain_per_usd","summary":"widen the reference budget","failed":["seesaw"],"laps":40},{"generation":4,"promoted":true,"role":"AERO","part":"R-v1","official_s":69.743,"claimed_s":68.963,"rule_fired":"gain_per_usd","summary":"add references for the rules it keeps failing","failed":[],"laps":40},{"generation":5,"promoted":false,"role":"TYRES","part":null,"official_s":68.307,"claimed_s":67.487,"rule_fired":"gain_per_usd","summary":"draw more candidates per brief","failed":["regression"],"laps":40},{"generation":6,"promoted":true,"role":"TYRES","part":"S-v0","official_s":68.307,"claimed_s":67.487,"rule_fired":"gain_per_usd","summary":"cool the decode policy and keep the extra candidate","failed":[],"laps":40},{"generation":7,"promoted":false,"role":"DATA","part":null,"official_s":66.87,"claimed_s":66.01,"rule_fired":"gain_per_usd","summary":"re-check the page after a fix","failed":["novelty"],"laps":40},{"generation":8,"promoted":true,"role":"DATA","part":"H-v1","official_s":66.87,"claimed_s":66.01,"rule_fired":"gain_per_usd","summary":"reject a candidate whose own audit is not clean","failed":[],"laps":40},{"generation":9,"promoted":false,"role":null,"part":null,"official_s":65.433,"claimed_s":64.533,"rule_fired":"no_upgrade","summary":"","failed":[],"laps":40}]};
+window.SCRUTINEER_PIT_CSS = "/* The pit board. Prefixed and self-contained: it lands on other people's pages too. */\n.pit,.pit *{box-sizing:border-box}\n.pit{position:fixed;right:24px;bottom:24px;width:262px;z-index:2147483000;color:#FFF;background:#06081A;\n  border:3px solid #F4C542;box-shadow:0 6px 0 #000,0 0 0 1px #000;font-family:\"VT323\",\"Courier New\",monospace;\n  font-size:18px;line-height:1.1;user-select:none;-webkit-user-select:none;-webkit-font-smoothing:none;touch-action:none;\n  outline:none}\n.pit.dragging{cursor:grabbing}\n.pit:focus-visible{border-color:#3DD2FF}\n.pit canvas{display:block;width:256px;height:160px;image-rendering:pixelated;image-rendering:crisp-edges;cursor:pointer}\n.pit-strip{position:relative;display:flex;align-items:center;gap:8px;height:28px;padding:0 8px;background:#000;\n  font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:7px;letter-spacing:.04em;text-transform:uppercase;cursor:grab}\n.pit.inpip .pit-strip{cursor:default}\n.pit-txt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#FFF}\n.pit-dot{width:7px;height:7px;flex:none;background:#6A6F8A}\n.pit-dot.live{background:#2FD968}.pit-dot.busy{background:#2FD968;animation:pit-blink 1s steps(2) infinite}\n.pit-dot.replay{background:#3DD2FF}.pit-dot.down{background:#E31E2D;animation:pit-blink .6s steps(2) infinite}\n.pit-dot.probe{animation:pit-blink .5s steps(2) infinite}\n.pit-pop{flex:none;border:0;background:#121A4A;color:#F4C542;font:inherit;font-size:9px;line-height:1;padding:4px 6px;cursor:pointer}\n.pit-pop:hover{background:#F4C542;color:#000}\n.pit-card{position:absolute;left:8px;right:8px;top:118px;padding:6px 8px;background:#F4C542;color:#000;\n  font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:7px;line-height:1.5;text-transform:uppercase;\n  opacity:0;transform:translateY(14px);transition:opacity .2s steps(3),transform .2s steps(3);pointer-events:none;\n  box-shadow:0 3px 0 #000}\n.pit-card.show{opacity:1;transform:none}\n.pit-card.refused{background:#E31E2D;color:#FFF}.pit-card.none{background:#C8CBD8;color:#000}\n.pit-card b{margin-right:6px}.pit-card i{font-style:normal;opacity:.75}\n/* the board: opens under the card, or above it when the card sits low; overlays the car in its own window */\n.pit-board{display:none;background:#06081A;border-top:2px solid #121A4A;padding:8px 10px 10px}\n.pit.open .pit-board{display:block}\n.pit.up .pit-board{position:absolute;left:-3px;right:-3px;bottom:100%;border:3px solid #F4C542;border-bottom:0;box-shadow:0 0 0 1px #000}\n.pit.inpip .pit-board{position:absolute;inset:0 0 28px 0;overflow:auto;background:rgba(6,8,26,.94);border:0}\n.pb-head{display:flex;align-items:baseline;justify-content:space-between;font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:8px;margin-bottom:8px}\n.pb-head b{color:#F4C542;border-bottom:2px solid #F4C542;padding-bottom:2px}\n.pb-src{font-size:6px;color:#6A6F8A;letter-spacing:.06em}.pb-src.live{color:#2FD968}.pb-src.replay{color:#3DD2FF}\n.pb-big{display:flex;gap:14px;align-items:flex-end}\n.pb-big span{display:flex;flex-direction:column}\n.pb-big em{font-style:normal;font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:6px;color:#6A6F8A;letter-spacing:.1em;margin-bottom:3px}\n.pb-big b{font-size:30px;line-height:22px;color:#F4C542;font-weight:400}\n.pb-big i{font-style:normal;font-size:14px;color:#6A6F8A}\n.pb-gain{font-size:15px;color:#C8CBD8;margin:5px 0 7px;min-height:15px}\n.pb-ticks{display:flex;gap:3px;align-items:center;margin-bottom:8px;flex-wrap:wrap}\n.pb-ticks i{width:11px;height:7px;background:#121A4A;flex:none}\n.pb-ticks i.keep{background:#F4C542}.pb-ticks i.drop{background:#E31E2D}.pb-ticks i.none{background:#6A6F8A}\n.pb-ticks i.now{width:22px;background:linear-gradient(90deg,#2FD968 calc(var(--p,0)*100%),#121A4A 0)}\n.pb-rig{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:6px;letter-spacing:.04em;margin-bottom:8px}\n.pb-comp{display:flex;align-items:center;gap:6px;color:#6A6F8A;white-space:nowrap}\n.pb-comp span{flex:1;overflow:hidden;text-overflow:ellipsis}\n.pb-comp b{font-weight:400;letter-spacing:-1px;color:#121A4A}.pb-comp.up{color:#C8CBD8}.pb-comp.up b{color:#3DD2FF}.pb-comp.now{color:#F4C542}.pb-comp.now b{color:#F4C542}\n.pb-comp em{font-style:normal;width:16px;text-align:right}\n.pb-last{font-size:15px;color:#C8CBD8;border-top:1px solid #121A4A;padding-top:6px;margin-bottom:6px;line-height:1.15}\n.pb-last b{font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:6px;padding:2px 4px;margin-right:4px;vertical-align:1px;font-weight:400}\n.pb-last b.k{background:#F4C542;color:#000}.pb-last b.d{background:#E31E2D;color:#FFF}.pb-last b.n{background:#6A6F8A;color:#000}\n.pb-last code{font-family:inherit;color:#3DD2FF;margin-left:4px}.pb-last span{display:block;color:#6A6F8A;margin-top:2px}\n.pb-foot{font-size:14px;color:#6A6F8A;margin-bottom:8px}\n.pb-actions{display:flex;gap:6px;align-items:center}\n.pb-btn,.pb-link{font-family:\"Press Start 2P\",\"Courier New\",monospace;font-size:6px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;\n  padding:7px 9px;border:0;cursor:pointer;background:#F4C542;color:#000}\n.pb-link{background:#121A4A;color:#FFF}.pb-btn:hover{background:#FFEDAE}.pb-link:hover{background:#1B245C}\n/* its own window: the card fills it */\n.pit-pipbody{margin:0;background:#06081A;overflow:hidden}\n.pit.inpip{position:absolute;inset:0;width:auto;right:auto;bottom:auto;border:0;box-shadow:none;display:flex;flex-direction:column}\n.pit.inpip canvas{width:100%;height:auto;flex:1;object-fit:contain;background:#06081A}\n.pit.inpip .pit-card{top:auto;bottom:40px}\n@keyframes pit-blink{50%{opacity:.25}}\n@media (prefers-reduced-motion:reduce){.pit-dot,.pit-card{animation:none;transition:none}}\n";
 // ============================================================================
 // SCR.engine — software rasterizer on 2D canvas, Bayer-dithered, pixel-art 3D
 // Shared by every scene. No DOM except the target canvas. No allocation in hot loops.
@@ -348,7 +346,7 @@ E.createRenderer = function (canvas, W, H, SCALE) {
   R.begin = function () { R.drawn = 0; R.lookAt(); };
   return R;
 };
-})(__SCR);
+})(window.SCR = window.SCR || {});
 
 // ============================================================================
 // SCR.car — the car: parts spec -> geometry + physics constants, per-pixel livery, transforms
@@ -656,7 +654,7 @@ C.makeXform = function (c, opts = {}) {
     const cy = Math.cos(c.yaw), sy = Math.sin(c.yaw); o[0] = x2 * cy + z2 * sy + c.x; o[1] = y3 + c.y; o[2] = -x2 * sy + z2 * cy + c.z;
   };
 };
-})(__SCR);
+})(window.SCR = window.SCR || {});
 
 // ============================================================================
 // SCR.sim — lap physics driven by the derived spec and team multipliers, lap prediction, sparks
@@ -719,487 +717,13 @@ S.predictLap = function (sp, circ, tm) { const dd = SCR.car.derive(sp, tm), c = 
 S.fmt = t => { const m = Math.floor(t / 60), s = t - m * 60; return `${m}:${s < 10 ? '0' : ''}${s.toFixed(1)}`; };
 S.fmt3 = t => { const m = Math.floor(t / 60), s = t - m * 60; return `${m}:${s < 10 ? '0' : ''}${s.toFixed(3)}`; };
 S.fmtD = d => (d <= 0 ? '−' : '+') + Math.abs(d).toFixed(2) + 's';
-})(__SCR);
-
-// ============================================================================
-// SCR.world — procedural circuits and the trackside world (static mesh, signs, crowd, TV cams, light pools)
-// ============================================================================
-(function (SCR) {
-'use strict';
-const E = SCR.engine, M = E.M, Wd = SCR.world = {};
-const { box, Q, T } = E;
-const ROAD_W = Wd.ROAD_W = 6;
-// How full the grandstands are drawn, 0..1. build() sets it from opts.detail, so a circuit
-// early in the season is a half-empty Thursday and a late one is a full house.
-Wd.crowdFill = 0.8;
-// How much of the circuit either side of a point counts as "the corner you are standing on"
-// when working out how much room there is beside the track. Lower is stricter.
-Wd.ROOM_NEAR = 4;
-// How hard the centreline is relaxed before the road is laid on it. Higher rounds off tighter
-// corners; too high and every circuit becomes an oval.
-Wd.RELAX_PASSES = 6;
-// ---------------------------------------------------------------------------------------
-// Venues. A circuit is somewhere, and where it is decides the sky, the ground and the light.
-// Each one repaints the material ramps the world is drawn in, so the same geometry reads as a
-// desert at dusk, a parkland afternoon or a street race at night.
-// ---------------------------------------------------------------------------------------
-const VENUES = Wd.VENUES = [
-  { name: 'NIGHT', sky: {} },      // the original: floodlit, mountains, a moon and stars
-  { name: 'DESERT DUSK',
-    sky: { night: '#2A1838', studio: '#6A3450', dusk: '#C85A2A', glow: '#FF8C3A',
-           mount: '#4A2C48', mount2: '#2A1832', ground: '#6E5F44',
-           cityA: '#FFD27A', cityB: '#FFA318', stars: false, moon: false },
-    mats: { GRASS: ['#4A4030', '#6E5F44', '#8C7B58', '#B09C72'],
-            GRASS2: ['#443A2C', '#665840', '#857452', '#A8946C'],
-            GRAVEL: ['#6E5F44', '#8C7B58', '#B09C72', '#D8C79A'] } },
-  { name: 'PARKLAND',
-    sky: { night: '#4E86C8', studio: '#9CC5F0', dusk: '#D6E8FB', glow: '#FFFFFF',
-           mount: '#3A5A7A', mount2: '#2A4058', ground: '#1F6B3C',
-           cityA: '#E8EBF5', cityB: '#C8CBD8', stars: false, moon: false },
-    mats: { GRASS: ['#123F24', '#1F6B3C', '#2E8A4E', '#5CB878'],
-            GRASS2: ['#0F3A20', '#1A5C33', '#27784A', '#4FA468'] } },
-  { name: 'AUTUMN',
-    sky: { night: '#3A3050', studio: '#8A7288', dusk: '#D08A4A', glow: '#F0B070',
-           mount: '#4A3A52', mount2: '#2E2438', ground: '#6B3A26',
-           cityA: '#FFD27A', cityB: '#E8EBF5', stars: false, moon: false },
-    mats: { GRASS: ['#3A1E14', '#6B3A26', '#96612F', '#BE8248'],
-            GRASS2: ['#33200E', '#5E3A08', '#A86E10', '#D89A30'],
-            GRAVEL: ['#4A3020', '#6B4420', '#96612F', '#BE8248'] } },
-  { name: 'COASTAL SUNSET',
-    sky: { night: '#14235A', studio: '#3A4CA8', dusk: '#E0567A', glow: '#FFA318',
-           mount: '#222E6A', mount2: '#131A40', ground: '#123F24',
-           cityA: '#FFA318', cityB: '#3DD2FF', stars: false, moon: false } },
-  { name: 'WINTER',
-    sky: { night: '#6F87A4', studio: '#AEBDD2', dusk: '#E4E8F2', glow: '#FFFFFF',
-           mount: '#8A8FA6', mount2: '#6A6F8A', ground: '#AEB6C6',
-           cityA: '#E8EBF5', cityB: '#CDF4FF', stars: false, moon: false },
-    mats: { GRASS: ['#6A6F8A', '#AEB6C6', '#E4E8F2', '#FFFFFF'],
-            GRASS2: ['#626880', '#A4ACBE', '#DCE2EE', '#F6F8FC'],
-            GRAVEL: ['#4A4E5E', '#7E8499', '#BDC2D4', '#E4E8F2'] } },
-  { name: 'STREET NIGHT',
-    sky: { night: '#0A0518', studio: '#2A0C4A', dusk: '#7A32B0', glow: '#B04BFF',
-           mount: '#1A0E30', mount2: '#0E0620', ground: '#171922',
-           cityA: '#B04BFF', cityB: '#3DD2FF' },
-    mats: { GRASS: ['#171922', '#252834', '#323544', '#434757'],
-            GRASS2: ['#14161E', '#1E2028', '#2C2E3A', '#3A3D4C'],
-            GRAVEL: ['#262A36', '#3E4354', '#5C6176', '#828799'] } },
-];
-// Repaint the world for a venue. Idempotent: always applied from the pristine ramps.
-Wd.applyVenue = function (R, venue) {
-  const v = venue || VENUES[0];
-  E.setPalette(v.mats || null);
-  if (R && R.setSky) R.setSky(v.sky || {});
-};
-
-// Three shapes of circuit, so layouts differ in character and not only in outline.
-const SHAPES = [
-  { name: 'SPEEDWAY',  pts: [8, 11],  base: [168, 210], spread: [40, 80],  wander: [0.14, 0.30] },
-  { name: 'BALANCED',  pts: [10, 14], base: [140, 180], spread: [70, 120], wander: [0.24, 0.50] },
-  { name: 'TECHNICAL', pts: [13, 17], base: [118, 150], spread: [90, 150], wander: [0.38, 0.70] },
-];
-
-// A Catmull-Rom through randomly placed control points can double back on itself: the curve
-// makes a little loop and the centreline has a cusp, where the heading reverses between one
-// four-metre step and the next. That is what the wonky corners were — not a rendering fault but
-// a road that genuinely folds. Rather than try to repair a folded spline, generate, measure, and
-// take the first layout that is actually drivable. Deterministic: the retry seeds come from the
-// seed you asked for.
-Wd.makeCircuit = function (seed) {
-  // A heading step is what the car's yaw has to swallow in one four-metre bite: at racing speed
-  // 0.42 rad spikes the yaw rate past 200 deg/s, which is a snap, not a corner. 0.24 keeps it
-  // near what a car can actually do.
-  const MAX_STEP_RAD = 0.24;
-  const MIN_RADIUS = 18;              // metres; tighter than this and the road is wider than the corner
-  let best = null, bestScore = -Infinity;
-  for (let attempt = 0; attempt < 14; attempt++) {
-    // Each retry is a different road AND a gentler one: if this seed keeps folding, stop
-    // fighting it and smooth harder until it is drivable.
-    const c = buildCircuit((seed + attempt * 1013) | 0, seed, Wd.RELAX_PASSES + attempt * 3);
-    let worstStep = 0, maxCurv = 0;
-    for (let i = 0; i < c.n; i++) {
-      const a2 = c.pts[i], b2 = c.pts[(i + 1) % c.n];
-      let dh = Math.atan2(b2.tx, b2.tz) - Math.atan2(a2.tx, a2.tz);
-      while (dh > Math.PI) dh -= 2 * Math.PI; while (dh < -Math.PI) dh += 2 * Math.PI;
-      if (Math.abs(dh) > worstStep) worstStep = Math.abs(dh);
-      if (Math.abs(a2.curv) > maxCurv) maxCurv = Math.abs(a2.curv);
-    }
-    const radius = 1 / Math.max(maxCurv, 1e-9);
-    if (worstStep <= MAX_STEP_RAD && radius >= MIN_RADIUS) return c;
-    // nothing clean yet: remember the least bad one in case ten tries all fold
-    const score = -worstStep * 10 - Math.max(0, MIN_RADIUS - radius) * 0.1;
-    if (score > bestScore) { bestScore = score; best = c; }
-  }
-  return best;
-};
-
-function buildCircuit(seed, labelSeed, relaxPasses) {
-  const rng = E.mulberry32(seed);
-  // Where this circuit is, and what shape of circuit it is. Both are drawn from the seed through
-  // their own hash, so consecutive seeds do not march through the list in step.
-  // Venue and shape key off the seed that was ASKED for, so retrying a folded layout changes the
-  // road without changing where the race is or what kind of circuit it claims to be.
-  const key = labelSeed === undefined ? seed : labelSeed;
-  const vpick = E.mulberry32((key ^ 0x9E3779B9) | 0), spick = E.mulberry32((key ^ 0x85EBCA6B) | 0);
-  const venue = VENUES[Math.floor(vpick() * VENUES.length) % VENUES.length];
-  const shape = SHAPES[Math.floor(spick() * SHAPES.length) % SHAPES.length];
-  const span = (r, k) => r[0] + (r[1] - r[0]) * k;
-  // Layout character: how many corners it is built from, how stretched the loop is, and how far
-  // a corner may wander off the ring. A circuit is its seed.
-  const N = Math.round(span(shape.pts, rng()));
-  const aspect = 1.08 + rng() * 0.62;               // 1.08..1.70, long-and-thin through to square
-  const wander = span(shape.wander, rng());         // how irregular the spacing gets
-  const spread = span(shape.spread, rng());         // radius variation, so straights and hairpins
-  const base = span(shape.base, rng());
-  const phase = rng() * Math.PI * 2;
-  const ctrl = [];
-  for (let i = 0; i < N; i++) {
-    const ang = (i / N) * Math.PI * 2 + phase + (rng() - 0.5) * wander;
-    const rad = base + (rng() - 0.5) * spread;
-    ctrl.push([Math.cos(ang) * rad * aspect, Math.sin(ang) * rad]);
-  }
-  const pts = [], cr = (p0, p1, p2, p3, t) => { const t2 = t * t, t3 = t2 * t; return 0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3); };
-  for (let i = 0; i < N; i++) { const p0 = ctrl[(i - 1 + N) % N], p1 = ctrl[i], p2 = ctrl[(i + 1) % N], p3 = ctrl[(i + 2) % N]; const steps = Math.max(8, Math.round(Math.hypot(p2[0] - p1[0], p2[1] - p1[1]) / 3.5));
-    for (let k = 0; k < steps; k++) { const t = k / steps; pts.push([cr(p0[0], p1[0], p2[0], p3[0], t), cr(p0[1], p1[1], p2[1], p3[1], t)]); } }
-  const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
-  // -------------------------------------------------------------------------------------
-  // Resample the closed spline at a UNIFORM arc length that divides the lap exactly.
-  //
-  // The old walk stepped a fixed 4 m and then dropped the last point if it landed near the
-  // start, which left one segment per circuit anywhere between 2 and 6 m — always at the
-  // start/finish line, which is where the car begins and crosses every lap. A short segment
-  // next to a normal one throws the tangent and the curvature estimate right off, and that
-  // is where the heading was jumping by up to 170 degrees in a single step.
-  //
-  // Choosing n = round(total / 4) and stepping total / n instead means the last point is
-  // exactly one step from the first, by construction.
-  // -------------------------------------------------------------------------------------
-  const resample = (poly, target) => {
-    let total = 0;
-    for (let i = 0; i < poly.length; i++) total += dist(poly[i], poly[(i + 1) % poly.length]);
-    const cnt = Math.max(48, Math.round(total / target)), step = total / cnt;
-    const out = [poly[0].slice()];
-    let acc = 0, prev = poly[0].slice(), idx = 0, guard = 0;
-    while (out.length < cnt && guard++ < poly.length * 40) {
-      const nxt = poly[(idx + 1) % poly.length], d = dist(prev, nxt);
-      if (acc + d >= step) {
-        const t = (step - acc) / (d || 1);
-        prev = [prev[0] + (nxt[0] - prev[0]) * t, prev[1] + (nxt[1] - prev[1]) * t];
-        out.push(prev.slice()); acc = 0;
-      } else { acc += d; prev = nxt.slice(); idx++; }
-    }
-    return { pts: out, step };
-  };
-  // Round off the corners the control points happened to make too tight to drive. A few gentle
-  // Laplacian passes; the loop is resampled afterwards so the spacing stays exact.
-  const relax = (poly, passes, k) => {
-    let cur = poly.map(q => q.slice());
-    for (let it = 0; it < passes; it++) {
-      cur = cur.map((q, i) => {
-        const a = cur[(i - 1 + cur.length) % cur.length], b = cur[(i + 1) % cur.length];
-        return [q[0] + k * ((a[0] + b[0]) / 2 - q[0]), q[1] + k * ((a[1] + b[1]) / 2 - q[1])];
-      });
-    }
-    return cur;
-  };
-  const RELAX_PASSES = relaxPasses === undefined ? Wd.RELAX_PASSES : relaxPasses;
-  // Relaxing the whole loop softens everything a little; it does not fix one corner that is
-  // genuinely too tight, which is why a fraction of layouts kept failing however many times they
-  // were re-rolled. This goes after the kinks themselves: any point where the road turns more
-  // than it should in one step is pulled toward the line between its neighbours, by as much as
-  // it is over, until nothing is over. It converges because every move strictly reduces the
-  // angle it was called for.
-  const easeKinks = (poly, maxTurn, iters) => {
-    const cur = poly.map(q => q.slice()), m = cur.length;
-    for (let it = 0; it < iters; it++) {
-      let worst = 0;
-      for (let i = 0; i < m; i++) {
-        const a2 = cur[(i - 1 + m) % m], q = cur[i], b2 = cur[(i + 1) % m];
-        const h1 = Math.atan2(q[0] - a2[0], q[1] - a2[1]), h2 = Math.atan2(b2[0] - q[0], b2[1] - q[1]);
-        let d = h2 - h1; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
-        const ad = Math.abs(d);
-        if (ad > worst) worst = ad;
-        if (ad > maxTurn) {
-          const k = Math.min(0.85, (ad - maxTurn) / ad);
-          cur[i] = [q[0] + k * ((a2[0] + b2[0]) / 2 - q[0]), q[1] + k * ((a2[1] + b2[1]) / 2 - q[1])];
-        }
-      }
-      if (worst <= maxTurn) break;
-    }
-    return cur;
-  };
-  // The cap has to hold on the grid the car actually drives, and resampling redistributes the
-  // points — so ease and re-grid together until it sticks, rather than easing once on a polyline
-  // that is about to be resampled out from under the result.
-  let poly = relax(resample(pts, 4).pts, RELAX_PASSES, 0.5);
-  for (let pass = 0; pass < 3; pass++) poly = easeKinks(resample(poly, 4).pts, 0.16, 70);
-  const lane = resample(poly, 4);
-  const STEP = lane.step;
-  const S = lane.pts.map(q => ({ x: q[0], z: q[1] }));
-  const n = S.length;
-  for (let i = 0; i < n; i++) { const a = S[(i - 1 + n) % n], b = S[(i + 1) % n], p = S[i]; let tx = b.x - a.x, tz = b.z - a.z; const l = Math.hypot(tx, tz) || 1; tx /= l; tz /= l;
-    p.tx = tx; p.tz = tz; p.nx = -tz; p.nz = tx; const ta = S[(i - 2 + n) % n], tb = S[(i + 2) % n];
-    const h1 = Math.atan2(p.x - ta.x, p.z - ta.z), h2 = Math.atan2(tb.x - p.x, tb.z - p.z); let dh = h2 - h1; while (dh > Math.PI) dh -= 2 * Math.PI; while (dh < -Math.PI) dh += 2 * Math.PI; p.curv = dh / (4 * STEP); }
-  // This is the number the physics brakes for, so it has to be the corner the car is actually
-  // going to drive. Smoothed over plus or minus twenty metres it was reporting a gentle bend
-  // where the road had a kink, the car carried far too much speed into it, and the yaw snapped
-  // round at over two hundred degrees a second. Now the geometry is smooth in its own right,
-  // this only needs enough filtering to take the sampling noise off.
-  const KER = [1, 3, 4, 3, 1], KR = 2, KSUM = KER.reduce((a, b) => a + b, 0);
-  const sm = S.map((p, i) => { let s = 0; for (let k = -KR; k <= KR; k++) s += S[(i + k + n) % n].curv * KER[k + KR]; return s / KSUM; });
-  S.forEach((p, i) => p.curv = sm[i]);
-  let best = 0, bestLen = 0;
-  for (let i = 0; i < n; i++) { let len = 0; while (len < n && Math.abs(S[(i + len) % n].curv) < 0.004) len++; if (len > bestLen) { bestLen = len; best = i; } }
-  const R = []; for (let i = 0; i < n; i++) R.push(S[(best + i) % n]); R.forEach((p, i) => p.s = i * STEP);
-  const cx = R.reduce((s, p) => s + p.x, 0) / n, cz = R.reduce((s, p) => s + p.z, 0) / n;
-  const c = { seed, pts: R, n, step: STEP, len: n * STEP, cx, cz };
-  c.at = i => R[((i % n) + n) % n];
-  c.pos = (i, off, y) => { const p = c.at(i); return [p.x + p.nx * off, y || 0, p.z + p.nz * off]; };
-  c.outside = i => { const p = c.at(i); const dl = Math.hypot(p.x + p.nx - cx, p.z + p.nz - cz), dr = Math.hypot(p.x - p.nx - cx, p.z - p.nz - cz); return dl > dr ? 1 : -1; };
-  c.geomInside = i => c.at(i).curv > 0 ? 1 : -1;
-  c.clearOfTrack = (x, z, margin) => { const m2 = margin * margin; for (const p of R) { const dx = p.x - x, dz = p.z - z; if (dx * dx + dz * dz < m2) return false; } return true; };
-  // ---------------------------------------------------------------------------------------
-  // How far you can step off the centreline at i, on one side, before you are standing on
-  // another part of the same circuit. A hairpin brings the track back alongside itself within
-  // thirty metres, and a barrier built at the usual twelve metres out then sits in the middle
-  // of the road further round — which is what the car was driving through.
-  // Walk the normal at i and stop short of any other stretch of track it runs into.
-  // ---------------------------------------------------------------------------------------
-  const CLEAR = ROAD_W + 2.5, ROOM_MAX = 46, NEAR = Wd.ROOM_NEAR, STEP_W = 1.5, CELL = 8;
-  // Index the centreline once so the walk below is a handful of cell lookups rather than a
-  // scan of the whole circuit at every step.
-  const grid = new Map(), gkey = (x, z) => Math.floor(x / CELL) + ',' + Math.floor(z / CELL);
-  for (let j = 0; j < n; j++) { const p = R[j], k = gkey(p.x, p.z); const a = grid.get(k); if (a) a.push(j); else grid.set(k, [j]); }
-  // Is this spot standing on a different stretch of the circuit?
-  const onTrack = (x, z, i) => {
-    const cx = Math.floor(x / CELL), cz = Math.floor(z / CELL), r = Math.ceil(CLEAR / CELL);
-    for (let a = cx - r; a <= cx + r; a++) for (let b = cz - r; b <= cz + r; b++) {
-      const arr = grid.get(a + ',' + b); if (!arr) continue;
-      for (const j of arr) { const dj = Math.abs(j - i), gap = Math.min(dj, n - dj);
-        if (gap < NEAR) continue;                       // the corner you are standing on
-        const q = R[j], dx = q.x - x, dz = q.z - z;
-        if (dx * dx + dz * dz < CLEAR * CLEAR) return true; } }
-    return false;
-  };
-  // Walk out along the normal until the road comes back at you, and stop there.
-  const roomOf = (i, side) => {
-    const p = R[i], ax = p.nx * side, az = p.nz * side;
-    let w = 0;
-    for (; w <= ROOM_MAX; w += STEP_W) if (onTrack(p.x + ax * w, p.z + az * w, i)) break;
-    return Math.max(0, w - STEP_W);
-  };
-  const roomP = new Array(n), roomN = new Array(n);
-  for (let i = 0; i < n; i++) { roomP[i] = roomOf(i, 1); roomN[i] = roomOf(i, -1); }
-  // Neighbouring segments have to agree, or a barrier ends abruptly mid-air where the room runs
-  // out. Take the tightest value over a short window so the wall tapers instead of stopping.
-  const tighten = arr => arr.map((_, i) => { let m = 1e9; for (let k = -2; k <= 2; k++) m = Math.min(m, arr[((i + k) % n + n) % n]); return m; });
-  const rp = tighten(roomP), rn = tighten(roomN);
-  c.room = (i, side) => { const k = ((i % n) + n) % n; return side > 0 ? rp[k] : rn[k]; };
-  c.venue = venue;
-  c.shape = shape.name;
-  // named for the seed that was asked for, so a retry does not rename the circuit
-  c.name = Wd.circuitName(labelSeed === undefined ? seed : labelSeed);
-  return c;
-};
-const NAMES = ['SILVERSTONE-LIKE', 'MONZA-LIKE', 'SUZUKA-LIKE', 'SPA-LIKE', 'INTERLAGOS-LIKE', 'MONACO-LIKE', 'IMOLA-LIKE', 'ZANDVOORT-LIKE', 'ESTORIL-LIKE', 'HOCKENHEIM-LIKE', 'KYALAMI-LIKE', 'JEREZ-LIKE', 'FUJI-LIKE', 'ADELAIDE-LIKE', 'MAGNY-COURS-LIKE', 'MONTREAL-LIKE', 'SEPANG-LIKE', 'ISTANBUL-LIKE', 'BAHRAIN-LIKE', 'SOCHI-LIKE', 'AUSTIN-LIKE', 'LAS VEGAS-LIKE'];
-Wd.circuitName = seed => `${NAMES[Math.abs(seed) % NAMES.length]} LAYOUT ${String.fromCharCode(65 + (Math.abs(seed >> 3) % 6))}`;
-// crowd hook (aux -> sign with crowd:true)
-E.hooks[M.CROWD] = function (mx, my, mz, a) {
-  const sg = E.signs[a]; if (!sg) return M.STAND; const [u, v] = E.signUV(sg, mx, my, mz);
-  const cx = Math.floor(u / 0.48), cy = Math.floor(v / 0.42), h = E.hash2(cx, cy);
-  if (v > 0.1 && h > (1 - Wd.crowdFill)) { const wave = Math.sin(E.time * 2.2 + cx * 0.35) > 0.85 ? 0.35 : 0, hh = E.hash2(cx + 7, cy + 3) + wave;
-    return hh < 0.2 ? M.BODY : hh < 0.34 ? M.STRIPE : hh < 0.44 ? M.GOLD : hh < 0.56 ? M.CYAN : hh < 0.86 ? M.NAVY : M.PURPLE; }
-  return M.STAND;
-};
-// build(circuit, opts) -> { mesh, lightpools, tvcams, circuit }
-Wd.build = function (c, opts = {}) {
-  const cp = c.pts, cn = c.n, at = c.at, pos = c.pos, outside = c.outside, geomInside = c.geomInside, clearOfTrack = c.clearOfTrack;
-  // 0 is a bare circuit on a quiet evening; 1 is a full house under lights. The broadcast
-  // raises it as the harness levels up, so the season visibly grows around the car.
-  const detail = Math.max(0, Math.min(1, opts.detail === undefined ? 1 : opts.detail));
-  const STAND_ROWS = 4 + Math.round(detail * 5);          // 4..9 rows of seats
-  const STAND_CAP = 1 + Math.round(detail * 3);           // 1..4 grandstands
-  const LIGHTS = 5 + Math.round(detail * 9);              // 5..14 floodlight towers
-  Wd.crowdFill = 0.32 + detail * 0.52;
-  const maxInside = i => 0.85 / Math.max(Math.abs(at(i).curv), 1e-4);
-  const safeOff = (i, side, w) => Math.min(
-    (side === geomInside(i)) ? Math.min(w, maxInside(i)) : w,
-    c.room ? c.room(i, side) : w);
-  const LIGHTPOOLS = [], TVCAMS = [], signs = E.signs, tris = () => E.current();
-  let PIT = null;   // where the pit lane is, so a car can actually be driven down it
-  E.begin(); E.setGroup(0); E.setAux(0);
-  let minx = 1e9, maxx = -1e9, minz = 1e9, maxz = -1e9;
-  for (const p of cp) { minx = Math.min(minx, p.x); maxx = Math.max(maxx, p.x); minz = Math.min(minz, p.z); maxz = Math.max(maxz, p.z); }
-  const PAD = 120, TILE = 24;
-  for (let x = minx - PAD; x < maxx + PAD; x += TILE) for (let z = minz - PAD; z < maxz + PAD; z += TILE) { const m = Math.floor(z / TILE) & 1 ? M.GRASS : M.GRASS2; Q([x, -0.06, z + TILE], [x + TILE, -0.06, z + TILE], [x + TILE, -0.06, z], [x, -0.06, z], m); }
-  for (let i = 0; i < cn; i++) {
-    const a = at(i), b = at(i + 1), k = Math.abs(a.curv), left = a.curv > 0;
-    Q(pos(i, ROAD_W), pos(i + 1, ROAD_W), pos(i + 1, -ROAD_W), pos(i, -ROAD_W), M.ASPHALT);
-    const rl0 = pos(i, Math.max(-3.5, Math.min(3.5, -a.curv * 180)), 0.01), rl1 = pos(i + 1, Math.max(-3.5, Math.min(3.5, -b.curv * 180)), 0.01);
-    Q([rl0[0] + a.nx * 1.1, 0.012, rl0[2] + a.nz * 1.1], [rl1[0] + b.nx * 1.1, 0.012, rl1[2] + b.nz * 1.1], [rl1[0] - b.nx * 1.1, 0.012, rl1[2] - b.nz * 1.1], [rl0[0] - a.nx * 1.1, 0.012, rl0[2] - a.nz * 1.1], M.RUBBER);
-    if (k > 0.006) {
-      const km = ((i >> 1) & 1) ? M.KERB_R : M.KERB_W, side = left ? 1 : -1;
-      const ki0 = pos(i, side * ROAD_W, 0.02), ki1 = pos(i + 1, side * ROAD_W, 0.02), ko0 = pos(i, side * (ROAD_W + 1.3), 0.06), ko1 = pos(i + 1, side * (ROAD_W + 1.3), 0.06);
-      if (side > 0) Q(ki0, ko0, ko1, ki1, km); else Q(ki0, ki1, ko1, ko0, km);
-      const kx0 = pos(i, -side * ROAD_W, 0.02), kx1 = pos(i + 1, -side * ROAD_W, 0.02), ky0 = pos(i, -side * (ROAD_W + 1.6), 0.05), ky1 = pos(i + 1, -side * (ROAD_W + 1.6), 0.05);
-      if (side > 0) Q(kx0, kx1, ky1, ky0, km); else Q(kx0, ky0, ky1, kx1, km);
-    }
-    for (const side of [1, -1]) {
-      const isOut = side !== geomInside(i), gravel = isOut && k > 0.008;
-      let w0 = ROAD_W + 1.7, w1 = gravel ? ROAD_W + 22 : ROAD_W + 9; w1 = safeOff(i, side, w1); if (w1 <= w0 + 0.5) continue;
-      const g0 = pos(i, side * w0), g1 = pos(i + 1, side * w0), h0 = pos(i, side * w1), h1 = pos(i + 1, side * w1), gm = gravel ? M.GRAVEL : (((i >> 2) & 1) ? M.GRASS : M.GRASS2);
-      if (side > 0) Q(g0, h0, h1, g1, gm); else Q(g0, g1, h1, h0, gm);
-      const bw = safeOff(i, side, gravel ? w1 : ROAD_W + 12); if (bw < ROAD_W + 4) continue;
-      const b0 = pos(i, side * bw), b1 = pos(i + 1, side * bw), bh = gravel ? 1.2 : 0.8, bm = gravel ? M.TYRE : M.STEEL, t0 = [b0[0], bh, b0[2]], t1 = [b1[0], bh, b1[2]];
-      if (side > 0) { Q(b0, b1, t1, t0, bm); Q(t0, t1, [t1[0] + a.nx * 0.5, bh, t1[2] + a.nz * 0.5], [t0[0] + a.nx * 0.5, bh, t0[2] + a.nz * 0.5], M.BODY); }
-      else { Q(b0, t0, t1, b1, bm); Q(t0, [t0[0] - a.nx * 0.5, bh, t0[2] - a.nz * 0.5], [t1[0] - b.nx * 0.5, bh, t1[2] - b.nz * 0.5], t1, M.BODY); }
-    }
-  }
-  const straights = []; let i = 0;
-  while (i < cn) { if (Math.abs(at(i).curv) < 0.004) { let j = i; while (j < cn && Math.abs(at(j).curv) < 0.004) j++; straights.push([i, j - i]); i = j; } else i++; }
-  straights.sort((a, b) => b[1] - a[1]);
-  const clearRun = (i0, len, side, wmax) => { for (let q = i0; q <= i0 + len; q += 2) {
-    if (c.room && c.room(q, side) < wmax) return false;
-    const p = pos(q, side * wmax); if (!clearOfTrack(p[0], p[2], ROAD_W + 3)) return false; } return true; };
-  const segQuad = (k, side, w0, w1, y0, y1, m) => { const A = pos(k, side * w0, y0), B = pos(k + 1, side * w0, y0), Cq = pos(k + 1, side * w1, y1), Dq = pos(k, side * w1, y1); if (side > 0) Q(A, Dq, Cq, B, m); else Q(A, B, Cq, Dq, m); };
-  const segWall = (k, side, w, y0, y1, m) => { const A = pos(k, side * w, y0), B = pos(k + 1, side * w, y0), Cq = pos(k + 1, side * w, y1), Dq = pos(k, side * w, y1); if (side > 0) Q(A, B, Cq, Dq, m); else Q(A, Dq, Cq, B, m); };
-  const segSign = (k, side, w, y0, y1, text, u0, cell, fg, bg) => { const t = at(k), A = pos(k, side * w, y0); E.setAux(signs.length); signs.push({ text, o: A, r: [t.tx, 0, t.tz], u: [0, 1, 0], cell, fg, bg, u0 }); segWall(k, side, w, y0, y1, M.SIGN); E.setAux(0); };
-  const teamName = opts.teamName || 'SCRUTINEER';
-  const placeStand = (i0, len, side) => {
-    const rows = STAND_ROWS;
-    for (let k = i0; k < i0 + len; k++) {
-      const t = at(k);
-      for (let r = 0; r < rows; r++) { const w0 = ROAD_W + 15 + r * 1.6, y0 = 0.3 + r * 1.15;
-        E.setAux(signs.length); signs.push({ crowd: true, o: pos(k, side * w0, y0 - 1.15), r: [t.tx, 0, t.tz], u: [0, 1, 0], u0: (k - i0) * 4 }); segWall(k, side, w0, y0 - 1.15, y0, M.CROWD); E.setAux(0);
-        segQuad(k, side, w0, w0 + 1.6, y0, y0, M.STAND); }
-      const wr = ROAD_W + 14, yr = 0.3 + rows * 1.15 + 3.2;
-      segQuad(k, side, wr, wr + rows * 1.6 + 3, yr, yr + 1.2, M.STEEL);
-      const A = pos(k, side * wr, yr), B = pos(k + 1, side * wr, yr), Cq = pos(k + 1, side * (wr + rows * 1.6 + 3), yr + 1.2), Dq = pos(k, side * (wr + rows * 1.6 + 3), yr + 1.2);
-      if (side > 0) Q(A, B, Cq, Dq, M.CARBON); else Q(A, Dq, Cq, B, M.CARBON);
-      if (k > i0 + 1 && k < i0 + len - 2) segSign(k, side, wr - 0.4, yr - 1.6, yr - 0.2, `${teamName} · GRANDSTAND · ${teamName} · GRANDSTAND`, (k - i0 - 2) * 4, 0.34, M.GOLD, M.NAVY);
-      if ((k - i0) % 3 === 0) { const p = pos(k, side * (wr + 1)); box(p[0], yr / 2, p[2], 0.5, yr, 0.5, M.STEEL); }
-      if ((k - i0) % 6 === 3) { const p = pos(k, side * (wr + rows * 1.6 + 2)); box(p[0], yr / 2 + 0.6, p[2], 0.6, yr + 1.2, 0.6, M.STEEL); }
-    }
-  };
-  let standsPlaced = 0;
-  for (const [s0, sl] of straights) { if (standsPlaced >= STAND_CAP || sl < 10) continue; const i0 = s0 + 2, len = sl - 4, side = outside(s0 + Math.floor(sl / 2)); if (clearRun(i0, len, side, ROAD_W + 36)) { placeStand(i0, len, side); standsPlaced++; } }
-  if (straights.length) {
-    const [s0, sl] = straights[0]; const i0 = s0 + 3, len = sl - 6; let side = -outside(s0 + Math.floor(sl / 2));
-    if (!clearRun(i0, len, side, ROAD_W + 17)) side = -side;
-    if (clearRun(i0, len, side, ROAD_W + 17)) {
-      const wf = ROAD_W + 7.0, wb = ROAD_W + 16.0, hgt = 5.2;   // lane 2.3..7.0 = 4.7 m wide
-      // The lane itself: between the armco and the front of the building, with the box
-      // halfway along it.
-      const BOX = i0 + Math.floor(len / 2);
-      PIT = { i0, len, side, lane: side * (ROAD_W + 4.6), box: BOX,
-              entry: i0 - 6, exit: i0 + len + 6,
-              // A broadcast pit camera: across the lane from the box, slightly back and low,
-              // so the stop is seen three-quarters on rather than straight down the lane.
-              cam: pos(BOX - 3, side * (ROAD_W + 0.4), 1.9) };
-      for (let k = i0; k < i0 + len; k++) {
-        // The lane is a surface you drive on, not the grass that happened to be there. Lay it
-        // between the wall and the garage fronts, with a painted edge.
-        segQuad(k, side, ROAD_W + 2.3, wf - 0.2, 0.03, 0.03, M.ASPHALT);
-        segQuad(k, side, ROAD_W + 2.3, ROAD_W + 2.55, 0.045, 0.045, M.KERB_W);
-        // one bay per two segments, so the lane reads as a row of garages
-        if ((k - i0) % 2 === 0) { const q = pos(k, side * (wf - 0.3));
-          box(q[0], 0.9, q[2], 0.12, 1.8, 0.12, M.STEEL); }
-        segWall(k, side, wf, 0, hgt, M.BODY); segQuad(k, side, wf, wb, hgt, hgt, M.STEEL);
-        const A = pos(k, side * wb, 0), B = pos(k + 1, side * wb, 0), Cq = pos(k + 1, side * wb, hgt), Dq = pos(k, side * wb, hgt); if (side > 0) Q(A, Dq, Cq, B, M.BODY); else Q(A, B, Cq, Dq, M.BODY);
-        segWall(k, side, wf - 0.05, hgt - 0.5, hgt, M.NAVY); segWall(k, side, wf - 0.06, 3.1, 4.0, M.CYAN);
-        if ((k - i0) % 2 === 0) { segWall(k, side, wf - 0.08, 0.1, 2.9, M.STEEL); segWall(k, side, wf - 0.1, 2.95, 3.05, M.GOLD); }
-        if ((k - i0) % 2 === 1) { const p = pos(k, side * (wf - 0.12)); box(p[0], 1.5, p[2], 0.16, 2.9, 0.16, M.CARBON); }
-        if (k > i0 + 1 && k < i0 + len - 2) segSign(k, side, wf - 0.14, 4.1, 4.9, 'PIT LANE · PARC FERME · SCRUTINEERING BAY · PIT LANE · PARC FERME', (k - i0 - 2) * 4, 0.3, M.CYAN, M.NAVY);
-        // Leave the ends open: that is the pit entry and the pit exit, and without them the
-        // car would have to drive through the barrier to be serviced.
-        if (k > i0 + 2 && k < i0 + len - 3) segWall(k, side, ROAD_W + 2.4, 0, 1.0, M.ARMCO);
-      }
-      // The box itself: a marked stall, the bay it belongs to, and a crew waiting in it.
-      for (let k = BOX - 1; k <= BOX + 1; k++) segQuad(k, side, ROAD_W + 2.6, wf - 0.3, 0.05, 0.05, M.GOLD);
-      segQuad(BOX, side, ROAD_W + 2.6, ROAD_W + 2.9, 0.07, 0.07, M.NAVY);
-      segSign(BOX - 2, side, wf - 0.16, 1.2, 2.0, `${teamName} \u00B7 PIT BOX`, 0, 0.3, M.NAVY, M.GOLD);
-      {
-        // A pit crew, waiting where a pit crew waits: either side of the stall, plus one with
-        // the board out in front of it.
-        const crew = (q, m) => { box(q[0], 0.42, q[2], 0.34, 0.84, 0.34, m);
-          box(q[0], 1.02, q[2], 0.42, 0.36, 0.42, M.BODY);
-          box(q[0], 1.32, q[2], 0.3, 0.26, 0.3, m); };
-        // Clear of the car, which sits on the lane centre at ROAD_W + 3.5 and is about a
-        // metre wide over the wheels.
-        for (const [d, w, m] of [[-1, 3.35, M.GOLD], [1, 3.35, M.GOLD],
-                                 [-1, 5.85, M.CYAN], [1, 5.85, M.CYAN], [0, 6.3, M.STRIPE]]) {
-          const q = pos(BOX + d, side * (ROAD_W + w));
-          if (clearOfTrack(q[0], q[2], ROAD_W - 1.2)) crew(q, m);
-        }
-        const lolli = pos(BOX + 2, side * (ROAD_W + 4.5));
-        box(lolli[0], 1.3, lolli[2], 0.1, 2.6, 0.1, M.CARBON);
-        box(lolli[0], 2.5, lolli[2], 0.9, 0.5, 0.12, M.STRIPE);
-      }
-      const mid = pos(i0 + Math.floor(len / 2), side * (wf + 4.5)); box(mid[0], hgt + 0.8, mid[2], 3, 1.6, 8, M.STEEL); box(mid[0], hgt + 2.2, mid[2], 0.3, 2.6, 0.3, M.STEEL);
-    }
-  }
-  { const p = at(0), l = pos(0, ROAD_W + 2.5), r = pos(0, -(ROAD_W + 2.5));
-    box(l[0], 4, l[2], 0.8, 8, 0.8, M.STEEL); box(r[0], 4, r[2], 0.8, 8, 0.8, M.STEEL);
-    const cx = (l[0] + r[0]) / 2, cz = (l[2] + r[2]) / 2, yaw = Math.atan2(p.tx, p.tz), save = tris().length;
-    box(0, 8.4, 0, 2 * (ROAD_W + 2.9), 1.6, 1.0, M.NAVY); for (let k = -2; k <= 2; k++) box(k * 1.6, 7.3, 0.55, 0.8, 0.5, 0.2, M.STRIPE);
-    E.rotateRange(save, yaw, cx, cz);
-    E.setAux(signs.length); const so = [cx + p.nx * (ROAD_W + 2.4) - p.tx * 0.51, 7.7, cz + p.nz * (ROAD_W + 2.4) - p.tz * 0.51];
-    signs.push({ text: `${teamName} · SEALED CIRCUIT`, o: so, r: [-p.nx, 0, -p.nz], u: [0, 1, 0], cell: 0.36, fg: M.GOLD, bg: M.NAVY });
-    const se = [so[0] - p.nx * 2 * (ROAD_W + 2.4), 7.7, so[2] - p.nz * 2 * (ROAD_W + 2.4)]; Q(so, se, [se[0], 9.1, se[2]], [so[0], 9.1, so[2]], M.SIGN); E.setAux(0);
-    const s0 = pos(0, ROAD_W, 0.015), s1 = pos(0, -ROAD_W, 0.015), s2 = pos(-1, -ROAD_W, 0.015), s3 = pos(-1, ROAD_W, 0.015);
-    for (let k = 0; k < 6; k++) { const f = k / 6, g = (k + 1) / 6, A = [s0[0] + (s1[0] - s0[0]) * f, 0.015, s0[2] + (s1[2] - s0[2]) * f], B = [s0[0] + (s1[0] - s0[0]) * g, 0.015, s0[2] + (s1[2] - s0[2]) * g], Cc = [s3[0] + (s2[0] - s3[0]) * g, 0.015, s3[2] + (s2[2] - s3[2]) * g], D = [s3[0] + (s2[0] - s3[0]) * f, 0.015, s3[2] + (s2[2] - s3[2]) * f]; Q(A, D, Cc, B, (k & 1) ? M.KERB_W : M.CARBON); }
-  }
-  for (let k = 0; k < cn; k += Math.max(4, Math.round(cn / LIGHTS))) { const side = outside(k), p = pos(k, side * (ROAD_W + 26)); if (!clearOfTrack(p[0], p[2], ROAD_W + 6)) continue;
-    box(p[0], 14, p[2], 0.9, 28, 0.9, M.STEEL); box(p[0], 28.6, p[2], 4.5, 1.4, 1.2, M.STEEL); for (let j = -1; j <= 1; j++) box(p[0] + j * 1.4, 28.0, p[2] - side * 0.8, 1.0, 0.8, 0.3, M.LAMP);
-    const q = pos(k, side * (ROAD_W + 2)); LIGHTPOOLS.push([q[0], q[2], 26]); }
-  for (let k = 0; k < cn; k++) { const nxt = at(k + 25);
-    if (Math.abs(at(k).curv) < 0.003 && Math.abs(nxt.curv) > 0.012 && Math.abs(at(k + 24).curv) < 0.012) { const side = outside(k + 25);
-      for (const [d, txt] of [[0, '100'], [12, '50']]) { const p = pos(k + d, side * (ROAD_W + 3.5)); if (!clearOfTrack(p[0], p[2], ROAD_W + 1)) continue; box(p[0], 1.1, p[2], 0.15, 2.2, 0.15, M.STEEL);
-        E.setAux(signs.length); const t = at(k + d), o = [p[0] + t.tx * 0.8, 1.6, p[2] + t.tz * 0.8]; signs.push({ text: txt, o, r: [-t.tx, 0, -t.tz], u: [0, 1, 0], cell: 1.6 / (txt.length * 4 + 1), fg: M.BODY, bg: M.STRIPE });
-        Q(o, [o[0] - t.tx * 1.6, 1.6, o[2] - t.tz * 1.6], [o[0] - t.tx * 1.6, 2.6, o[2] - t.tz * 1.6], [o[0], 2.6, o[2]], M.SIGN); E.setAux(0); }
-      k += 40; } }
-  for (const [f, txt] of [[1 / 3, 'S1'], [2 / 3, 'S2'], [0, 'S3']]) { const k = Math.round(cn * f), side = outside(k), p = pos(k, side * (ROAD_W + 3.2)); box(p[0], 1.2, p[2], 0.15, 2.4, 0.15, M.STEEL);
-    E.setAux(signs.length); const t = at(k), o = [p[0] - t.tx * 0.6, 1.9, p[2] - t.tz * 0.6]; signs.push({ text: txt, o, r: [t.tx, 0, t.tz], u: [0, 1, 0], cell: 1.2 / (txt.length * 4 + 1), fg: M.NAVY, bg: M.CYAN });
-    Q(o, [o[0] + t.tx * 1.2, 1.9, o[2] + t.tz * 1.2], [o[0] + t.tx * 1.2, 2.7, o[2] + t.tz * 1.2], [o[0], 2.7, o[2]], M.SIGN); E.setAux(0); }
-  const clearOfStructs = (x, y, z, r) => { for (const t of tris()) { if (E.GROUND_MATS.has(t.m)) continue; for (const v of t.v) if (Math.hypot(v[0] - x, v[1] - y, v[2] - z) < r) return false; } return true; };
-  // A camera that is clear of structures where it stands can still have a grandstand column
-  // squarely between it and the car. Grid the tall geometry once, then march each camera's
-  // sightline through it and record which stretch of track it can actually see.
-  const BLOCK = new Set(), CELL = 2.2, key = (x, z) => `${Math.round(x / CELL)},${Math.round(z / CELL)}`;
-  for (const t of tris()) { if (E.GROUND_MATS.has(t.m)) continue;
-    for (const v of t.v) if (v[1] > 2.0 && v[1] < 26) BLOCK.add(key(v[0], v[2])); }
-  const sees = (cx, cz, px, pz) => {
-    const dx = px - cx, dz = pz - cz, len = Math.hypot(dx, dz); if (len < 1) return true;
-    const n = Math.ceil(len / (CELL * 0.7));
-    for (let q = 1; q < n; q++) { const f = q / n;
-      if (f < 0.12 || f > 0.9) continue;              // its own stand behind it, and the barrier in front
-      if (BLOCK.has(key(cx + dx * f, cz + dz * f))) return false; }
-    return true;
-  };
-  for (let k = 0; k < 8; k++) {
-    const a0 = Math.round(cn * k / 8), a1 = Math.round(cn * (k + 1) / 8); let bi = a0, bk = -1;
-    for (let q = a0; q < a1; q++) { const kk = Math.abs(at(q).curv); if (kk > bk) { bk = kk; bi = q; } }
-    const side = outside(bi); let placed = false;
-    for (const w of [ROAD_W + 14, ROAD_W + 10, ROAD_W + 7]) { const p = pos(bi, side * w, 6.5); if ((clearOfTrack(p[0], p[2], w - 1) && clearOfStructs(p[0], p[1], p[2], 4)) || w === ROAD_W + 7) { TVCAMS.push({ i: bi, x: p[0], y: p[1], z: p[2], s: bi * c.step }); placed = true; break; } }
-    if (!placed) { const p = pos(bi, side * (ROAD_W + 7), 6.5); TVCAMS.push({ i: bi, x: p[0], y: p[1], z: p[2], s: bi * c.step }); }
-  }
-  // how much of its approach each camera has a clean view of; a camera that mostly sees a wall
-  // is never cut to
-  for (const tc of TVCAMS) {
-    let ok = 0, n = 0;
-    for (let d = -40; d <= 90; d += 10) { const q = pos(tc.i + Math.round(d / c.step), 0, 0.6);
-      n++; if (sees(tc.x, tc.z, q[0], q[2])) ok++; }
-    tc.clear = ok / n;
-  }
-  return { mesh: E.end(), lightpools: LIGHTPOOLS, tvcams: TVCAMS, circuit: c, pit: PIT };
-};
-})(__SCR);
+})(window.SCR = window.SCR || {});
 
 // ============================================================================
 // SCR.pit — the pit board: the car on your desk while the loop runs behind it.
 //
-// A small card that stays on top, with a toy car lapping the season's circuit. Where the car is on
-// the lap is how far the current run has got, and it crosses the line when the loop decides the run;
-// a kept change rebuilds the car right there. Click or hover the card for the board: how far the
+// A small card that stays on top. The car turns on its pit-box floor; each time the loop lands a
+// generation the car rebuilds in front of you, and hovering the card opens the board: how far the
 // agent has run, what it kept, what it is running on. Three ways to keep it in view:
 //   · pop it out — Document Picture-in-Picture gives it a window of its own, above every app
 //   · drag it anywhere on the page it lives in; it remembers where you left it
@@ -1214,7 +738,7 @@ Wd.build = function (c, opts = {}) {
 // ============================================================================
 (function (SCR) {
 'use strict';
-const E = SCR.engine, C = SCR.car, S = SCR.sim, Wd = SCR.world, M = E.M, P = SCR.pit = {};
+const E = SCR.engine, C = SCR.car, S = SCR.sim, M = E.M, P = SCR.pit = {};
 const W = 128, H = 80;                        // the board's own pixels; CSS doubles them, nearest neighbour
 const LOCAL = 'http://127.0.0.1:7777';
 const FONTS = 'https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap';
@@ -1224,7 +748,6 @@ const NAME = { AERO: 'RETRIEVAL', DATA: 'VERIFICATION', TYRES: 'SAMPLING', POWER
 const WHY = { seesaw: 'the two splits disagreed', regression: 'it made the car slower', cost_cap: 'over the cost cap',
   scrutineering: 'black-flagged', diff_size: 'too big a change', comparable_ab: 'the A/B was not comparable',
   novelty: 'nothing new in it', evidence: 'not enough evidence', correlation: 'the splits did not track',
-  ladder: "inside the sealed split's own noise",
   rl_entropy: 'the model collapsed', 'debrief gate': 'the debrief did not clear' };
 const unchanged = r => r.rule_fired === 'no_upgrade' || r.rule_fired === 'circuit';
 const esc = s => String(s === undefined || s === null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -1239,133 +762,20 @@ const st = {
   levels: {}, run: 0, laps: 0, lap: 0, lapsRun: 0, race: '', busy: false, phase: '', error: null,
   claimed: null, official: null, since: 0, seenSeq: 0,
   replay: { all: [], i: 0, every: 24, at: 0, elapsed: 0, beat: 0, laps: 40 },
-  orbit: 0, camYaw: 0, along: 0, whip: 0, fx: [], anim: null, card: null, cardTimer: 0,
-  R: null, track: null, spec: null, mesh: null, car: null,
-  root: null, host: null, win: window, raf: 0, last: 0, pip: null, vpip: null, placard: null, open: false, drag: null, boardAt: 0, stripTxt: '',
+  orbit: 0.9, whip: 0, fx: [], anim: null, card: null, cardTimer: 0,
+  R: null, ground: null, spec: null, mesh: null, car: null,
+  root: null, host: null, win: window, raf: 0, last: 0, pip: null, open: false, drag: null, boardAt: 0, stripTxt: '',
 };
 P.state = () => st;
 
-// ---------- the circuit: the season's own, the same one the front page drives ----------
-// Where the car is on the lap is how far the current run has got; crossing the line is the run
-// being decided. So the lap is a progress bar you can read from across the room, and the speed
-// on it is a real car's: brake for the corners, flat out on the straights, and the lap still ends
-// exactly when the run does.
-const ROAD = 6, KERB = 1.4, RUN_SHARE = 0.8;
-const PHASE_AT = { RUN: 0, SCORE: 0.82, DIAGNOSE: 0.86, SELECT: 0.9, CHANGE: 0.93, GATES: 0.96, RESULT: 0.98 };
-const wrap = (i, n) => ((i % n) + n) % n;
-function makeTrack(seed) {
-  const circ = Wd.makeCircuit(seed), pts = circ.pts, n = circ.n, step = circ.step;
-  // how hard each stretch can be taken, then accelerate out of and brake into it
-  const curvS = pts.map((_, i) => { let a = 0; for (let k = -12; k <= 12; k++) a += pts[wrap(i + k, n)].curv; return a / 25; });
-  const v = pts.map(q => Math.min(78, Math.sqrt(34 / Math.max(1e-5, Math.abs(q.curv)))));
-  for (let pass = 0; pass < 2; pass++) {
-    for (let i = 0; i < n; i++) { const j = (i + 1) % n; v[j] = Math.min(v[j], Math.sqrt(v[i] * v[i] + 2 * 11 * step)); }
-    for (let i = n - 1; i >= 0; i--) { const j = (i + 1) % n; v[i] = Math.min(v[i], Math.sqrt(v[j] * v[j] + 2 * 28 * step)); }
-  }
-  const tcum = new Float64Array(n + 1);
-  for (let i = 0; i < n; i++) tcum[i + 1] = tcum[i] + step * 2 / (v[i] + v[(i + 1) % n]);
-  const off = curvS.map(c => Math.max(-1, Math.min(1, c * 260)) * 3.1);   // the racing line: tuck in at the apex
-  // the static world: striped grass, the road, kerbs where it turns, armco where there is room
-  E.begin(); E.setGroup(0); E.setAux(0);
-  const quad = (a, b, c, d, m) => {   // ground quads wind the one way the renderer expects
-    const ux = b[0] - a[0], uz = b[2] - a[2], vx = c[0] - a[0], vz = c[2] - a[2];
-    if (uz * vx - ux * vz < 0) E.Q(a, b, c, d, m); else E.Q(d, c, b, a, m);
-  };
-  let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9;
-  for (const q of pts) { x0 = Math.min(x0, q.x); x1 = Math.max(x1, q.x); z0 = Math.min(z0, q.z); z1 = Math.max(z1, q.z); }
-  const G = 18, gx0 = Math.floor((x0 - 90) / G) * G, gz0 = Math.floor((z0 - 90) / G) * G;
-  for (let gx = gx0; gx < x1 + 90; gx += G) for (let gz = gz0; gz < z1 + 90; gz += G)
-    quad([gx, 0, gz], [gx + G, 0, gz], [gx + G, 0, gz + G], [gx, 0, gz + G], ((gx - gx0) / G + (gz - gz0) / G) % 2 ? M.GRASS : M.GRASS2);
-  const edge = (i, o) => { const q = pts[wrap(i, n)]; return [q.x + q.nx * o, 0, q.z + q.nz * o]; };
-  for (let i = 0; i < n; i++) {
-    const j = i + 1;
-    quad(edge(i, -ROAD), edge(i, ROAD), edge(j, ROAD), edge(j, -ROAD), i === 0 ? M.KERB_W : M.ASPHALT);
-    for (const sd of [-1, 1]) quad(edge(i, sd * (ROAD - 0.55)), edge(i, sd * (ROAD - 0.2)), edge(j, sd * (ROAD - 0.2)), edge(j, sd * (ROAD - 0.55)), M.KERB_W);
-    if (Math.abs(curvS[i]) > 0.0045) for (const sd of [-1, 1])
-      quad(edge(i, sd * ROAD), edge(i, sd * (ROAD + KERB)), edge(j, sd * (ROAD + KERB)), edge(j, sd * ROAD), (i >> 1) % 2 ? M.KERB_R : M.KERB_W);
-    for (const sd of [-1, 1]) {
-      const room = Math.min(circ.room(i, sd), circ.room(j, sd));
-      if (room < 10) continue;
-      const w = Math.min(room - 1, 13) * sd, a = edge(i, w), b = edge(j, w), h = 0.9;
-      E.Q(a, b, [b[0], h, b[2]], [a[0], h, a[2]], M.ARMCO); E.Q(b, a, [a[0], h, a[2]], [b[0], h, b[2]], M.ARMCO);
-    }
-  }
-  // the gantry over the line: where every run is decided
-  const q0 = pts[0], yaw0 = Math.atan2(q0.tx, q0.tz), from = E.current().length;
-  E.box(-ROAD - 1.2, 3, 0, 0.5, 6, 0.5, M.STEEL); E.box(ROAD + 1.2, 3, 0, 0.5, 6, 0.5, M.STEEL);
-  E.box(0, 5.9, 0, ROAD * 2 + 2.9, 0.9, 0.6, M.NAVY);
-  for (let k = -3; k <= 3; k++) E.box(k * 1.4, 5.9, 0.32, 0.8, 0.5, 0.05, k % 2 ? M.GOLD : M.LAMP);
-  E.rotateRange(from, yaw0, q0.x, q0.z);
-  const mesh = E.end();
-  // the minimap: the same lap, a few pixels wide, in the corner of the card
-  const MW = 30, MH = 19, sc = Math.min((MW - 2) / (x1 - x0), (MH - 2) / (z1 - z0));
-  const padX = ((MW - 2) - (x1 - x0) * sc) / 2, padY = ((MH - 2) - (z1 - z0) * sc) / 2;
-  const mini = pts.map(q => [Math.round(1 + padX + (q.x - x0) * sc), Math.round(1 + padY + (q.z - z0) * sc)]);
-  return { circ, pts, n, step, v, tcum, T: tcum[n], off, curvS, mesh, mini, MW, MH };
-}
-// lap fraction (0..1 of lap time) -> distance along the lap, through the speed profile
-function sAt(tr, frac) {
-  const tt = (((frac % 1) + 1) % 1) * tr.T, a = tr.tcum;
-  let lo = 0, hi = tr.n;
-  while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (a[mid] <= tt) lo = mid; else hi = mid; }
-  const u = (tt - a[lo]) / Math.max(1e-9, a[lo + 1] - a[lo]);
-  return (lo + u) * tr.step;
-}
-function poseAt(tr, s) {
-  const f = s / tr.step, i = Math.floor(f), u = f - i, n = tr.n, A = tr.pts[wrap(i, n)], B = tr.pts[wrap(i + 1, n)];
-  const o = tr.off[wrap(i, n)] + (tr.off[wrap(i + 1, n)] - tr.off[wrap(i, n)]) * u;
-  return { x: A.x + (B.x - A.x) * u + (A.nx + (B.nx - A.nx) * u) * o, z: A.z + (B.z - A.z) * u + (A.nz + (B.nz - A.nz) * u) * o, curv: tr.curvS[wrap(i, n)] };
-}
-// where the run is, as a fraction of the lap: the laps fill the first 80 %, the loop's own phases
-// the rest, and the line itself only when the result is in
-function runFraction() {
-  if (st.source === 'replay') return st.busy ? Math.min(0.995, st.replay.elapsed / st.replay.every) : 0;
-  if (!st.busy) return 0;
-  if (st.phase === 'RUN' || !st.phase) return st.laps ? RUN_SHARE * st.lap / st.laps : 0;
-  return PHASE_AT[st.phase] !== undefined ? PHASE_AT[st.phase] : RUN_SHARE;
-}
-function drive(dt) {
-  const tr = st.track, c = st.car;
-  const target = st.rounds.length + runFraction();
-  if (target < st.along - 0.5 || target - st.along > 1.5) st.along = target - 0.001;   // a new season, or back from a hidden tab
-  const gap = target - st.along, rate = gap > 0.25 ? 1 / 4 : 1 / 12;
-  st.along += Math.max(0, Math.min(gap, rate * dt * (1 + gap * 4)));
-  const s = sAt(tr, st.along), p = poseAt(tr, s), ahead = poseAt(tr, s + 3), behind = poseAt(tr, s - 3);
-  const speed = dt > 0 ? Math.hypot(p.x - c.x, p.z - c.z) / dt : 0;
-  c.x = p.x; c.z = p.z; c.y = 0;
-  c.yaw = Math.atan2(ahead.x - behind.x, ahead.z - behind.z);
-  c.speed = speed;
-  const k = 1 - Math.exp(-8 * dt), moving = speed > 1.5;
-  c.steer += ((moving ? Math.max(-0.34, Math.min(0.34, p.curv * 24)) : 0) - c.steer) * k;
-  c.roll += ((moving ? Math.max(-0.07, Math.min(0.07, -p.curv * speed * 0.9)) : 0) - c.roll) * k;
-  c.pitch = 0; c.spin += speed * dt / 0.33; c.fanSpin += dt * (1.5 + speed * 0.2);
-  c.drsAngle += ((moving && speed > 55 && Math.abs(p.curv) < 0.002 ? 0.75 : 0) - c.drsAngle) * k;
-  if (!moving) {   // parked on the line between runs: a wink of DRS, a steering check
-    const t = E.time % 9;
-    if (t > 6 && t < 6.9) c.drsAngle = 0.75 * Math.sin((t - 6) / 0.9 * Math.PI);
-    if (t > 2.5 && t < 4) c.steer = 0.3 * Math.sin((t - 2.5) / 1.5 * Math.PI * 2);
-  }
-}
-function camera(dt) {
-  const c = st.car, cam = st.R.cam, k = 1 - Math.exp(-3.2 * dt), calm = reduced();
-  st.whip = Math.max(0, st.whip - dt * 4.5);
-  let d = c.yaw - st.camYaw; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
-  st.camYaw += d * k;
-  st.orbit += st.whip * dt * 1.87;                                   // a kept run: the camera goes once round the car
-  if (!st.whip) { const home = Math.round(st.orbit / (2 * Math.PI)) * 2 * Math.PI; st.orbit += (home - st.orbit) * (1 - Math.exp(-1.5 * dt)); }
-  const a = st.camYaw + st.orbit + (calm ? 0.35 : 0.35 + Math.sin(E.time * 0.21) * 0.4), dist = 9.5, h = 3.6;
-  cam.pos = [c.x - Math.sin(a) * dist, h, c.z - Math.cos(a) * dist];
-  cam.target = [c.x + Math.sin(c.yaw) * 2.5, 0.3, c.z + Math.cos(c.yaw) * 2.5]; cam.fov = 42;
-}
-function minimap(R) {
-  const tr = st.track, px = R.px, w = R.W, ox = w - tr.MW - 2, oy = 2;
-  for (let y = 0; y < tr.MH; y++) for (let x = 0; x < tr.MW; x++) { const o = ((oy + y) * w + ox + x) * 4; px[o] >>= 2; px[o + 1] >>= 2; px[o + 2] >>= 1; }
-  const done = ((st.along % 1) + 1) % 1, iNow = Math.min(tr.n - 1, Math.floor(sAt(tr, done) / tr.step));
-  const put = (x, y, r, g, b) => { const o = ((oy + y) * w + ox + x) * 4; px[o] = r; px[o + 1] = g; px[o + 2] = b; };
-  tr.mini.forEach(([x, y], i) => i <= iNow && st.busy ? put(x, y, 244, 197, 66) : put(x, y, 82, 88, 114));
-  put(tr.mini[0][0], tr.mini[0][1], 255, 255, 255);
-  const [cx, cy] = tr.mini[iNow]; if ((E.time * 3 | 0) % 2 || !st.busy) put(cx, cy, 255, 255, 255); else put(cx, cy, 227, 30, 45);
-}
+// ---------- the floor: concrete, with the box painted on it ----------
+E.hooks[M.CONCRETE] = function (mx, my, mz) {
+  const ax = Math.abs(mx), az = Math.abs(mz);
+  return ((ax > 2.1 && ax < 2.26 && az < 3.95) || (az > 3.8 && az < 3.95 && ax < 2.26)) ? M.GOLD : M.CONCRETE;
+};
+function makeGround() { E.begin(); E.setGroup(0); E.setAux(0); E.Q([-8, 0, -8], [8, 0, -8], [8, 0, 8], [-8, 0, 8], M.CONCRETE); return E.end(); }
+
+// ---------- the car, idling: turntable camera, a wink of DRS, a steering check ----------
 function rebuild(animate) {
   st.spec = C.specForLevels(st.levels);
   const mesh = C.build(st.spec, C.eraForLevels(st.levels));
@@ -1373,12 +783,24 @@ function rebuild(animate) {
   st.mesh = mesh;
   if (animate && !reduced()) st.whip = 5.5;
 }
+function camera(dt) {
+  st.whip = Math.max(0, st.whip - dt * 4.5);
+  st.orbit += dt * (0.3 + st.whip);
+  const cam = st.R.cam, r = 5.35;
+  cam.pos = [Math.sin(st.orbit) * r, 1.5, Math.cos(st.orbit) * r]; cam.target = [0, 0.4, 0]; cam.fov = 31;
+}
+function idle(dt) {
+  const c = st.car, k = E.time % 9;
+  c.spin = 0; c.roll = 0; c.pitch = 0;
+  c.drsAngle = k > 6 && k < 6.9 ? 0.75 * Math.sin((k - 6) / 0.9 * Math.PI) : 0;
+  c.steer = k > 2.5 && k < 4 ? 0.3 * Math.sin((k - 2.5) / 1.5 * Math.PI * 2) : 0;
+  c.fanSpin += dt * 1.5;
+}
 const lifted = (xf, dy) => (x, y, z, g, o) => { xf(x, y, z, g, o); o[1] += dy; };
 function burst(n) {
   for (let k = 0; k < n; k++) {
-    const h = E.hash2(k, st.fx.length + 1), h2 = E.hash2(k * 7 + 3, 11), wd = C.WHEELS[k & 3], o = [0, 0, 0];
-    C.makeXform(st.car, { pose: 'display' })(wd.cx * 1.1, 0.15, wd.cz, 0, o);
-    st.fx.push({ x: o[0], y: o[1], z: o[2], vx: (h - 0.5) * 9, vy: 2 + h2 * 4, vz: (h2 - 0.5) * 9, life: 0.45 + h * 0.5 });
+    const h = E.hash2(k, st.fx.length + 1), h2 = E.hash2(k * 7 + 3, 11), wd = C.WHEELS[k & 3];
+    st.fx.push({ x: wd.cx * 1.1, y: 0.15, z: wd.cz, vx: (h - 0.5) * 9, vy: 2 + h2 * 4, vz: (h2 - 0.5) * 9, life: 0.45 + h * 0.5 });
   }
 }
 function tint(R, col, amount) {
@@ -1402,14 +824,13 @@ function renderAnim(a) {
   }
 }
 function frame(dt) {
-  E.time += dt; drive(dt); camera(dt); S.stepSparks(st.fx, dt);
-  const R = st.R; R.begin(); R.sky(); R.drawStatic(st.track.mesh);
+  E.time += dt; camera(dt); idle(dt); S.stepSparks(st.fx, dt);
+  const R = st.R; R.begin(); R.gradient('#0C1236', '#06081A'); R.drawStatic(st.ground);
   const a = st.anim;
   if (a) { a.t += dt; renderAnim(a); if (a.t > a.len) st.anim = null; }
   else { const xf = C.makeXform(st.car); R.drawDynamic(st.mesh, xf, 'shadow', 0); R.drawDynamic(st.mesh, xf, 'solid', 0); }
   S.drawSparks(R, st.fx); R.outline();
   if (a) { if (a.flash > 0) R.flash(a.flash); if (a.tint > 0) tint(R, [227, 30, 45], a.tint); }
-  minimap(R);
   R.present();
 }
 
@@ -1432,7 +853,6 @@ function card(kind, html) {
   const c = st.card; if (!c) return;
   clearTimeout(st.cardTimer);
   c.className = 'pit-card ' + kind; c.innerHTML = html;
-  st.placard = { kind, text: c.textContent.replace(/\s+/g, ' ').trim(), until: Date.now() + 3400 };
   void c.offsetWidth; c.classList.add('show');
   st.cardTimer = setTimeout(() => c.classList.remove('show'), 3400);
 }
@@ -1485,19 +905,12 @@ const loopback = o => { try { const u = new URL(o); return u.hostname === '127.0
 async function detect(pref) {
   const here = /^https?:/.test(location.origin) ? location.origin : '';
   if (pref && pref !== 'replay' && pref !== here && !loopback(pref)) pref = 'replay';
-  const cands = pref === 'replay' ? [] : pref ? [pref] : [here, location.protocol === 'http:' ? LOCAL : ''].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i);
+  const cands = pref === 'replay' ? [] : pref ? [pref] : [here, LOCAL].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i);
   for (const o of cands) { const s = await probe(o); if (s) { goLive(o, s); return; } }
   goReplay();
-  if (pref || location.protocol !== 'http:' || !cands.length) return;
-  const again = setInterval(async () => {
-    for (const o of cands) { const s = await probe(o); if (!s) continue;
-      clearInterval(again); st.replay.all = []; st.rounds = []; st.lapsRun = 0; st.levels = C.levelsAfter([], 0);
-      goLive(o, s); rebuild(false); paint(true); paintActions(); return; }
-  }, 20000);
 }
 function goLive(origin, s) {
   st.source = 'live'; st.origin = origin; st.busy = !!s.busy; st.error = s.error || null;
-  if (st.root) paintActions();
   if (s.levels && Object.keys(s.levels).length) { st.levels = s.levels; rebuild(false); }
   st.run = s.run || 0;
   const es = new EventSource(origin + '/api/events'); st.es = es;
@@ -1507,16 +920,11 @@ function goLive(origin, s) {
   es.onmessage = ev => { let d; try { d = JSON.parse(ev.data); } catch (e) { return; }
     if (d.seq !== undefined) { if (d.seq <= st.seenSeq) return; st.seenSeq = d.seq; }
     if (warm) settle(); st.linkDown = false; onLive(d, !warm); };
-  es.onopen = () => {
-    if (!st.linkDown) return;
-    st.linkDown = false; st.seenSeq = 0; st.rounds = []; st.lapsRun = 0; st.error = null;
-    warm = true; settle(); paint(true);
-  };
   es.onerror = () => { st.linkDown = true; paint(true); };
   settle(); paint(true);
 }
 function onLive(d, fresh) {
-  if (d.kind === 'phase') { st.phase = d.phase; if (d.phase === 'RUN') { st.run = d.generation + 1; st.lap = 0; st.laps = d.total || 0; st.busy = true; st.error = null; }
+  if (d.kind === 'phase') { st.phase = d.phase; if (d.phase === 'RUN') { st.run = d.generation + 1; st.lap = 0; st.laps = d.total || 0; st.busy = true; }
     if (d.levels && !fresh) { st.levels = d.levels; rebuild(false); } }
   else if (d.kind === 'lap') { if (d.race !== st.race) { st.race = d.race; st.lap = 0; } st.lap = d.index; st.laps = d.total; st.lapsRun++; }
   else if (d.kind === 'score') { st.claimed = d.claimed; st.official = d.official; }
@@ -1537,9 +945,9 @@ const level = k => { const n = Math.floor(Number((st.levels || {})[k])); return 
 function paint(now) {
   const root = st.root; if (!root) return;
   const src = st.source === 'live' ? 'LIVE' : st.source === 'replay' ? 'REPLAY' : '';
-  const runNo = st.busy ? (st.source === 'live' && st.run ? st.run : st.rounds.length + 1) : st.rounds.length;
+  const runNo = st.busy ? st.run || st.rounds.length + 1 : st.rounds.length;
   const txt = st.source === 'probing' ? 'LOOKING FOR THE LOOP'
-    : st.error ? `${src} · RUN STOPPED` : st.busy && st.laps && (st.phase === 'RUN' || !st.phase) ? `${src} RUN ${runNo} · LAP ${st.lap}/${st.laps}`
+    : st.error ? `${src} · RUN STOPPED` : st.busy && st.laps ? `${src} RUN ${runNo} · LAP ${st.lap}/${st.laps}`
     : st.busy ? `${src} RUN ${runNo} · ${st.phase || 'STARTING'}` : `${src} · RUN ${runNo} · KEPT ${kept()}`;
   if (txt !== st.stripTxt) { st.stripTxt = txt; root.querySelector('.pit-txt').textContent = txt; }
   const dot = root.querySelector('.pit-dot'), dc = 'pit-dot ' + (st.source === 'live' ? (st.linkDown ? 'down' : st.busy ? 'busy' : 'live') : st.source === 'replay' ? 'replay' : 'probe');
@@ -1587,10 +995,10 @@ function paintBoard() {
 }
 function paintActions() {
   const a = st.root.querySelector('.pb-actions'); a.innerHTML = '';
-  if (canPip() || canVideoPip()) { const pb = el('button', 'pb-btn', st.pip || st.vpip ? 'BRING IT BACK' : 'POP OUT ↗'); pb.type = 'button';
-    pb.addEventListener('click', ev => { ev.stopPropagation(); togglePop(); }); a.append(pb); }
-  const link = el('a', 'pb-link', 'TELEMETRY ↗');
-  link.href = (st.source === 'live' && (st.origin === location.origin || loopback(st.origin)) ? st.origin : 'https://scrutineer-one.vercel.app') + '/telemetry'; link.target = '_blank'; link.rel = 'noopener'; a.append(link);
+  if (canPip()) { const pb = el('button', 'pb-btn', st.pip ? 'BRING IT BACK' : 'POP OUT ↗'); pb.type = 'button';
+    pb.addEventListener('click', ev => { ev.stopPropagation(); if (st.pip) st.pip.close(); else P.popOut(); }); a.append(pb); }
+  const link = el('a', 'pb-link', 'THE BROADCAST ↗');
+  link.href = st.source === 'live' && (st.origin === location.origin || loopback(st.origin)) ? st.origin + '/' : 'https://scrutineer-one.vercel.app/'; link.target = '_blank'; link.rel = 'noopener'; a.append(link);
 }
 
 // ---------- the card on the page: drag, hover, pop out ----------
@@ -1619,132 +1027,19 @@ function wire() {
   const drop = () => { if (!st.drag) return; st.drag = null; r.classList.remove('dragging'); if (st.open) setOpen(true); };
   strip.addEventListener('pointerup', drop); strip.addEventListener('pointercancel', drop);
   // hover opens the board; a tap on the car does the same on a screen with no hover
-  r.addEventListener('mouseenter', () => { if (!st.open) st.openedAt = Date.now(); setOpen(true); }); r.addEventListener('mouseleave', () => setOpen(false));
+  r.addEventListener('mouseenter', () => setOpen(true)); r.addEventListener('mouseleave', () => setOpen(false));
   r.addEventListener('focusin', () => setOpen(true)); r.addEventListener('focusout', ev => { if (!r.contains(ev.relatedTarget)) setOpen(false); });
-  r.querySelector('canvas').addEventListener('click', () => { if (st.open && Date.now() - (st.openedAt || 0) < 400) return; setOpen(!st.open); });
+  r.querySelector('canvas').addEventListener('click', () => setOpen(!st.open));
   r.addEventListener('keydown', ev => { if (ev.key === 'Escape') setOpen(false); });
   window.addEventListener('resize', () => { if (!st.pip && r.style.left) place(parseFloat(r.style.left), parseFloat(r.style.top)); });
   const pop = r.querySelector('.pit-pop');
-  if (!canPip() && !canVideoPip()) pop.hidden = true;
+  if (!canPip()) pop.hidden = true;
   pop.addEventListener('pointerdown', ev => ev.stopPropagation());
-  pop.addEventListener('click', ev => { ev.stopPropagation(); togglePop(); });
+  pop.addEventListener('click', ev => { ev.stopPropagation(); if (st.pip) st.pip.close(); else P.popOut(); });
 }
-// ---------- the pop-out ----------
-// Chrome gives a document picture-in-picture window a title bar with the site's address and the
-// system's window buttons, and no page can take them off. A video picture-in-picture window has
-// neither: it is only the picture, with its controls on hover. So the pop-out is a live video of
-// the card, drawn frame by frame, and its play/pause button flips between the car and the board.
-// Where a browser has no video pop-out, the document window is still there.
-const VW = 512, VH = 360, SH = 40;
-const canVideoPip = () => !!(document.pictureInPictureEnabled && HTMLCanvasElement.prototype.captureStream);
-function togglePop() { if (st.vpip) stopVideoPip(); else if (st.pip) st.pip.close(); else P.popOut(); }
 P.popOut = async function () {
-  if (st.pip || st.vpip) return true;
-  if (canVideoPip() && await videoPip()) return true;
-  return docPip();
-};
-async function videoPip() {
-  const cv = el('canvas'); cv.width = VW; cv.height = VH;
-  const manual = !!(window.CanvasCaptureMediaStreamTrack && 'requestFrame' in CanvasCaptureMediaStreamTrack.prototype);
-  const stream = cv.captureStream(manual ? 0 : 30), track = stream.getVideoTracks()[0];
-  const video = el('video'); video.muted = true; video.playsInline = true; video.setAttribute('aria-hidden', 'true');
-  video.style.cssText = 'position:fixed;left:-9999px;top:0;width:2px;height:2px;opacity:0;pointer-events:none';
-  document.body.append(video); video.srcObject = stream;
-  const v = st.vpip = { cv, ctx: cv.getContext('2d'), track, manual, video, board: false, last: 0, worker: null, timer: 0 };
-  composeFrame();
-  try {
-    await Promise.race([video.play(), new Promise((_, no) => setTimeout(() => no(new Error('no frame')), 1500))]);
-    await video.requestPictureInPicture();
-  } catch (e) { stopVideoPip(); return false; }
-  video.addEventListener('leavepictureinpicture', () => stopVideoPip(), { once: true });
-  // a hidden tab draws no animation frames, but a worker's clock keeps running, so the car keeps lapping
-  try { st.win.cancelAnimationFrame(st.raf); } catch (e) { /* nothing was scheduled */ }
-  const step = () => {
-    if (st.vpip !== v) return;
-    const now = performance.now(), dt = v.last ? Math.min(0.05, (now - v.last) / 1000) : 0; v.last = now;
-    frame(dt); if (st.source === 'replay') replayTick(); paint(false); composeFrame();
-  };
-  const interval = () => { if (!v.timer) v.timer = setInterval(step, 33); };
-  try {
-    v.worker = new Worker(URL.createObjectURL(new Blob(['setInterval(function(){postMessage(0)},33)'], { type: 'text/javascript' })));
-    v.worker.onmessage = step; v.worker.onerror = () => { v.worker.terminate(); v.worker = null; interval(); };
-  } catch (e) { interval(); }   // a page whose policy refuses workers still gets a clock, a slower one when hidden
-  if ('mediaSession' in navigator) {
-    const flip = () => { v.board = !v.board; composeFrame(); video.play().catch(() => {}); };
-    for (const a of ['play', 'pause', 'nexttrack', 'previoustrack']) { try { navigator.mediaSession.setActionHandler(a, flip); } catch (e) { /* not offered here */ } }
-  }
-  paintActions();
-  return true;
-}
-function stopVideoPip() {
-  const v = st.vpip; if (!v) return; st.vpip = null;
-  if (v.worker) v.worker.terminate(); if (v.timer) clearInterval(v.timer);
-  try { if (document.pictureInPictureElement === v.video) document.exitPictureInPicture(); } catch (e) { /* already closed */ }
-  v.track.stop(); v.video.remove();
-  if ('mediaSession' in navigator) for (const a of ['play', 'pause', 'nexttrack', 'previoustrack']) { try { navigator.mediaSession.setActionHandler(a, null); } catch (e) { /* not offered here */ } }
-  swapLoop(window); paintActions(); paint(true);
-}
-// one frame of the pop-out: the car (or the board), the strip under it, and any placard
-function composeFrame() {
-  const v = st.vpip; if (!v) return;
-  const g = v.ctx, px = '"Press Start 2P","Courier New",monospace', big = '"VT323","Courier New",monospace';
-  g.imageSmoothingEnabled = false;
-  if (v.board) drawPipBoard(g, px, big);
-  else {
-    g.drawImage(st.root.querySelector('canvas'), 0, 0, VW, VH - SH);
-    const pc = st.placard;
-    if (pc && Date.now() < pc.until) {
-      const bg = pc.kind === 'refused' ? '#E31E2D' : pc.kind === 'none' ? '#C8CBD8' : '#F4C542';
-      g.fillStyle = '#000'; g.fillRect(16, VH - SH - 66, VW - 32, 46); g.fillStyle = bg; g.fillRect(16, VH - SH - 70, VW - 32, 46);
-      g.fillStyle = pc.kind === 'refused' ? '#FFF' : '#000'; g.font = `14px ${px}`; g.textBaseline = 'middle';
-      g.fillText(pc.text.toUpperCase().slice(0, 30), 30, VH - SH - 47);
-    }
-  }
-  g.fillStyle = '#000'; g.fillRect(0, VH - SH, VW, SH);
-  g.fillStyle = st.source === 'live' ? (st.linkDown ? '#E31E2D' : '#2FD968') : st.source === 'replay' ? '#3DD2FF' : '#6A6F8A';
-  g.fillRect(14, VH - SH / 2 - 6, 12, 12);
-  g.fillStyle = '#FFF'; g.font = `12px ${px}`; g.textBaseline = 'middle';
-  g.fillText((st.stripTxt || '').slice(0, 28), 38, VH - SH / 2 + 1);
-  // the pop-out's own pause button is what flips the view, so the hint draws that button
-  g.fillStyle = '#6A6F8A'; g.font = `9px ${px}`; g.textAlign = 'right';
-  const hint = v.board ? 'CAR' : 'BOARD', hw = g.measureText(hint).width;
-  g.fillText(hint, VW - 12, VH - SH / 2 + 1); g.textAlign = 'left';
-  g.fillRect(VW - 12 - hw - 16, VH - SH / 2 - 5, 3, 10); g.fillRect(VW - 12 - hw - 10, VH - SH / 2 - 5, 3, 10);
-  g.fillStyle = '#121A4A'; g.fillRect(0, VH - 3, VW, 3);
-  g.fillStyle = '#F4C542'; g.fillRect(0, VH - 3, Math.round(VW * runFraction()), 3);
-  if (v.manual) v.track.requestFrame();
-}
-function drawPipBoard(g, px, big) {
-  const H = VH - SH, total = st.source === 'replay' ? st.replay.all.length : 0, last = st.rounds[st.rounds.length - 1];
-  g.fillStyle = '#06081A'; g.fillRect(0, 0, VW, H);
-  g.textBaseline = 'alphabetic'; g.font = `14px ${px}`; g.fillStyle = '#F4C542'; g.fillText('PIT BOARD', 20, 36);
-  g.fillRect(20, 42, 126, 2);
-  g.font = `9px ${px}`; g.textAlign = 'right'; g.fillStyle = st.source === 'live' ? '#2FD968' : '#3DD2FF';
-  g.fillText(st.source === 'live' ? 'LIVE' : st.demo ? 'REPLAY · DEMO SEASON' : 'REPLAY', VW - 20, 36); g.textAlign = 'left';
-  const score = last && typeof last.official_s === 'number' ? last.official_s.toFixed(2) : '—';
-  [['RUNS', `${st.rounds.length}`, total ? `of ${total}` : ''], ['KEPT', `${kept()}`, ''], ['LAPS', `${st.lapsRun}`, ''], ['SCORE', score, score === '—' ? '' : 's']]
-    .forEach(([k, val, unit], i) => {
-      const x = 20 + i * 122;
-      g.font = `8px ${px}`; g.fillStyle = '#6A6F8A'; g.fillText(k, x, 74);
-      g.font = `46px ${big}`; g.fillStyle = '#F4C542'; g.fillText(val, x, 116);
-      if (unit) { const w = g.measureText(val).width; g.font = `20px ${big}`; g.fillStyle = '#6A6F8A'; g.fillText(unit, x + w + 6, 116); }
-    });
-  const n = Math.max(st.rounds.length, total), tw = Math.min(40, (VW - 40) / Math.max(1, n) - 4);
-  for (let k = 0; k < n; k++) {
-    const r = st.rounds[k], x = 20 + k * (tw + 4);
-    g.fillStyle = !r ? '#121A4A' : r.promoted ? '#F4C542' : unchanged(r) ? '#6A6F8A' : '#E31E2D';
-    g.fillRect(x, 134, tw, 12);
-  }
-  C.ROLE_KEYS.forEach((key, i) => {
-    const col = i % 2, row = Math.floor(i / 2), x = 20 + col * 246, y = 178 + row * 26, lv = level(key), hot = last && last.promoted && last.role === key;
-    g.font = `9px ${px}`; g.fillStyle = hot ? '#F4C542' : lv > 1 ? '#FFFFFF' : '#6A6F8A'; g.fillText(NAME[key], x, y);
-    for (let b = 0; b < Math.min(6, lv); b++) { g.fillStyle = hot && b === lv - 1 ? '#2FD968' : '#F4C542'; g.fillRect(x + 128 + b * 12, y - 9, 9, 10); }
-    g.font = `20px ${big}`; g.fillStyle = '#6A6F8A'; g.fillText(`L${lv}`, x + 206, y + 1);
-  });
-}
-async function docPip() {
-  if (!canPip()) return false;
-  let w; try { w = await window.documentPictureInPicture.requestWindow({ width: 288, height: 230 }); } catch (e) { return false; }
+  if (!canPip() || st.pip) return;
+  let w; try { w = await window.documentPictureInPicture.requestWindow({ width: 288, height: 230 }); } catch (e) { return; }
   for (const n of document.querySelectorAll('link[data-pit],style[data-pit]')) w.document.head.append(n.cloneNode(true));
   w.document.title = 'Scrutineer · pit board'; w.document.body.className = 'pit-pipbody';
   w.document.body.append(st.root); st.root.classList.add('inpip'); st.root.classList.remove('open', 'up'); st.open = false;
@@ -1753,8 +1048,7 @@ async function docPip() {
     if (st.pip !== w) return;
     st.pip = null; st.host.append(st.root); st.root.classList.remove('inpip'); restore(); swapLoop(window); paintActions(); paint(true);
   });
-  return true;
-}
+};
 // the animation loop runs on whichever window holds the card: a background tab stops its own
 // frames, but the popped-out window keeps drawing
 function swapLoop(win) {
@@ -1774,9 +1068,7 @@ function ensureStyles() {
 
 // mount({host, source}) — source: 'auto' (default) | 'replay' | an origin such as http://127.0.0.1:7777
 P.mount = function (opts = {}) {
-  if (document.fonts && document.fonts.load) { document.fonts.load('12px "Press Start 2P"').catch(() => {}); document.fonts.load('20px "VT323"').catch(() => {}); }
-  if (st.root) { if (opts.dock === false) { st.dock = false; st.root.classList.add('pit-away'); } return P; }
-  st.dock = opts.dock !== false;
+  if (st.root) return P;
   ensureStyles();
   st.host = opts.host || document.body; st.since = Date.now();
   const root = st.root = el('div', 'pit'); root.tabIndex = 0; root.setAttribute('role', 'group'); root.setAttribute('aria-label', 'Scrutineer pit board');
@@ -1785,12 +1077,9 @@ P.mount = function (opts = {}) {
     + '<div class="pit-strip"><i class="pit-dot probe"></i><span class="pit-txt">LOOKING FOR THE LOOP</span>'
     + '<button class="pit-pop" type="button" title="pop out — a window of its own, above every app" aria-label="pop out">↗</button></div>'
     + '<div class="pit-board"><div class="pb-body"></div><div class="pb-actions"></div></div>';
-  if (!st.dock) root.classList.add('pit-away');
   st.host.append(root); st.card = root.querySelector('.pit-card');
   st.R = E.createRenderer(root.querySelector('canvas'), W, H, 1); st.R.ambient = 0.22; st.R.seamCutoff = 40;
-  const L = window.SCRUTINEER_PIT || {};
-  st.track = makeTrack(L.seed === undefined ? 1994 : L.seed); Wd.applyVenue(st.R, st.track.circ.venue);
-  st.car = C.newState(); drive(0); st.camYaw = st.car.yaw;
+  st.ground = makeGround(); st.car = C.displayState(0, 0, 0);
   st.levels = C.levelsAfter([], 0); rebuild(false);
   restore(); wire(); paintActions(); paint(true); swapLoop(window);
   const q = new URLSearchParams(location.search).get('source');
@@ -1805,7 +1094,4 @@ P.land = (r, animate = true) => landed(r, animate);   // for a page that drives 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
   }
 }
-})(__SCR);
-
-var g = window.SCR = window.SCR || {}; g.pit = __SCR.pit;
-})();
+})(window.SCR = window.SCR || {});
