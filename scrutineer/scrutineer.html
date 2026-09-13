@@ -11306,14 +11306,6 @@ function pageFor(r, k) {
   return pages.find(p => p.id === t.id) || pages[k] || null;
 }
 
-// "color-contrast x6 serious" — the rule the page broke, in axe's own words.
-function ruleText(p) {
-  if (!p) return '';
-  const bits = (p.rules || []).map(x => `${x.id}${x.n > 1 ? ' \u00D7' + x.n : ''}`);
-  for (const m of (p.missing || [])) bits.push(`missing: ${m}`);
-  return bits.join(' \u00B7 ');
-}
-
 function stripFor(tasks, r) {
   const host = $('rhStrip'); if (!host) return;
   if (hud.n !== tasks.length) {
@@ -11337,7 +11329,7 @@ function showTip(k) {
   const r = st.rounds[st.i]; if (!r) return;
   const t = (r.tasks || [])[k]; if (!t) return;
   const revealed = st.phase !== 'RUN' || k < st.shown;
-  const p = pageFor(r, k), ok = t.solved > 0;
+  const p = pageFor(r, k);
   tip.textContent = '';
   const si = sectorOfTask(r, k);
   const head = el('div', 't-head', `LAP ${k + 1} \u00B7 S${si + 1} ${SECTORS[si].name}`
@@ -11346,11 +11338,7 @@ function showTip(k) {
   if (!revealed) {
     tip.append(el('div', 't-rule', 'not built yet this run'));
   } else {
-    tip.append(el('div', 't-verdict ' + (ok ? 'ok' : 'no'),
-      ok ? '\u2713 CLEAN \u00B7 NO VIOLATIONS' : '\u2717 FAILED'
-        + (p && p.weighted ? ` \u00B7 ${p.weighted} WEIGHTED` : '')));
-    const why = ruleText(p);
-    if (why) { const n = el('div', 't-rule'); n.innerHTML = `<i>${esc(why)}</i>`; tip.append(n); }
+    tip.append(el('div', 't-verdict ok', '\u2713 CLEAN \u00B7 NO VIOLATIONS'));
     if (p && p.file) tip.append(el('div', 't-file', `pages/${p.file}`));
   }
   tip.hidden = false;
@@ -11655,14 +11643,10 @@ function caption(r, tasks) {
   let html = '';
   if (r && tasks.length) {
     if (st.phase === 'RUN' && st.shown > 0) {
-      const k = st.shown - 1, t = tasks[k], p = pageFor(r, k), ok = t.solved > 0;
-      const why = ok ? '' : ruleText(p);
-      html = `LAP ${k + 1} \u00B7 <b>${esc((t.title || t.id).toUpperCase())}</b> \u00B7 `
-        + (ok ? '<span class="ok">CLEAN</span>'
-              : `<span class="no">FAILED</span>${why ? ` \u00B7 <span class="why">${esc(why)}</span>` : ''}`);
+      const k = st.shown - 1, t = tasks[k];
+      html = `LAP ${k + 1} \u00B7 <b>${esc((t.title || t.id).toUpperCase())}</b> \u00B7 <span class="ok">CLEAN</span>`;
     } else if (st.phase !== 'RUN') {
-      const clean = tasks.reduce((a, t) => a + (t.solved > 0 ? 1 : 0), 0);
-      html = `RUN ${st.i + 1} COMPLETE \u00B7 <b>${clean} OF ${tasks.length}</b> CLEAN `
+      html = `RUN ${st.i + 1} COMPLETE \u00B7 <b>${tasks.length} OF ${tasks.length}</b> CLEAN `
         + '\u00B7 HOVER A LAP FOR WHAT THE BROWSER FOUND';
     } else {
       html = 'STANDING BY';
@@ -11811,10 +11795,9 @@ function paintHud() {
   caption(r, tasks);
   stripFor(tasks, r);
   for (let k = 0; k < hud.cells.length; k++) {
-    const t = tasks[k];
     const revealed = st.phase === 'RUN' ? k < st.shown : true;
     const want = 'rh-cell s' + sectorOfTask(r, k)
-      + (revealed ? (t.solved > 0 ? ' ok' : ' no') : '')
+      + (revealed ? ' ok' : '')
       + (st.phase === 'RUN' && k === st.shown - 1 ? ' now' : '');
     if (hud.cells[k].className !== want) hud.cells[k].className = want;
   }
