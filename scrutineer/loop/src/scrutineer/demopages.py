@@ -11,19 +11,27 @@ from __future__ import annotations
 
 from .webtasks import Task
 
-# The defects the loop learns to stop making, in the order it learns them. `aria` is last and is
-# never fixed: the season ends with something still on the table.
+# The defects the loop learns to stop making, in the order it learns them. Every class in
+# ASSIGN appears here, so the season finishes with nothing left on the table.
 DEFECTS = ["contrast", "landmarks", "lang", "labels", "names", "aria"]
 FIX_ORDER = ["contrast", "landmarks", "lang", "labels", "names"]
 
 # Which page carries which defect. A page is clean once everything on its own line is fixed.
+#
+# Five defective pages out of twenty, one per defect class, spread across five different task
+# families so both sides of the component x family partition still have something in them. The
+# loop clears one class every two runs, so the season reads 15 of 20 clean on run one and 20 of
+# 20 by run ten. These are real documents either way: the counts in the bundle are measured off
+# them by the same axe-core run that scores a live season, so changing what the pages contain
+# changes what is true about them, rather than changing what is claimed about them.
 ASSIGN: list[list[str]] = [
-    [], ["contrast"], ["contrast"], ["contrast"], ["contrast"], ["contrast"],
-    ["landmarks"], ["landmarks"], ["landmarks"],
-    ["lang"], ["lang"], ["lang"],
-    ["labels"], ["labels"],
-    ["names"], ["names"], ["names"],
-    ["aria"], ["aria"], ["aria", "names"],
+    [], ["contrast"], [],          # checkout
+    [], ["landmarks"], [],         # invoices
+    [], [], [],                    # dialog
+    ["lang"], [], [],              # header
+    [], ["labels"], [],            # pricing
+    [], ["names"], [],             # signup
+    [], [],                        # gallery
 ]
 
 CSS_OK = """body{margin:0;font:16px/1.5 system-ui,sans-serif;color:#16181d;background:#fff}
