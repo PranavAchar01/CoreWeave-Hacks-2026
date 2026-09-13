@@ -49,6 +49,17 @@ const specFor = lv => SCR.car.specForLevels(lv);
 // says on screen that the fit-out is scaled.
 const GARAGE_SCALE = 6;
 
+// The car's bodywork eras (neon, canopy, fairings, chrome) are spaced for a long game too, and a
+// ten-run season never reaches the first of them. So the car is stretched across the season's real
+// span the same way the garage is: it starts as the car the loop starts with and ends as the fully
+// built car, one step closer with every component level the loop earned. The note under the
+// scrubber says so.
+const levelTotal = lv => SCR.car.ROLE_KEYS.reduce((a, k) => a + (lv[k] || 1), 0);
+function eraAt(lv) {
+  const start = levelTotal(levelsAt(0)), end = levelTotal(levelsAt(st.rounds.length));
+  return end > start ? Math.min(1, (levelTotal(lv) - start) / (end - start)) : 0;
+}
+
 /** The same levels as a garage team: stations, crew and era all follow the component levels. */
 function teamFor(lv, scaled) {
   const T = SCR.team, levels = {};
@@ -73,13 +84,17 @@ function rebuild() {
   const prev = specFor(levelsAt(Math.max(0, st.i - 1)));
   st.spec = specFor(lv);
   st.dd = SCR.car.derive(st.spec);
-  st.mesh = SCR.car.build(st.spec, SCR.car.eraForLevels(lv));
+  const era = eraAt(lv);
+  st.mesh = SCR.car.build(st.spec, era);
 
   // The garage is the same state seen from the other side: each component owns a station, and a
   // station rebuilds itself at the tier its component has reached.
   if (st.garage && SCR.team) {
     const r = st.rounds[st.i - 1];
     st.garage.setTeam(teamFor(lv, true), st.spec);
+    // one car in both views: the garage would otherwise paint it at the room's era
+    st.garage.era = era;
+    st.garage.carMesh = SCR.car.build(st.spec, era, { jacks: st.garage.eraIndex >= 1, drones: false });
     // Overview, always. A station camera frames one bench and a crate, which is the wrong shot
     // for a timeline: the point is seeing the whole floor change. `select` only moves the camera
     // when it is already at a station, so setting the wide shot first keeps it wide and still
@@ -93,6 +108,7 @@ function rebuild() {
       eraN.textContent = t.era ? t.era.name : '';
     }
   }
+  SCR.car.era = era;   // the livery reads the era as it paints
   paint(specDiff(prev, st.spec), lv);
 }
 
@@ -242,7 +258,7 @@ function showView(view) {
     note.textContent = view === 'garage'
       ? 'station fit-out and era are scaled ×' + GARAGE_SCALE + ' — ten runs move the real '
         + 'team level from 10 to 15, which the garage alone would not show'
-      : '';
+      : 'the car\'s bodywork era is stretched across the season — the fully built car is where run 10 ends';
   }
 }
 
@@ -305,6 +321,7 @@ T.boot = function () {
 
   buildScrubber();
   wire();
+  showView('car');
   rebuild();
 
   let last = performance.now();
